@@ -22,11 +22,11 @@ import de.hterhors.semanticmr.exploration.candidateprovider.EntityTemplateCandid
 import de.hterhors.semanticmr.exploration.candidateprovider.EntityTypeCandidateProvider;
 import de.hterhors.semanticmr.exploration.candidateprovider.ISlotFillerCandidateProvider;
 import de.hterhors.semanticmr.exploration.candidateprovider.LiteralCandidateProvider;
+import de.hterhors.semanticmr.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
 import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
 import de.hterhors.semanticmr.init.specifications.SystemInitializionHandler;
 import de.hterhors.semanticmr.psink.normalization.WeightNormalization;
-import de.hterhors.semanticmr.structure.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.slotfiller.DocumentLink;
 import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
@@ -45,7 +45,7 @@ public class SemanticMRMain {
 		File entityStructureSpecifications = new File(
 				"src/main/resources/specifications/csv/entityStructureSpecifications.csv");
 		File slotPairConstraitsSpecifications = new File(
-				"src/main/resources/specifications/csv/slotPairConstraitsSpecifications.csv");
+				"src/main/resources/specifications/csv/slotPairConstraintsSpecifications.csv");
 
 		SpecificationsProvider specificationProvider = new SpecificationsProvider(
 				new CSVSpecifictationsReader(entitySpecifications, entityStructureSpecifications, slotSpecifications,

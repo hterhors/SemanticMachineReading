@@ -1,11 +1,11 @@
-package de.hterhors.semanticmr.structure.constraints;
+package de.hterhors.semanticmr.exploration.constraints;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import de.hterhors.semanticmr.init.specifications.StructureSpecification.ExcludeSlotTypePairNames;
+import de.hterhors.semanticmr.exploration.constraints.ExcludePairConstraint.SlotEntityPair;
 import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
-import de.hterhors.semanticmr.structure.constraints.ExcludePairConstraint.SlotEntityPair;
 import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 import de.hterhors.semanticmr.structure.slotfiller.EntityType;
 import de.hterhors.semanticmr.structure.slots.SlotType;
