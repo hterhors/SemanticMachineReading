@@ -1,5 +1,6 @@
-package de.hterhors.semanticmr.exploration.constraints;
+package de.hterhors.semanticmr.exploration.constraints.impl;
 
+import de.hterhors.semanticmr.exploration.constraints.AbstractHardConstraint;
 import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 import de.hterhors.semanticmr.structure.slotfiller.EntityType;
 import de.hterhors.semanticmr.structure.slots.AbstractSlot;
@@ -78,7 +79,7 @@ public class ExcludePairConstraint extends AbstractHardConstraint {
 	}
 
 	@Override
-	boolean violatesConstraint(EntityTemplate entityTemplate) {
+	public boolean violatesConstraint(EntityTemplate entityTemplate) {
 
 		if (onTemplateType != null && onTemplateType != entityTemplate.getEntityType())
 			return false;

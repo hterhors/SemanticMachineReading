@@ -10,6 +10,6 @@ public abstract class AbstractHardConstraint {
 	 * @param entityTemplate
 	 * @return true if the implemented constraint is violated, else false.
 	 */
-	abstract boolean violatesConstraint(EntityTemplate entityTemplate);
+	public abstract boolean violatesConstraint(EntityTemplate entityTemplate);
 
 }
