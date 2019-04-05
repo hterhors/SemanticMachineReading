@@ -1,0 +1,9 @@
+#Entity	Slot	SlotSuperEntityType	SlotCardinalityType MaxCardinality
+AnimalModel	hasAgeCategory	AgeCategory	Single	1
+AnimalModel	hasGender	Gender	Single	1
+AnimalModel	hasSpecies	AnimalSpecies	Single	1
+AnimalModel	hasAge	Age	Single	1
+AnimalModel	hasWeight	Weight	Single	1
+AnimalModel	hasMentions	Mention	Multi	7
+AnimalModel	hasSubAnimal	AnimalModel	Single	1
+RatModel	hasName	Name	Single	1

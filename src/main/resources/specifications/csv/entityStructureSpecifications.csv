@@ -1,0 +1,16 @@
+#SuperClass	SubClasses	
+AnimalModel	RatModel
+AnimalModel	MouseModel
+RatModel	TinyRatModel
+AgeCategory	Adult
+AgeCategory	Young
+Gender	Female
+Gender	Male
+Gender	Mixed
+AnimalSpecies	RatSpecies
+AnimalSpecies	MouseSpecies
+RatSpecies	WistarRat
+RatSpecies	SpragueDawleyRat
+MouseSpecies	BALB_C_Mouse
+MouseSpecies	C57_BL6_Mouse
+MouseSpecies	CD1_Mouse
