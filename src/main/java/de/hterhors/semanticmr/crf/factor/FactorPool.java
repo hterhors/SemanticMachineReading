@@ -49,7 +49,6 @@ final class FactorPool {
 	}
 
 	protected void addFactor(Factor factor) {
-		System.out.println(factorCache.size());
 		final Factor old = factorCache.put(factor.getFactorScope(), factor);
 		if (old != null)
 			throw new IllegalStateException("Factorpool already contains factor. " + factor);

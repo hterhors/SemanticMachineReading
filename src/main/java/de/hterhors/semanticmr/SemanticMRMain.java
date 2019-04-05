@@ -102,14 +102,14 @@ public class SemanticMRMain {
 
 		ObjectiveFunction objectiveFunction = new ObjectiveFunction();
 
-		System.out.println(goldTemplate.toPrettyString());
-
 		List<AbstractFactorTemplate> factorTemplates = new ArrayList<>();
 
 		factorTemplates.add(new TestTemplate());
+		System.out.println("Gold:");
+		System.out.println(goldTemplate.toPrettyString());
 
 		int maxNumberOfSamplingSteps = 10;
-		int numberOfEpochs = 10;
+		int numberOfEpochs = 100;
 		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0, 0, false), new L2(0.0001));
 		Model model = new Model(factorTemplates, learner);
 		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
@@ -123,7 +123,10 @@ public class SemanticMRMain {
 
 		trainingInstances.add(new Instance(document, goldTemplate));
 
+		long t = System.currentTimeMillis();
 		trainer.train(trainingInstances);
+		
+		System.out.println((System.currentTimeMillis()-t));
 
 	}
 

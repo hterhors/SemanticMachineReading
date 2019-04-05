@@ -38,9 +38,8 @@ public class Trainer {
 	}
 
 	public void train(List<Instance> trainingInstances) {
-
+		State finalState = null;
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
-
 			for (Instance instance : trainingInstances) {
 
 				State currentState = instance.getInitialState();
@@ -71,10 +70,14 @@ public class Trainer {
 					if (isAccepted) {
 						model.updateWeights(currentState, candidateState);
 						currentState = candidateState;
+						finalState = currentState;
 					}
 				}
 			}
 		}
+		System.out.println("Prediction: objective score = " + finalState.getObjectiveScore());
+		System.out.println(finalState.currentPredictedEntityTemplate.toPrettyString());
+		System.out.println("Learned Model: ");
 		System.out.println(model);
 	}
 }
