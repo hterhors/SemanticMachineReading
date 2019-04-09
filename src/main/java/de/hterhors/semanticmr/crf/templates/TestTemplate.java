@@ -6,7 +6,7 @@ import java.util.List;
 import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.factor.FactorScope;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.crf.variables.Vector;
+import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class TestTemplate extends AbstractFactorTemplate {
@@ -81,7 +81,7 @@ public class TestTemplate extends AbstractFactorTemplate {
 
 	@Override
 	public void computeFeatureVector(Factor factor) {
-		Vector featureVector = factor.getFeatureVector();
+		DoubleVector featureVector = factor.getFeatureVector();
 		featureVector.set(((Scope) factor.getFactorScope()).x, true);
 	}
 

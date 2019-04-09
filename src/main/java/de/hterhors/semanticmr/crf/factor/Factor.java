@@ -1,7 +1,7 @@
 package de.hterhors.semanticmr.crf.factor;
 
 import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
-import de.hterhors.semanticmr.crf.variables.Vector;
+import de.hterhors.semanticmr.crf.variables.DoubleVector;
 
 /**
  * A factor is an object that connects a feature vector to the variables that
@@ -14,14 +14,14 @@ import de.hterhors.semanticmr.crf.variables.Vector;
 public class Factor {
 
 	private final FactorScope factorScope;
-	
-	private final Vector features = new Vector();
+
+	private final DoubleVector features = new DoubleVector();
 
 	public Factor(FactorScope factorScope) {
 		this.factorScope = factorScope;
 	}
 
-	public Vector getFeatureVector() {
+	public DoubleVector getFeatureVector() {
 		return features;
 	}
 

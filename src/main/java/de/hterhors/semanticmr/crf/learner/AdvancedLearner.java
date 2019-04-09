@@ -8,16 +8,13 @@ import de.hterhors.semanticmr.crf.learner.optimizer.Optimizer;
 import de.hterhors.semanticmr.crf.learner.regularizer.Regularizer;
 import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.crf.variables.Vector;
+import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.VectorUtil;
 
 /**
  * This learner implements a margin rank learning scheme with modular parameter
  * optimization and regularization.
  * 
- * @author sjebbara
- *
- * @param <State>
  */
 public class AdvancedLearner {
 
@@ -61,13 +58,8 @@ public class AdvancedLearner {
 	public void updateWeights(List<AbstractFactorTemplate> factorTemplates, State currentState,
 			State possibleNextState) {
 
-		Map<AbstractFactorTemplate, Vector> batchGradients = new HashMap<>();
-		for (AbstractFactorTemplate t : factorTemplates) {
-			batchGradients.put(t, new Vector());
-		}
-		collectMarginRankGradients(factorTemplates, currentState, possibleNextState, batchGradients, 1);
+		collectMarginRankGradientsAndApply(factorTemplates, currentState, possibleNextState, 1);
 
-		applyWeightUpdate(factorTemplates, batchGradients);
 	}
 
 	/**
@@ -81,17 +73,19 @@ public class AdvancedLearner {
 	 * @param batchGradients
 	 * @param i
 	 */
-	private void collectMarginRankGradients(List<AbstractFactorTemplate> factorTemplates, final State currentState,
-			final State possibleNextState, Map<AbstractFactorTemplate, Vector> batchGradients, int sampleWeight) {
+	private void collectMarginRankGradientsAndApply(List<AbstractFactorTemplate> factorTemplates,
+			final State currentState, final State possibleNextState, int sampleWeight) {
 
 		double linearScore = 0;
 		/*
 		 * Collect differences of features for both states and remember respective
 		 * template
 		 */
-		Map<AbstractFactorTemplate, Vector> featureDifferences = new HashMap<>();
-		State posState = null;
-		State negState = null;
+		final Map<AbstractFactorTemplate, DoubleVector> featureDifferencesPerTemplate = new HashMap<>(
+				factorTemplates.size());
+
+		final State posState;
+		final State negState;
 
 		if (preference(possibleNextState, currentState)) {
 			// possibleNextState is POS
@@ -104,9 +98,10 @@ public class AdvancedLearner {
 			posState = currentState;
 			negState = possibleNextState;
 		}
+
 		for (AbstractFactorTemplate t : factorTemplates) {
-			Vector differences = VectorUtil.getFeatureDifferences(t, negState, posState);
-			featureDifferences.put(t, differences);
+			DoubleVector differences = VectorUtil.getFeatureDifferences(t, negState, posState);
+			featureDifferencesPerTemplate.put(t, differences);
 			linearScore += differences.dotProduct(t.getWeights());
 			if (regularizer != null) {
 				linearScore -= regularizer.penalize(t.getWeights());
@@ -118,34 +113,28 @@ public class AdvancedLearner {
 			 * gradient for weight w[i] is simply featureDifference[i].
 			 */
 			for (AbstractFactorTemplate t : factorTemplates) {
-				Vector weightGradient = featureDifferences.get(t);
-				if (regularizer != null) {
-					weightGradient = regularizer.regularize(weightGradient, t.getWeights());
-				}
-				if (sampleWeight == 0) {
-					weightGradient = new Vector();
-				} else if (sampleWeight != 1) {
-					weightGradient = weightGradient.mul(sampleWeight);
-				}
-				Vector templateBatchGradients = batchGradients.get(t);
-				templateBatchGradients.addToValue(weightGradient);
-			}
-		}
-	}
+				final DoubleVector weightGradient;
 
-	/**
-	 * Applies the previously collected weight updates in one step.
-	 * 
-	 * @param weightGradients
-	 * @param numberOfUpdates
-	 */
-	private void applyWeightUpdate(List<AbstractFactorTemplate> factorTemplates,
-			Map<AbstractFactorTemplate, Vector> batchGradients) {
-		for (AbstractFactorTemplate t : factorTemplates) {
-			Vector templateGradients = batchGradients.get(t);
-			Vector oldWeights = t.getWeights();
-			Vector newWeights = optimizer.getUpdates(oldWeights, templateGradients);
-			t.setWeights(newWeights);
+				if (sampleWeight == 0) {
+					weightGradient = new DoubleVector();
+				} else {
+					weightGradient = featureDifferencesPerTemplate.get(t);
+
+					if (regularizer != null) {
+						regularizer.regularize(weightGradient, t.getWeights());
+					}
+
+					if (sampleWeight != 1) {
+						weightGradient.mul(sampleWeight);
+					}
+				}
+//				batchGradients.get(t).add(weightGradient);
+				/**
+				 * Applies the previously collected weight updates in one step.
+				 */
+				optimizer.applyUpdates(t.getWeights(), weightGradient);
+
+			}
 		}
 	}
 

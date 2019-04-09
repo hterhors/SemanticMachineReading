@@ -1,6 +1,11 @@
 package de.hterhors.semanticmr.crf.variables;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import de.hterhors.semanticmr.crf.factor.FactorGraph;
+import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
 import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 
 public class State {
@@ -9,7 +14,7 @@ public class State {
 
 	final public EntityTemplate currentPredictedEntityTemplate;
 
-	final private FactorGraph factorGraph = new FactorGraph();
+	final private Map<AbstractFactorTemplate, FactorGraph> factorGraph = new HashMap<>();
 
 	private double modelScore = 0;
 
@@ -41,8 +46,14 @@ public class State {
 		return new State(goldEntityTemplate, newCurrentPrediction, modelScore, objectiveScore);
 	}
 
-	public FactorGraph getFactorGraph() {
-		return factorGraph;
+	public FactorGraph getFactorGraph(final AbstractFactorTemplate template) {
+		FactorGraph fg;
+		if ((fg = factorGraph.get(template)) == null) {
+			fg = new FactorGraph();
+			factorGraph.put(template, fg);
+		}
+
+		return fg;
 	}
 
 	public double getModelScore() {
@@ -65,6 +76,10 @@ public class State {
 	public String toString() {
 		return "State [currentPredictedEntityTemplate=" + currentPredictedEntityTemplate.toPrettyString()
 				+ ", factorGraph=" + factorGraph + "]";
+	}
+
+	public Collection<FactorGraph> getFactorGraphs() {
+		return factorGraph.values();
 	}
 
 }

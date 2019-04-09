@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.crf.learner.regularizer;
 
-import de.hterhors.semanticmr.crf.variables.Vector;
+import de.hterhors.semanticmr.crf.variables.DoubleVector;
 
 public class L2 implements Regularizer {
 
@@ -14,13 +14,12 @@ public class L2 implements Regularizer {
 	}
 
 	@Override
-	public Vector regularize(Vector gradients, Vector weights) {
-		Vector regularized = gradients.add(weights.mul(l2));
-		return regularized;
+	public void regularize(DoubleVector gradients, DoubleVector weights) {
+		gradients.mulAndAdd(weights, l2);
 	}
 
 	@Override
-	public double penalize(Vector weights) {
+	public double penalize(DoubleVector weights) {
 		double penalty = weights.length() * l2;
 		return penalty;
 	}

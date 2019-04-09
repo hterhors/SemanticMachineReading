@@ -16,7 +16,6 @@ import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
 import de.hterhors.semanticmr.crf.templates.TestTemplate;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.exploration.DetermineStructureDepth;
 import de.hterhors.semanticmr.exploration.EntityTemplateExploration;
 import de.hterhors.semanticmr.exploration.candidateprovider.EntityTemplateCandidateProvider;
 import de.hterhors.semanticmr.exploration.candidateprovider.EntityTypeCandidateProvider;
@@ -109,8 +108,8 @@ public class SemanticMRMain {
 		System.out.println(goldTemplate.toPrettyString());
 
 		int maxNumberOfSamplingSteps = 10;
-		int numberOfEpochs = 100;
-		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0, 0, false), new L2(0.0001));
+		int numberOfEpochs = 10;
+		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
 		Model model = new Model(factorTemplates, learner);
 		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
 
@@ -125,8 +124,8 @@ public class SemanticMRMain {
 
 		long t = System.currentTimeMillis();
 		trainer.train(trainingInstances);
-		
-		System.out.println((System.currentTimeMillis()-t));
+
+		System.out.println((System.currentTimeMillis() - t));
 
 	}
 

@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.crf.variables;
 
-import java.util.Collection;
+import java.util.List;
 
 import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
@@ -16,29 +16,23 @@ public class VectorUtil {
 	 * @param state2
 	 * @return
 	 */
-	public static Vector getFeatureDifferences(AbstractFactorTemplate template, State state1, State state2) {
-		Vector diff = new Vector();
-		Collection<Factor> factors1 = null;
-		Collection<Factor> factors2 = null;
-		try {
-			factors1 = state1.getFactorGraph().getFactors();
-			factors2 = state2.getFactorGraph().getFactors();
-		} catch (RuntimeException e) {
-			e.printStackTrace();
-		}
+	public static DoubleVector getFeatureDifferences(AbstractFactorTemplate template, State state1, State state2) {
+		DoubleVector diff = new DoubleVector();
+
+		List<Factor> factors1 = state1.getFactorGraph(template).getFactors();
+		List<Factor> factors2 = state2.getFactorGraph(template).getFactors();
+
 		for (Factor factor : factors1) {
-			if (factor.getTemplate() == template) {
-				Vector featureVector = factor.getFeatureVector();
-				diff.addFAST(featureVector);
-			}
+			DoubleVector featureVector = factor.getFeatureVector();
+			diff.add(featureVector);
 		}
 		for (Factor factor : factors2) {
-			if (factor.getTemplate() == template) {
-				Vector featureVector = factor.getFeatureVector();
-				diff.subFAST(featureVector);
-			}
+			DoubleVector featureVector = factor.getFeatureVector();
+			diff.sub(featureVector);
 		}
 		return diff;
 	}
+	
+	
 
 }

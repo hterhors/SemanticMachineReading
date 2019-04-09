@@ -5,7 +5,7 @@ import java.util.List;
 import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.factor.FactorScope;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.crf.variables.Vector;
+import de.hterhors.semanticmr.crf.variables.DoubleVector;
 
 public abstract class AbstractFactorTemplate {
 
@@ -13,24 +13,13 @@ public abstract class AbstractFactorTemplate {
 	 * Weights for the computation of factor scores. These weights are shared across
 	 * all factors of this template.
 	 */
-	protected Vector weights = new Vector();
+	protected DoubleVector weights = new DoubleVector();
 
-	/**
-	 * Updates the weight of the given feature by adding the given alpha value.
-	 * 
-	 * @param feature
-	 * @param gradient
-	 * @param currentAlpha
-	 */
-	public void update(String feature, double update) {
-		weights.addToValue(feature, update);
-	}
-
-	public Vector getWeights() {
+	public DoubleVector getWeights() {
 		return weights;
 	}
 
-	public void setWeights(Vector weights) {
+	public void setWeights(DoubleVector weights) {
 		this.weights = weights;
 	}
 
