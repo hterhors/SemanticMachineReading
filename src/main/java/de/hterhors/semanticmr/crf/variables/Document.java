@@ -5,6 +5,7 @@ package de.hterhors.semanticmr.crf.variables;
  * document. A document is part of an Instance.
  * 
  * @author hterhors
+ * @see {@link Instance}
  *
  */
 public class Document {

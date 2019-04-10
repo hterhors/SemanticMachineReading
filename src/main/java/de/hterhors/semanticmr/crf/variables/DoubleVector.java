@@ -7,6 +7,17 @@ import java.util.Set;
 
 import de.hterhors.semanticmr.crf.factor.Model;
 
+/**
+ * This class basically wraps a Map of feature names (index) and values.
+ * Additionally, it provides convenience functions for some of the computations
+ * during the learning process.
+ * 
+ * 
+ * TODO: Implement boolean feature vector for memory savings.
+ * 
+ * @author hterhors
+ *
+ */
 public class DoubleVector {
 	/**
 	 * 
@@ -31,12 +42,6 @@ public class DoubleVector {
 		this.isDirty = true;
 		this.length = 0;
 
-	}
-
-	private DoubleVector(DoubleVector v) {
-		this.features = new HashMap<Integer, Double>(v.features);
-		this.isDirty = true;
-		this.length = 0;
 	}
 
 	private void set(Integer index, Double value) {

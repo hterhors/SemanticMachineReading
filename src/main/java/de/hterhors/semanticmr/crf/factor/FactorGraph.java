@@ -27,7 +27,7 @@ public class FactorGraph {
 	 * A cache of computed factors which is computed only once after the factor
 	 * scopes are added to this factor graph.
 	 */
-	private List<Factor> cache = null;
+	private List<Factor<?>> cache = null;
 
 	/**
 	 * Is dirty flag for computing the factor cache.
@@ -58,7 +58,7 @@ public class FactorGraph {
 	 * 
 	 * @return
 	 */
-	public List<Factor> getFactors() {
+	public List<Factor<?>> getFactors() {
 
 		if (this.isDirty || this.cache == null)
 			this.cache = FactorPool.getInstance().getFactors(factorScopes);

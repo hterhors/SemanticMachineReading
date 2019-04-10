@@ -69,10 +69,10 @@ public class TestTemplate extends AbstractFeatureTemplate<Scope> {
 	public List<Scope> generateFactorScopes(State state) {
 		List<Scope> factors = new ArrayList<>();
 
-		for (SlotType slot : state.currentPredictedEntityTemplate.getSingleFillerSlots().keySet()) {
+		for (SlotType slot : state.currentPrediction.getSingleFillerSlots().keySet()) {
 
-			if (state.currentPredictedEntityTemplate.getSingleFillerSlot(slot).containsSlotFiller())
-				factors.add(new Scope(this, state.currentPredictedEntityTemplate.getSingleFillerSlot(slot)
+			if (state.currentPrediction.getSingleFillerSlot(slot).containsSlotFiller())
+				factors.add(new Scope(this, state.currentPrediction.getSingleFillerSlot(slot)
 						.getSlotFiller().getEntityType().entityTypeName));
 
 		}

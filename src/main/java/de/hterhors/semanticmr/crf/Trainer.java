@@ -53,7 +53,7 @@ public class Trainer {
 
 				final List<State> producedStateChain = new ArrayList<>();
 
-				State currentState = initializer.get(instance);
+				State currentState = initializer.getInitState(instance);
 
 				for (int samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
 
@@ -94,7 +94,7 @@ public class Trainer {
 			}
 		}
 		System.out.println("Prediction: objective score = " + finalState.getObjectiveScore());
-		System.out.println(finalState.currentPredictedEntityTemplate.toPrettyString());
+		System.out.println(finalState.currentPrediction.toPrettyString());
 		System.out.println("Learned Model: ");
 		System.out.println(model);
 	}

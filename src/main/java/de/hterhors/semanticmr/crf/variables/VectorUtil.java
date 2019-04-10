@@ -5,6 +5,12 @@ import java.util.List;
 import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 
+/**
+ * Vector utility class.
+ * 
+ * @author hterhors
+ *
+ */
 public class VectorUtil {
 
 	/**
@@ -16,23 +22,21 @@ public class VectorUtil {
 	 * @param state2
 	 * @return
 	 */
-	public static DoubleVector getFeatureDifferences(AbstractFeatureTemplate template, State state1, State state2) {
+	public static DoubleVector getFeatureDifferences(AbstractFeatureTemplate<?> template, State state1, State state2) {
 		DoubleVector diff = new DoubleVector();
 
-		List<Factor> factors1 = state1.getFactorGraph(template).getFactors();
-		List<Factor> factors2 = state2.getFactorGraph(template).getFactors();
+		List<Factor<?>> factors1 = state1.getFactorGraph(template).getFactors();
+		List<Factor<?>> factors2 = state2.getFactorGraph(template).getFactors();
 
-		for (Factor factor : factors1) {
+		for (Factor<?> factor : factors1) {
 			DoubleVector featureVector = factor.getFeatureVector();
 			diff.add(featureVector);
 		}
-		for (Factor factor : factors2) {
+		for (Factor<?> factor : factors2) {
 			DoubleVector featureVector = factor.getFeatureVector();
 			diff.sub(featureVector);
 		}
 		return diff;
 	}
-	
-	
 
 }

@@ -108,9 +108,10 @@ public class Model {
 		state.setModelScore(computeScore(state));
 	}
 
+	@SuppressWarnings("unchecked")
 	private void computeRemainingFactors(AbstractFeatureTemplate<?> template, Stream<AbstractFactorScope> stream) {
 		stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs)).map(remainingFactorScope -> {
-			@SuppressWarnings({ "rawtypes", "unchecked" })
+			@SuppressWarnings({ "rawtypes" })
 			Factor f = new Factor(remainingFactorScope);
 			template.generateFeatureVector(f);
 			return f;
@@ -128,18 +129,17 @@ public class Model {
 	 * @param list
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
 	private double computeScore(State state) {
 
 		double score = 1;
 		boolean factorsAvailable = false;
 		for (FactorGraph abstractFactorTemplate : state.getFactorGraphs()) {
 
-			final List<Factor> factors = abstractFactorTemplate.getFactors();
+			final List<Factor<?>> factors = abstractFactorTemplate.getFactors();
 
 			factorsAvailable |= factors.size() != 0;
 
-			for (Factor factor : factors) {
+			for (Factor<?> factor : factors) {
 				score *= factor.computeScalarScore();
 			}
 

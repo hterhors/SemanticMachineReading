@@ -16,7 +16,7 @@ public class State {
 
 	private static final double DEFAULT_MODEL_SCORE = 1.0D;
 
-	final public EntityTemplate currentPredictedEntityTemplate;
+	final public EntityTemplate currentPrediction;
 
 	final private Map<AbstractFeatureTemplate<?>, FactorGraph> factorGraphs;
 
@@ -26,7 +26,7 @@ public class State {
 
 	public State(Instance instance, EntityTemplate currentPredictedEntityTemplate) {
 		this.instance = instance;
-		this.currentPredictedEntityTemplate = currentPredictedEntityTemplate;
+		this.currentPrediction = currentPredictedEntityTemplate;
 		this.factorGraphs = new HashMap<>();
 		this.modelScore = DEFAULT_MODEL_SCORE;
 		this.objectiveScore = DEFAULT_OBJECTIVE_SCORE;
@@ -72,8 +72,8 @@ public class State {
 
 	@Override
 	public String toString() {
-		return "State [currentPredictedEntityTemplate=" + currentPredictedEntityTemplate.toPrettyString()
-				+ ", modelScore=" + modelScore + ", objectiveScore=" + objectiveScore + "]";
+		return "State [currentPredictedEntityTemplate=" + currentPrediction.toPrettyString() + ", modelScore="
+				+ modelScore + ", objectiveScore=" + objectiveScore + "]";
 	}
 
 	public Collection<FactorGraph> getFactorGraphs() {

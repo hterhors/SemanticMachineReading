@@ -69,7 +69,7 @@ public class EntityTemplateExploration {
 
 	public List<State> explore(State currentState) {
 
-		final EntityTemplate entityTemplate = currentState.currentPredictedEntityTemplate;
+		final EntityTemplate entityTemplate = currentState.currentPrediction;
 
 		final List<State> proposalStates = new ArrayList<>(averageNumberOfNewProposalStates);
 
