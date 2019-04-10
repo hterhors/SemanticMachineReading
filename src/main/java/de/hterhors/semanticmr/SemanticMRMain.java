@@ -6,22 +6,26 @@ import java.util.List;
 
 import de.hterhors.semanticmr.crf.ObjectiveFunction;
 import de.hterhors.semanticmr.crf.Trainer;
+import de.hterhors.semanticmr.crf.exploration.EntityTemplateExploration;
+import de.hterhors.semanticmr.crf.exploration.candidateprovider.EntityTemplateCandidateProvider;
+import de.hterhors.semanticmr.crf.exploration.candidateprovider.EntityTypeCandidateProvider;
+import de.hterhors.semanticmr.crf.exploration.candidateprovider.ISlotFillerCandidateProvider;
+import de.hterhors.semanticmr.crf.exploration.candidateprovider.LiteralCandidateProvider;
+import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.learner.optimizer.SGD;
 import de.hterhors.semanticmr.crf.learner.regularizer.L2;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
-import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
+import de.hterhors.semanticmr.crf.stopcrit.IStoppingCriterion;
+import de.hterhors.semanticmr.crf.stopcrit.impl.MaxSamplingSteps;
+import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.TestTemplate;
 import de.hterhors.semanticmr.crf.variables.Document;
+import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.exploration.EntityTemplateExploration;
-import de.hterhors.semanticmr.exploration.candidateprovider.EntityTemplateCandidateProvider;
-import de.hterhors.semanticmr.exploration.candidateprovider.EntityTypeCandidateProvider;
-import de.hterhors.semanticmr.exploration.candidateprovider.ISlotFillerCandidateProvider;
-import de.hterhors.semanticmr.exploration.candidateprovider.LiteralCandidateProvider;
-import de.hterhors.semanticmr.exploration.constraints.HardConstraintsProvider;
+import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
 import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
 import de.hterhors.semanticmr.init.specifications.SystemInitializionHandler;
@@ -101,20 +105,26 @@ public class SemanticMRMain {
 
 		ObjectiveFunction objectiveFunction = new ObjectiveFunction();
 
-		List<AbstractFactorTemplate> factorTemplates = new ArrayList<>();
+		List<AbstractFeatureTemplate<?>> featureTemplates = new ArrayList<>();
 
-		factorTemplates.add(new TestTemplate());
+		featureTemplates.add(new TestTemplate());
 		System.out.println("Gold:");
 		System.out.println(goldTemplate.toPrettyString());
 
-		int maxNumberOfSamplingSteps = 100;
+		IStateInitializer stateInitializer = ((instance) -> new State(instance,
+				new EntityTemplate(instance.getGoldTemplate().getEntityType())));
+
 		int numberOfEpochs = 100;
+
 		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
-		Model model = new Model(factorTemplates, learner);
+		Model model = new Model(featureTemplates, learner);
+
 		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
 
-		Trainer trainer = new Trainer(maxNumberOfSamplingSteps, numberOfEpochs, explorer, objectiveFunction, model,
-				sampler);
+		IStoppingCriterion stoppingCriterion = new MaxSamplingSteps(20);
+
+		Trainer trainer = new Trainer(model, explorer, sampler, stateInitializer, stoppingCriterion,
+				objectiveFunction, numberOfEpochs);
 
 		List<Instance> trainingInstances = new ArrayList<>();
 
@@ -123,6 +133,7 @@ public class SemanticMRMain {
 		trainingInstances.add(new Instance(document, goldTemplate));
 
 		long t = System.currentTimeMillis();
+	
 		trainer.train(trainingInstances);
 
 		System.out.println((System.currentTimeMillis() - t));

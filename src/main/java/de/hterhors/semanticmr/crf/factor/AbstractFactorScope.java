@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.crf.factor;
 
-import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
+import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 
 /**
  * The factor scope is basically a list of variables in the context of a
@@ -21,9 +21,9 @@ public abstract class AbstractFactorScope {
 	/**
 	 * The template context of the list of variables.
 	 */
-	protected final AbstractFactorTemplate template;
+	protected final AbstractFeatureTemplate template;
 
-	public AbstractFactorScope(AbstractFactorTemplate template) {
+	public AbstractFactorScope(AbstractFeatureTemplate template) {
 		this.template = template;
 	}
 
@@ -32,7 +32,7 @@ public abstract class AbstractFactorScope {
 	 * 
 	 * @return the template
 	 */
-	public AbstractFactorTemplate getTemplate() {
+	public AbstractFeatureTemplate getTemplate() {
 		return template;
 	}
 

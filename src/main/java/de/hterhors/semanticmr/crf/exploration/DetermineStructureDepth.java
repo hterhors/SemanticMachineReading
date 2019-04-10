@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.exploration;
+package de.hterhors.semanticmr.crf.exploration;
 
 import java.util.Set;
 

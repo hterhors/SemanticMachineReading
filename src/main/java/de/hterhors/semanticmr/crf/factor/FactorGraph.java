@@ -3,7 +3,7 @@ package de.hterhors.semanticmr.crf.factor;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
+import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.State;
 
 /**
@@ -41,7 +41,7 @@ public class FactorGraph {
 	 * @param generatedFactorScopes a list of scopes for a particular feature
 	 *                              template.
 	 * 
-	 * @see {@link AbstractFactorTemplate}
+	 * @see {@link AbstractFeatureTemplate}
 	 */
 	public void addFactorScopes(List<? extends AbstractFactorScope> generatedFactorScopes) {
 		this.factorScopes.addAll(generatedFactorScopes);

@@ -10,13 +10,13 @@ import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
-public class TestTemplate extends AbstractFactorTemplate<Scope> {
+public class TestTemplate extends AbstractFeatureTemplate<Scope> {
 
 	class Scope extends AbstractFactorScope {
 
 		final String x;
 
-		public Scope(AbstractFactorTemplate<Scope> template, String x) {
+		public Scope(AbstractFeatureTemplate<Scope> template, String x) {
 			super(TestTemplate.this);
 			this.x = x;
 		}

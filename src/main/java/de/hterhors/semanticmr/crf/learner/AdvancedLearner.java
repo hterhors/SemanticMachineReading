@@ -6,9 +6,9 @@ import java.util.Map;
 
 import de.hterhors.semanticmr.crf.learner.optimizer.Optimizer;
 import de.hterhors.semanticmr.crf.learner.regularizer.Regularizer;
-import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
-import de.hterhors.semanticmr.crf.variables.State;
+import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
+import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.crf.variables.VectorUtil;
 
 /**
@@ -57,7 +57,7 @@ public class AdvancedLearner {
 	 * @param currentState
 	 * @param possibleNextState
 	 */
-	public void updateWeights(List<AbstractFactorTemplate> factorTemplates, State currentState,
+	public void updateWeights(List<AbstractFeatureTemplate<?>> factorTemplates, State currentState,
 			State possibleNextState) {
 
 		collectMarginRankGradientsAndApply(factorTemplates, currentState, possibleNextState, 1);
@@ -75,7 +75,7 @@ public class AdvancedLearner {
 	 * @param batchGradients
 	 * @param i
 	 */
-	private void collectMarginRankGradientsAndApply(List<AbstractFactorTemplate> factorTemplates,
+	private void collectMarginRankGradientsAndApply(List<AbstractFeatureTemplate<?>> factorTemplates,
 			final State currentState, final State possibleNextState, int sampleWeight) {
 
 		double linearScore = 0;
@@ -83,7 +83,7 @@ public class AdvancedLearner {
 		 * Collect differences of features for both states and remember respective
 		 * template
 		 */
-		final Map<AbstractFactorTemplate, DoubleVector> featureDifferencesPerTemplate = new HashMap<>(
+		final Map<AbstractFeatureTemplate<?>, DoubleVector> featureDifferencesPerTemplate = new HashMap<>(
 				factorTemplates.size());
 
 		final State posState;
@@ -101,7 +101,7 @@ public class AdvancedLearner {
 			negState = possibleNextState;
 		}
 
-		for (AbstractFactorTemplate t : factorTemplates) {
+		for (AbstractFeatureTemplate<?> t : factorTemplates) {
 			DoubleVector differences = VectorUtil.getFeatureDifferences(t, negState, posState);
 			featureDifferencesPerTemplate.put(t, differences);
 			linearScore += differences.dotProduct(t.getWeights());
@@ -114,7 +114,7 @@ public class AdvancedLearner {
 			/*
 			 * gradient for weight w[i] is simply featureDifference[i].
 			 */
-			for (AbstractFactorTemplate t : factorTemplates) {
+			for (AbstractFeatureTemplate<?> t : factorTemplates) {
 				final DoubleVector weightGradient;
 
 				if (sampleWeight == 0) {

@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.exploration.constraints;
+package de.hterhors.semanticmr.crf.exploration.constraints;
 
 import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 

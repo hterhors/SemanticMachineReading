@@ -5,58 +5,50 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hterhors.semanticmr.crf.factor.FactorGraph;
-import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
+import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 
 public class State {
 
-	private static final double DEFAULT_OBJECTIVE_SCORE = 0;
+	private final Instance instance;
 
-	private static final double DEFAULT_MODEL_SCORE = 1.0;
+	private static final double DEFAULT_OBJECTIVE_SCORE = 0.0D;
 
-	final public EntityTemplate goldEntityTemplate;
+	private static final double DEFAULT_MODEL_SCORE = 1.0D;
 
 	final public EntityTemplate currentPredictedEntityTemplate;
 
-	final private Map<AbstractFactorTemplate, FactorGraph> factorGraph;
+	final private Map<AbstractFeatureTemplate<?>, FactorGraph> factorGraphs;
 
-	private double modelScore = DEFAULT_MODEL_SCORE;
+	private double modelScore;
 
-	private double objectiveScore = DEFAULT_OBJECTIVE_SCORE;
+	private double objectiveScore;
+
+	public State(Instance instance, EntityTemplate currentPredictedEntityTemplate) {
+		this.instance = instance;
+		this.currentPredictedEntityTemplate = currentPredictedEntityTemplate;
+		this.factorGraphs = new HashMap<>();
+		this.modelScore = DEFAULT_MODEL_SCORE;
+		this.objectiveScore = DEFAULT_OBJECTIVE_SCORE;
+	}
 
 	/**
-	 * Creates a new deep copy of the state except of the factor graph and the new
-	 * prediction.
+	 * Creates a new State instance copying all of its properties except the model
+	 * score, objective score and the current prediction. this is directly updated
+	 * to the provided one.
 	 * 
-	 * @param goldEntityTemplate
-	 * @param currentPredictedEntityTemplate
-	 * @param modelScore
-	 * @param objectiveScore
+	 * @param newCurrentPrediction
+	 * @return a new State instance
 	 */
-	private State(EntityTemplate goldEntityTemplate, EntityTemplate currentPredictedEntityTemplate, double modelScore,
-			double objectiveScore) {
-		this.goldEntityTemplate = goldEntityTemplate;
-		this.currentPredictedEntityTemplate = currentPredictedEntityTemplate;
-		this.modelScore = modelScore;
-		this.objectiveScore = objectiveScore;
-		this.factorGraph = new HashMap<>();
-	}
-
-	public State(EntityTemplate goldEntityTemplate, EntityTemplate currentPredictedEntityTemplate) {
-		this.goldEntityTemplate = goldEntityTemplate;
-		this.currentPredictedEntityTemplate = currentPredictedEntityTemplate;
-		this.factorGraph = new HashMap<>();
-	}
-
 	public State deepUpdateCopy(EntityTemplate newCurrentPrediction) {
-		return new State(goldEntityTemplate, newCurrentPrediction, DEFAULT_MODEL_SCORE, DEFAULT_OBJECTIVE_SCORE);
+		return new State(this.instance, newCurrentPrediction);
 	}
 
-	public FactorGraph getFactorGraph(final AbstractFactorTemplate template) {
+	public FactorGraph getFactorGraph(final AbstractFeatureTemplate<?> template) {
 		FactorGraph fg;
-		if ((fg = factorGraph.get(template)) == null) {
+		if ((fg = factorGraphs.get(template)) == null) {
 			fg = new FactorGraph();
-			factorGraph.put(template, fg);
+			factorGraphs.put(template, fg);
 		}
 
 		return fg;
@@ -85,7 +77,11 @@ public class State {
 	}
 
 	public Collection<FactorGraph> getFactorGraphs() {
-		return factorGraph.values();
+		return factorGraphs.values();
+	}
+
+	public EntityTemplate getGoldEntityTemplate() {
+		return instance.getGoldTemplate();
 	}
 
 }

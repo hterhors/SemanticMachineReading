@@ -7,7 +7,7 @@ import de.hterhors.semanticmr.crf.variables.State;
 public class ObjectiveFunction {
 
 	public void score(State state) {
-		state.setObjectiveScore(state.goldEntityTemplate.compare(state.currentPredictedEntityTemplate).getF1());
+		state.setObjectiveScore(state.getGoldEntityTemplate().compare(state.currentPredictedEntityTemplate).getF1());
 	}
 
 	public void score(List<State> states) {

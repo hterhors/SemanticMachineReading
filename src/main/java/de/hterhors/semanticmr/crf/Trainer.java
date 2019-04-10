@@ -1,21 +1,25 @@
 package de.hterhors.semanticmr.crf;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
+import de.hterhors.semanticmr.crf.exploration.EntityTemplateExploration;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
-import de.hterhors.semanticmr.crf.sampling.AcceptStrategies;
-import de.hterhors.semanticmr.crf.sampling.AcceptStrategy;
+import de.hterhors.semanticmr.crf.stopcrit.IStoppingCriterion;
+import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.exploration.EntityTemplateExploration;
 
 public class Trainer {
 
 	final int numberOfEpochs;
 
-	final int maxNumberOfSamplingStepsPerInstance;
+	/**
+	 * The maximum number of sampling steps per instance. This prevents infinite
+	 * loops if no stopping criterion ever matches.
+	 */
+	final static public int MAX_SAMPLING = 100;
 
 	final EntityTemplateExploration explorer;
 
@@ -25,24 +29,35 @@ public class Trainer {
 
 	final AbstractSampler sampler;
 
-	public Trainer(final int maxNumberOfSamplingSteps, final int numberOfEpochs, EntityTemplateExploration explorer,
-			ObjectiveFunction objectiveFunction, Model model, AbstractSampler sampler) {
+	private final IStateInitializer initializer;
+
+	private final IStoppingCriterion stoppingCriterion;
+
+	public Trainer(Model model, EntityTemplateExploration explorer, AbstractSampler sampler,
+			IStateInitializer initializer, IStoppingCriterion stoppingCriterion, ObjectiveFunction objectiveFunction,
+			final int numberOfEpochs) {
 		this.numberOfEpochs = numberOfEpochs;
-		this.maxNumberOfSamplingStepsPerInstance = maxNumberOfSamplingSteps;
+		this.stoppingCriterion = stoppingCriterion;
 		this.model = model;
 		this.explorer = explorer;
 		this.objectiveFunction = objectiveFunction;
 		this.sampler = sampler;
+		this.initializer = initializer;
 	}
 
 	public void train(List<Instance> trainingInstances) {
 		State finalState = null;
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
+
 			for (Instance instance : trainingInstances) {
 
-				State currentState = instance.getInitialState();
+				final List<State> producedStateChain = new ArrayList<>();
 
-				for (int i = 0; i < maxNumberOfSamplingStepsPerInstance; i++) {
+				State currentState = initializer.get(instance);
+
+				for (int samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
+
+					producedStateChain.add(currentState);
 
 					final List<State> proposalStates = explorer.explore(currentState);
 
@@ -69,7 +84,12 @@ public class Trainer {
 						model.updateWeights(currentState, candidateState);
 						currentState = candidateState;
 					}
+
+					if (stoppingCriterion.checkCondition(producedStateChain))
+						break;
+
 				}
+
 				finalState = currentState;
 			}
 		}

@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
-import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
+import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.State;
 
 public class Model {
@@ -42,11 +42,11 @@ public class Model {
 		return indexFeatureName.get(feature);
 	}
 
-	final private List<AbstractFactorTemplate> factorTemplates;
+	final private List<AbstractFeatureTemplate<?>> factorTemplates;
 
 	final private AdvancedLearner learner;
 
-	public Model(List<AbstractFactorTemplate> factorTemplates, AdvancedLearner learner) {
+	public Model(List<AbstractFeatureTemplate<?>> factorTemplates, AdvancedLearner learner) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
 		this.learner = learner;
 	}
@@ -56,7 +56,7 @@ public class Model {
 		/**
 		 * TODO: measure efficiency of streams
 		 */
-		for (AbstractFactorTemplate template : this.factorTemplates) {
+		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
 
 			/*
 			 * Collect all factor scopes of all states to that this template can be applied
@@ -83,7 +83,7 @@ public class Model {
 		/**
 		 * TODO: measure efficiency of streams
 		 */
-		for (AbstractFactorTemplate template : this.factorTemplates) {
+		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
 
 			/*
 			 * Collect all factor scopes of all states to that this template can be applied
@@ -108,15 +108,16 @@ public class Model {
 		state.setModelScore(computeScore(state));
 	}
 
-	private void computeRemainingFactors(AbstractFactorTemplate template, Stream<AbstractFactorScope> stream) {
+	private void computeRemainingFactors(AbstractFeatureTemplate<?> template, Stream<AbstractFactorScope> stream) {
 		stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs)).map(remainingFactorScope -> {
+			@SuppressWarnings({ "rawtypes", "unchecked" })
 			Factor f = new Factor(remainingFactorScope);
 			template.generateFeatureVector(f);
 			return f;
 		}).sequential().forEach(factor -> FACTOR_POOL_INSTANCE.addFactor(factor));
 	}
 
-	private void collectFactorScopesForState(AbstractFactorTemplate template, State state) {
+	private void collectFactorScopesForState(AbstractFeatureTemplate<?> template, State state) {
 		state.getFactorGraph(template).addFactorScopes(template.generateFactorScopes(state));
 	}
 
@@ -127,7 +128,7 @@ public class Model {
 	 * @param list
 	 * @return
 	 */
-
+	@SuppressWarnings("rawtypes")
 	private double computeScore(State state) {
 
 		double score = 1;

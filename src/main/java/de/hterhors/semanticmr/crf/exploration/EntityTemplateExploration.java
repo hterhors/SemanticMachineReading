@@ -1,12 +1,12 @@
-package de.hterhors.semanticmr.exploration;
+package de.hterhors.semanticmr.crf.exploration;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.hterhors.semanticmr.crf.exploration.candidateprovider.ISlotFillerCandidateProvider;
+import de.hterhors.semanticmr.crf.exploration.constraints.IHardConstraintsProvider;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.exploration.candidateprovider.ISlotFillerCandidateProvider;
-import de.hterhors.semanticmr.exploration.constraints.IHardConstraintsProvider;
 import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 import de.hterhors.semanticmr.structure.slotfiller.EntityType;

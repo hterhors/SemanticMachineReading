@@ -7,7 +7,14 @@ import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
 
-public abstract class AbstractFactorTemplate<S extends AbstractFactorScope> {
+/**
+ * Abstract class for feature templates. Consists of the shared weight vector.
+ * 
+ * @author hterhors
+ *
+ * @param <S>
+ */
+public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope> {
 
 	/**
 	 * Weights for the computation of factor scores. These weights are shared across
@@ -17,10 +24,6 @@ public abstract class AbstractFactorTemplate<S extends AbstractFactorScope> {
 
 	public DoubleVector getWeights() {
 		return weights;
-	}
-
-	public void setWeights(DoubleVector weights) {
-		this.weights = weights;
 	}
 
 	/**
