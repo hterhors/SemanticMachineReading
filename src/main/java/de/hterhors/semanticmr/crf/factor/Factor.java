@@ -12,12 +12,12 @@ import de.hterhors.semanticmr.crf.variables.DoubleVector;
  * @author hterhors
  *
  */
-public class Factor {
+public class Factor<S extends AbstractFactorScope> {
 
 	/**
 	 * The factors scope
 	 */
-	private final AbstractFactorScope factorScope;
+	private final S factorScope;
 
 	/**
 	 * The factors feature
@@ -29,7 +29,7 @@ public class Factor {
 	 * 
 	 * @param factorScope
 	 */
-	public Factor(AbstractFactorScope factorScope) {
+	public Factor(S factorScope) {
 		this.factorScope = factorScope;
 	}
 
@@ -47,7 +47,7 @@ public class Factor {
 	 * 
 	 * @return
 	 */
-	public AbstractFactorScope getFactorScope() {
+	public S getFactorScope() {
 		return factorScope;
 	}
 

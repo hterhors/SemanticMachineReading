@@ -3,19 +3,20 @@ package de.hterhors.semanticmr.crf.templates;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.factor.Factor;
-import de.hterhors.semanticmr.crf.factor.FactorScope;
-import de.hterhors.semanticmr.crf.variables.State;
+import de.hterhors.semanticmr.crf.templates.TestTemplate.Scope;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
+import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
-public class TestTemplate extends AbstractFactorTemplate {
+public class TestTemplate extends AbstractFactorTemplate<Scope> {
 
-	class Scope extends FactorScope {
+	class Scope extends AbstractFactorScope {
 
 		final String x;
 
-		public Scope(AbstractFactorTemplate template, String x) {
+		public Scope(AbstractFactorTemplate<Scope> template, String x) {
 			super(TestTemplate.this);
 			this.x = x;
 		}
@@ -65,8 +66,8 @@ public class TestTemplate extends AbstractFactorTemplate {
 	}
 
 	@Override
-	public List<FactorScope> generateFactorScopes(State state) {
-		List<FactorScope> factors = new ArrayList<>();
+	public List<Scope> generateFactorScopes(State state) {
+		List<Scope> factors = new ArrayList<>();
 
 		for (SlotType slot : state.currentPredictedEntityTemplate.getSingleFillerSlots().keySet()) {
 
@@ -80,9 +81,9 @@ public class TestTemplate extends AbstractFactorTemplate {
 	}
 
 	@Override
-	public void computeFeatureVector(Factor factor) {
+	public void generateFeatureVector(Factor<Scope> factor) {
 		DoubleVector featureVector = factor.getFeatureVector();
-		featureVector.set(((Scope) factor.getFactorScope()).x, true);
+		featureVector.set(factor.getFactorScope().x, true);
 	}
 
 }

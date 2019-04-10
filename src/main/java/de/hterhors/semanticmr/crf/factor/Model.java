@@ -111,7 +111,7 @@ public class Model {
 	private void computeRemainingFactors(AbstractFactorTemplate template, Stream<AbstractFactorScope> stream) {
 		stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs)).map(remainingFactorScope -> {
 			Factor f = new Factor(remainingFactorScope);
-			template.computeFeatureVector(f);
+			template.generateFeatureVector(f);
 			return f;
 		}).sequential().forEach(factor -> FACTOR_POOL_INSTANCE.addFactor(factor));
 	}
