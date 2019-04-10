@@ -17,31 +17,46 @@ public class Factor {
 	/**
 	 * The factors scope
 	 */
-	private final FactorScope factorScope;
+	private final AbstractFactorScope factorScope;
 
 	/**
 	 * The factors feature
 	 */
-	private final DoubleVector features = new DoubleVector();
+	private final DoubleVector featureVector = new DoubleVector();
 
 	/**
 	 * Initialize the factor with its scope
 	 * 
 	 * @param factorScope
 	 */
-	public Factor(FactorScope factorScope) {
+	public Factor(AbstractFactorScope factorScope) {
 		this.factorScope = factorScope;
 	}
 
+	/**
+	 * Getter for the feature vector
+	 * 
+	 * @return
+	 */
 	public DoubleVector getFeatureVector() {
-		return features;
+		return featureVector;
 	}
 
-	public FactorScope getFactorScope() {
+	/**
+	 * Getter for the factor scope
+	 * 
+	 * @return
+	 */
+	public AbstractFactorScope getFactorScope() {
 		return factorScope;
 	}
 
-	public double computeScalaScore() {
-		return Math.exp(features.dotProduct(factorScope.getTemplate().getWeights()));
+	/**
+	 * Computes the scalar score of that factor.
+	 * 
+	 * @return the factor scalar score
+	 */
+	public double computeScalarScore() {
+		return Math.exp(featureVector.dotProduct(factorScope.getTemplate().getWeights()));
 	}
 }

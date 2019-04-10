@@ -3,13 +3,11 @@ package de.hterhors.semanticmr.crf.factor;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
-import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
 
 public class Model {
@@ -55,8 +53,6 @@ public class Model {
 
 	public void score(State state) {
 
-		final Set<FactorScope> cachedFactorScopes = FACTOR_POOL_INSTANCE.getCachedFactorScopes();
-
 		/**
 		 * TODO: measure efficiency of streams
 		 */
@@ -71,7 +67,7 @@ public class Model {
 			/*
 			 * Compute all selected factors in parallel.
 			 */
-			computeRemainingFactors(cachedFactorScopes, template,
+			computeRemainingFactors(template,
 					state.getFactorGraphs().stream().flatMap(l -> l.getFactorScopes().stream()));
 		}
 
@@ -83,8 +79,6 @@ public class Model {
 	}
 
 	public void score(List<State> states) {
-
-		final Set<FactorScope> cachedFactorScopes = FACTOR_POOL_INSTANCE.getCachedFactorScopes();
 
 		/**
 		 * TODO: measure efficiency of streams
@@ -100,8 +94,8 @@ public class Model {
 			/*
 			 * Compute all selected factors in parallel.
 			 */
-			computeRemainingFactors(cachedFactorScopes, template, states.stream()
-					.flatMap(state -> state.getFactorGraphs().stream()).flatMap(l -> l.getFactorScopes().stream()));
+			computeRemainingFactors(template, states.stream().flatMap(state -> state.getFactorGraphs().stream())
+					.flatMap(l -> l.getFactorScopes().stream()));
 		}
 		/*
 		 * Compute and set model score
@@ -114,9 +108,8 @@ public class Model {
 		state.setModelScore(computeScore(state));
 	}
 
-	private void computeRemainingFactors(final Set<FactorScope> cachedFactorScopes, AbstractFactorTemplate template,
-			Stream<FactorScope> stream) {
-		stream.parallel().filter(fs -> !cachedFactorScopes.contains(fs)).map(remainingFactorScope -> {
+	private void computeRemainingFactors(AbstractFactorTemplate template, Stream<AbstractFactorScope> stream) {
+		stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs)).map(remainingFactorScope -> {
 			Factor f = new Factor(remainingFactorScope);
 			template.computeFeatureVector(f);
 			return f;
@@ -146,7 +139,7 @@ public class Model {
 			factorsAvailable |= factors.size() != 0;
 
 			for (Factor factor : factors) {
-				score *= factor.computeScalaScore();
+				score *= factor.computeScalarScore();
 			}
 
 		}

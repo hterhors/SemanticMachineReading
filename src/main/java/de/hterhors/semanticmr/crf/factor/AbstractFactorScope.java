@@ -2,14 +2,36 @@ package de.hterhors.semanticmr.crf.factor;
 
 import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
 
-public abstract class FactorScope {
+/**
+ * The factor scope is basically a list of variables in the context of a
+ * specific template.
+ * 
+ * The scope is used to compute a feature vector. Both factor scope and feature
+ * vector are stored in a factor.
+ * 
+ * <b>As factor scopes are used as keys in a hash map in the factor pool, it is
+ * imperative to proper implement the hashCode and equals - methods!</b>
+ * 
+ * @author hterhors
+ *
+ * @see {@link Factor}
+ */
+public abstract class AbstractFactorScope {
 
+	/**
+	 * The template context of the list of variables.
+	 */
 	protected final AbstractFactorTemplate template;
 
-	public FactorScope(AbstractFactorTemplate template) {
+	public AbstractFactorScope(AbstractFactorTemplate template) {
 		this.template = template;
 	}
 
+	/**
+	 * Getter for the template context.
+	 * 
+	 * @return the template
+	 */
 	public AbstractFactorTemplate getTemplate() {
 		return template;
 	}
@@ -45,7 +67,7 @@ public abstract class FactorScope {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		FactorScope other = (FactorScope) obj;
+		AbstractFactorScope other = (AbstractFactorScope) obj;
 		if (template == null) {
 			if (other.template != null)
 				return false;
