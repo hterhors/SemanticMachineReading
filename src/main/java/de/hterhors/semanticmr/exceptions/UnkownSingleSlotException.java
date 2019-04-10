@@ -1,5 +1,12 @@
 package de.hterhors.semanticmr.exceptions;
 
+/**
+ * This exception is thrown, if a single slot is requested but it does not
+ * exist.
+ * 
+ * @author hterhors
+ *
+ */
 public class UnkownSingleSlotException extends RuntimeException {
 
 	/**
