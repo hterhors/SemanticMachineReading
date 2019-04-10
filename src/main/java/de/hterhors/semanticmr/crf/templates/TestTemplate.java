@@ -8,6 +8,8 @@ import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.templates.TestTemplate.Scope;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
+import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
+import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class TestTemplate extends AbstractFeatureTemplate<Scope> {
@@ -69,12 +71,15 @@ public class TestTemplate extends AbstractFeatureTemplate<Scope> {
 	public List<Scope> generateFactorScopes(State state) {
 		List<Scope> factors = new ArrayList<>();
 
-		for (SlotType slot : state.currentPrediction.getSingleFillerSlots().keySet()) {
+		for (EntityTemplate annotation : state.currentPredictions.<EntityTemplate>getAnnotations()) {
 
-			if (state.currentPrediction.getSingleFillerSlot(slot).containsSlotFiller())
-				factors.add(new Scope(this, state.currentPrediction.getSingleFillerSlot(slot)
-						.getSlotFiller().getEntityType().entityTypeName));
+			for (SlotType slot : annotation.getSingleFillerSlots().keySet()) {
 
+				if (annotation.getSingleFillerSlot(slot).containsSlotFiller())
+					factors.add(new Scope(this,
+							annotation.getSingleFillerSlot(slot).getSlotFiller().getEntityType().entityTypeName));
+
+			}
 		}
 
 		return factors;

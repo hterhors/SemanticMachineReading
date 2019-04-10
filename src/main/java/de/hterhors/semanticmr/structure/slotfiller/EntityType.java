@@ -8,9 +8,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.hterhors.semanticmr.evaluation.IEvaluatable.Score;
-import de.hterhors.semanticmr.exceptions.UnkownEnityTypeException;
+import de.hterhors.semanticmr.exce.UnkownEnityTypeException;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification;
+import de.hterhors.semanticmr.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.structure.slotfiller.normalization.INormalizationFunction;
 import de.hterhors.semanticmr.structure.slotfiller.normalization.IRequiresInitialization;
 import de.hterhors.semanticmr.structure.slotfiller.normalization.IdentityNormalization;
@@ -296,7 +296,7 @@ final public class EntityType extends AbstractSlotFiller<EntityType>
 	}
 
 	@Override
-	public Score compare(EntityType otherVal) {
+	public Score evaluate(EntityType otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else if (equals(otherVal)) {

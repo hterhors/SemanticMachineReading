@@ -6,7 +6,7 @@ import java.util.Map;
 
 import de.hterhors.semanticmr.crf.factor.FactorGraph;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
+import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
 
 public class State {
 
@@ -16,7 +16,7 @@ public class State {
 
 	private static final double DEFAULT_MODEL_SCORE = 1.0D;
 
-	final public EntityTemplate currentPrediction;
+	final public Annotations currentPredictions;
 
 	final private Map<AbstractFeatureTemplate<?>, FactorGraph> factorGraphs;
 
@@ -24,9 +24,9 @@ public class State {
 
 	private double objectiveScore;
 
-	public State(Instance instance, EntityTemplate currentPredictedEntityTemplate) {
+	public State(Instance instance, Annotations currentPredictions) {
 		this.instance = instance;
-		this.currentPrediction = currentPredictedEntityTemplate;
+		this.currentPredictions = currentPredictions;
 		this.factorGraphs = new HashMap<>();
 		this.modelScore = DEFAULT_MODEL_SCORE;
 		this.objectiveScore = DEFAULT_OBJECTIVE_SCORE;
@@ -40,8 +40,8 @@ public class State {
 	 * @param newCurrentPrediction
 	 * @return a new State instance
 	 */
-	public State deepUpdateCopy(EntityTemplate newCurrentPrediction) {
-		return new State(this.instance, newCurrentPrediction);
+	public State deepUpdateCopy(final int annotationIndex, AbstractSlotFiller<?> newCurrentPrediction) {
+		return new State(this.instance, currentPredictions.deepUpdateCopy(annotationIndex, newCurrentPrediction));
 	}
 
 	public FactorGraph getFactorGraph(final AbstractFeatureTemplate<?> template) {
@@ -72,16 +72,20 @@ public class State {
 
 	@Override
 	public String toString() {
-		return "State [currentPredictedEntityTemplate=" + currentPrediction.toPrettyString() + ", modelScore="
-				+ modelScore + ", objectiveScore=" + objectiveScore + "]";
+		return "State [modelScore=" + modelScore + ", objectiveScore=" + objectiveScore + ", currentPredictions="
+				+ currentPredictions + ", instance=" + instance.getDocument().documentID + "]";
 	}
 
 	public Collection<FactorGraph> getFactorGraphs() {
 		return factorGraphs.values();
 	}
 
-	public EntityTemplate getGoldEntityTemplate() {
-		return instance.getGoldTemplate();
+	public Annotations getGoldAnnotations() {
+		return instance.getGoldTemplates();
+	}
+
+	public double computeAnnotationsOverlapScore() {
+		return instance.getGoldTemplates().evaluate(currentPredictions).getF1();
 	}
 
 }

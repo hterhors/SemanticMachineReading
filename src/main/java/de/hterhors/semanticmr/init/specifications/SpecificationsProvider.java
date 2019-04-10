@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.init.specifications;
 
-import de.hterhors.semanticmr.exceptions.InvalidSpecificationException;
+import de.hterhors.semanticmr.exce.InvalidSpecificationException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
 
 /**

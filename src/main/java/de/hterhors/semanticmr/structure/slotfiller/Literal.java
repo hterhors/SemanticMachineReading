@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.structure.slotfiller;
 
-import de.hterhors.semanticmr.evaluation.IEvaluatable.Score;
+import de.hterhors.semanticmr.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.structure.slotfiller.container.TextualContent;
 
 /**
@@ -82,7 +82,7 @@ public class Literal extends AbstractSlotFiller<Literal> {
 	}
 
 	@Override
-	public Score compare(Literal otherVal) {
+	public Score evaluate(Literal otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else if (equals(otherVal)) {

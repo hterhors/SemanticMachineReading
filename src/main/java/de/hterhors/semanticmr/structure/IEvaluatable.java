@@ -1,51 +1,30 @@
-package de.hterhors.semanticmr.evaluation;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import org.apache.jena.ext.com.google.common.collect.Collections2;
+package de.hterhors.semanticmr.structure;
 
 public interface IEvaluatable<T> {
 
 	public static class Score {
 
-		public static final int MAXIMUM_PERMUTATION_SIZE = 8;
-
-		private static final Collection<List<Integer>>[] permutationCache = new Collection[MAXIMUM_PERMUTATION_SIZE];
-
-		static {
-			for (int i = 0; i < MAXIMUM_PERMUTATION_SIZE; i++) {
-				permutationCache[i] = Collections2
-						.permutations(IntStream.range(0, i).boxed().collect(Collectors.toList()));
-			}
-		}
-
-		public final static Score ZERO = new Score();
-
-		public static Stream<List<Integer>> getPermutationStream(final int size) {
-
-			if (permutationCache.length < size)
-				throw new IllegalArgumentException("Request for permutation of size " + size
-						+ " exceeds maximum size of: " + MAXIMUM_PERMUTATION_SIZE);
-
-			return permutationCache[size].stream();
-		}
+		final public static Score ZERO = new Score().unmod();
 
 		final public static Score CORRECT = new Score(1, 0, 0, 0);
 
 		final public static Score INCORRECT = new Score(0, 1, 1, 0);
 
-		public static final Score FN = new Score(0, 0, 1, 0);
+		final public static Score FN = new Score(0, 0, 1, 0);
 
-		public int tp = 0;
-		public int fp = 0;
-		public int fn = 0;
-		public int tn = 0;
+		private int tp = 0;
+		private int fp = 0;
+		private int fn = 0;
+		private int tn = 0;
 
 		public Score() {
+		}
+
+		private boolean unmod = false;
+
+		private Score unmod() {
+			unmod = true;
+			return this;
 		}
 
 		public Score(int tp, int fp, int fn, int tn) {
@@ -62,6 +41,9 @@ public interface IEvaluatable<T> {
 		}
 
 		public void add(Score evaluate) {
+			if (unmod)
+				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
+
 			this.tp += evaluate.tp;
 			this.fp += evaluate.fp;
 			this.fn += evaluate.fn;
@@ -69,6 +51,8 @@ public interface IEvaluatable<T> {
 		}
 
 		public void set(Score setter) {
+			if (unmod)
+				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
 			this.tp = setter.tp;
 			this.fp = setter.fp;
 			this.fn = setter.fn;
@@ -115,13 +99,27 @@ public interface IEvaluatable<T> {
 		 * @return this with inverted fp and fn
 		 */
 		public Score invert() {
+			if (unmod)
+				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
 			final int tmp = this.fn;
 			this.fn = this.fp;
 			this.fp = tmp;
 			return this;
 		}
+
+		public void increaseFalsePositive() {
+			if (unmod)
+				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
+			this.fp++;
+		}
+
+		public void increaseFalseNegative() {
+			if (unmod)
+				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
+			this.fn++;
+		}
 	}
 
-	public Score compare(T otherVal);
+	public Score evaluate(T otherVal);
 
 }

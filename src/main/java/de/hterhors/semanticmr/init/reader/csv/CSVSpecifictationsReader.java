@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import de.hterhors.semanticmr.exceptions.InvalidFileFormatException;
+import de.hterhors.semanticmr.exce.InvalidSpecificationFileFormatException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification.ExcludeSlotTypePairNames;
@@ -29,7 +29,7 @@ public class CSVSpecifictationsReader implements ISpecificationsReader {
 		this.slotPairConstriantsSpecificationFile = slotPairConstriantsSpecificationFile;
 	}
 
-	public StructureSpecification read() throws InvalidFileFormatException {
+	public StructureSpecification read() throws InvalidSpecificationFileFormatException {
 		try {
 			List<String[]> entities = Files.readAllLines(entitySpecificationFile.toPath()).stream()
 					.filter(l -> !l.startsWith("#")).map(l -> l.split("\t")).collect(Collectors.toList());
@@ -90,7 +90,7 @@ public class CSVSpecifictationsReader implements ISpecificationsReader {
 					excludeSlotTypePairs);
 
 		} catch (Exception e) {
-			throw new InvalidFileFormatException(e);
+			throw new InvalidSpecificationFileFormatException(e);
 		}
 	}
 

@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import de.hterhors.semanticmr.exceptions.UnkownEnityTypeException;
-import de.hterhors.semanticmr.exceptions.UnkownSlotTypeException;
+import de.hterhors.semanticmr.exce.UnkownEnityTypeException;
+import de.hterhors.semanticmr.exce.UnkownSlotTypeException;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification;
 import de.hterhors.semanticmr.structure.slotfiller.EntityType;
 import de.hterhors.semanticmr.structure.slotfiller.normalization.IRequiresInitialization;

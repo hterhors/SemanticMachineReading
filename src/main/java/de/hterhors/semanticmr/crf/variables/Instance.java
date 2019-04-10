@@ -1,7 +1,5 @@
 package de.hterhors.semanticmr.crf.variables;
 
-import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
-
 /**
  * The Instance object couples a document and the gold annotation of that
  * document. This class is used during training as training instance, during
@@ -20,19 +18,20 @@ public class Instance {
 	/**
 	 * The corresponding gold annotation.
 	 */
-	private final EntityTemplate goldAnnotation;
+	private final Annotations goldAnnotations;
 
-	public Instance(Document document, EntityTemplate goldTemplate) {
-		this.goldAnnotation = goldTemplate;
+	public Instance(Document document, Annotations goldAnnotations) {
+		this.goldAnnotations = goldAnnotations;
 		this.document = document;
+		this.goldAnnotations.unmodifiable();
 	}
 
 	public Document getDocument() {
 		return document;
 	}
 
-	public EntityTemplate getGoldTemplate() {
-		return goldAnnotation;
+	public Annotations getGoldTemplates() {
+		return goldAnnotations;
 	}
 
 }

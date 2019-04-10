@@ -68,7 +68,7 @@ final public class DocumentLink extends Literal {
 	}
 
 	@Override
-	public Score compare(Literal otherVal) {
+	public Score evaluate(Literal otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else if (equals(otherVal)) {

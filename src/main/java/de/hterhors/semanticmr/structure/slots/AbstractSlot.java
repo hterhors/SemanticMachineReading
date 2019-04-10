@@ -1,8 +1,8 @@
 package de.hterhors.semanticmr.structure.slots;
 
-import de.hterhors.semanticmr.evaluation.IEvaluatable;
-import de.hterhors.semanticmr.evaluation.IEvaluatable.Score;
 import de.hterhors.semanticmr.structure.IDeepCopyable;
+import de.hterhors.semanticmr.structure.IEvaluatable;
+import de.hterhors.semanticmr.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.slotfiller.EntityType;
 

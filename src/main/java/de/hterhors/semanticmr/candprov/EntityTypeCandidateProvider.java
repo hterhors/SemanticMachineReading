@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.exploration.candidateprovider;
+package de.hterhors.semanticmr.candprov;
 
 import java.util.ArrayList;
 import java.util.Collection;

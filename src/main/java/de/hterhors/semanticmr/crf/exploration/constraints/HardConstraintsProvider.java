@@ -1,33 +1,17 @@
 package de.hterhors.semanticmr.crf.exploration.constraints;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import de.hterhors.semanticmr.init.specifications.StructureSpecification.ExcludeSlotTypePairNames;
 import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint;
-import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint.SlotEntityPair;
-import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
 import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
-import de.hterhors.semanticmr.structure.slotfiller.EntityType;
-import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class HardConstraintsProvider implements IHardConstraintsProvider {
 
-	final List<AbstractHardConstraint> hardConstraints = new ArrayList<>();
+	final List<ExcludePairConstraint> hardConstraints;
 
-	public HardConstraintsProvider(SpecificationsProvider specificationProvider) {
+	public HardConstraintsProvider(List<ExcludePairConstraint> hardConstraints) {
 
-		for (ExcludeSlotTypePairNames constraint : specificationProvider.getSpecifications()
-				.getExcludeSlotTypePairs()) {
-
-			hardConstraints.add(new ExcludePairConstraint(
-					constraint.onTemplateType.isEmpty() ? null : EntityType.get(constraint.onTemplateType),
-					new SlotEntityPair(SlotType.get(constraint.withSlotTypeName),
-							EntityType.get(constraint.withEntityTypeName)),
-					new SlotEntityPair(SlotType.get(constraint.excludeSlotTypeName),
-							EntityType.get(constraint.excludeEntityTypeName))));
-		}
-
+		this.hardConstraints = hardConstraints;
 	}
 
 	@Override

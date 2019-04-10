@@ -1,16 +1,16 @@
 package de.hterhors.semanticmr.structure.slotfiller;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
 
-import de.hterhors.semanticmr.exceptions.IllegalSlotFillerException;
-import de.hterhors.semanticmr.exceptions.UnkownMultiSlotException;
-import de.hterhors.semanticmr.exceptions.UnkownSingleSlotException;
+import de.hterhors.semanticmr.eval.EvaluationHelper;
+import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
+import de.hterhors.semanticmr.exce.UnkownMultiSlotException;
+import de.hterhors.semanticmr.exce.UnkownSingleSlotException;
 import de.hterhors.semanticmr.structure.slots.MultiFillerSlot;
 import de.hterhors.semanticmr.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.structure.slots.SlotType;
@@ -252,14 +252,14 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	}
 
 	@Override
-	public Score compare(EntityTemplate other) {
+	public Score evaluate(EntityTemplate other) {
 
 		final Score score = new Score();
 
 		if (other == null) {
-			score.fn++;
+			score.increaseFalseNegative();
 		} else {
-			score.add(this.entityType.compare(other.getEntityType()));
+			score.add(this.entityType.evaluate(other.getEntityType()));
 		}
 
 		addScoresForSingleFillerSlots(other, score);
@@ -287,9 +287,9 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 				final AbstractSlotFiller<?> otherVal = otherSingleSlotFiller == null ? null
 						: otherSingleSlotFiller.getSlotFiller();
 
-				score.add(score(val, otherVal));
+				score.add(EvaluationHelper.scoreSingle(val, otherVal));
 			} else if (otherSingleSlotFiller != null && otherSingleSlotFiller.containsSlotFiller()) {
-				score.fp++;
+				score.increaseFalsePositive();
 			}
 
 		}
@@ -309,90 +309,10 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 			if (!slotFiller.containsSlotFiller() && (otherSlotFiller == null || !otherSlotFiller.containsSlotFiller()))
 				continue;
 
-			final Score bestScore = new Score();
-
-			final int maxSize = otherSlotFiller == null ? slotFiller.size()
-					: Math.max(slotFiller.size(), otherSlotFiller.size());
-
-			final Score[][] scores = computeScores(slotFiller, otherSlotFiller, maxSize);
-
-			Score.getPermutationStream(maxSize).filter(indexPermutation -> {
-				final Score sum = new Score();
-
-				for (int index = 0; index < indexPermutation.size(); index++) {
-					final int permIndex = indexPermutation.get(index).intValue();
-					sum.add(scores[index][permIndex]);
-				}
-
-				final double f1 = sum.getF1();
-
-				if (bestScore.getF1() <= f1) {
-					bestScore.set(sum);
-				}
-
-				return f1 == 1;
-
-			}).findFirst();
+			final Score bestScore = EvaluationHelper.scoreMax(slotFiller.getSlotFiller(),
+					otherSlotFiller.getSlotFiller());
 
 			score.add(bestScore);
-		}
-	}
-
-	private Score[][] computeScores(final MultiFillerSlot slotFiller, final MultiFillerSlot otherSlotFiller,
-			final int maxSize) {
-
-		final Score[][] scores = new Score[maxSize][maxSize];
-
-		final Iterator<AbstractSlotFiller<?>> slotFillerIterator = slotFiller.getSlotFiller().iterator();
-
-		int i = 0;
-
-		while (i != maxSize) {
-
-			final AbstractSlotFiller<?> slotFillerVal;
-
-			if (slotFillerIterator.hasNext()) {
-				slotFillerVal = slotFillerIterator.next();
-			} else {
-				slotFillerVal = null;
-			}
-
-			int j = 0;
-
-			final Iterator<AbstractSlotFiller<?>> otherSlotFillerIterator = otherSlotFiller.getSlotFiller().iterator();
-
-			while (j != maxSize) {
-
-				final AbstractSlotFiller<?> otherSlotFillerVal;
-				if (otherSlotFillerIterator.hasNext()) {
-					otherSlotFillerVal = otherSlotFillerIterator.next();
-				} else {
-					otherSlotFillerVal = null;
-				}
-				if (slotFillerVal == null) {
-					scores[i][j] = score(otherSlotFillerVal, slotFillerVal).invert();
-				} else {
-					scores[i][j] = score(slotFillerVal, otherSlotFillerVal);
-				}
-				j++;
-			}
-			i++;
-		}
-
-		return scores;
-	}
-
-	private Score score(final AbstractSlotFiller<?> val, final AbstractSlotFiller<?> otherVal) {
-		if (val instanceof DocumentLink && (otherVal instanceof DocumentLink || otherVal == null)) {
-			return ((DocumentLink) val).compare((DocumentLink) otherVal);
-		} else if (val instanceof Literal && (otherVal instanceof Literal || otherVal == null)) {
-			return ((Literal) val).compare((Literal) otherVal);
-		} else if (val instanceof EntityType && (otherVal instanceof EntityType || otherVal == null)) {
-			return ((EntityType) val).compare((EntityType) otherVal);
-		} else if (val instanceof EntityTemplate && (otherVal instanceof EntityTemplate || otherVal == null)) {
-			return ((EntityTemplate) val).compare((EntityTemplate) otherVal);
-		} else {
-			return Score.INCORRECT;
 		}
 	}
 

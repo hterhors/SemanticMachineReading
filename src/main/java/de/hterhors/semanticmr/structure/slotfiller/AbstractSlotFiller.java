@@ -1,7 +1,7 @@
 package de.hterhors.semanticmr.structure.slotfiller;
 
-import de.hterhors.semanticmr.evaluation.IEvaluatable;
 import de.hterhors.semanticmr.structure.IDeepCopyable;
+import de.hterhors.semanticmr.structure.IEvaluatable;
 import de.hterhors.semanticmr.structure.slotfiller.container.DocumentPosition;
 import de.hterhors.semanticmr.structure.slotfiller.container.TextualContent;
 

@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.exploration.candidateprovider;
+package de.hterhors.semanticmr.candprov;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,15 +8,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 import de.hterhors.semanticmr.structure.slotfiller.EntityType;
-import de.hterhors.semanticmr.structure.slotfiller.Literal;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
-public class LiteralCandidateProvider implements ISlotFillerCandidateProvider<Literal> {
+public class EntityTemplateCandidateProvider implements ISlotFillerCandidateProvider<EntityTemplate> {
 
-	private final Map<SlotType, List<Literal>> entityAnnotationCache = new HashMap<>();
+	private final Map<SlotType, List<EntityTemplate>> entityAnnotationCache;
 
-	public void addSlotFiller(Literal slotFiller) {
+	public EntityTemplateCandidateProvider() {
+		this.entityAnnotationCache = new HashMap<>();
+	}
+
+	public void addSlotFiller(EntityTemplate slotFiller) {
 		for (SlotType slotType : slotFiller.getEntityType().getSlotFillerOfSlotTypes()) {
 			entityAnnotationCache.putIfAbsent(slotType, new ArrayList<>());
 			if (slotType.matchesEntityType(slotFiller.getEntityType())) {
@@ -25,15 +29,15 @@ public class LiteralCandidateProvider implements ISlotFillerCandidateProvider<Li
 		}
 	}
 
-	public void addBatchSlotFiller(Collection<Literal> slotFiller) {
-		for (Literal literalSlotFiller : slotFiller) {
+	public void addBatchSlotFiller(Collection<EntityTemplate> slotFiller) {
+		for (EntityTemplate literalSlotFiller : slotFiller) {
 			addSlotFiller(literalSlotFiller);
 		}
 	}
 
 	@Override
-	public List<Literal> getSlotFillerCandidates(SlotType slotType) {
-		return entityAnnotationCache.getOrDefault(slotType, Collections.emptyList());
+	public List<EntityTemplate> getSlotFillerCandidates(SlotType slot) {
+		return entityAnnotationCache.getOrDefault(slot, Collections.emptyList());
 	}
 
 	@Override

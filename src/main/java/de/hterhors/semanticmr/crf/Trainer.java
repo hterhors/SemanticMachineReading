@@ -1,5 +1,6 @@
 package de.hterhors.semanticmr.crf;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,21 @@ import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 
 public class Trainer {
+
+	private static class TrainingStatistics {
+		private long startTrainingTime;
+		private long endTrainingTime;
+
+		private long getTotalTrainingDuration() {
+			return endTrainingTime - startTrainingTime;
+		}
+
+		@Override
+		public String toString() {
+			return "TrainingStatistics [getTotalTrainingDuration()=" + getTotalTrainingDuration() + "]";
+		}
+
+	}
 
 	final int numberOfEpochs;
 
@@ -33,6 +49,8 @@ public class Trainer {
 
 	private final IStoppingCriterion stoppingCriterion;
 
+	private TrainingStatistics trainingStatistics;
+
 	public Trainer(Model model, EntityTemplateExploration explorer, AbstractSampler sampler,
 			IStateInitializer initializer, IStoppingCriterion stoppingCriterion, ObjectiveFunction objectiveFunction,
 			final int numberOfEpochs) {
@@ -43,10 +61,12 @@ public class Trainer {
 		this.objectiveFunction = objectiveFunction;
 		this.sampler = sampler;
 		this.initializer = initializer;
+		this.trainingStatistics = new TrainingStatistics();
 	}
 
-	public void train(List<Instance> trainingInstances) {
-		State finalState = null;
+	public void trainModel(List<Instance> trainingInstances) {
+		this.trainingStatistics.startTrainingTime = System.currentTimeMillis();
+
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
 
 			for (Instance instance : trainingInstances) {
@@ -90,12 +110,12 @@ public class Trainer {
 
 				}
 
-				finalState = currentState;
 			}
 		}
-		System.out.println("Prediction: objective score = " + finalState.getObjectiveScore());
-		System.out.println(finalState.currentPrediction.toPrettyString());
-		System.out.println("Learned Model: ");
-		System.out.println(model);
+		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
+	}
+
+	public void printTrainingStatistics(final PrintStream ps) {
+		ps.println(this.trainingStatistics);
 	}
 }

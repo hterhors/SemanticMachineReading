@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.exceptions;
+package de.hterhors.semanticmr.exce;
 
 public class InvalidSpecificationException extends RuntimeException {
 

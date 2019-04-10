@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.exceptions;
+package de.hterhors.semanticmr.exce;
 
 /**
  * This exception is thrown, if an entity type is requested from the entity type

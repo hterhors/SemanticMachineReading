@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.hterhors.semanticmr.crf.exploration.candidateprovider.ISlotFillerCandidateProvider;
+import de.hterhors.semanticmr.candprov.ISlotFillerCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.IHardConstraintsProvider;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
@@ -69,27 +69,41 @@ public class EntityTemplateExploration {
 
 	public List<State> explore(State currentState) {
 
-		final EntityTemplate entityTemplate = currentState.currentPrediction;
-
 		final List<State> proposalStates = new ArrayList<>(averageNumberOfNewProposalStates);
 
-		for (ISlotFillerCandidateProvider<?> slotFillerCandidateProvider : slotFillerCandidateProviders) {
+		for (int annotationIndex = 0; annotationIndex < currentState.currentPredictions.getAnnotations()
+				.size(); annotationIndex++) {
 
-			changeTemplateType(proposalStates, currentState, slotFillerCandidateProvider, entityTemplate);
+			final AbstractSlotFiller<?> annotation;
 
-			changeSingleFiller(proposalStates, currentState, slotFillerCandidateProvider, entityTemplate);
+			if (!((annotation = currentState.currentPredictions.getAnnotations()
+					.get(annotationIndex)) instanceof EntityTemplate))
+				throw new IllegalStateException("Can not handle non-EntityTemplate annotations in this explorer!");
 
-			addMultiFiller(proposalStates, currentState, slotFillerCandidateProvider, entityTemplate);
+			final EntityTemplate entitytemplateAnnotation = (EntityTemplate) annotation;
 
-			changeMultiFiller(proposalStates, currentState, slotFillerCandidateProvider, entityTemplate);
+			for (ISlotFillerCandidateProvider<?> slotFillerCandidateProvider : slotFillerCandidateProviders) {
+
+				changeTemplateType(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
+						annotationIndex);
+
+				changeSingleFiller(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
+						annotationIndex);
+
+				addMultiFiller(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
+						annotationIndex);
+
+				changeMultiFiller(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
+						annotationIndex);
+
+			}
+
+			deleteSingleFiller(proposalStates, currentState, entitytemplateAnnotation, annotationIndex);
+			deleteMultiFiller(proposalStates, currentState, entitytemplateAnnotation, annotationIndex);
+
+			updateAverage(proposalStates);
 
 		}
-
-		deleteSingleFiller(proposalStates, currentState, entityTemplate);
-		deleteMultiFiller(proposalStates, currentState, entityTemplate);
-
-		updateAverage(proposalStates);
-
 		return proposalStates;
 
 	}
@@ -100,7 +114,8 @@ public class EntityTemplateExploration {
 	}
 
 	private void changeTemplateType(final List<State> proposalStates, State currentState,
-			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate) {
+			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			int annotationIndex) {
 
 		for (EntityType templateTypeCandidate : slotFillerCandidateProvider
 				.getTemplateTypeCandidates(entityTemplate.getEntityType())) {
@@ -113,12 +128,12 @@ public class EntityTemplateExploration {
 			if (violatesConstraints(proposalStates, deepCopy))
 				continue;
 
-			proposalStates.add(currentState.deepUpdateCopy(deepCopy));
+			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
 		}
 	}
 
-	private void deleteMultiFiller(final List<State> proposalStates, State currentState,
-			EntityTemplate entityTemplate) {
+	private void deleteMultiFiller(final List<State> proposalStates, State currentState, EntityTemplate entityTemplate,
+			int annotationIndex) {
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
 			for (AbstractSlotFiller<?> slotFiller : entityTemplate.getMultiFillerSlot(slot).getSlotFiller()) {
 
@@ -128,14 +143,15 @@ public class EntityTemplateExploration {
 				if (violatesConstraints(proposalStates, deepCopy))
 					continue;
 
-				proposalStates.add(currentState.deepUpdateCopy(deepCopy));
+				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
 			}
 		}
 
 	}
 
 	private void changeMultiFiller(final List<State> proposalStates, State currentState,
-			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate) {
+			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			int annotationIndex) {
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
 			for (AbstractSlotFiller<?> slotFillerCandidate : slotFillerCandidateProvider
 					.getSlotFillerCandidates(slot)) {
@@ -163,14 +179,15 @@ public class EntityTemplateExploration {
 					if (violatesConstraints(proposalStates, deepCopy))
 						continue;
 
-					proposalStates.add(currentState.deepUpdateCopy(deepCopy));
+					proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
 				}
 			}
 		}
 	}
 
 	private void addMultiFiller(final List<State> proposalStates, State currentState,
-			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate) {
+			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			int annotationIndex) {
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
 			for (AbstractSlotFiller<?> slotFillerCandidate : slotFillerCandidateProvider
 					.getSlotFillerCandidates(slot)) {
@@ -201,13 +218,13 @@ public class EntityTemplateExploration {
 				if (violatesConstraints(proposalStates, deepCopy))
 					continue;
 
-				proposalStates.add(currentState.deepUpdateCopy(deepCopy));
+				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
 			}
 		}
 	}
 
 	private void deleteSingleFiller(final List<State> entityTemplates, State currentState,
-			EntityTemplate entityTemplate) {
+			EntityTemplate entityTemplate, int annotationIndex) {
 		for (SlotType slot : entityTemplate.getSingleFillerSlots().keySet()) {
 			final EntityTemplate deepCopy = entityTemplate.deepCopy();
 
@@ -218,12 +235,13 @@ public class EntityTemplateExploration {
 			if (violatesConstraints(entityTemplates, deepCopy))
 				continue;
 
-			entityTemplates.add(currentState.deepUpdateCopy(deepCopy));
+			entityTemplates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
 		}
 	}
 
 	private void changeSingleFiller(final List<State> proposalStates, State currentState,
-			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate) {
+			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			int annotationIndex) {
 		for (SlotType slotType : entityTemplate.getSingleFillerSlots().keySet()) {
 			for (AbstractSlotFiller<?> slotFillerCandidate : slotFillerCandidateProvider
 					.getSlotFillerCandidates(slotType)) {
@@ -251,7 +269,7 @@ public class EntityTemplateExploration {
 				if (violatesConstraints(proposalStates, deepCopy))
 					continue;
 
-				proposalStates.add(currentState.deepUpdateCopy(deepCopy));
+				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
 
 			}
 		}

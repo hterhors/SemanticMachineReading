@@ -1,17 +1,15 @@
 package de.hterhors.semanticmr;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hterhors.semanticmr.candprov.EntityTemplateCandidateProvider;
+import de.hterhors.semanticmr.candprov.EntityTypeCandidateProvider;
+import de.hterhors.semanticmr.candprov.ISlotFillerCandidateProvider;
+import de.hterhors.semanticmr.candprov.LiteralCandidateProvider;
 import de.hterhors.semanticmr.crf.ObjectiveFunction;
 import de.hterhors.semanticmr.crf.Trainer;
 import de.hterhors.semanticmr.crf.exploration.EntityTemplateExploration;
-import de.hterhors.semanticmr.crf.exploration.candidateprovider.EntityTemplateCandidateProvider;
-import de.hterhors.semanticmr.crf.exploration.candidateprovider.EntityTypeCandidateProvider;
-import de.hterhors.semanticmr.crf.exploration.candidateprovider.ISlotFillerCandidateProvider;
-import de.hterhors.semanticmr.crf.exploration.candidateprovider.LiteralCandidateProvider;
-import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.learner.optimizer.SGD;
@@ -19,16 +17,16 @@ import de.hterhors.semanticmr.crf.learner.regularizer.L2;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.stopcrit.IStoppingCriterion;
-import de.hterhors.semanticmr.crf.stopcrit.impl.MaxSamplingSteps;
+import de.hterhors.semanticmr.crf.stopcrit.impl.MaxChainLength;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.TestTemplate;
+import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
-import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
 import de.hterhors.semanticmr.init.specifications.SystemInitializionHandler;
+import de.hterhors.semanticmr.init.specifications.impl.CSVSpecs;
 import de.hterhors.semanticmr.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.slotfiller.DocumentLink;
@@ -43,22 +41,8 @@ public class SemanticMRMain {
 
 	public static void main(String[] args) {
 
-		File entitySpecifications = new File("src/main/resources/specifications/csv/entitySpecifications.csv");
-		File slotSpecifications = new File("src/main/resources/specifications/csv/slotSpecifications.csv");
-		File entityStructureSpecifications = new File(
-				"src/main/resources/specifications/csv/entityStructureSpecifications.csv");
-		File slotPairConstraitsSpecifications = new File(
-				"src/main/resources/specifications/csv/slotPairConstraintsSpecifications.csv");
-
-		SpecificationsProvider specificationProvider = new SpecificationsProvider(
-				new CSVSpecifictationsReader(entitySpecifications, entityStructureSpecifications, slotSpecifications,
-						slotPairConstraitsSpecifications));
-
-		SystemInitializionHandler initializer = new SystemInitializionHandler();
-		initializer.register(SlotType.getInitializationInstance());
-		initializer.register(EntityType.getInitializationInstance());
-		initializer.initialize(specificationProvider)
-				.registerNormalizationFunction(EntityType.get("Weight"), new WeightNormalization()).close();
+		SystemInitializionHandler initializer = new SystemInitializionHandler(new CSVSpecs().specificationProvider);
+		initializer.initialize().addNormalizationFunction(EntityType.get("Weight"), new WeightNormalization()).apply();
 
 		EntityTemplate template1 = new EntityTemplate(EntityType.get("RatModel"));
 		template1.updateSingleFillerSlot(SlotType.get("hasWeight"),
@@ -101,7 +85,7 @@ public class SemanticMRMain {
 		slotFillerCandidateProvider.add(entityTemplateCandidateProvider);
 
 		EntityTemplateExploration explorer = new EntityTemplateExploration(slotFillerCandidateProvider,
-				new HardConstraintsProvider(specificationProvider));
+				initializer.getHardConstraints());
 
 		ObjectiveFunction objectiveFunction = new ObjectiveFunction();
 
@@ -111,32 +95,34 @@ public class SemanticMRMain {
 		System.out.println("Gold:");
 		System.out.println(goldTemplate.toPrettyString());
 
-		IStateInitializer stateInitializer = ((instance) -> new State(instance,
-				new EntityTemplate(instance.getGoldTemplate().getEntityType())));
+		IStateInitializer stateInitializer = ((instance) -> new State(instance, new Annotations(
+				new EntityTemplate(instance.getGoldTemplates().getAnnotations().get(0).getEntityType()))));
 
-		int numberOfEpochs = 100;
+		int numberOfEpochs = 10;
 
 		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
 		Model model = new Model(featureTemplates, learner);
 
 		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
 
-		IStoppingCriterion stoppingCriterion = new MaxSamplingSteps(20);
+		IStoppingCriterion stoppingCriterion = new MaxChainLength(10);
 
-		Trainer trainer = new Trainer(model, explorer, sampler, stateInitializer, stoppingCriterion,
-				objectiveFunction, numberOfEpochs);
+		Trainer trainer = new Trainer(model, explorer, sampler, stateInitializer, stoppingCriterion, objectiveFunction,
+				numberOfEpochs);
 
 		List<Instance> trainingInstances = new ArrayList<>();
 
-		Document document = new Document();
+		Document document = new Document("Hello", new ArrayList<>());
+		Document document2 = new Document("Hello2", new ArrayList<>());
 
-		trainingInstances.add(new Instance(document, goldTemplate));
+		Annotations goldAnnotations1 = new Annotations(goldTemplate);
+		Annotations goldAnnotations2 = new Annotations(goldTemplate);
 
-		long t = System.currentTimeMillis();
-	
-		trainer.train(trainingInstances);
+		trainingInstances.add(new Instance(document, goldAnnotations1));
+		trainingInstances.add(new Instance(document2, goldAnnotations2));
 
-		System.out.println((System.currentTimeMillis() - t));
+		trainer.trainModel(trainingInstances);
+		trainer.printTrainingStatistics(System.out);
 
 	}
 

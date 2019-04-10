@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.structure.slots;
 
-import de.hterhors.semanticmr.exceptions.IllegalSlotFillerException;
+import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.slotfiller.EntityType;
 

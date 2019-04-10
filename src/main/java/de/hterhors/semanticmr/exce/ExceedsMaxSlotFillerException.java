@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.exceptions;
+package de.hterhors.semanticmr.exce;
 
 /**
  * This exception is thrown if a new slot filler is added to a multi filler slot

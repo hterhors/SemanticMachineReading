@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import de.hterhors.semanticmr.init.reader.json.structures.EntityTypeStructure;
+import de.hterhors.semanticmr.init.reader.json.structures.SlotTypeSpecification;
+
 import java.util.Set;
 
 public class StructureSpecification {
@@ -94,6 +98,7 @@ public class StructureSpecification {
 	 */
 	private final Map<String, Set<String>> superEntityTypes;
 	private final Map<String, Set<String>> subEntityTypes;
+
 	private final Map<String, Set<String>> slotsForEntity;
 	private final Map<String, Integer> multiAnnotationSlotMaxSizes;
 	private final Set<ExcludeSlotTypePairNames> excludeSlotTypePairs;

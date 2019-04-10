@@ -4,8 +4,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import de.hterhors.semanticmr.exceptions.ExceedsMaximumNumberOfSlotFillerException;
-import de.hterhors.semanticmr.exceptions.IllegalSlotFillerException;
+import de.hterhors.semanticmr.exce.ExceedsMaxSlotFillerException;
+import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.slotfiller.EntityType;
 
@@ -50,10 +50,10 @@ public class MultiFillerSlot extends AbstractSlot {
 		return !slotFiller.isEmpty();
 	}
 
-	public void addSlotFiller(AbstractSlotFiller<?> slotFiller) throws ExceedsMaximumNumberOfSlotFillerException {
+	public void addSlotFiller(AbstractSlotFiller<?> slotFiller) throws ExceedsMaxSlotFillerException {
 
 		if (containsMaximumFiller())
-			throw new ExceedsMaximumNumberOfSlotFillerException(
+			throw new ExceedsMaxSlotFillerException(
 					"Can not add slot filler, maximum capcaity of " + getMaxExplorationCapacity() + " reached!");
 
 		if (!slotType.matchesEntityType(slotFiller.getEntityType()))
