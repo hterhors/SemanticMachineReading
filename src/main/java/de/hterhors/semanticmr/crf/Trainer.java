@@ -25,8 +25,6 @@ public class Trainer {
 
 	final AbstractSampler sampler;
 
-	private AcceptStrategy acceptStrategy = AcceptStrategies.strictModelAccept();
-
 	public Trainer(final int maxNumberOfSamplingSteps, final int numberOfEpochs, EntityTemplateExploration explorer,
 			ObjectiveFunction objectiveFunction, Model model, AbstractSampler sampler) {
 		this.numberOfEpochs = numberOfEpochs;
@@ -59,20 +57,20 @@ public class Trainer {
 					State candidateState = sampler.sampleCandidate(proposalStates);
 
 					if (sampleBasedOnObjectiveFunction) {
-						model.score(Arrays.asList(candidateState, currentState));
+						model.score(candidateState);
 					} else {
 						objectiveFunction.score(candidateState);
 						objectiveFunction.score(currentState);
 					}
 
-					boolean isAccepted = acceptStrategy.isAccepted(candidateState, currentState);
+					boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState, currentState);
 
 					if (isAccepted) {
 						model.updateWeights(currentState, candidateState);
 						currentState = candidateState;
-						finalState = currentState;
 					}
 				}
+				finalState = currentState;
 			}
 		}
 		System.out.println("Prediction: objective score = " + finalState.getObjectiveScore());

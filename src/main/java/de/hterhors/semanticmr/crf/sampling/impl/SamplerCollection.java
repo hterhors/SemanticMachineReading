@@ -4,6 +4,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
+import de.hterhors.semanticmr.crf.sampling.AcceptStrategies;
+import de.hterhors.semanticmr.crf.sampling.AcceptStrategy;
 import de.hterhors.semanticmr.crf.sampling.SamplingUtils;
 import de.hterhors.semanticmr.crf.variables.State;
 
@@ -40,6 +42,11 @@ public class SamplerCollection {
 						.get();
 			}
 
+			@Override
+			public AcceptStrategy getAcceptanceStrategy(int epoch) {
+				return AcceptStrategies.strictModelAccept();
+			}
+
 		};
 	};
 
@@ -52,6 +59,10 @@ public class SamplerCollection {
 						.max((s1, s2) -> Double.compare(s1.getObjectiveScore(), s2.getObjectiveScore())).get();
 			}
 
+			@Override
+			public AcceptStrategy getAcceptanceStrategy(int epoch) {
+				return AcceptStrategies.strictObjectiveAccept();
+			}
 		};
 	}
 
@@ -62,6 +73,11 @@ public class SamplerCollection {
 			public State sampleCandidate(List<State> candidates) {
 				candidates.sort(modelScoreComparator);
 				return SamplingUtils.drawFromDistribution(candidates.subList(0, k), true);
+			}
+
+			@Override
+			public AcceptStrategy getAcceptanceStrategy(int epoch) {
+				return AcceptStrategies.strictModelAccept();
 			}
 
 		};
@@ -76,6 +92,10 @@ public class SamplerCollection {
 				return SamplingUtils.drawFromDistribution(candidates.subList(0, k), false);
 			}
 
+			@Override
+			public AcceptStrategy getAcceptanceStrategy(int epoch) {
+				return AcceptStrategies.strictObjectiveAccept();
+			}
 		};
 	}
 
@@ -87,6 +107,10 @@ public class SamplerCollection {
 				return SamplingUtils.drawFromDistribution(candidates, true);
 			}
 
+			@Override
+			public AcceptStrategy getAcceptanceStrategy(int epoch) {
+				return AcceptStrategies.strictModelAccept();
+			}
 		};
 	}
 
@@ -98,6 +122,10 @@ public class SamplerCollection {
 				return SamplingUtils.drawFromDistribution(candidates, false);
 			}
 
+			@Override
+			public AcceptStrategy getAcceptanceStrategy(int epoch) {
+				return AcceptStrategies.strictObjectiveAccept();
+			}
 		};
 	}
 

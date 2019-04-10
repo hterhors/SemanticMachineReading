@@ -9,11 +9,11 @@ public class AcceptStrategies {
 	 * @return
 	 */
 	public static AcceptStrategy strictModelAccept() {
-		return (candidate, current) -> candidate.getModelScore() > current.getObjectiveScore();
+		return (candidate, current) -> candidate.getModelScore() > current.getModelScore();
 	};
 
 	public static AcceptStrategy modelAccept() {
-		return (candidate, current) -> candidate.getModelScore() >= current.getObjectiveScore();
+		return (candidate, current) -> candidate.getModelScore() >= current.getModelScore();
 	};
 
 	/**

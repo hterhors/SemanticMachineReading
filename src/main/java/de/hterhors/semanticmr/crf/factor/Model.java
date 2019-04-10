@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
@@ -16,12 +17,12 @@ public class Model {
 	final private static FactorPool FACTOR_POOL_INSTANCE = FactorPool.getInstance();
 
 	/**
-	 * converts a feature name to its index.
+	 * Converts a feature name to its index.
 	 */
 	private final static Map<String, Integer> featureNameIndex = new ConcurrentHashMap<>();
 
 	/**
-	 * converts an index to its feature name.
+	 * Converts an index to its feature name.
 	 */
 	private final static Map<Integer, String> indexFeatureName = new ConcurrentHashMap<>();
 
@@ -52,11 +53,12 @@ public class Model {
 		this.learner = learner;
 	}
 
-	public void score(List<State> states) {
+	public void score(State state) {
 
 		final Set<FactorScope> cachedFactorScopes = FACTOR_POOL_INSTANCE.getCachedFactorScopes();
+
 		/**
-		 * TODO: measure efficiency
+		 * TODO: measure efficiency of streams
 		 */
 		for (AbstractFactorTemplate template : this.factorTemplates) {
 
@@ -64,23 +66,65 @@ public class Model {
 			 * Collect all factor scopes of all states to that this template can be applied
 			 */
 
-			states.parallelStream().forEach(
-					state -> state.getFactorGraph(template).addFactorScopes(template.generateFactorScopes(state)));
+			collectFactorScopesForState(template, state);
 
 			/*
 			 * Compute all selected factors in parallel.
 			 */
-			states.stream().flatMap(state -> state.getFactorGraphs().stream())
-					.flatMap(l -> l.getFactorScopes().stream()).parallel()
-					.filter(fs -> !cachedFactorScopes.contains(fs)).map(remainingFactorScope -> {
-						Factor f = new Factor(remainingFactorScope);
-						template.computeFeatureVector(f);
-						return f;
-					}).sequential().forEach(factor -> FACTOR_POOL_INSTANCE.addFactor(factor));
+			computeRemainingFactors(cachedFactorScopes, template,
+					state.getFactorGraphs().stream().flatMap(l -> l.getFactorScopes().stream()));
 		}
 
-		states.parallelStream().forEach(state -> state.setModelScore(computeScore(state)));
+		/*
+		 * Compute and set model score
+		 */
+		computeAndSetModelScore(state);
 
+	}
+
+	public void score(List<State> states) {
+
+		final Set<FactorScope> cachedFactorScopes = FACTOR_POOL_INSTANCE.getCachedFactorScopes();
+
+		/**
+		 * TODO: measure efficiency of streams
+		 */
+		for (AbstractFactorTemplate template : this.factorTemplates) {
+
+			/*
+			 * Collect all factor scopes of all states to that this template can be applied
+			 */
+
+			states.parallelStream().forEach(state -> collectFactorScopesForState(template, state));
+
+			/*
+			 * Compute all selected factors in parallel.
+			 */
+			computeRemainingFactors(cachedFactorScopes, template, states.stream()
+					.flatMap(state -> state.getFactorGraphs().stream()).flatMap(l -> l.getFactorScopes().stream()));
+		}
+		/*
+		 * Compute and set model score
+		 */
+		states.parallelStream().forEach(state -> computeAndSetModelScore(state));
+
+	}
+
+	private void computeAndSetModelScore(State state) {
+		state.setModelScore(computeScore(state));
+	}
+
+	private void computeRemainingFactors(final Set<FactorScope> cachedFactorScopes, AbstractFactorTemplate template,
+			Stream<FactorScope> stream) {
+		stream.parallel().filter(fs -> !cachedFactorScopes.contains(fs)).map(remainingFactorScope -> {
+			Factor f = new Factor(remainingFactorScope);
+			template.computeFeatureVector(f);
+			return f;
+		}).sequential().forEach(factor -> FACTOR_POOL_INSTANCE.addFactor(factor));
+	}
+
+	private void collectFactorScopesForState(AbstractFactorTemplate template, State state) {
+		state.getFactorGraph(template).addFactorScopes(template.generateFactorScopes(state));
 	}
 
 	/**
@@ -94,42 +138,24 @@ public class Model {
 	private double computeScore(State state) {
 
 		double score = 1;
+		boolean factorsAvailable = false;
 		for (FactorGraph abstractFactorTemplate : state.getFactorGraphs()) {
+
 			final List<Factor> factors = abstractFactorTemplate.getFactors();
 
-			if (factors.size() == 0)
-				return 0;
+			factorsAvailable |= factors.size() != 0;
 
 			for (Factor factor : factors) {
-				DoubleVector featureVector = factor.getFeatureVector();
-				DoubleVector weights = factor.getTemplate().getWeights();
-				double dotProduct = featureVector.dotProduct(weights);
-				double factorScore = Math.exp(dotProduct);
-				score *= factorScore;
+				score *= factor.computeScalaScore();
 			}
 
 		}
-		return score;
+		if (factorsAvailable)
+			return score;
+
+		return 0;
 
 	}
-
-//	protected double computeScore(List<Factor> factors) {
-//
-//		if (factors.size() == 0)
-//			return 0;
-//
-//		double score = 1;
-//		for (Factor factor : factors) {
-//			DoubleVector featureVector = factor.getFeatureVector();
-//			DoubleVector weights = factor.getTemplate().getWeights();
-//			double dotProduct = featureVector.dotProduct(weights);
-//			double factorScore = Math.exp(dotProduct);
-//			score *= factorScore;
-//		}
-//
-//		return score;
-//
-//	}
 
 	public void updateWeights(final State currentState, final State candidateState) {
 		this.learner.updateWeights(this.factorTemplates, currentState, candidateState);
@@ -137,7 +163,8 @@ public class Model {
 
 	@Override
 	public String toString() {
-		factorTemplates.get(0).getWeights().getFeatures().entrySet().forEach(System.out::println);
+		factorTemplates.get(0).getWeights().getFeatures().entrySet()
+				.forEach(f -> System.out.println(indexFeatureName.get(f.getKey()) + ":" + f.getValue()));
 		return "";
 	}
 

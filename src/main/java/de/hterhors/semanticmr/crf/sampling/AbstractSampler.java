@@ -23,4 +23,6 @@ public abstract class AbstractSampler {
 		return samplingStrategy.sampleBasedOnObjectiveScore(epoch);
 	}
 
+	public abstract AcceptStrategy getAcceptanceStrategy(int epoch);
+
 }

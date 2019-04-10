@@ -1,6 +1,5 @@
 package de.hterhors.semanticmr.crf.factor;
 
-import de.hterhors.semanticmr.crf.templates.AbstractFactorTemplate;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 
 /**
@@ -9,14 +8,27 @@ import de.hterhors.semanticmr.crf.variables.DoubleVector;
  * factor and the actual computation of its features is separated into to steps,
  * you need to store/reference the variables you need for the computation of the
  * features inside the factorVariables object.
+ * 
+ * @author hterhors
  *
  */
 public class Factor {
 
+	/**
+	 * The factors scope
+	 */
 	private final FactorScope factorScope;
 
+	/**
+	 * The factors feature
+	 */
 	private final DoubleVector features = new DoubleVector();
 
+	/**
+	 * Initialize the factor with its scope
+	 * 
+	 * @param factorScope
+	 */
 	public Factor(FactorScope factorScope) {
 		this.factorScope = factorScope;
 	}
@@ -29,8 +41,7 @@ public class Factor {
 		return factorScope;
 	}
 
-	public AbstractFactorTemplate getTemplate() {
-		return factorScope.getTemplate();
+	public double computeScalaScore() {
+		return Math.exp(features.dotProduct(factorScope.getTemplate().getWeights()));
 	}
-
 }

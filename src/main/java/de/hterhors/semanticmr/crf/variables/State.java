@@ -10,15 +10,19 @@ import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 
 public class State {
 
+	private static final double DEFAULT_OBJECTIVE_SCORE = 0;
+
+	private static final double DEFAULT_MODEL_SCORE = 1.0;
+
 	final public EntityTemplate goldEntityTemplate;
 
 	final public EntityTemplate currentPredictedEntityTemplate;
 
-	final private Map<AbstractFactorTemplate, FactorGraph> factorGraph = new HashMap<>();
+	final private Map<AbstractFactorTemplate, FactorGraph> factorGraph;
 
-	private double modelScore = 0;
+	private double modelScore = DEFAULT_MODEL_SCORE;
 
-	private double objectiveScore = 0;
+	private double objectiveScore = DEFAULT_OBJECTIVE_SCORE;
 
 	/**
 	 * Creates a new deep copy of the state except of the factor graph and the new
@@ -35,15 +39,17 @@ public class State {
 		this.currentPredictedEntityTemplate = currentPredictedEntityTemplate;
 		this.modelScore = modelScore;
 		this.objectiveScore = objectiveScore;
+		this.factorGraph = new HashMap<>();
 	}
 
 	public State(EntityTemplate goldEntityTemplate, EntityTemplate currentPredictedEntityTemplate) {
 		this.goldEntityTemplate = goldEntityTemplate;
 		this.currentPredictedEntityTemplate = currentPredictedEntityTemplate;
+		this.factorGraph = new HashMap<>();
 	}
 
 	public State deepUpdateCopy(EntityTemplate newCurrentPrediction) {
-		return new State(goldEntityTemplate, newCurrentPrediction, modelScore, objectiveScore);
+		return new State(goldEntityTemplate, newCurrentPrediction, DEFAULT_MODEL_SCORE, DEFAULT_OBJECTIVE_SCORE);
 	}
 
 	public FactorGraph getFactorGraph(final AbstractFactorTemplate template) {
@@ -75,7 +81,7 @@ public class State {
 	@Override
 	public String toString() {
 		return "State [currentPredictedEntityTemplate=" + currentPredictedEntityTemplate.toPrettyString()
-				+ ", factorGraph=" + factorGraph + "]";
+				+ ", modelScore=" + modelScore + ", objectiveScore=" + objectiveScore + "]";
 	}
 
 	public Collection<FactorGraph> getFactorGraphs() {
