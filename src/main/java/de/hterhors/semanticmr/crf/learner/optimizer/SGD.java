@@ -2,6 +2,17 @@ package de.hterhors.semanticmr.crf.learner.optimizer;
 
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 
+/**
+ * The SGD optimizer. TODO: link paper.
+ * 
+ *
+ * 
+ * <b> The current version does not support momentum functions! Only alpha
+ * static alpha decay is supported! </b>
+ * 
+ * @author hterhors
+ *
+ */
 public class SGD implements Optimizer {
 
 	private float alpha = 0.001F;
@@ -67,29 +78,5 @@ public class SGD implements Optimizer {
 		return "SGD [alpha=" + alpha + ", momentum=" + momentum + ", decay=" + decay + ", nesterov=" + nesterov + ", m="
 				+ mom + ", v=" + vel + ", t=" + t + "]";
 	}
-
-//	 public static void main(String[] args) {
-//	 DoubleVector theta = new Vector();
-//	 theta.set("x1", 1.0);
-//	 theta.set("x2", 1.0);
-//	
-//	 SGD adam = new SGD(0.001, 0.9, 0, false);
-//	 for (int t = 0; t < 200; t++) {
-//	 double x1 = theta.getValueOfFeature("x1");
-//	 double x2 = theta.getValueOfFeature("x2");
-//	 double loss = 1.0 / 2.0 * Math.pow(x1 * 2 + x2 * 4, 2);
-//	
-//	 System.out.println();
-//	 System.out.println("Time: " + t);
-//	 System.out.println("Theta: " + theta);
-//	 Vector g = new Vector();
-//	 g.set("x1", 4 * (x1 + 2 * x2));
-//	 g.set("x2", 8 * (x1 + 2 * x2));
-//	 System.out.println("Loss: " + loss);
-//	 System.out.println("Gradient: " + g);
-//	 theta = adam.getUpdates(theta, g);
-//	 System.out.println("Theta: " + theta);
-//	 }
-//	 }
 
 }

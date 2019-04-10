@@ -15,6 +15,8 @@ import de.hterhors.semanticmr.crf.variables.VectorUtil;
  * This learner implements a margin rank learning scheme with modular parameter
  * optimization and regularization.
  * 
+ * @author hterhors
+ *
  */
 public class AdvancedLearner {
 
