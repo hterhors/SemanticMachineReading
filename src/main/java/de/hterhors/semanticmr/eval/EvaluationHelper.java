@@ -82,7 +82,8 @@ public class EvaluationHelper {
 	}
 
 	public static Score scoreSingle(final AbstractSlotFiller<?> val, final AbstractSlotFiller<?> otherVal) {
-		if (val instanceof DocumentLinkedAnnotation && (otherVal instanceof DocumentLinkedAnnotation || otherVal == null)) {
+		if (val instanceof DocumentLinkedAnnotation
+				&& (otherVal instanceof DocumentLinkedAnnotation || otherVal == null)) {
 			return ((DocumentLinkedAnnotation) val).evaluate((DocumentLinkedAnnotation) otherVal);
 		} else if (val instanceof LiteralAnnotation && (otherVal instanceof LiteralAnnotation || otherVal == null)) {
 			return ((LiteralAnnotation) val).evaluate((LiteralAnnotation) otherVal);
@@ -91,7 +92,7 @@ public class EvaluationHelper {
 		} else if (val instanceof EntityTemplate && (otherVal instanceof EntityTemplate || otherVal == null)) {
 			return ((EntityTemplate) val).evaluate((EntityTemplate) otherVal);
 		} else {
-			return Score.INCORRECT;
+			return Score.FN_FP;
 		}
 	}
 

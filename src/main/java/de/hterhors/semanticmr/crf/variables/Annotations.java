@@ -45,7 +45,7 @@ public class Annotations implements IEvaluatable<Annotations> {
 
 	@Override
 	public Score evaluate(Annotations otherVal) {
-
+		
 		if (this.annotations.size() == 0 || otherVal.annotations.size() == 0 || otherVal == null)
 			return Score.ZERO;
 

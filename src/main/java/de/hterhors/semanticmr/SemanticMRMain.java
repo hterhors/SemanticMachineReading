@@ -68,51 +68,36 @@ public class SemanticMRMain {
 		List<JsonEntityTypeWrapper> entityTypeAnnotations = new ArrayList<>();
 		List<JsonEntityTemplateWrapper> entityTemplateAnnotations = new ArrayList<>();
 
-//		docLinkedAnnotations.add(new JsonDocumentLinkedAnnotationWrapper(new JsonEntityTypeWrapper("Male"),
-//				new JsonTextualContentWrapper("male"), new JsonDocumentPositionWrapper(0)));
-//
-//		literalAnnotations.add(new JsonLiteralAnnotationWrapper(new JsonEntityTypeWrapper("Female"),
-//				new JsonTextualContentWrapper("female")));
-//
-//		enittyTypeAnnotations.add(new JsonEntityTypeWrapper("Mixed"));
-
 		Map<JsonSlotTypeWrapper, JsonSingleFillerSlotWrapper> subSingleFillerSlots = new HashMap<>();
 
 		subSingleFillerSlots.put(new JsonSlotTypeWrapper("hasWeight"),
 				new JsonSingleFillerSlotWrapper(
 						new JsonDocumentLinkedAnnotationWrapper(new JsonEntityTypeWrapper("Weight"),
-								new JsonTextualContentWrapper("250 g"), new JsonDocumentPositionWrapper(350))));
-
-		Map<JsonSlotTypeWrapper, JsonMultiFillerSlotWrapper> subMultiFillerSlots = new HashMap<>();
-
-		List<JsonDocumentLinkedAnnotationWrapper> subSlotFiller = new ArrayList<>();
-		subSlotFiller.add(new JsonDocumentLinkedAnnotationWrapper(new JsonEntityTypeWrapper("Mention"),
-				new JsonTextualContentWrapper("Sub animal mention 1"), new JsonDocumentPositionWrapper(1000)));
-		subSlotFiller.add(new JsonDocumentLinkedAnnotationWrapper(new JsonEntityTypeWrapper("Mention"),
-				new JsonTextualContentWrapper("Sub animal mention 2"), new JsonDocumentPositionWrapper(2000)));
-
-		subMultiFillerSlots.put(new JsonSlotTypeWrapper("hasMentions"),
-				new JsonMultiFillerSlotWrapper(subSlotFiller, null, null, null));
+								new JsonTextualContentWrapper("100 g"), new JsonDocumentPositionWrapper(350))));
 
 		Map<JsonSlotTypeWrapper, JsonSingleFillerSlotWrapper> singleFillerSlots = new HashMap<>();
 
-		singleFillerSlots.put(new JsonSlotTypeWrapper("hasAgeCategory"),
-				new JsonSingleFillerSlotWrapper(new JsonEntityTypeWrapper("Adult")));
+		singleFillerSlots.put(new JsonSlotTypeWrapper("hasGender"),
+				new JsonSingleFillerSlotWrapper(new JsonEntityTypeWrapper("Male")));
 
 		singleFillerSlots.put(new JsonSlotTypeWrapper("hasSubAnimal"),
 				new JsonSingleFillerSlotWrapper(new JsonEntityTemplateWrapper(new JsonEntityTypeWrapper("MouseModel"),
-						subSingleFillerSlots, subMultiFillerSlots)));
+						subSingleFillerSlots, new HashMap<>())));
+
+		singleFillerSlots.put(new JsonSlotTypeWrapper("hasWeight"),
+				new JsonSingleFillerSlotWrapper(
+						new JsonDocumentLinkedAnnotationWrapper(new JsonEntityTypeWrapper("Weight"),
+								new JsonTextualContentWrapper("200 g"), new JsonDocumentPositionWrapper(1234))));
 
 		Map<JsonSlotTypeWrapper, JsonMultiFillerSlotWrapper> multiFillerSlots = new HashMap<>();
-
-		List<JsonDocumentLinkedAnnotationWrapper> slotFiller = new ArrayList<>();
-		slotFiller.add(new JsonDocumentLinkedAnnotationWrapper(new JsonEntityTypeWrapper("Mention"),
-				new JsonTextualContentWrapper("The First Mention"), new JsonDocumentPositionWrapper(100)));
-		slotFiller.add(new JsonDocumentLinkedAnnotationWrapper(new JsonEntityTypeWrapper("Mention"),
-				new JsonTextualContentWrapper("The Second Mention"), new JsonDocumentPositionWrapper(200)));
+		List<JsonDocumentLinkedAnnotationWrapper> multiSlotFiller = new ArrayList<>();
+		multiSlotFiller.add(new JsonDocumentLinkedAnnotationWrapper(new JsonEntityTypeWrapper("Mention"),
+				new JsonTextualContentWrapper("rats in da hood"), new JsonDocumentPositionWrapper(666)));
+		multiSlotFiller.add(new JsonDocumentLinkedAnnotationWrapper(new JsonEntityTypeWrapper("Mention"),
+				new JsonTextualContentWrapper("rat in da hood"), new JsonDocumentPositionWrapper(999)));
 
 		multiFillerSlots.put(new JsonSlotTypeWrapper("hasMentions"),
-				new JsonMultiFillerSlotWrapper(slotFiller, null, null, null));
+				new JsonMultiFillerSlotWrapper(multiSlotFiller, null, null, null));
 
 		entityTemplateAnnotations.add(new JsonEntityTemplateWrapper(new JsonEntityTypeWrapper("RatModel"),
 				singleFillerSlots, multiFillerSlots));
@@ -149,18 +134,15 @@ public class SemanticMRMain {
 
 		IStoppingCriterion stoppingCriterion = new MaxChainLength(10);
 
-		Document document = new Document("Hello", new ArrayList<>());
-		Document document2 = new Document("Hello2", new ArrayList<>());
-
-		EntityTemplate template1 = new EntityTemplate(EntityType.get("RatModel"));
+		EntityTemplate template1 = new EntityTemplate(EntityType.get("MouseModel"));
 		template1.updateSingleFillerSlot(SlotType.get("hasWeight"),
-				AbstractSlotFiller.toSlotFiller("Weight", "100 g", 1234));
+				AbstractSlotFiller.toSlotFiller("Weight", "100 g", 350));
 
-		EntityTemplate template2 = new EntityTemplate(EntityType.get("RatModel"));
+		EntityTemplate template2 = new EntityTemplate(EntityType.get("MouseModel"));
 		template2.updateSingleFillerSlot(SlotType.get("hasWeight"),
 				AbstractSlotFiller.toSlotFiller("Weight", "400 g", 1234));
 
-		template1.updateSingleFillerSlot(SlotType.get("hasSubAnimal"), template2);
+//		template1.updateSingleFillerSlot(SlotType.get("hasSubAnimal"), template2);
 
 		EntityTemplate goldTemplate = new EntityTemplate(EntityType.get("RatModel"));
 		goldTemplate.updateSingleFillerSlot(SlotType.get("hasGender"), AbstractSlotFiller.toSlotFiller("Male"));
@@ -172,18 +154,20 @@ public class SemanticMRMain {
 		goldTemplate.addToMultiFillerSlot(SlotType.get("hasMentions"),
 				AbstractSlotFiller.toSlotFiller("Mention", "rat in da hood", 999));
 
-		EntityTemplateCandidateProvider entityTemplateCandidateProvider = new EntityTemplateCandidateProvider(document);
+		EntityTemplateCandidateProvider entityTemplateCandidateProvider = new EntityTemplateCandidateProvider(
+				instances.get(0).getDocument());
 		entityTemplateCandidateProvider.addSlotFiller(template1);
 		entityTemplateCandidateProvider.addSlotFiller(template2);
 
 		EntityTemplateCandidateProvider entityTemplateCandidateProvider2 = new EntityTemplateCandidateProvider(
-				document2);
+				instances.get(0).getDocument());
 		entityTemplateCandidateProvider2.addSlotFiller(template1);
 		entityTemplateCandidateProvider2.addSlotFiller(template2);
 
 		EntityTypeCandidateProvider entityCandidateProvider = EntityTypeCandidateProvider.getInstance();
 
-		LiteralCandidateProvider literalCandidateProvider = new LiteralCandidateProvider(document);
+		LiteralCandidateProvider literalCandidateProvider = new LiteralCandidateProvider(
+				instances.get(0).getDocument());
 		literalCandidateProvider
 				.addSlotFiller(new LiteralAnnotation(EntityType.get("Mention"), new TextualContent("rating")));
 		literalCandidateProvider
@@ -199,10 +183,9 @@ public class SemanticMRMain {
 
 		List<Instance> trainingInstances = new ArrayList<>(instances);
 
-		for (Instance instance : trainingInstances) {
-			System.out.println(instance);
-		}
-		System.out.println("----");
+		System.out.println(trainingInstances.get(0).getGoldAnnotations().getAnnotations().get(0).toPrettyString());
+		System.out.println(goldTemplate.toPrettyString());
+		System.out.println(trainingInstances.get(0).getGoldAnnotations().getAnnotations().get(0).equals(goldTemplate));
 
 		// trainingInstances.add(new Instance(document, goldAnnotations1));
 //		trainingInstances.add(new Instance(document2, goldAnnotations2));

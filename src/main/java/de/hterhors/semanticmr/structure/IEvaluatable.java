@@ -6,11 +6,13 @@ public interface IEvaluatable<T> {
 
 		final public static Score ZERO = new Score().unmod();
 
-		final public static Score CORRECT = new Score(1, 0, 0, 0);
+		final public static Score TP = new Score(1, 0, 0, 0).unmod();
 
-		final public static Score INCORRECT = new Score(0, 1, 1, 0);
+		final public static Score FN_FP = new Score(0, 1, 1, 0).unmod();
 
-		final public static Score FN = new Score(0, 0, 1, 0);
+		final public static Score FN = new Score(0, 0, 1, 0).unmod();
+
+		final public static Score FP = new Score(0, 1, 0, 0).unmod();
 
 		private int tp = 0;
 		private int fp = 0;
@@ -99,8 +101,21 @@ public interface IEvaluatable<T> {
 		 * @return this with inverted fp and fn
 		 */
 		public Score invert() {
+			/*
+			 * Invert is the same.
+			 */
+			if (this == FN_FP || this == ZERO)
+				return this;
+
+			if (this == FN)
+				return FP;
+
+			if (this == FP)
+				return FN;
+
 			if (unmod)
 				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
+
 			final int tmp = this.fn;
 			this.fn = this.fp;
 			this.fp = tmp;

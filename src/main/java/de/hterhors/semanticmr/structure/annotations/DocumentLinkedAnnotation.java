@@ -75,9 +75,9 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 		if (otherVal == null) {
 			return Score.FN;
 		} else if (equals(otherVal)) {
-			return Score.CORRECT;
+			return Score.TP;
 		} else {
-			return Score.INCORRECT;
+			return Score.FN_FP;
 		}
 	}
 }

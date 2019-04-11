@@ -300,9 +300,9 @@ final public class EntityType extends AbstractSlotFiller<EntityType>
 		if (otherVal == null) {
 			return Score.FN;
 		} else if (equals(otherVal)) {
-			return Score.CORRECT;
+			return Score.TP;
 		} else {
-			return Score.INCORRECT;
+			return Score.FN_FP;
 		}
 	}
 

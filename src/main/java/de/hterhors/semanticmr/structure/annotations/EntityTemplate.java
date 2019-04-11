@@ -3,6 +3,7 @@ package de.hterhors.semanticmr.structure.annotations;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.SynchronousQueue;
 import java.util.stream.Collectors;
 
 import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
@@ -297,24 +298,20 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 
 	private void addScoresForMultiFillerSlots(EntityTemplate other, final Score score) {
 
-		System.out.println(this);
-		System.out.println(other);
-		System.out.println("------");
 		for (SlotType multiSlotType : this.multiFillerSlots.keySet()) {
 
-			final MultiFillerSlot slotFiller = this.getMultiFillerSlot(multiSlotType);
-			final MultiFillerSlot otherSlotFiller;
+			final Set<AbstractSlotFiller<?>> slotFiller = this.getMultiFillerSlot(multiSlotType).getSlotFiller();
+			final Set<AbstractSlotFiller<?>> otherSlotFiller;
 
 			if (other != null && other.containsMultiFillerSlot(multiSlotType))
-				otherSlotFiller = other.getMultiFillerSlot(multiSlotType);
+				otherSlotFiller = other.getMultiFillerSlot(multiSlotType).getSlotFiller();
 			else
-				otherSlotFiller = null;
+				otherSlotFiller = Collections.emptySet();
 
-			if (!slotFiller.containsSlotFiller() && (otherSlotFiller == null || !otherSlotFiller.containsSlotFiller()))
+			if (slotFiller.isEmpty() && (otherSlotFiller == null || otherSlotFiller.isEmpty()))
 				continue;
 
-			final Score bestScore = EvaluationHelper.scoreMax(slotFiller.getSlotFiller(),
-					otherSlotFiller.getSlotFiller());
+			final Score bestScore = EvaluationHelper.scoreMax(slotFiller, otherSlotFiller);
 
 			score.add(bestScore);
 		}
