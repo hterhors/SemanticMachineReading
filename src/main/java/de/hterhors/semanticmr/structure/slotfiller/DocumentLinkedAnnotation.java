@@ -17,7 +17,8 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 	 */
 	public final DocumentPosition documentPosition;
 
-	public DocumentLinkedAnnotation(EntityType entityType, TextualContent textualContent, DocumentPosition documentPosition) {
+	public DocumentLinkedAnnotation(EntityType entityType, TextualContent textualContent,
+			DocumentPosition documentPosition) {
 		super(entityType, textualContent);
 		this.documentPosition = documentPosition;
 	}
@@ -29,7 +30,8 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	@Override
 	public DocumentLinkedAnnotation deepCopy() {
-		return new DocumentLinkedAnnotation(getEntityType().deepCopy(), textualContent.deepCopy(), documentPosition.deepCopy());
+		return new DocumentLinkedAnnotation(getEntityType().deepCopy(), textualContent.deepCopy(),
+				documentPosition.deepCopy());
 	}
 
 	public String toPrettyString(int depth) {
@@ -69,6 +71,7 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	@Override
 	public Score evaluate(LiteralAnnotation otherVal) {
+
 		if (otherVal == null) {
 			return Score.FN;
 		} else if (equals(otherVal)) {
