@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.structure.slotfiller.normalization;
+package de.hterhors.semanticmr.structure.annotations.normalization;
 
 public interface INormalizationFunction {
 

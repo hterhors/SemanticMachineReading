@@ -29,13 +29,13 @@ import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.init.specifications.SystemInitializionHandler;
 import de.hterhors.semanticmr.init.specifications.impl.CSVSpecs;
 import de.hterhors.semanticmr.psink.normalization.WeightNormalization;
-import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.slotfiller.DocumentLinkedAnnotation;
-import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
-import de.hterhors.semanticmr.structure.slotfiller.EntityType;
-import de.hterhors.semanticmr.structure.slotfiller.LiteralAnnotation;
-import de.hterhors.semanticmr.structure.slotfiller.container.DocumentPosition;
-import de.hterhors.semanticmr.structure.slotfiller.container.TextualContent;
+import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.structure.annotations.DocumentLinkedAnnotation;
+import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.structure.annotations.EntityType;
+import de.hterhors.semanticmr.structure.annotations.LiteralAnnotation;
+import de.hterhors.semanticmr.structure.annotations.container.DocumentPosition;
+import de.hterhors.semanticmr.structure.annotations.container.TextualContent;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class SemanticMRMain {

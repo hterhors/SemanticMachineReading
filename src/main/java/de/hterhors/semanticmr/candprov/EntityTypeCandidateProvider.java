@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.hterhors.semanticmr.structure.slotfiller.EntityType;
+import de.hterhors.semanticmr.structure.annotations.EntityType;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class EntityTypeCandidateProvider implements ISlotFillerCandidateProvider<EntityType> {

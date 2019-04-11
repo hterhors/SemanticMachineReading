@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.structure.slotfiller.container;
+package de.hterhors.semanticmr.structure.annotations.container;
 
 /**
  * Contains information of the document position of an annotation.

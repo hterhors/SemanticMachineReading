@@ -8,9 +8,9 @@ import de.hterhors.semanticmr.candprov.DocumentCandidateProviderCollection;
 import de.hterhors.semanticmr.candprov.ISlotFillerCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.IHardConstraintsProvider;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
-import de.hterhors.semanticmr.structure.slotfiller.EntityType;
+import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.structure.annotations.EntityType;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 /**

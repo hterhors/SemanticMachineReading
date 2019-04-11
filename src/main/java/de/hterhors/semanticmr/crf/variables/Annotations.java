@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import de.hterhors.semanticmr.eval.EvaluationHelper;
 import de.hterhors.semanticmr.structure.IEvaluatable;
-import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
+import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
 
 public class Annotations implements IEvaluatable<Annotations> {
 

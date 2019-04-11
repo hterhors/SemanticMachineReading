@@ -7,7 +7,7 @@ import java.util.Map;
 import de.hterhors.semanticmr.crf.factor.FactorGraph;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.structure.IEvaluatable.Score;
-import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
+import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
 
 public class State {
 

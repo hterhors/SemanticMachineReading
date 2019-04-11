@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.slotfiller.EntityType;
+import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.structure.annotations.EntityType;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public interface ISlotFillerCandidateProvider<T extends AbstractSlotFiller<T>> {

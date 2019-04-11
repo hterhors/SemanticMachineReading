@@ -12,9 +12,9 @@ import de.hterhors.semanticmr.crf.exploration.constraints.IHardConstraintsProvid
 import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint;
 import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint.SlotEntityPair;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification.ExcludeSlotTypePairNames;
-import de.hterhors.semanticmr.structure.slotfiller.EntityType;
-import de.hterhors.semanticmr.structure.slotfiller.normalization.INormalizationFunction;
-import de.hterhors.semanticmr.structure.slotfiller.normalization.IRequiresInitialization;
+import de.hterhors.semanticmr.structure.annotations.EntityType;
+import de.hterhors.semanticmr.structure.annotations.normalization.INormalizationFunction;
+import de.hterhors.semanticmr.structure.annotations.normalization.IRequiresInitialization;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class SystemInitializionHandler {

@@ -2,8 +2,8 @@ package de.hterhors.semanticmr.crf.exploration;
 
 import java.util.Set;
 
-import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
+import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
 
 public class DetermineStructureDepth {
 

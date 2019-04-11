@@ -3,7 +3,7 @@ package de.hterhors.semanticmr.crf.exploration.constraints;
 import java.util.List;
 
 import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint;
-import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
+import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
 
 public class HardConstraintsProvider implements IHardConstraintsProvider {
 

@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import de.hterhors.semanticmr.crf.variables.Document;
-import de.hterhors.semanticmr.structure.slotfiller.EntityType;
-import de.hterhors.semanticmr.structure.slotfiller.LiteralAnnotation;
+import de.hterhors.semanticmr.structure.annotations.EntityType;
+import de.hterhors.semanticmr.structure.annotations.LiteralAnnotation;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class LiteralCandidateProvider implements ISlotFillerCandidateProvider<LiteralAnnotation> {

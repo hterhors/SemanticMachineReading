@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.exce.ExceedsMaxSlotFillerException;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
-import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.slotfiller.EntityType;
+import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.structure.annotations.EntityType;
 
 public class MultiFillerSlot extends AbstractSlot {
 

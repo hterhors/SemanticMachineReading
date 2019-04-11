@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.structure.slotfiller;
+package de.hterhors.semanticmr.structure.annotations;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,9 +11,9 @@ import java.util.stream.Stream;
 import de.hterhors.semanticmr.exce.UnkownEnityTypeException;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification;
 import de.hterhors.semanticmr.structure.IEvaluatable.Score;
-import de.hterhors.semanticmr.structure.slotfiller.normalization.INormalizationFunction;
-import de.hterhors.semanticmr.structure.slotfiller.normalization.IRequiresInitialization;
-import de.hterhors.semanticmr.structure.slotfiller.normalization.IdentityNormalization;
+import de.hterhors.semanticmr.structure.annotations.normalization.INormalizationFunction;
+import de.hterhors.semanticmr.structure.annotations.normalization.IRequiresInitialization;
+import de.hterhors.semanticmr.structure.annotations.normalization.IdentityNormalization;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 final public class EntityType extends AbstractSlotFiller<EntityType>

@@ -8,8 +8,8 @@ import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.templates.TestTemplate.Scope;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
+import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class TestTemplate extends AbstractFeatureTemplate<Scope> {

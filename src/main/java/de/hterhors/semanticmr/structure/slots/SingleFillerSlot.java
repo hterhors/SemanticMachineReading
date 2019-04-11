@@ -1,8 +1,8 @@
 package de.hterhors.semanticmr.structure.slots;
 
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
-import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.slotfiller.EntityType;
+import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.structure.annotations.EntityType;
 
 public class SingleFillerSlot extends AbstractSlot {
 

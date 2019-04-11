@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.psink.normalization;
 
-import de.hterhors.semanticmr.structure.slotfiller.normalization.INormalizationFunction;
+import de.hterhors.semanticmr.structure.annotations.normalization.INormalizationFunction;
 
 public class WeightNormalization implements INormalizationFunction {
 

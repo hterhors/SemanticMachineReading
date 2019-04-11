@@ -1,6 +1,6 @@
-package de.hterhors.semanticmr.structure.slotfiller;
+package de.hterhors.semanticmr.structure.annotations;
 
-import de.hterhors.semanticmr.structure.slotfiller.container.TextualContent;
+import de.hterhors.semanticmr.structure.annotations.container.TextualContent;
 
 /**
  * Annotation object for literal based slots that are NOT linked to the

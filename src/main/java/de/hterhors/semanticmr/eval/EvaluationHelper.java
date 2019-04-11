@@ -10,11 +10,11 @@ import java.util.stream.Stream;
 import org.apache.jena.ext.com.google.common.collect.Collections2;
 
 import de.hterhors.semanticmr.structure.IEvaluatable.Score;
-import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.slotfiller.DocumentLinkedAnnotation;
-import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
-import de.hterhors.semanticmr.structure.slotfiller.EntityType;
-import de.hterhors.semanticmr.structure.slotfiller.LiteralAnnotation;
+import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.structure.annotations.DocumentLinkedAnnotation;
+import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.structure.annotations.EntityType;
+import de.hterhors.semanticmr.structure.annotations.LiteralAnnotation;
 
 public class EvaluationHelper {
 

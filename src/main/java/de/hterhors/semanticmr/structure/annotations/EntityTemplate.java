@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.structure.slotfiller;
+package de.hterhors.semanticmr.structure.annotations;
 
 import java.util.Collections;
 import java.util.Map;

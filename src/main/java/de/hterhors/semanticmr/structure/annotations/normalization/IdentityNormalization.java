@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.structure.slotfiller.normalization;
+package de.hterhors.semanticmr.structure.annotations.normalization;
 
 /**
  * Evaluation function that returns the identity of the annotation of a slot.

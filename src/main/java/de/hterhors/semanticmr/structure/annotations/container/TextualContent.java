@@ -1,6 +1,6 @@
-package de.hterhors.semanticmr.structure.slotfiller.container;
+package de.hterhors.semanticmr.structure.annotations.container;
 
-import de.hterhors.semanticmr.structure.slotfiller.normalization.INormalizationFunction;
+import de.hterhors.semanticmr.structure.annotations.normalization.INormalizationFunction;
 
 /**
  * 
