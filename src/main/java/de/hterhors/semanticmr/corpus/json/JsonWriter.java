@@ -95,21 +95,35 @@ public class JsonWriter {
 		toJsoninstances
 				.add(new JsonInstanceWrapper(new JsonDocumentWrapper("Hello World", tokenList), goldAnnotations));
 
-//		GsonBuilder builder = new GsonBuilder();
-//		builder.disableHtmlEscaping();
-		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().disableHtmlEscaping().create();
-		Type type = new TypeToken<List<JsonInstanceWrapper>>() {
-		}.getType();
+		JsonWriter jsonWriter = new JsonWriter();
+		JsonReader jsonReader = new JsonReader();
 
-//		Gson gson = new Gson();//.create();
-		String json = gson.toJson(toJsoninstances, type);
+		String json = jsonWriter.writeInstances(toJsoninstances);
 
 		System.out.println(json);
-		List<JsonInstanceWrapper> fromJsonInstances = gson.fromJson(json, type);
+		List<JsonInstanceWrapper> fromJsonInstances = jsonReader.readInstances(json);
 		System.out.println(fromJsonInstances.equals(toJsoninstances));
 		System.out.println(toJsoninstances);
 		System.out.println(fromJsonInstances);
 
 	}
 
+	final private Gson gson;
+	final private Type type;
+
+	public JsonWriter() {
+		this.gson = new GsonBuilder().enableComplexMapKeySerialization().disableHtmlEscaping().create();
+		this.type = new TypeToken<List<JsonInstanceWrapper>>() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+		}.getType();
+
+	}
+
+	public String writeInstances(List<JsonInstanceWrapper> instances) {
+		return gson.toJson(instances, type);
+	}
 }

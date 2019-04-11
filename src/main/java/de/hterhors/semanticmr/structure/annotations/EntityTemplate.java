@@ -296,6 +296,10 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	}
 
 	private void addScoresForMultiFillerSlots(EntityTemplate other, final Score score) {
+
+		System.out.println(this);
+		System.out.println(other);
+		System.out.println("------");
 		for (SlotType multiSlotType : this.multiFillerSlots.keySet()) {
 
 			final MultiFillerSlot slotFiller = this.getMultiFillerSlot(multiSlotType);

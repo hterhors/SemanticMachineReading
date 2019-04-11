@@ -19,21 +19,24 @@ import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class SystemInitializionHandler {
 
-	final private List<IRequiresInitialization> requiresInitialization = new ArrayList<>();
+	final static private List<IRequiresInitialization> requiresInitialization = new ArrayList<>();
 
-	final private SpecificationsProvider specifications;
+	private static SpecificationsProvider specifications;
 
-	public SystemInitializionHandler(SpecificationsProvider specifications) {
-		this.specifications = specifications;
-		register(SlotType.getInitializationInstance());
-		register(EntityType.getInitializationInstance());
+	private SystemInitializionHandler() {
 	}
 
-	private void register(IRequiresInitialization object) {
+	private static void register(IRequiresInitialization object) {
 		requiresInitialization.add(object);
 	}
 
-	public NormalizationFunctionHandler initialize() {
+	public static NormalizationFunctionHandler initialize(SpecificationsProvider specificationProvider) {
+
+		SystemInitializionHandler.specifications = specificationProvider;
+
+		register(SlotType.getInitializationInstance());
+		register(EntityType.getInitializationInstance());
+
 		for (IRequiresInitialization iRequiresInitialization : requiresInitialization) {
 			iRequiresInitialization.system_init(specifications.getSpecifications());
 		}
@@ -82,10 +85,11 @@ public class SystemInitializionHandler {
 			return this;
 		}
 
-		public void apply() {
+		public SystemInitializionHandler apply() {
 			for (Entry<EntityType, INormalizationFunction> entry : normalizationFunctions.entrySet()) {
 				entry.getKey().setNormalizationFunction(entry.getValue());
 			}
+			return new SystemInitializionHandler();
 		}
 	}
 

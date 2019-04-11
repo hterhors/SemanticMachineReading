@@ -76,4 +76,9 @@ public class Document {
 		return documentContentBuilder.toString();
 	}
 
+	@Override
+	public String toString() {
+		return "Document [documentID=" + documentID + "]";
+	}
+
 }

@@ -34,4 +34,9 @@ public class Instance {
 		return goldAnnotations;
 	}
 
+	@Override
+	public String toString() {
+		return "Instance [document=" + document + ", goldAnnotations=" + goldAnnotations + "]";
+	}
+
 }

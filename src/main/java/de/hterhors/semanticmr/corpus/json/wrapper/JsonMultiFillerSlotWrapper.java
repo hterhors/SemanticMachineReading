@@ -6,16 +6,16 @@ public class JsonMultiFillerSlotWrapper {
 
 	private List<JsonDocumentLinkedAnnotationWrapper> docLinkedAnnotations;
 	private List<JsonLiteralAnnotationWrapper> literalAnnotations;
-	private List<JsonEntityTypeWrapper> enittyTypeAnnotations;
+	private List<JsonEntityTypeWrapper> entityTypeAnnotations;
 	private List<JsonEntityTemplateWrapper> entityTemplateAnnotations;
 
 	public JsonMultiFillerSlotWrapper(List<JsonDocumentLinkedAnnotationWrapper> docLinkedAnnotations,
-			List<JsonLiteralAnnotationWrapper> literalAnnotations, List<JsonEntityTypeWrapper> enittyTypeAnnotations,
+			List<JsonLiteralAnnotationWrapper> literalAnnotations, List<JsonEntityTypeWrapper> entityTypeAnnotations,
 			List<JsonEntityTemplateWrapper> entityTemplateAnnotations) {
 		super();
 		this.docLinkedAnnotations = docLinkedAnnotations;
 		this.literalAnnotations = literalAnnotations;
-		this.enittyTypeAnnotations = enittyTypeAnnotations;
+		this.entityTypeAnnotations = entityTypeAnnotations;
 		this.entityTemplateAnnotations = entityTemplateAnnotations;
 	}
 
@@ -35,12 +35,12 @@ public class JsonMultiFillerSlotWrapper {
 		this.literalAnnotations = literalAnnotations;
 	}
 
-	public List<JsonEntityTypeWrapper> getEnittyTypeAnnotations() {
-		return enittyTypeAnnotations;
+	public List<JsonEntityTypeWrapper> getEntityTypeAnnotations() {
+		return entityTypeAnnotations;
 	}
 
-	public void setEnittyTypeAnnotations(List<JsonEntityTypeWrapper> enittyTypeAnnotations) {
-		this.enittyTypeAnnotations = enittyTypeAnnotations;
+	public void setEntityTypeAnnotations(List<JsonEntityTypeWrapper> entityTypeAnnotations) {
+		this.entityTypeAnnotations = entityTypeAnnotations;
 	}
 
 	public List<JsonEntityTemplateWrapper> getEntityTemplateAnnotations() {
@@ -56,7 +56,7 @@ public class JsonMultiFillerSlotWrapper {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((docLinkedAnnotations == null) ? 0 : docLinkedAnnotations.hashCode());
-		result = prime * result + ((enittyTypeAnnotations == null) ? 0 : enittyTypeAnnotations.hashCode());
+		result = prime * result + ((entityTypeAnnotations == null) ? 0 : entityTypeAnnotations.hashCode());
 		result = prime * result + ((entityTemplateAnnotations == null) ? 0 : entityTemplateAnnotations.hashCode());
 		result = prime * result + ((literalAnnotations == null) ? 0 : literalAnnotations.hashCode());
 		return result;
@@ -76,10 +76,10 @@ public class JsonMultiFillerSlotWrapper {
 				return false;
 		} else if (!docLinkedAnnotations.equals(other.docLinkedAnnotations))
 			return false;
-		if (enittyTypeAnnotations == null) {
-			if (other.enittyTypeAnnotations != null)
+		if (entityTypeAnnotations == null) {
+			if (other.entityTypeAnnotations != null)
 				return false;
-		} else if (!enittyTypeAnnotations.equals(other.enittyTypeAnnotations))
+		} else if (!entityTypeAnnotations.equals(other.entityTypeAnnotations))
 			return false;
 		if (entityTemplateAnnotations == null) {
 			if (other.entityTemplateAnnotations != null)
@@ -97,7 +97,7 @@ public class JsonMultiFillerSlotWrapper {
 	@Override
 	public String toString() {
 		return "JsonMultiFillerSlotWrapper [docLinkedAnnotations=" + docLinkedAnnotations + ", literalAnnotations="
-				+ literalAnnotations + ", enittyTypeAnnotations=" + enittyTypeAnnotations
+				+ literalAnnotations + ", enittyTypeAnnotations=" + entityTypeAnnotations
 				+ ", entityTemplateAnnotations=" + entityTemplateAnnotations + "]";
 	}
 
