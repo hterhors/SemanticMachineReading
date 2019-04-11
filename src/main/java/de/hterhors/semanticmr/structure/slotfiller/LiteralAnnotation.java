@@ -10,7 +10,7 @@ import de.hterhors.semanticmr.structure.slotfiller.container.TextualContent;
  * @author hterhors
  *
  */
-public class Literal extends AbstractSlotFiller<Literal> {
+public class LiteralAnnotation extends AbstractSlotFiller<LiteralAnnotation> {
 
 	/**
 	 * Contains the textual content of this annotation.
@@ -21,7 +21,7 @@ public class Literal extends AbstractSlotFiller<Literal> {
 	 */
 	private final EntityType entityType;
 
-	public Literal(EntityType entityType, TextualContent textualContent) {
+	public LiteralAnnotation(EntityType entityType, TextualContent textualContent) {
 		this.entityType = entityType;
 		this.textualContent = textualContent;
 		this.textualContent.normalize(entityType.getNormalizationFunction());
@@ -33,8 +33,8 @@ public class Literal extends AbstractSlotFiller<Literal> {
 	}
 
 	@Override
-	public Literal deepCopy() {
-		return new Literal(entityType.deepCopy(), textualContent.deepCopy());
+	public LiteralAnnotation deepCopy() {
+		return new LiteralAnnotation(entityType.deepCopy(), textualContent.deepCopy());
 	}
 
 	public String toPrettyString(int depth) {
@@ -62,7 +62,7 @@ public class Literal extends AbstractSlotFiller<Literal> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Literal other = (Literal) obj;
+		LiteralAnnotation other = (LiteralAnnotation) obj;
 		if (entityType == null) {
 			if (other.entityType != null)
 				return false;
@@ -82,7 +82,7 @@ public class Literal extends AbstractSlotFiller<Literal> {
 	}
 
 	@Override
-	public Score evaluate(Literal otherVal) {
+	public Score evaluate(LiteralAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else if (equals(otherVal)) {

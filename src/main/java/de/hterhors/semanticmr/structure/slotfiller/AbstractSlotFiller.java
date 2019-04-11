@@ -15,17 +15,17 @@ public abstract class AbstractSlotFiller<T> implements IEvaluatable<T>, IDeepCop
 
 	public abstract EntityType getEntityType();
 
-	public static Literal toSlotFiller(final String entityTypeName, final String literal) {
-		return new Literal(EntityType.get(entityTypeName), new TextualContent(literal));
+	public static LiteralAnnotation toSlotFiller(final String entityTypeName, final String literal) {
+		return new LiteralAnnotation(EntityType.get(entityTypeName), new TextualContent(literal));
 	}
 
 	public static EntityType toSlotFiller(final String entityTypeName) {
 		return EntityType.get(entityTypeName);
 	}
 
-	public static DocumentLink toSlotFiller(final String entityTypeName, final String textualContent,
+	public static DocumentLinkedAnnotation toSlotFiller(final String entityTypeName, final String textualContent,
 			final int offset) {
-		return new DocumentLink(EntityType.get(entityTypeName), new TextualContent(textualContent),
+		return new DocumentLinkedAnnotation(EntityType.get(entityTypeName), new TextualContent(textualContent),
 				new DocumentPosition(offset));
 	}
 

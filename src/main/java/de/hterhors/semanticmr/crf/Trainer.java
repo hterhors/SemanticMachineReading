@@ -2,7 +2,10 @@ package de.hterhors.semanticmr.crf;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import de.hterhors.semanticmr.crf.exploration.EntityTemplateExploration;
 import de.hterhors.semanticmr.crf.factor.Model;
@@ -64,8 +67,10 @@ public class Trainer {
 		this.trainingStatistics = new TrainingStatistics();
 	}
 
-	public void trainModel(List<Instance> trainingInstances) {
+	public Map<Instance, State> trainModel(List<Instance> trainingInstances) {
 		this.trainingStatistics.startTrainingTime = System.currentTimeMillis();
+
+		final Map<Instance, State> finalStates = new LinkedHashMap<>();
 
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
 
@@ -74,10 +79,10 @@ public class Trainer {
 				final List<State> producedStateChain = new ArrayList<>();
 
 				State currentState = initializer.getInitState(instance);
+				objectiveFunction.score(currentState);
+				producedStateChain.add(currentState);
 
 				for (int samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
-
-					producedStateChain.add(currentState);
 
 					final List<State> proposalStates = explorer.explore(currentState);
 
@@ -105,14 +110,17 @@ public class Trainer {
 						currentState = candidateState;
 					}
 
+					producedStateChain.add(currentState);
+
 					if (stoppingCriterion.checkCondition(producedStateChain))
 						break;
 
 				}
-
+				finalStates.put(instance, producedStateChain.get(producedStateChain.size() - 1));
 			}
 		}
 		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
+		return finalStates;
 	}
 
 	public void printTrainingStatistics(final PrintStream ps) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.hterhors.semanticmr.candprov.DocumentCandidateProviderCollection;
 import de.hterhors.semanticmr.candprov.ISlotFillerCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.IHardConstraintsProvider;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -18,51 +19,23 @@ import de.hterhors.semanticmr.structure.slots.SlotType;
  */
 public class EntityTemplateExploration {
 
-	final private List<ISlotFillerCandidateProvider<?>> slotFillerCandidateProviders;
+	final private DocumentCandidateProviderCollection candidateProvider;
 
 	final private List<IHardConstraintsProvider> hardConstraintsProviders;
 
-	public EntityTemplateExploration(List<ISlotFillerCandidateProvider<?>> entityCandidateProviders,
+	public EntityTemplateExploration(DocumentCandidateProviderCollection candidateProvider,
 			List<IHardConstraintsProvider> hardConstraintsProvders) {
-		this.slotFillerCandidateProviders = entityCandidateProviders;
+		this.candidateProvider = candidateProvider;
 		this.hardConstraintsProviders = hardConstraintsProvders;
 	}
 
-	public EntityTemplateExploration(ISlotFillerCandidateProvider<?> entityCandidateProvider,
-			IHardConstraintsProvider hardConstraintsProvider) {
-		this.slotFillerCandidateProviders = new ArrayList<>(1);
-		this.slotFillerCandidateProviders.add(entityCandidateProvider);
-		this.hardConstraintsProviders = new ArrayList<IHardConstraintsProvider>(1);
-		this.hardConstraintsProviders.add(hardConstraintsProvider);
-	}
-
-	public EntityTemplateExploration(List<ISlotFillerCandidateProvider<?>> entityCandidateProviders,
-			IHardConstraintsProvider hardConstraintsProvider) {
-		this.slotFillerCandidateProviders = entityCandidateProviders;
-		this.hardConstraintsProviders = new ArrayList<IHardConstraintsProvider>(1);
-		this.hardConstraintsProviders.add(hardConstraintsProvider);
-	}
-
-	public EntityTemplateExploration(List<ISlotFillerCandidateProvider<?>> entityCandidateProviders) {
-		this.slotFillerCandidateProviders = entityCandidateProviders;
-		this.hardConstraintsProviders = Collections.emptyList();
-	}
-
-	public EntityTemplateExploration(ISlotFillerCandidateProvider<?> entityCandidateProvider,
-			List<IHardConstraintsProvider> hardConstraintsProvders) {
-		this.slotFillerCandidateProviders = new ArrayList<>(1);
-		this.slotFillerCandidateProviders.add(entityCandidateProvider);
-		this.hardConstraintsProviders = hardConstraintsProvders;
-	}
-
-	public EntityTemplateExploration(ISlotFillerCandidateProvider<?> entityCandidateProvider) {
-		this.slotFillerCandidateProviders = new ArrayList<>(1);
-		this.slotFillerCandidateProviders.add(entityCandidateProvider);
+	public EntityTemplateExploration(DocumentCandidateProviderCollection candidateProvider) {
+		this.candidateProvider = candidateProvider;
 		this.hardConstraintsProviders = Collections.emptyList();
 	}
 
 	/**
-	 * AverageNumber of new explored proposal states. This variable is used as
+	 * Average number of new explored proposal states. This variable is used as
 	 * initial size of the next new proposal state list.
 	 */
 	int averageNumberOfNewProposalStates = 16;
@@ -82,7 +55,8 @@ public class EntityTemplateExploration {
 
 			final EntityTemplate entitytemplateAnnotation = (EntityTemplate) annotation;
 
-			for (ISlotFillerCandidateProvider<?> slotFillerCandidateProvider : slotFillerCandidateProviders) {
+			for (ISlotFillerCandidateProvider<?> slotFillerCandidateProvider : candidateProvider
+					.getCandidateProviderForDocument(currentState.getInstance().getDocument())) {
 
 				changeTemplateType(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
 						annotationIndex);
@@ -104,6 +78,11 @@ public class EntityTemplateExploration {
 			updateAverage(proposalStates);
 
 		}
+		if (proposalStates.isEmpty()) {
+			System.out.println("WARN no states generated");
+			proposalStates.add(currentState);
+		}
+
 		return proposalStates;
 
 	}
@@ -125,7 +104,7 @@ public class EntityTemplateExploration {
 
 			final EntityTemplate deepCopy = entityTemplate.deepMergeCopy(templateTypeCandidate);
 
-			if (violatesConstraints(proposalStates, deepCopy))
+			if (violatesConstraints(deepCopy))
 				continue;
 
 			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -140,7 +119,7 @@ public class EntityTemplateExploration {
 				final EntityTemplate deepCopy = entityTemplate.deepCopy();
 				deepCopy.getMultiFillerSlot(slot).removeSlotFiller(slotFiller);
 
-				if (violatesConstraints(proposalStates, deepCopy))
+				if (violatesConstraints(deepCopy))
 					continue;
 
 				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -152,7 +131,9 @@ public class EntityTemplateExploration {
 	private void changeMultiFiller(final List<State> proposalStates, State currentState,
 			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
+
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
+
 			for (AbstractSlotFiller<?> slotFillerCandidate : slotFillerCandidateProvider
 					.getSlotFillerCandidates(slot)) {
 
@@ -176,7 +157,7 @@ public class EntityTemplateExploration {
 
 					deepCopy.updateMultiFillerSlot(slot, slotFiller, slotFillerCandidate);
 
-					if (violatesConstraints(proposalStates, deepCopy))
+					if (violatesConstraints(deepCopy))
 						continue;
 
 					proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -215,7 +196,7 @@ public class EntityTemplateExploration {
 				final EntityTemplate deepCopy = entityTemplate.deepCopy();
 				deepCopy.addToMultiFillerSlot(slot, slotFillerCandidate);
 
-				if (violatesConstraints(proposalStates, deepCopy))
+				if (violatesConstraints(deepCopy))
 					continue;
 
 				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -232,7 +213,7 @@ public class EntityTemplateExploration {
 				continue;
 
 			deepCopy.getSingleFillerSlot(slot).removeFiller();
-			if (violatesConstraints(entityTemplates, deepCopy))
+			if (violatesConstraints(deepCopy))
 				continue;
 
 			entityTemplates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -266,7 +247,7 @@ public class EntityTemplateExploration {
 				final EntityTemplate deepCopy = entityTemplate.deepCopy().updateSingleFillerSlot(slotType,
 						slotFillerCandidate);
 
-				if (violatesConstraints(proposalStates, deepCopy))
+				if (violatesConstraints(deepCopy))
 					continue;
 
 				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -281,12 +262,11 @@ public class EntityTemplateExploration {
 	 * 
 	 * Checks if the newly generated templateEntity violates any constraints.
 	 * 
-	 * @param proposalStates
 	 * @param deepCopy
 	 * 
 	 * @return false if the template does NOT violates any constraints, else true.
 	 */
-	private boolean violatesConstraints(final List<State> proposalStates, EntityTemplate deepCopy) {
+	private boolean violatesConstraints(EntityTemplate deepCopy) {
 		for (IHardConstraintsProvider hardConstraintsProvider : hardConstraintsProviders) {
 			if (hardConstraintsProvider.violatesConstraints(deepCopy))
 				return true;

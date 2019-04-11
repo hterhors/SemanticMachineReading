@@ -13,10 +13,18 @@ import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class EntityTypeCandidateProvider implements ISlotFillerCandidateProvider<EntityType> {
 
-	private final Map<SlotType, List<EntityType>> entityAnnotationCache = new HashMap<>();
+	private static EntityTypeCandidateProvider instance = null;
 
-	public EntityTypeCandidateProvider() {
+	public static EntityTypeCandidateProvider getInstance() {
+
+		if (instance == null)
+			instance = new EntityTypeCandidateProvider();
+
+		return instance;
+
 	}
+
+	private final Map<SlotType, List<EntityType>> entityAnnotationCache = new HashMap<>();
 
 	public List<EntityType> getSlotFillerCandidates(SlotType slot) {
 		if (!entityAnnotationCache.containsKey(slot)) {
@@ -43,14 +51,14 @@ public class EntityTypeCandidateProvider implements ISlotFillerCandidateProvider
 
 	@Override
 	public void addSlotFiller(EntityType slotFiller) {
-		// TODO Auto-generated method stub
-
+		throw new IllegalStateException(
+				"Can not add slot filler to enitty type candiate provider. Candidates are based on the specification.");
 	}
 
 	@Override
 	public void addBatchSlotFiller(Collection<EntityType> slotFiller) {
-		// TODO Auto-generated method stub
-
+		throw new IllegalStateException(
+				"Can not add slot filler to enitty type candiate provider. Candidates are based on the specification.");
 	}
 
 }

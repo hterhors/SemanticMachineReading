@@ -30,7 +30,7 @@ public class Instance {
 		return document;
 	}
 
-	public Annotations getGoldTemplates() {
+	public Annotations getGoldAnnotations() {
 		return goldAnnotations;
 	}
 

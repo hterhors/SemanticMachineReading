@@ -11,10 +11,10 @@ import org.apache.jena.ext.com.google.common.collect.Collections2;
 
 import de.hterhors.semanticmr.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.slotfiller.DocumentLink;
+import de.hterhors.semanticmr.structure.slotfiller.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 import de.hterhors.semanticmr.structure.slotfiller.EntityType;
-import de.hterhors.semanticmr.structure.slotfiller.Literal;
+import de.hterhors.semanticmr.structure.slotfiller.LiteralAnnotation;
 
 public class EvaluationHelper {
 
@@ -82,10 +82,10 @@ public class EvaluationHelper {
 	}
 
 	public static Score scoreSingle(final AbstractSlotFiller<?> val, final AbstractSlotFiller<?> otherVal) {
-		if (val instanceof DocumentLink && (otherVal instanceof DocumentLink || otherVal == null)) {
-			return ((DocumentLink) val).evaluate((DocumentLink) otherVal);
-		} else if (val instanceof Literal && (otherVal instanceof Literal || otherVal == null)) {
-			return ((Literal) val).evaluate((Literal) otherVal);
+		if (val instanceof DocumentLinkedAnnotation && (otherVal instanceof DocumentLinkedAnnotation || otherVal == null)) {
+			return ((DocumentLinkedAnnotation) val).evaluate((DocumentLinkedAnnotation) otherVal);
+		} else if (val instanceof LiteralAnnotation && (otherVal instanceof LiteralAnnotation || otherVal == null)) {
+			return ((LiteralAnnotation) val).evaluate((LiteralAnnotation) otherVal);
 		} else if (val instanceof EntityType && (otherVal instanceof EntityType || otherVal == null)) {
 			return ((EntityType) val).evaluate((EntityType) otherVal);
 		} else if (val instanceof EntityTemplate && (otherVal instanceof EntityTemplate || otherVal == null)) {

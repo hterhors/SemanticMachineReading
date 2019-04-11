@@ -36,8 +36,8 @@ public interface IEvaluatable<T> {
 
 		@Override
 		public String toString() {
-			return "Score [tp=" + tp + ", fp=" + fp + ", fn=" + fn + ", tn=" + tn + ", getPrecision()=" + getPrecision()
-					+ ", getRecall()=" + getRecall() + ", getF1()=" + getF1() + "]";
+			return "Score [getF1()=" + getF1() + ", getPrecision()=" + getPrecision() + ", getRecall()=" + getRecall()
+					+ ", tp=" + tp + ", fp=" + fp + ", fn=" + fn + ", tn=" + tn + "]";
 		}
 
 		public void add(Score evaluate) {

@@ -10,14 +10,14 @@ import de.hterhors.semanticmr.structure.slotfiller.container.TextualContent;
  * @author hterhors
  *
  */
-final public class DocumentLink extends Literal {
+final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	/**
 	 * Contains the document position of this annotation.
 	 */
 	public final DocumentPosition documentPosition;
 
-	public DocumentLink(EntityType entityType, TextualContent textualContent, DocumentPosition documentPosition) {
+	public DocumentLinkedAnnotation(EntityType entityType, TextualContent textualContent, DocumentPosition documentPosition) {
 		super(entityType, textualContent);
 		this.documentPosition = documentPosition;
 	}
@@ -28,8 +28,8 @@ final public class DocumentLink extends Literal {
 	}
 
 	@Override
-	public DocumentLink deepCopy() {
-		return new DocumentLink(getEntityType().deepCopy(), textualContent.deepCopy(), documentPosition.deepCopy());
+	public DocumentLinkedAnnotation deepCopy() {
+		return new DocumentLinkedAnnotation(getEntityType().deepCopy(), textualContent.deepCopy(), documentPosition.deepCopy());
 	}
 
 	public String toPrettyString(int depth) {
@@ -58,7 +58,7 @@ final public class DocumentLink extends Literal {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DocumentLink other = (DocumentLink) obj;
+		DocumentLinkedAnnotation other = (DocumentLinkedAnnotation) obj;
 		if (documentPosition == null) {
 			if (other.documentPosition != null)
 				return false;
@@ -68,7 +68,7 @@ final public class DocumentLink extends Literal {
 	}
 
 	@Override
-	public Score evaluate(Literal otherVal) {
+	public Score evaluate(LiteralAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else if (equals(otherVal)) {

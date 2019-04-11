@@ -31,6 +31,7 @@ public class Annotations implements IEvaluatable<Annotations> {
 		unmodifiable = true;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <Annotation extends AbstractSlotFiller<?>> List<Annotation> getAnnotations() {
 		return (List<Annotation>) annotations;
 	}
@@ -54,7 +55,6 @@ public class Annotations implements IEvaluatable<Annotations> {
 		return EvaluationHelper.scoreMax(this.annotations, otherVal.annotations);
 
 	}
-//	.stream().map(p -> p.toPrettyString()).reduce("", String::concat)
 
 	public Annotations deepUpdateCopy(int annotationIndex, AbstractSlotFiller<?> newCurrentPrediction) {
 
@@ -69,6 +69,12 @@ public class Annotations implements IEvaluatable<Annotations> {
 		}
 
 		return new Annotations(updatedList);
+	}
+
+	@Override
+	public String toString() {
+		return "Annotations [annotations="
+				+ annotations.stream().map(p -> p.toPrettyString()).reduce("", String::concat) + "]";
 	}
 
 }

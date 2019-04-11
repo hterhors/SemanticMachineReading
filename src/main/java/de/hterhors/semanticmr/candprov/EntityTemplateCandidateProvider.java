@@ -8,16 +8,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 import de.hterhors.semanticmr.structure.slotfiller.EntityType;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class EntityTemplateCandidateProvider implements ISlotFillerCandidateProvider<EntityTemplate> {
 
-	private final Map<SlotType, List<EntityTemplate>> entityAnnotationCache;
+	private final Map<SlotType, List<EntityTemplate>> entityAnnotationCache = new HashMap<>();
+	private final Document relatedDocument;
 
-	public EntityTemplateCandidateProvider() {
-		this.entityAnnotationCache = new HashMap<>();
+	public EntityTemplateCandidateProvider(Document relatedDocument) {
+		this.relatedDocument = relatedDocument;
 	}
 
 	public void addSlotFiller(EntityTemplate slotFiller) {
@@ -45,4 +47,7 @@ public class EntityTemplateCandidateProvider implements ISlotFillerCandidateProv
 		return Collections.emptySet();
 	}
 
+	public Document getRelatedDocument() {
+		return relatedDocument;
+	}
 }

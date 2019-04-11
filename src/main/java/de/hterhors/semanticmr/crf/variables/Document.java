@@ -25,6 +25,21 @@ public class Document {
 
 	final public List<DocumentToken> tokenList;
 
+	/**
+	 * Create a new document without any textual content.
+	 * 
+	 * @param documentID
+	 */
+	public Document(String documentID) {
+		this(documentID, Collections.emptyList());
+	}
+
+	/**
+	 * Create a new document with textual content.
+	 * 
+	 * @param documentID
+	 * @param tokenList
+	 */
 	public Document(String documentID, List<DocumentToken> tokenList) {
 		this.documentID = documentID;
 
@@ -49,7 +64,9 @@ public class Document {
 
 		for (int i = 0; i < tokenList.size() - 1; i++) {
 			documentContentBuilder.append(tokenList.get(i).text);
-			final int gap = tokenList.get(i + 1).docCharOnset - tokenList.get(i).docCharOnset;
+			final int gap = tokenList.get(i + 1).docCharOnset
+					- (tokenList.get(i).docCharOnset + tokenList.get(i).text.length());
+
 			for (int j = 0; j < gap; j++) {
 				documentContentBuilder.append(" ");
 			}

@@ -19,4 +19,11 @@ public class DocumentToken {
 		this.text = text;
 	}
 
+	@Override
+	public String toString() {
+		return "DocumentToken [sentenceIndex=" + sentenceIndex + ", senTokenIndex=" + senTokenIndex + ", docTokenIndex="
+				+ docTokenIndex + ", senCharOnset=" + senCharOnset + ", docCharOnset=" + docCharOnset + ", text=" + text
+				+ "]";
+	}
+
 }

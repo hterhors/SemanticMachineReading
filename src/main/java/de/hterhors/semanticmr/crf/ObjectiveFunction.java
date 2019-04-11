@@ -7,7 +7,7 @@ import de.hterhors.semanticmr.crf.variables.State;
 public class ObjectiveFunction {
 
 	public void score(State state) {
-		state.setObjectiveScore(state.computeAnnotationsOverlapScore());
+		state.setObjectiveScore(state.computeAnnotationsOverlapScore().getF1());
 	}
 
 	public void score(List<State> states) {

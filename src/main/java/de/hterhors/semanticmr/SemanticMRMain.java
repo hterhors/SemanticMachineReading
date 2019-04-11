@@ -2,10 +2,11 @@ package de.hterhors.semanticmr;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import de.hterhors.semanticmr.candprov.DocumentCandidateProviderCollection;
 import de.hterhors.semanticmr.candprov.EntityTemplateCandidateProvider;
 import de.hterhors.semanticmr.candprov.EntityTypeCandidateProvider;
-import de.hterhors.semanticmr.candprov.ISlotFillerCandidateProvider;
 import de.hterhors.semanticmr.candprov.LiteralCandidateProvider;
 import de.hterhors.semanticmr.crf.ObjectiveFunction;
 import de.hterhors.semanticmr.crf.Trainer;
@@ -29,10 +30,10 @@ import de.hterhors.semanticmr.init.specifications.SystemInitializionHandler;
 import de.hterhors.semanticmr.init.specifications.impl.CSVSpecs;
 import de.hterhors.semanticmr.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.slotfiller.DocumentLink;
+import de.hterhors.semanticmr.structure.slotfiller.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.structure.slotfiller.EntityTemplate;
 import de.hterhors.semanticmr.structure.slotfiller.EntityType;
-import de.hterhors.semanticmr.structure.slotfiller.Literal;
+import de.hterhors.semanticmr.structure.slotfiller.LiteralAnnotation;
 import de.hterhors.semanticmr.structure.slotfiller.container.DocumentPosition;
 import de.hterhors.semanticmr.structure.slotfiller.container.TextualContent;
 import de.hterhors.semanticmr.structure.slots.SlotType;
@@ -43,6 +44,27 @@ public class SemanticMRMain {
 
 		SystemInitializionHandler initializer = new SystemInitializionHandler(new CSVSpecs().specificationProvider);
 		initializer.initialize().addNormalizationFunction(EntityType.get("Weight"), new WeightNormalization()).apply();
+
+		ObjectiveFunction objectiveFunction = new ObjectiveFunction();
+
+		List<AbstractFeatureTemplate<?>> featureTemplates = new ArrayList<>();
+
+		featureTemplates.add(new TestTemplate());
+
+		IStateInitializer stateInitializer = ((instance) -> new State(instance, new Annotations(
+				new EntityTemplate(instance.getGoldAnnotations().getAnnotations().get(0).getEntityType()))));
+
+		int numberOfEpochs = 10;
+
+		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
+		Model model = new Model(featureTemplates, learner);
+
+		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
+
+		IStoppingCriterion stoppingCriterion = new MaxChainLength(10);
+
+		Document document = new Document("Hello", new ArrayList<>());
+		Document document2 = new Document("Hello2", new ArrayList<>());
 
 		EntityTemplate template1 = new EntityTemplate(EntityType.get("RatModel"));
 		template1.updateSingleFillerSlot(SlotType.get("hasWeight"),
@@ -64,64 +86,52 @@ public class SemanticMRMain {
 		goldTemplate.addToMultiFillerSlot(SlotType.get("hasMentions"),
 				AbstractSlotFiller.toSlotFiller("Mention", "rat in da hood", 999));
 
-		EntityTemplateCandidateProvider entityTemplateCandidateProvider = new EntityTemplateCandidateProvider();
+		EntityTemplateCandidateProvider entityTemplateCandidateProvider = new EntityTemplateCandidateProvider(document);
 		entityTemplateCandidateProvider.addSlotFiller(template1);
 		entityTemplateCandidateProvider.addSlotFiller(template2);
 
-		ISlotFillerCandidateProvider<EntityType> entityCandidateProvider = new EntityTypeCandidateProvider();
+		EntityTemplateCandidateProvider entityTemplateCandidateProvider2 = new EntityTemplateCandidateProvider(
+				document2);
+		entityTemplateCandidateProvider2.addSlotFiller(template1);
+		entityTemplateCandidateProvider2.addSlotFiller(template2);
 
-		LiteralCandidateProvider literalCandidateProvider = new LiteralCandidateProvider();
-		literalCandidateProvider.addSlotFiller(new Literal(EntityType.get("Mention"), new TextualContent("rating")));
-		literalCandidateProvider.addSlotFiller(new Literal(EntityType.get("Mention"), new TextualContent("rat")));
-		literalCandidateProvider.addSlotFiller(
-				new DocumentLink(EntityType.get("Weight"), new TextualContent("200 g"), new DocumentPosition(12345)));
+		EntityTypeCandidateProvider entityCandidateProvider = EntityTypeCandidateProvider.getInstance();
+
+		LiteralCandidateProvider literalCandidateProvider = new LiteralCandidateProvider(document);
+		literalCandidateProvider
+				.addSlotFiller(new LiteralAnnotation(EntityType.get("Mention"), new TextualContent("rating")));
+		literalCandidateProvider
+				.addSlotFiller(new LiteralAnnotation(EntityType.get("Mention"), new TextualContent("rat")));
+		literalCandidateProvider.addSlotFiller(new DocumentLinkedAnnotation(EntityType.get("Weight"),
+				new TextualContent("200 g"), new DocumentPosition(12345)));
 		literalCandidateProvider.addSlotFiller(AbstractSlotFiller.toSlotFiller("Mention", "rats in da hood", 666));
 		literalCandidateProvider.addSlotFiller(AbstractSlotFiller.toSlotFiller("Mention", "rat in da hood", 999));
 		literalCandidateProvider.addSlotFiller(AbstractSlotFiller.toSlotFiller("Weight", "200 g", 1234));
 
-		List<ISlotFillerCandidateProvider<?>> slotFillerCandidateProvider = new ArrayList<>();
-		slotFillerCandidateProvider.add(entityCandidateProvider);
-		slotFillerCandidateProvider.add(literalCandidateProvider);
-		slotFillerCandidateProvider.add(entityTemplateCandidateProvider);
-
-		EntityTemplateExploration explorer = new EntityTemplateExploration(slotFillerCandidateProvider,
-				initializer.getHardConstraints());
-
-		ObjectiveFunction objectiveFunction = new ObjectiveFunction();
-
-		List<AbstractFeatureTemplate<?>> featureTemplates = new ArrayList<>();
-
-		featureTemplates.add(new TestTemplate());
-		System.out.println("Gold:");
-		System.out.println(goldTemplate.toPrettyString());
-
-		IStateInitializer stateInitializer = ((instance) -> new State(instance, new Annotations(
-				new EntityTemplate(instance.getGoldTemplates().getAnnotations().get(0).getEntityType()))));
-
-		int numberOfEpochs = 10;
-
-		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
-		Model model = new Model(featureTemplates, learner);
-
-		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
-
-		IStoppingCriterion stoppingCriterion = new MaxChainLength(10);
-
-		Trainer trainer = new Trainer(model, explorer, sampler, stateInitializer, stoppingCriterion, objectiveFunction,
-				numberOfEpochs);
-
-		List<Instance> trainingInstances = new ArrayList<>();
-
-		Document document = new Document("Hello", new ArrayList<>());
-		Document document2 = new Document("Hello2", new ArrayList<>());
-
 		Annotations goldAnnotations1 = new Annotations(goldTemplate);
 		Annotations goldAnnotations2 = new Annotations(goldTemplate);
+
+		List<Instance> trainingInstances = new ArrayList<>();
 
 		trainingInstances.add(new Instance(document, goldAnnotations1));
 		trainingInstances.add(new Instance(document2, goldAnnotations2));
 
-		trainer.trainModel(trainingInstances);
+		DocumentCandidateProviderCollection documentCandidateProviderCollection = new DocumentCandidateProviderCollection();
+		documentCandidateProviderCollection.setEntityTypeCandidateProvider(entityCandidateProvider);
+		documentCandidateProviderCollection.addEntityTemplateCandidateProvider(entityTemplateCandidateProvider);
+		documentCandidateProviderCollection.addEntityTemplateCandidateProvider(entityTemplateCandidateProvider2);
+		documentCandidateProviderCollection.addLiteralCandidateProvider(literalCandidateProvider);
+
+		EntityTemplateExploration explorer = new EntityTemplateExploration(documentCandidateProviderCollection,
+				initializer.getHardConstraints());
+
+		Trainer trainer = new Trainer(model, explorer, sampler, stateInitializer, stoppingCriterion, objectiveFunction,
+				numberOfEpochs);
+
+		Map<Instance, State> results = trainer.trainModel(trainingInstances);
+
+		results.entrySet().forEach(System.out::println);
+		
 		trainer.printTrainingStatistics(System.out);
 
 	}

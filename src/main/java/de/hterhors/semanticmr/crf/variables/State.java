@@ -6,6 +6,7 @@ import java.util.Map;
 
 import de.hterhors.semanticmr.crf.factor.FactorGraph;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
+import de.hterhors.semanticmr.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.structure.slotfiller.AbstractSlotFiller;
 
 public class State {
@@ -72,8 +73,10 @@ public class State {
 
 	@Override
 	public String toString() {
-		return "State [modelScore=" + modelScore + ", objectiveScore=" + objectiveScore + ", currentPredictions="
-				+ currentPredictions + ", instance=" + instance.getDocument().documentID + "]";
+		return "State [modelScore=" + modelScore + ", objectiveScore=" + objectiveScore
+				+ ", computeAnnotationsOverlapScore()=" + computeAnnotationsOverlapScore() + ", goldAnnotation="
+				+ instance.getGoldAnnotations() + ", currentPredictions=" + currentPredictions + ", instance="
+				+ instance.getDocument().documentID + "]";
 	}
 
 	public Collection<FactorGraph> getFactorGraphs() {
@@ -81,11 +84,15 @@ public class State {
 	}
 
 	public Annotations getGoldAnnotations() {
-		return instance.getGoldTemplates();
+		return instance.getGoldAnnotations();
 	}
 
-	public double computeAnnotationsOverlapScore() {
-		return instance.getGoldTemplates().evaluate(currentPredictions).getF1();
+	public Score computeAnnotationsOverlapScore() {
+		return instance.getGoldAnnotations().evaluate(currentPredictions);
+	}
+
+	public Instance getInstance() {
+		return instance;
 	}
 
 }
