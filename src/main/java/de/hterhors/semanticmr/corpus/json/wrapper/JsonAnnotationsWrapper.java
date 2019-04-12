@@ -10,11 +10,11 @@ public class JsonAnnotationsWrapper {
 	private List<JsonEntityTemplateWrapper> entityTemplateAnnotations;
 
 	public JsonAnnotationsWrapper(List<JsonDocumentLinkedAnnotationWrapper> docLinkedAnnotations,
-			List<JsonLiteralAnnotationWrapper> literalAnnotations, List<JsonEntityTypeWrapper> enittyTypeAnnotations,
+			List<JsonLiteralAnnotationWrapper> literalAnnotations, List<JsonEntityTypeWrapper> entityTypeAnnotations,
 			List<JsonEntityTemplateWrapper> entityTemplateAnnotations) {
 		this.docLinkedAnnotations = docLinkedAnnotations;
 		this.literalAnnotations = literalAnnotations;
-		this.entityTypeAnnotations = enittyTypeAnnotations;
+		this.entityTypeAnnotations = entityTypeAnnotations;
 		this.entityTemplateAnnotations = entityTemplateAnnotations;
 	}
 

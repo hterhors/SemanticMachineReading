@@ -8,9 +8,10 @@ import de.hterhors.semanticmr.candprov.DocumentCandidateProviderCollection;
 import de.hterhors.semanticmr.candprov.ISlotFillerCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.IHardConstraintsProvider;
 import de.hterhors.semanticmr.crf.variables.State;
+import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.annotations.EntityType;
+import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 /**
@@ -79,9 +80,10 @@ public class EntityTemplateExploration {
 
 		}
 		if (proposalStates.isEmpty()) {
-			System.out.println("WARN no states generated");
+			System.out.println("WARN no states generated for instance: " + currentState.getInstance().getDocument());
 			proposalStates.add(currentState);
 		}
+//		proposalStates.forEach(System.out::println);
 
 		return proposalStates;
 
@@ -96,10 +98,10 @@ public class EntityTemplateExploration {
 			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 
-		for (EntityType templateTypeCandidate : slotFillerCandidateProvider
-				.getTemplateTypeCandidates(entityTemplate.getEntityType())) {
+		for (EntityTypeAnnotation templateTypeCandidate : slotFillerCandidateProvider
+				.getTemplateRootAnnotationCandidates(entityTemplate.getEntityType())) {
 
-			if (templateTypeCandidate == entityTemplate.getEntityType())
+			if (templateTypeCandidate.equals(entityTemplate.getRootAnnotation()))
 				continue;
 
 			final EntityTemplate deepCopy = entityTemplate.deepMergeCopy(templateTypeCandidate);
@@ -194,7 +196,7 @@ public class EntityTemplateExploration {
 				}
 
 				final EntityTemplate deepCopy = entityTemplate.deepCopy();
-				deepCopy.addToMultiFillerSlot(slot, slotFillerCandidate);
+				deepCopy.addMultiSlotFiller(slot, slotFillerCandidate);
 
 				if (violatesConstraints(deepCopy))
 					continue;
@@ -244,7 +246,7 @@ public class EntityTemplateExploration {
 				if (slotFillerCandidate.equals(entityTemplate.getSingleFillerSlot(slotType).getSlotFiller()))
 					continue;
 
-				final EntityTemplate deepCopy = entityTemplate.deepCopy().updateSingleFillerSlot(slotType,
+				final EntityTemplate deepCopy = entityTemplate.deepCopy().setSingleSlotFiller(slotType,
 						slotFillerCandidate);
 
 				if (violatesConstraints(deepCopy))

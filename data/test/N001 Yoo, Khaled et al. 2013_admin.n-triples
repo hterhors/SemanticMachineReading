@@ -1,0 +1,11 @@
+<http://scio/data/RatModel_1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://psink.de/scio/RatModel> .
+<http://scio/data/MouseModel_1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://psink.de/scio/MouseModel> .
+<http://scio/data/RatModel_1> <http://www.w3.org/2000/01/rdf-schema#comment> "SD-Rats"
+<http://scio/data/RatModel_1> <http://www.w3.org/2000/01/rdf-schema#label> "mouse"
+<http://scio/data/RatModel_1> <http://psink.de/scio/hasAgeCategory> <http://psink.de/scio/Adult> .
+<http://scio/data/RatModel_1> <http://psink.de/scio/hasGender> <http://psink.de/scio/Female> .
+<http://scio/data/RatModel_1> <http://psink.de/scio/hasWeight> "200 g" .
+<http://scio/data/RatModel_1> <http://psink.de/scio/hasSubAnimal> <http://scio/data/MouseModel_1> .
+<http://scio/data/RatModel_1> <http://psink.de/scio/hasMentions> "rats in da hood" .
+<http://scio/data/RatModel_1> <http://psink.de/scio/hasMentions> "rat in da hood" .
+<http://scio/data/MouseModel_1> <http://psink.de/scio/hasWeight> "100 g" .

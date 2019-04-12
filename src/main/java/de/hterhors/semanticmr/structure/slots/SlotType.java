@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import de.hterhors.semanticmr.exce.UnkownEnityTypeException;
 import de.hterhors.semanticmr.exce.UnkownSlotTypeException;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification;
-import de.hterhors.semanticmr.structure.annotations.EntityType;
+import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.annotations.normalization.IRequiresInitialization;
 
 public class SlotType implements Comparable<SlotType>, IRequiresInitialization {

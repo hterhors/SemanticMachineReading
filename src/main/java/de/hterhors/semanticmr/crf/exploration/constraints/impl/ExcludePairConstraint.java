@@ -1,8 +1,8 @@
 package de.hterhors.semanticmr.crf.exploration.constraints.impl;
 
 import de.hterhors.semanticmr.crf.exploration.constraints.AbstractHardConstraint;
+import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.annotations.EntityType;
 import de.hterhors.semanticmr.structure.slots.AbstractSlot;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 

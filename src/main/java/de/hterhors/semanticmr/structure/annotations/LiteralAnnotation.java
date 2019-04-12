@@ -1,5 +1,7 @@
 package de.hterhors.semanticmr.structure.annotations;
 
+import de.hterhors.semanticmr.structure.EntityType;
+import de.hterhors.semanticmr.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.structure.annotations.container.TextualContent;
 
 /**
@@ -9,19 +11,15 @@ import de.hterhors.semanticmr.structure.annotations.container.TextualContent;
  * @author hterhors
  *
  */
-public class LiteralAnnotation extends AbstractSlotFiller<LiteralAnnotation> {
+public class LiteralAnnotation extends EntityTypeAnnotation {
 
 	/**
 	 * Contains the textual content of this annotation.
 	 */
 	public final TextualContent textualContent;
-	/**
-	 * Defines the entity type of this annotation.
-	 */
-	private final EntityType entityType;
 
 	public LiteralAnnotation(EntityType entityType, TextualContent textualContent) {
-		this.entityType = entityType;
+		super(entityType);
 		this.textualContent = textualContent;
 		this.textualContent.normalize(entityType.getNormalizationFunction());
 	}
@@ -33,12 +31,12 @@ public class LiteralAnnotation extends AbstractSlotFiller<LiteralAnnotation> {
 
 	@Override
 	public LiteralAnnotation deepCopy() {
-		return new LiteralAnnotation(entityType.deepCopy(), textualContent.deepCopy());
+		return new LiteralAnnotation(entityType, textualContent.deepCopy());
 	}
 
 	public String toPrettyString(int depth) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(entityType.toPrettyString());
+		sb.append(super.toPrettyString(depth));
 		sb.append("\t");
 		sb.append(textualContent.toPrettyString());
 		return sb.toString().trim();
@@ -47,8 +45,7 @@ public class LiteralAnnotation extends AbstractSlotFiller<LiteralAnnotation> {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((entityType == null) ? 0 : entityType.hashCode());
+		int result = super.hashCode();
 		result = prime * result + ((textualContent == null) ? 0 : textualContent.hashCode());
 		return result;
 	}
@@ -57,16 +54,11 @@ public class LiteralAnnotation extends AbstractSlotFiller<LiteralAnnotation> {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		LiteralAnnotation other = (LiteralAnnotation) obj;
-		if (entityType == null) {
-			if (other.entityType != null)
-				return false;
-		} else if (entityType != other.entityType)
-			return false;
 		if (textualContent == null) {
 			if (other.textualContent != null)
 				return false;
@@ -76,13 +68,7 @@ public class LiteralAnnotation extends AbstractSlotFiller<LiteralAnnotation> {
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return entityType;
-	}
-
-	@Override
-	public Score evaluate(LiteralAnnotation otherVal) {
-
+	public Score evaluate(EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else if (equals(otherVal)) {
@@ -91,5 +77,4 @@ public class LiteralAnnotation extends AbstractSlotFiller<LiteralAnnotation> {
 			return Score.FN_FP;
 		}
 	}
-
 }

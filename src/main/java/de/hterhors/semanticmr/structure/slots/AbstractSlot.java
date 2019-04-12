@@ -1,10 +1,10 @@
 package de.hterhors.semanticmr.structure.slots;
 
+import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.IDeepCopyable;
 import de.hterhors.semanticmr.structure.IEvaluatable;
 import de.hterhors.semanticmr.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.annotations.EntityType;
 
 /**
  * Abstract class of a slot. There are two instantiations.

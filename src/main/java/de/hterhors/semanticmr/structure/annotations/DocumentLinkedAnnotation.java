@@ -1,5 +1,7 @@
 package de.hterhors.semanticmr.structure.annotations;
 
+import de.hterhors.semanticmr.structure.EntityType;
+import de.hterhors.semanticmr.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.structure.annotations.container.DocumentPosition;
 import de.hterhors.semanticmr.structure.annotations.container.TextualContent;
 
@@ -30,15 +32,12 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	@Override
 	public DocumentLinkedAnnotation deepCopy() {
-		return new DocumentLinkedAnnotation(getEntityType().deepCopy(), textualContent.deepCopy(),
-				documentPosition.deepCopy());
+		return new DocumentLinkedAnnotation(entityType, textualContent.deepCopy(), documentPosition.deepCopy());
 	}
 
 	public String toPrettyString(int depth) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(getEntityType().toPrettyString());
-		sb.append("\t");
-		sb.append(textualContent.toPrettyString());
+		sb.append(super.toPrettyString(depth));
 		sb.append("\t");
 		sb.append(documentPosition.toPrettyString());
 		return sb.toString().trim();
@@ -70,8 +69,7 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 	}
 
 	@Override
-	public Score evaluate(LiteralAnnotation otherVal) {
-
+	public Score evaluate(EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else if (equals(otherVal)) {

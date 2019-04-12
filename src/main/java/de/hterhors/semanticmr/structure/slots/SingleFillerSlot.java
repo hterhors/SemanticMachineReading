@@ -1,8 +1,8 @@
 package de.hterhors.semanticmr.structure.slots;
 
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
+import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.annotations.EntityType;
 
 public class SingleFillerSlot extends AbstractSlot {
 
@@ -40,11 +40,11 @@ public class SingleFillerSlot extends AbstractSlot {
 	 * @param slotFiller
 	 * @return the old annotation.
 	 */
-	public void updateFiller(final AbstractSlotFiller<?> slotFiller) {
+	public void set(final AbstractSlotFiller<?> slotFiller) {
 
 		if (this.slotFiller == slotFiller)
 			return;
-		
+
 		if (!slotType.matchesEntityType(slotFiller.getEntityType()))
 			throw new IllegalSlotFillerException("The provided slot filler annotation type "
 					+ slotFiller.getEntityType() + "is not suitable for this slot of type " + slotType);

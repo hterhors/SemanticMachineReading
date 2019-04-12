@@ -9,8 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 import de.hterhors.semanticmr.crf.variables.Document;
+import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.annotations.EntityType;
+import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class EntityTemplateCandidateProvider implements ISlotFillerCandidateProvider<EntityTemplate> {
@@ -43,7 +44,7 @@ public class EntityTemplateCandidateProvider implements ISlotFillerCandidateProv
 	}
 
 	@Override
-	public Set<EntityType> getTemplateTypeCandidates(EntityType templateType) {
+	public Set<EntityTypeAnnotation> getTemplateRootAnnotationCandidates(EntityType templateType) {
 		return Collections.emptySet();
 	}
 

@@ -76,8 +76,8 @@ public class TestTemplate extends AbstractFeatureTemplate<Scope> {
 			for (SlotType slot : annotation.getSingleFillerSlots().keySet()) {
 
 				if (annotation.getSingleFillerSlot(slot).containsSlotFiller())
-					factors.add(new Scope(this,
-							annotation.getSingleFillerSlot(slot).getSlotFiller().getEntityType().entityTypeName));
+					factors.add(new Scope(this, annotation.getSingleFillerSlot(slot).getSlotFiller()
+							.getEntityType().entityTypeName));
 
 			}
 		}

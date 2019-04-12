@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.psink.preprocessing;
+package de.hterhors.semanticmr.santo;
 
 import java.io.File;
 import java.io.IOException;

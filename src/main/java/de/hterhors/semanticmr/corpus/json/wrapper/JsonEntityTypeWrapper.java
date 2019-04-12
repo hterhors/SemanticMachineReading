@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.corpus.json.wrapper;
 
-public class JsonEntityTypeWrapper   {
+public class JsonEntityTypeWrapper {
 
 	private String entityType;
 

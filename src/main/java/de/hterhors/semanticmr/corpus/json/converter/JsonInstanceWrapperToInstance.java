@@ -11,6 +11,7 @@ import de.hterhors.semanticmr.corpus.json.wrapper.JsonDocumentPositionWrapper;
 import de.hterhors.semanticmr.corpus.json.wrapper.JsonDocumentTokenWrapper;
 import de.hterhors.semanticmr.corpus.json.wrapper.JsonDocumentWrapper;
 import de.hterhors.semanticmr.corpus.json.wrapper.JsonEntityTemplateWrapper;
+import de.hterhors.semanticmr.corpus.json.wrapper.JsonRootAnnotationWrapper;
 import de.hterhors.semanticmr.corpus.json.wrapper.JsonEntityTypeWrapper;
 import de.hterhors.semanticmr.corpus.json.wrapper.JsonInstanceWrapper;
 import de.hterhors.semanticmr.corpus.json.wrapper.JsonLiteralAnnotationWrapper;
@@ -22,25 +23,26 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.SystemInitializionHandler;
+import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.annotations.EntityType;
+import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.structure.annotations.LiteralAnnotation;
 import de.hterhors.semanticmr.structure.annotations.container.DocumentPosition;
 import de.hterhors.semanticmr.structure.annotations.container.TextualContent;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
-public class JsonToObjectConverter {
+public class JsonInstanceWrapperToInstance {
 
 	private List<JsonInstanceWrapper> jsonInstances;
 
-	public JsonToObjectConverter(List<JsonInstanceWrapper> jsonInstances) {
+	public JsonInstanceWrapperToInstance(List<JsonInstanceWrapper> jsonInstances) {
 		this.jsonInstances = jsonInstances;
 	}
 
-	public List<Instance> convertToInstances(SystemInitializionHandler initializer) {
+	public List<Instance> convertToInstances(SystemInitializer initializer) {
 		return jsonInstances.stream().map(instanceWrapper -> toInstance(instanceWrapper)).collect(Collectors.toList());
 	}
 
@@ -83,7 +85,7 @@ public class JsonToObjectConverter {
 			}
 		if (entityTypeAnnotations != null)
 			for (JsonEntityTypeWrapper wrapper : entityTypeAnnotations) {
-				annotations.add(toEntityType(wrapper));
+				annotations.add(toEntityTypeAnnotation(wrapper));
 			}
 		if (entityTemplateAnnotations != null)
 			for (JsonEntityTemplateWrapper wrapper : entityTemplateAnnotations) {
@@ -114,12 +116,17 @@ public class JsonToObjectConverter {
 		return EntityType.get(wrapper.getEntityType());
 	}
 
+	private EntityTypeAnnotation toEntityTypeAnnotation(JsonEntityTypeWrapper wrapper) {
+		return EntityTypeAnnotation.get(EntityType.get(wrapper.getEntityType()));
+	}
+
 	private EntityTemplate toEntityTemplate(JsonEntityTemplateWrapper wrapper) {
-		EntityTemplate entityTemplate = new EntityTemplate(toEntityType(wrapper.getEntityType()));
+
+		EntityTemplate entityTemplate = new EntityTemplate(toRootAnnotation(wrapper.getRootAnnotation()));
 
 		for (Entry<JsonSlotTypeWrapper, JsonSingleFillerSlotWrapper> singleSlotWrapper : wrapper.getSingleFillerSlots()
 				.entrySet()) {
-			entityTemplate.updateSingleFillerSlot(toSlotType(singleSlotWrapper.getKey()),
+			entityTemplate.setSingleSlotFiller(toSlotType(singleSlotWrapper.getKey()),
 					toSlotFiller(singleSlotWrapper.getValue()));
 		}
 
@@ -133,12 +140,23 @@ public class JsonToObjectConverter {
 					multiSlotWrapper.getValue().getEntityTemplateAnnotations());
 
 			for (AbstractSlotFiller<?> abstractSlotFiller : annotations) {
-				entityTemplate.addToMultiFillerSlot(toSlotType(multiSlotWrapper.getKey()), abstractSlotFiller);
+				entityTemplate.addMultiSlotFiller(toSlotType(multiSlotWrapper.getKey()), abstractSlotFiller);
 			}
 
 		}
 
 		return entityTemplate;
+	}
+
+	private EntityTypeAnnotation toRootAnnotation(JsonRootAnnotationWrapper wrapper) {
+		if (wrapper.getDocLinkedAnnotation() != null) {
+			return toDocumentLinkedAnnotation(wrapper.getDocLinkedAnnotation());
+		} else if (wrapper.getEntityTypeAnnotation() != null) {
+			return toEntityTypeAnnotation(wrapper.getEntityTypeAnnotation());
+		} else if (wrapper.getLiteralAnnotation() != null) {
+			return toLiteralAnnotation(wrapper.getLiteralAnnotation());
+		}
+		throw new IllegalStateException("Root annotation has no value.");
 	}
 
 	private AbstractSlotFiller<?> toSlotFiller(JsonSingleFillerSlotWrapper wrapper) {
@@ -147,7 +165,7 @@ public class JsonToObjectConverter {
 		} else if (wrapper.getEntityTemplateAnnotation() != null) {
 			return toEntityTemplate(wrapper.getEntityTemplateAnnotation());
 		} else if (wrapper.getEntityTypeAnnotation() != null) {
-			return toEntityType(wrapper.getEntityTypeAnnotation());
+			return toEntityTypeAnnotation(wrapper.getEntityTypeAnnotation());
 		} else if (wrapper.getLiteralAnnotation() != null) {
 			return toLiteralAnnotation(wrapper.getLiteralAnnotation());
 		}

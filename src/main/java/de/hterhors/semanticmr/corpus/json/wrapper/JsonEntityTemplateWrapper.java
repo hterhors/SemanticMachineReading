@@ -2,9 +2,9 @@ package de.hterhors.semanticmr.corpus.json.wrapper;
 
 import java.util.Map;
 
-public class JsonEntityTemplateWrapper   {
+public class JsonEntityTemplateWrapper {
 
-	private JsonEntityTypeWrapper entityType;
+	private JsonRootAnnotationWrapper rootAnnotation;
 
 	/**
 	 * An unmodifiable map of slots to fill.
@@ -16,27 +16,27 @@ public class JsonEntityTemplateWrapper   {
 	 */
 	private Map<JsonSlotTypeWrapper, JsonMultiFillerSlotWrapper> multiFillerSlots;
 
-	public JsonEntityTemplateWrapper(JsonEntityTypeWrapper entityType,
+	public JsonEntityTemplateWrapper(JsonRootAnnotationWrapper entityType,
 			Map<JsonSlotTypeWrapper, JsonSingleFillerSlotWrapper> singleFillerSlots,
 			Map<JsonSlotTypeWrapper, JsonMultiFillerSlotWrapper> multiFillerSlots) {
 		super();
-		this.entityType = entityType;
+		this.rootAnnotation = entityType;
 		this.singleFillerSlots = singleFillerSlots;
 		this.multiFillerSlots = multiFillerSlots;
 	}
 
 	@Override
 	public String toString() {
-		return "JsonEntityTemplateWrapper [entityType=" + entityType + ", singleFillerSlots=" + singleFillerSlots
+		return "JsonEntityTemplateWrapper [entityType=" + rootAnnotation + ", singleFillerSlots=" + singleFillerSlots
 				+ ", multiFillerSlots=" + multiFillerSlots + "]";
 	}
 
-	public JsonEntityTypeWrapper getEntityType() {
-		return entityType;
+	public JsonRootAnnotationWrapper getRootAnnotation() {
+		return rootAnnotation;
 	}
 
-	public void setEntityType(JsonEntityTypeWrapper entityType) {
-		this.entityType = entityType;
+	public void setRootAnnotation(JsonRootAnnotationWrapper rootAnnotation) {
+		this.rootAnnotation = rootAnnotation;
 	}
 
 	public Map<JsonSlotTypeWrapper, JsonSingleFillerSlotWrapper> getSingleFillerSlots() {
@@ -59,7 +59,7 @@ public class JsonEntityTemplateWrapper   {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((entityType == null) ? 0 : entityType.hashCode());
+		result = prime * result + ((rootAnnotation == null) ? 0 : rootAnnotation.hashCode());
 		result = prime * result + ((multiFillerSlots == null) ? 0 : multiFillerSlots.hashCode());
 		result = prime * result + ((singleFillerSlots == null) ? 0 : singleFillerSlots.hashCode());
 		return result;
@@ -74,10 +74,10 @@ public class JsonEntityTemplateWrapper   {
 		if (getClass() != obj.getClass())
 			return false;
 		JsonEntityTemplateWrapper other = (JsonEntityTemplateWrapper) obj;
-		if (entityType == null) {
-			if (other.entityType != null)
+		if (rootAnnotation == null) {
+			if (other.rootAnnotation != null)
 				return false;
-		} else if (!entityType.equals(other.entityType))
+		} else if (!rootAnnotation.equals(other.rootAnnotation))
 			return false;
 		if (multiFillerSlots == null) {
 			if (other.multiFillerSlots != null)

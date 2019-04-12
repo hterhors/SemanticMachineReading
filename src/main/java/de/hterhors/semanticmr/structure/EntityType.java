@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.structure.annotations;
+package de.hterhors.semanticmr.structure;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,14 +10,13 @@ import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.exce.UnkownEnityTypeException;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification;
-import de.hterhors.semanticmr.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.annotations.normalization.INormalizationFunction;
 import de.hterhors.semanticmr.structure.annotations.normalization.IRequiresInitialization;
 import de.hterhors.semanticmr.structure.annotations.normalization.IdentityNormalization;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
-final public class EntityType extends AbstractSlotFiller<EntityType>
-		implements Comparable<EntityType>, IRequiresInitialization {
+final public class EntityType implements Comparable<EntityType>, IRequiresInitialization {
 	/**
 	 * The name of this entity type.
 	 */
@@ -274,14 +273,6 @@ final public class EntityType extends AbstractSlotFiller<EntityType>
 		return false;
 	}
 
-	public EntityType deepCopy() {
-		return this;
-	}
-
-	public String toPrettyString(final int depth) {
-		return entityTypeName;
-	}
-
 	public boolean containsSlotType(SlotType slotType) {
 		return getSlotTypes().contains(slotType);
 	}
@@ -293,22 +284,6 @@ final public class EntityType extends AbstractSlotFiller<EntityType>
 	 */
 	public boolean isLeafEntityType() {
 		return getSlotTypes().isEmpty();
-	}
-
-	@Override
-	public Score evaluate(EntityType otherVal) {
-		if (otherVal == null) {
-			return Score.FN;
-		} else if (equals(otherVal)) {
-			return Score.TP;
-		} else {
-			return Score.FN_FP;
-		}
-	}
-
-	@Override
-	public EntityType getEntityType() {
-		return this;
 	}
 
 }

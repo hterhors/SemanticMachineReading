@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.corpus.json.wrapper;
 
-public class JsonLiteralAnnotationWrapper   {
+public class JsonLiteralAnnotationWrapper {
 
 	/**
 	 * Contains the textual content of this annotation.

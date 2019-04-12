@@ -3,7 +3,6 @@ package de.hterhors.semanticmr.structure.annotations;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.SynchronousQueue;
 import java.util.stream.Collectors;
 
 import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
@@ -12,6 +11,7 @@ import de.hterhors.semanticmr.eval.EvaluationHelper;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 import de.hterhors.semanticmr.exce.UnkownMultiSlotException;
 import de.hterhors.semanticmr.exce.UnkownSingleSlotException;
+import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.slots.MultiFillerSlot;
 import de.hterhors.semanticmr.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.structure.slots.SlotType;
@@ -27,7 +27,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	/**
 	 * Defines the entity type of this annotation.
 	 */
-	private final EntityType entityType;
+	private final EntityTypeAnnotation rootAnnotation;
 
 	/**
 	 * An unmodifiable map of slots to fill.
@@ -44,13 +44,15 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	 * 
 	 * @param entityType
 	 */
-	public EntityTemplate(EntityType entityType) {
-		this.entityType = entityType;
-		this.singleFillerSlots = Collections.unmodifiableMap(this.entityType.getSingleFillerSlotTypes().stream()
-				.map(slotType -> new SingleFillerSlot(slotType)).collect(Collectors.toMap(s -> s.slotType, s -> s)));
+	public EntityTemplate(EntityTypeAnnotation entityType) {
+		this.rootAnnotation = entityType;
+		this.singleFillerSlots = Collections.unmodifiableMap(this.rootAnnotation.entityType.getSingleFillerSlotTypes()
+				.stream().map(slotType -> new SingleFillerSlot(slotType))
+				.collect(Collectors.toMap(s -> s.slotType, s -> s)));
 
-		this.multiFillerSlots = Collections.unmodifiableMap(this.entityType.getMultiFillerSlotTypes().stream()
-				.map(slotType -> new MultiFillerSlot(slotType)).collect(Collectors.toMap(s -> s.slotType, s -> s)));
+		this.multiFillerSlots = Collections.unmodifiableMap(this.rootAnnotation.entityType.getMultiFillerSlotTypes()
+				.stream().map(slotType -> new MultiFillerSlot(slotType))
+				.collect(Collectors.toMap(s -> s.slotType, s -> s)));
 
 	}
 
@@ -75,9 +77,9 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	 * @param singleFillerSlots
 	 * @param multiFillerSlots
 	 */
-	private EntityTemplate(EntityType entityType, Map<SlotType, SingleFillerSlot> singleFillerSlots,
+	private EntityTemplate(EntityTypeAnnotation entityType, Map<SlotType, SingleFillerSlot> singleFillerSlots,
 			Map<SlotType, MultiFillerSlot> multiFillerSlots) {
-		this.entityType = entityType;
+		this.rootAnnotation = entityType;
 		this.singleFillerSlots = singleFillerSlots;
 		this.multiFillerSlots = multiFillerSlots;
 	}
@@ -99,7 +101,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		return slot;
 	}
 
-	public EntityTemplate updateSingleFillerSlot(SlotType slotType, final AbstractSlotFiller<?> slotFiller) {
+	public EntityTemplate setSingleSlotFiller(SlotType slotType, final AbstractSlotFiller<?> slotFiller) {
 
 		if (slotFiller == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
@@ -108,7 +110,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 			throw new IllegalSlotFillerException("Can not update slot .\"" + slotType.toPrettyString()
 					+ "\" with slot filler: \"" + slotFiller.toPrettyString() + "\"");
 
-		getSingleFillerSlot(slotType).updateFiller(slotFiller);
+		getSingleFillerSlot(slotType).set(slotFiller);
 		return this;
 	}
 
@@ -127,7 +129,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		getMultiFillerSlot(slotType).replace(slotFiller, slotFillerCandidate);
 	}
 
-	public void addToMultiFillerSlot(SlotType slotType, final AbstractSlotFiller<?> slotFiller) {
+	public void addMultiSlotFiller(SlotType slotType, final AbstractSlotFiller<?> slotFiller) {
 
 		if (slotFiller == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
@@ -138,7 +140,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 					+ "\" with slot filler: \"" + slotFiller.toPrettyString() + "\"");
 		}
 
-		getMultiFillerSlot(slotType).addSlotFiller(slotFiller);
+		getMultiFillerSlot(slotType).add(slotFiller);
 	}
 
 	public MultiFillerSlot getMultiFillerSlot(SlotType slotType) {
@@ -163,7 +165,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		final StringBuilder sb = new StringBuilder();
 		final int newDepth = depth + 1;
 
-		sb.append(entityType.toPrettyString());
+		sb.append(rootAnnotation.toPrettyString());
 		sb.append("\n");
 		for (SingleFillerSlot slot : singleFillerSlots.values()) {
 			if (slot.containsSlotFiller()) {
@@ -187,12 +189,12 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	@Override
 	public String toString() {
 		return "EntityTemplate [singleFillerSlots=" + singleFillerSlots + ", multiFillerSlots=" + multiFillerSlots
-				+ ", entityType=" + entityType + "]";
+				+ ", entityType=" + rootAnnotation + "]";
 	}
 
 	@Override
 	public EntityTemplate deepCopy() {
-		return new EntityTemplate(entityType,
+		return new EntityTemplate(rootAnnotation,
 				this.singleFillerSlots.entrySet().stream()
 						.collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue().deepCopy())),
 				this.multiFillerSlots.entrySet().stream()
@@ -200,18 +202,20 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	}
 
 	/**
-	 * Creates a deep copy of this entity template but changes the template type.
-	 * Overlapping slots are copied. New slots are empty. Vanishing slots are
-	 * removed.
+	 * Creates a deep copy of this entity template but changes the template root
+	 * annotation. Overlapping slots are deep copied. New slots are empty. Vanishing
+	 * slots are removed.
 	 * 
 	 * @param newTemplateType
 	 * @return
 	 */
-	public EntityTemplate deepMergeCopy(EntityType newTemplateType) {
-		return new EntityTemplate(newTemplateType,
-				this.singleFillerSlots.entrySet().stream().filter(s -> newTemplateType.containsSlotType(s.getKey()))
+	public EntityTemplate deepMergeCopy(EntityTypeAnnotation newTemplateType) {
+		return new EntityTemplate(newTemplateType.deepCopy(),
+				this.singleFillerSlots.entrySet().stream()
+						.filter(s -> newTemplateType.entityType.containsSlotType(s.getKey()))
 						.collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue().deepCopy())),
-				this.multiFillerSlots.entrySet().stream().filter(s -> newTemplateType.containsSlotType(s.getKey()))
+				this.multiFillerSlots.entrySet().stream()
+						.filter(s -> newTemplateType.entityType.containsSlotType(s.getKey()))
 						.collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue().deepCopy())));
 	}
 
@@ -219,7 +223,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((entityType == null) ? 0 : entityType.hashCode());
+		result = prime * result + ((rootAnnotation == null) ? 0 : rootAnnotation.hashCode());
 		result = prime * result + ((multiFillerSlots == null) ? 0 : multiFillerSlots.hashCode());
 		result = prime * result + ((singleFillerSlots == null) ? 0 : singleFillerSlots.hashCode());
 		return result;
@@ -234,10 +238,10 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		if (getClass() != obj.getClass())
 			return false;
 		EntityTemplate other = (EntityTemplate) obj;
-		if (entityType == null) {
-			if (other.entityType != null)
+		if (rootAnnotation == null) {
+			if (other.rootAnnotation != null)
 				return false;
-		} else if (entityType != other.entityType)
+		} else if (rootAnnotation != other.rootAnnotation)
 			return false;
 		if (multiFillerSlots == null) {
 			if (other.multiFillerSlots != null)
@@ -260,7 +264,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		if (other == null) {
 			score.increaseFalseNegative();
 		} else {
-			score.add(this.entityType.evaluate(other.getEntityType()));
+			score.add(this.rootAnnotation.evaluate(other.rootAnnotation));
 		}
 
 		addScoresForSingleFillerSlots(other, score);
@@ -319,7 +323,11 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 
 	@Override
 	public EntityType getEntityType() {
-		return entityType;
+		return rootAnnotation.entityType;
+	}
+
+	public EntityTypeAnnotation getRootAnnotation() {
+		return rootAnnotation;
 	}
 
 }

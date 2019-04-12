@@ -22,12 +22,12 @@ public class DocumentCandidateProviderCollection {
 
 	private EntityTypeCandidateProvider entityTypeCandidateProvider;
 
-	private Map<Document, List<LiteralCandidateProvider>> literalCandidateProvider = new HashMap<>();
+	private Map<Document, List<GeneralCandidateProvider>> literalCandidateProvider = new HashMap<>();
 	private Map<Document, List<EntityTemplateCandidateProvider>> entityTemplateCandidateProvider = new HashMap<>();
 
 	private Map<Document, List<ISlotFillerCandidateProvider<?>>> candidateProviderPerDocument = new HashMap<>();
 
-	public void addLiteralCandidateProvider(LiteralCandidateProvider candidateProvider) {
+	public void addLiteralCandidateProvider(GeneralCandidateProvider candidateProvider) {
 		literalCandidateProvider.putIfAbsent(candidateProvider.getRelatedDocument(), new ArrayList<>());
 		literalCandidateProvider.get(candidateProvider.getRelatedDocument()).add(candidateProvider);
 
@@ -35,7 +35,7 @@ public class DocumentCandidateProviderCollection {
 		candidateProviderPerDocument.get(candidateProvider.getRelatedDocument()).add(candidateProvider);
 	}
 
-	public List<LiteralCandidateProvider> getLiteralCandidateProvider(Document relatedDocument) {
+	public List<GeneralCandidateProvider> getLiteralCandidateProvider(Document relatedDocument) {
 		return literalCandidateProvider.get(relatedDocument);
 	}
 

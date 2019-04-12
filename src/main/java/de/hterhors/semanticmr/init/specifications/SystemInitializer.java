@@ -12,27 +12,31 @@ import de.hterhors.semanticmr.crf.exploration.constraints.IHardConstraintsProvid
 import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint;
 import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint.SlotEntityPair;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification.ExcludeSlotTypePairNames;
-import de.hterhors.semanticmr.structure.annotations.EntityType;
+import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.annotations.normalization.INormalizationFunction;
 import de.hterhors.semanticmr.structure.annotations.normalization.IRequiresInitialization;
 import de.hterhors.semanticmr.structure.slots.SlotType;
 
-public class SystemInitializionHandler {
+public class SystemInitializer {
 
 	final static private List<IRequiresInitialization> requiresInitialization = new ArrayList<>();
 
 	private static SpecificationsProvider specifications;
 
-	private SystemInitializionHandler() {
+	private SystemInitializer() {
 	}
 
 	private static void register(IRequiresInitialization object) {
 		requiresInitialization.add(object);
 	}
 
+	public SpecificationsProvider getSpecificationProvider() {
+		return specifications;
+	}
+
 	public static NormalizationFunctionHandler initialize(SpecificationsProvider specificationProvider) {
 
-		SystemInitializionHandler.specifications = specificationProvider;
+		SystemInitializer.specifications = specificationProvider;
 
 		register(SlotType.getInitializationInstance());
 		register(EntityType.getInitializationInstance());
@@ -85,11 +89,11 @@ public class SystemInitializionHandler {
 			return this;
 		}
 
-		public SystemInitializionHandler apply() {
+		public SystemInitializer apply() {
 			for (Entry<EntityType, INormalizationFunction> entry : normalizationFunctions.entrySet()) {
 				entry.getKey().setNormalizationFunction(entry.getValue());
 			}
-			return new SystemInitializionHandler();
+			return new SystemInitializer();
 		}
 	}
 

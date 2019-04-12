@@ -1,4 +1,5 @@
 #Entity	isLiteral
+OrganismModel	false
 AnimalModel	false
 RatModel	false
 TinyRatModel	false

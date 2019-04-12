@@ -1,4 +1,5 @@
 #SuperClass	SubClasses	
+OrganismModel	AnimalModel
 AnimalModel	RatModel
 AnimalModel	MouseModel
 RatModel	TinyRatModel

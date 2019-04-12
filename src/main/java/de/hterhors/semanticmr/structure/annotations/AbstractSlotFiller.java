@@ -1,5 +1,6 @@
 package de.hterhors.semanticmr.structure.annotations;
 
+import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.IDeepCopyable;
 import de.hterhors.semanticmr.structure.IEvaluatable;
 import de.hterhors.semanticmr.structure.annotations.container.DocumentPosition;
@@ -19,14 +20,18 @@ public abstract class AbstractSlotFiller<T> implements IEvaluatable<T>, IDeepCop
 		return new LiteralAnnotation(EntityType.get(entityTypeName), new TextualContent(literal));
 	}
 
-	public static EntityType toSlotFiller(final String entityTypeName) {
-		return EntityType.get(entityTypeName);
+	public static EntityTypeAnnotation toSlotFiller(final String entityTypeName) {
+		return toSlotFiller(EntityType.get(entityTypeName));
 	}
 
 	public static DocumentLinkedAnnotation toSlotFiller(final String entityTypeName, final String textualContent,
 			final int offset) {
 		return new DocumentLinkedAnnotation(EntityType.get(entityTypeName), new TextualContent(textualContent),
 				new DocumentPosition(offset));
+	}
+
+	public static EntityTypeAnnotation toSlotFiller(EntityType entityType) {
+		return EntityTypeAnnotation.get(entityType);
 	}
 
 }
