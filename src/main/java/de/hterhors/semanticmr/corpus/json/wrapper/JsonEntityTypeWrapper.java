@@ -1,33 +1,36 @@
 package de.hterhors.semanticmr.corpus.json.wrapper;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonEntityTypeWrapper {
 
-	private String entityType;
+	@SerializedName("etn")
+	private String entityTypeName;
 
-	public JsonEntityTypeWrapper(String entityType) {
+	public JsonEntityTypeWrapper(String entityTypeName) {
 		super();
-		this.entityType = entityType;
+		this.entityTypeName = entityTypeName;
 	}
 
-	public String getEntityType() {
-		return entityType;
+	public String getEntityTypeName() {
+		return entityTypeName;
 	}
 
-	public void setEntityType(String entityType) {
-		this.entityType = entityType;
+	public void setEntityTypeName(String entityTypeName) {
+		this.entityTypeName = entityTypeName;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((entityType == null) ? 0 : entityType.hashCode());
+		result = prime * result + ((entityTypeName == null) ? 0 : entityTypeName.hashCode());
 		return result;
 	}
 
 	@Override
 	public String toString() {
-		return "JsonEntityTypeWrapper [entityType=" + entityType + "]";
+		return "JsonEntityTypeWrapper [entityTypeName=" + entityTypeName + "]";
 	}
 
 	@Override
@@ -39,10 +42,10 @@ public class JsonEntityTypeWrapper {
 		if (getClass() != obj.getClass())
 			return false;
 		JsonEntityTypeWrapper other = (JsonEntityTypeWrapper) obj;
-		if (entityType == null) {
-			if (other.entityType != null)
+		if (entityTypeName == null) {
+			if (other.entityTypeName != null)
 				return false;
-		} else if (!entityType.equals(other.entityType))
+		} else if (!entityTypeName.equals(other.entityTypeName))
 			return false;
 		return true;
 	}

@@ -68,12 +68,12 @@ public class JsonInstanceWrapperToInstance {
 				goldAnnotationsWrapper.getEntityTemplateAnnotations()));
 	}
 
-	private List<AbstractSlotFiller<?>> collectAnnotations(
+	private List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> collectAnnotations(
 			List<JsonDocumentLinkedAnnotationWrapper> docLinkedAnnotations,
 			List<JsonLiteralAnnotationWrapper> literalAnnotations, List<JsonEntityTypeWrapper> entityTypeAnnotations,
 			List<JsonEntityTemplateWrapper> entityTemplateAnnotations) {
 
-		final List<AbstractSlotFiller<?>> annotations = new ArrayList<>();
+		final List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations = new ArrayList<>();
 
 		if (docLinkedAnnotations != null)
 			for (JsonDocumentLinkedAnnotationWrapper wrapper : docLinkedAnnotations) {
@@ -113,11 +113,11 @@ public class JsonInstanceWrapperToInstance {
 	}
 
 	private EntityType toEntityType(JsonEntityTypeWrapper wrapper) {
-		return EntityType.get(wrapper.getEntityType());
+		return EntityType.get(wrapper.getEntityTypeName());
 	}
 
 	private EntityTypeAnnotation toEntityTypeAnnotation(JsonEntityTypeWrapper wrapper) {
-		return EntityTypeAnnotation.get(EntityType.get(wrapper.getEntityType()));
+		return EntityTypeAnnotation.get(EntityType.get(wrapper.getEntityTypeName()));
 	}
 
 	private EntityTemplate toEntityTemplate(JsonEntityTemplateWrapper wrapper) {
@@ -133,13 +133,13 @@ public class JsonInstanceWrapperToInstance {
 		for (Entry<JsonSlotTypeWrapper, JsonMultiFillerSlotWrapper> multiSlotWrapper : wrapper.getMultiFillerSlots()
 				.entrySet()) {
 
-			List<AbstractSlotFiller<?>> annotations = collectAnnotations(
+			List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations = collectAnnotations(
 					multiSlotWrapper.getValue().getDocLinkedAnnotations(),
 					multiSlotWrapper.getValue().getLiteralAnnotations(),
 					multiSlotWrapper.getValue().getEntityTypeAnnotations(),
 					multiSlotWrapper.getValue().getEntityTemplateAnnotations());
 
-			for (AbstractSlotFiller<?> abstractSlotFiller : annotations) {
+			for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> abstractSlotFiller : annotations) {
 				entityTemplate.addMultiSlotFiller(toSlotType(multiSlotWrapper.getKey()), abstractSlotFiller);
 			}
 
@@ -159,7 +159,7 @@ public class JsonInstanceWrapperToInstance {
 		throw new IllegalStateException("Root annotation has no value.");
 	}
 
-	private AbstractSlotFiller<?> toSlotFiller(JsonSingleFillerSlotWrapper wrapper) {
+	private AbstractSlotFiller<? extends AbstractSlotFiller<?>> toSlotFiller(JsonSingleFillerSlotWrapper wrapper) {
 		if (wrapper.getDocLinkedAnnotation() != null) {
 			return toDocumentLinkedAnnotation(wrapper.getDocLinkedAnnotation());
 		} else if (wrapper.getEntityTemplateAnnotation() != null) {
@@ -173,7 +173,7 @@ public class JsonInstanceWrapperToInstance {
 	}
 
 	private SlotType toSlotType(JsonSlotTypeWrapper wrapper) {
-		return SlotType.get(wrapper.getSlotType());
+		return SlotType.get(wrapper.getSlotTypeName());
 	}
 
 }

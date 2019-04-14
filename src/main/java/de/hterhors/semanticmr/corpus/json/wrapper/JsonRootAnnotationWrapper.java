@@ -1,9 +1,14 @@
 package de.hterhors.semanticmr.corpus.json.wrapper;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonRootAnnotationWrapper {
 
+	@SerializedName("dla")
 	private JsonDocumentLinkedAnnotationWrapper docLinkedAnnotation;
+	@SerializedName("la")
 	private JsonLiteralAnnotationWrapper literalAnnotation;
+	@SerializedName("ea")
 	private JsonEntityTypeWrapper entityTypeAnnotation;
 
 	public JsonDocumentLinkedAnnotationWrapper getDocLinkedAnnotation() {
@@ -58,7 +63,6 @@ public class JsonRootAnnotationWrapper {
 		this.literalAnnotation = null;
 		this.entityTypeAnnotation = entityTypeAnnotation;
 	}
-
 
 	@Override
 	public int hashCode() {

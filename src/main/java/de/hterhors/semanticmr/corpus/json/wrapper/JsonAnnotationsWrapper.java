@@ -2,11 +2,17 @@ package de.hterhors.semanticmr.corpus.json.wrapper;
 
 import java.util.List;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonAnnotationsWrapper {
 
+	@SerializedName("dla")
 	private List<JsonDocumentLinkedAnnotationWrapper> docLinkedAnnotations;
+	@SerializedName("la")
 	private List<JsonLiteralAnnotationWrapper> literalAnnotations;
+	@SerializedName("ea")
 	private List<JsonEntityTypeWrapper> entityTypeAnnotations;
+	@SerializedName("eta")
 	private List<JsonEntityTemplateWrapper> entityTemplateAnnotations;
 
 	public JsonAnnotationsWrapper(List<JsonDocumentLinkedAnnotationWrapper> docLinkedAnnotations,

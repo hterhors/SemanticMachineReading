@@ -101,7 +101,8 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		return slot;
 	}
 
-	public EntityTemplate setSingleSlotFiller(SlotType slotType, final AbstractSlotFiller<?> slotFiller) {
+	public EntityTemplate setSingleSlotFiller(SlotType slotType,
+			final AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
 
 		if (slotFiller == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
@@ -114,8 +115,8 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		return this;
 	}
 
-	public void updateMultiFillerSlot(SlotType slotType, AbstractSlotFiller<?> slotFiller,
-			AbstractSlotFiller<?> slotFillerCandidate) {
+	public void updateMultiFillerSlot(SlotType slotType, AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller,
+			AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFillerCandidate) {
 
 		if (slotFillerCandidate == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
@@ -129,7 +130,8 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		getMultiFillerSlot(slotType).replace(slotFiller, slotFillerCandidate);
 	}
 
-	public void addMultiSlotFiller(SlotType slotType, final AbstractSlotFiller<?> slotFiller) {
+	public void addMultiSlotFiller(SlotType slotType,
+			final AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
 
 		if (slotFiller == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
@@ -304,8 +306,9 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 
 		for (SlotType multiSlotType : this.multiFillerSlots.keySet()) {
 
-			final Set<AbstractSlotFiller<?>> slotFiller = this.getMultiFillerSlot(multiSlotType).getSlotFiller();
-			final Set<AbstractSlotFiller<?>> otherSlotFiller;
+			final Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller = this
+					.getMultiFillerSlot(multiSlotType).getSlotFiller();
+			final Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherSlotFiller;
 
 			if (other != null && other.containsMultiFillerSlot(multiSlotType))
 				otherSlotFiller = other.getMultiFillerSlot(multiSlotType).getSlotFiller();

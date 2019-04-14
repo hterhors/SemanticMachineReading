@@ -1,15 +1,20 @@
 package de.hterhors.semanticmr.corpus.json.wrapper;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonInstanceWrapper {
 
 	/**
 	 * The document.
 	 */
+
+	@SerializedName("doc")
 	private JsonDocumentWrapper document;
 
 	/**
 	 * The corresponding gold annotation.
 	 */
+	@SerializedName("ganns")
 	private JsonAnnotationsWrapper goldAnnotations;
 
 	public JsonInstanceWrapper(JsonDocumentWrapper document, JsonAnnotationsWrapper goldAnnotations) {

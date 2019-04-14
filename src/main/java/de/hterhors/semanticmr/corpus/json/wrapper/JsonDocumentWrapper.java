@@ -2,10 +2,14 @@ package de.hterhors.semanticmr.corpus.json.wrapper;
 
 import java.util.List;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonDocumentWrapper {
 
+	@SerializedName("id")
 	private String documentID;
 
+	@SerializedName("tl")
 	private List<JsonDocumentTokenWrapper> tokenList;
 
 	public JsonDocumentWrapper(String documentID, List<JsonDocumentTokenWrapper> tokenList) {

@@ -1,27 +1,30 @@
 package de.hterhors.semanticmr.corpus.json.wrapper;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonSlotTypeWrapper {
 
-	private String slotType;
+	@SerializedName("stn")
+	private String slotTypeName;
 
-	public JsonSlotTypeWrapper(String slotType) {
+	public JsonSlotTypeWrapper(String slotTypeName) {
 		super();
-		this.slotType = slotType;
+		this.slotTypeName = slotTypeName;
 	}
 
-	public String getSlotType() {
-		return slotType;
+	public String getSlotTypeName() {
+		return slotTypeName;
 	}
 
-	public void setSlotType(String slotType) {
-		this.slotType = slotType;
+	public void setSlotTypeName(String slotTypeName) {
+		this.slotTypeName = slotTypeName;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((slotType == null) ? 0 : slotType.hashCode());
+		result = prime * result + ((slotTypeName == null) ? 0 : slotTypeName.hashCode());
 		return result;
 	}
 
@@ -34,17 +37,17 @@ public class JsonSlotTypeWrapper {
 		if (getClass() != obj.getClass())
 			return false;
 		JsonSlotTypeWrapper other = (JsonSlotTypeWrapper) obj;
-		if (slotType == null) {
-			if (other.slotType != null)
+		if (slotTypeName == null) {
+			if (other.slotTypeName != null)
 				return false;
-		} else if (!slotType.equals(other.slotType))
+		} else if (!slotTypeName.equals(other.slotTypeName))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "JsonSlotTypeWrapper [slotType=" + slotType + "]";
+		return "JsonSlotTypeWrapper [slotTypeName=" + slotTypeName + "]";
 	}
 
 }

@@ -91,7 +91,7 @@ public class Test {
 		toJsoninstances
 				.add(new JsonInstanceWrapper(new JsonDocumentWrapper("Hello World", tokenList), goldAnnotations));
 
-		JsonWriter jsonWriter = new JsonWriter();
+		JsonWriter jsonWriter = new JsonWriter(true);
 		JsonReader jsonReader = new JsonReader();
 
 		String json = jsonWriter.writeInstances(toJsoninstances);

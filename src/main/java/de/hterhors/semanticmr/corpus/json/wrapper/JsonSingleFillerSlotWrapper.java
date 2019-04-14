@@ -1,10 +1,16 @@
 package de.hterhors.semanticmr.corpus.json.wrapper;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonSingleFillerSlotWrapper {
 
+	@SerializedName("dla")
 	private JsonDocumentLinkedAnnotationWrapper docLinkedAnnotation;
+	@SerializedName("la")
 	private JsonLiteralAnnotationWrapper literalAnnotation;
+	@SerializedName("ea")
 	private JsonEntityTypeWrapper entityTypeAnnotation;
+	@SerializedName("eta")
 	private JsonEntityTemplateWrapper entityTemplateAnnotation;
 
 	public JsonSingleFillerSlotWrapper(JsonDocumentLinkedAnnotationWrapper docLinkedAnnotation,
@@ -23,8 +29,9 @@ public class JsonSingleFillerSlotWrapper {
 		countNumberOfAnnotations += this.literalAnnotation == null ? 0 : 1;
 		countNumberOfAnnotations += this.entityTypeAnnotation == null ? 0 : 1;
 		countNumberOfAnnotations += this.entityTemplateAnnotation == null ? 0 : 1;
-		if (countNumberOfAnnotations != 1)
-			throw new IllegalStateException("Can not put more than one annotation into SingleFillerSlot object!");
+		if (countNumberOfAnnotations > 1)
+			throw new IllegalStateException(
+					"Can not put more than one annotation into SingleFillerSlot object: " + countNumberOfAnnotations);
 	}
 
 	public JsonSingleFillerSlotWrapper(JsonDocumentLinkedAnnotationWrapper docLinkedAnnotation) {

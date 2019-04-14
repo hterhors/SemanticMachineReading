@@ -1,7 +1,10 @@
 package de.hterhors.semanticmr.corpus.json.wrapper;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonDocumentPositionWrapper {
 
+	@SerializedName("off")
 	private int charOffset;
 
 	public JsonDocumentPositionWrapper(int charOffset) {

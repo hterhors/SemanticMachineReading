@@ -8,4 +8,4 @@
 <http://scio/data/RatModel_1> <http://psink.de/scio/hasSubAnimal> <http://scio/data/MouseModel_1> .
 <http://scio/data/RatModel_1> <http://psink.de/scio/hasMentions> "rats in da hood" .
 <http://scio/data/RatModel_1> <http://psink.de/scio/hasMentions> "rat in da hood" .
-<http://scio/data/MouseModel_1> <http://psink.de/scio/hasWeight> "100 g" .
+<http://scio/data/MouseModel_1> <http://psink.de/scio/hasAge> "Eight-week-old" .

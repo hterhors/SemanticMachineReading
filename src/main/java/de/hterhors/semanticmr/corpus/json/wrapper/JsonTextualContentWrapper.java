@@ -1,9 +1,12 @@
 package de.hterhors.semanticmr.corpus.json.wrapper;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonTextualContentWrapper {
 	/**
 	 * The textual content of an annotation.
 	 */
+	@SerializedName("sff")
 	private String surfaceForm;
 
 	public String getSurfaceForm() {

@@ -9,7 +9,7 @@ public class SingleFillerSlot extends AbstractSlot {
 	/**
 	 * The single annotation of this slot.
 	 */
-	private AbstractSlotFiller<?> slotFiller = null;
+	private AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller = null;
 
 	public SingleFillerSlot(SlotType slotType) {
 		super(slotType);
@@ -21,7 +21,7 @@ public class SingleFillerSlot extends AbstractSlot {
 	 * @param slotType
 	 * @param deepClone
 	 */
-	private SingleFillerSlot(SlotType slotType, AbstractSlotFiller<?> slotFiller) {
+	private SingleFillerSlot(SlotType slotType, AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
 		super(slotType);
 		this.slotFiller = slotFiller;
 	}
@@ -40,7 +40,7 @@ public class SingleFillerSlot extends AbstractSlot {
 	 * @param slotFiller
 	 * @return the old annotation.
 	 */
-	public void set(final AbstractSlotFiller<?> slotFiller) {
+	public void set(final AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
 
 		if (this.slotFiller == slotFiller)
 			return;

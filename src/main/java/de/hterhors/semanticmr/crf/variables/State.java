@@ -41,7 +41,8 @@ public class State {
 	 * @param newCurrentPrediction
 	 * @return a new State instance
 	 */
-	public State deepUpdateCopy(final int annotationIndex, AbstractSlotFiller<?> newCurrentPrediction) {
+	public State deepUpdateCopy(final int annotationIndex,
+			AbstractSlotFiller<? extends AbstractSlotFiller<?>> newCurrentPrediction) {
 		return new State(this.instance, currentPredictions.deepUpdateCopy(annotationIndex, newCurrentPrediction));
 	}
 

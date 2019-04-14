@@ -14,14 +14,13 @@ public class Annotations implements IEvaluatable<Annotations> {
 
 	private boolean unmodifiable = false;
 
-	private List<AbstractSlotFiller<?>> annotations;
+	private List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations;
 
-	public Annotations(AbstractSlotFiller<?> goldAnnotation) {
-		Objects.requireNonNull(goldAnnotation);
-		this.annotations = Arrays.asList(goldAnnotation);
+	public Annotations(AbstractSlotFiller<? extends AbstractSlotFiller<?>> goldAnnotation) {
+		this(Arrays.asList(goldAnnotation));
 	}
 
-	public Annotations(List<AbstractSlotFiller<?>> goldAnnotations) {
+	public Annotations(List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> goldAnnotations) {
 		Objects.requireNonNull(goldAnnotations);
 		this.annotations = goldAnnotations;
 	}
@@ -36,7 +35,7 @@ public class Annotations implements IEvaluatable<Annotations> {
 		return (List<Annotation>) annotations;
 	}
 
-	public void setAnnotations(List<AbstractSlotFiller<?>> annotations) {
+	public void setAnnotations(List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations) {
 		if (unmodifiable)
 			throw new IllegalStateException("Annotations are unmodifiabled. Can not override them.");
 
@@ -45,7 +44,7 @@ public class Annotations implements IEvaluatable<Annotations> {
 
 	@Override
 	public Score evaluate(Annotations otherVal) {
-		
+
 		if (this.annotations.size() == 0 || otherVal.annotations.size() == 0 || otherVal == null)
 			return Score.ZERO;
 
@@ -56,9 +55,11 @@ public class Annotations implements IEvaluatable<Annotations> {
 
 	}
 
-	public Annotations deepUpdateCopy(int annotationIndex, AbstractSlotFiller<?> newCurrentPrediction) {
+	public Annotations deepUpdateCopy(int annotationIndex,
+			AbstractSlotFiller<? extends AbstractSlotFiller<?>> newCurrentPrediction) {
 
-		final List<AbstractSlotFiller<?>> updatedList = new ArrayList<>(annotations.size());
+		final List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> updatedList = new ArrayList<>(
+				annotations.size());
 		for (int index = 0; index < annotations.size(); index++) {
 
 			if (index == annotationIndex) {

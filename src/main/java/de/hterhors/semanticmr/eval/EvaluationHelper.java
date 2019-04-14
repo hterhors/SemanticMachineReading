@@ -38,12 +38,13 @@ public class EvaluationHelper {
 		return permutationCache[size].stream();
 	}
 
-	private static Score[][] computeScores(final Collection<AbstractSlotFiller<?>> slotFiller,
-			final Collection<AbstractSlotFiller<?>> otherSlotFiller, final int maxSize) {
+	private static Score[][] computeScores(
+			final Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller,
+			final Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherSlotFiller, final int maxSize) {
 
 		final Score[][] scores = new Score[maxSize][maxSize];
 
-		final Iterator<AbstractSlotFiller<?>> slotFillerIterator = slotFiller.iterator();
+		final Iterator<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFillerIterator = slotFiller.iterator();
 
 		int i = 0;
 
@@ -59,7 +60,8 @@ public class EvaluationHelper {
 
 			int j = 0;
 
-			final Iterator<AbstractSlotFiller<?>> otherSlotFillerIterator = otherSlotFiller.iterator();
+			final Iterator<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherSlotFillerIterator = otherSlotFiller
+					.iterator();
 
 			while (j != maxSize) {
 
@@ -98,8 +100,8 @@ public class EvaluationHelper {
 		}
 	}
 
-	public static Score scoreMax(Collection<AbstractSlotFiller<?>> annotations,
-			Collection<AbstractSlotFiller<?>> otherAnnotations) {
+	public static Score scoreMax(Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations,
+			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherAnnotations) {
 
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 

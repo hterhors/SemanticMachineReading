@@ -136,7 +136,7 @@ public class EntityTemplateExploration {
 
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
 
-			for (AbstractSlotFiller<?> slotFillerCandidate : slotFillerCandidateProvider
+			for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFillerCandidate : slotFillerCandidateProvider
 					.getSlotFillerCandidates(slot)) {
 
 				/*
@@ -153,7 +153,8 @@ public class EntityTemplateExploration {
 					continue;
 				}
 
-				for (AbstractSlotFiller<?> slotFiller : entityTemplate.getMultiFillerSlot(slot).getSlotFiller()) {
+				for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller : entityTemplate
+						.getMultiFillerSlot(slot).getSlotFiller()) {
 
 					final EntityTemplate deepCopy = entityTemplate.deepCopy();
 
@@ -172,7 +173,7 @@ public class EntityTemplateExploration {
 			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
-			for (AbstractSlotFiller<?> slotFillerCandidate : slotFillerCandidateProvider
+			for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFillerCandidate : slotFillerCandidateProvider
 					.getSlotFillerCandidates(slot)) {
 
 				/*
@@ -226,7 +227,7 @@ public class EntityTemplateExploration {
 			ISlotFillerCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 		for (SlotType slotType : entityTemplate.getSingleFillerSlots().keySet()) {
-			for (AbstractSlotFiller<?> slotFillerCandidate : slotFillerCandidateProvider
+			for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFillerCandidate : slotFillerCandidateProvider
 					.getSlotFillerCandidates(slotType)) {
 
 				/*

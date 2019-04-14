@@ -1,15 +1,20 @@
 package de.hterhors.semanticmr.corpus.json.wrapper;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonDocumentLinkedAnnotationWrapper {
 	/**
 	 * Contains the textual content of this annotation.
 	 */
+	@SerializedName("txt")
 	private JsonTextualContentWrapper textualContent;
 	/**
 	 * Defines the entity type of this annotation.
 	 */
+	@SerializedName("et")
 	private JsonEntityTypeWrapper entityType;
 
+	@SerializedName("dp")
 	private JsonDocumentPositionWrapper documentPosition;
 
 	public JsonDocumentLinkedAnnotationWrapper(JsonEntityTypeWrapper entityType,

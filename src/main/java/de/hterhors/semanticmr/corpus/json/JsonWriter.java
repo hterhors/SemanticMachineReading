@@ -31,8 +31,12 @@ public class JsonWriter {
 	final private Gson gson;
 	final private Type type;
 
-	public JsonWriter() {
-		this.gson = new GsonBuilder().enableComplexMapKeySerialization().disableHtmlEscaping().create();
+	public JsonWriter(final boolean prettyString) {
+
+		GsonBuilder builder = new GsonBuilder();
+		if (prettyString)
+			builder.setPrettyPrinting();
+		this.gson = builder.enableComplexMapKeySerialization().disableHtmlEscaping().create();
 		this.type = new TypeToken<List<JsonInstanceWrapper>>() {
 
 			/**

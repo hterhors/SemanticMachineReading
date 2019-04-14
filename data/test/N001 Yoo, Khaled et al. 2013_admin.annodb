@@ -25,7 +25,8 @@
 48365, DefinedExperimentalGroup, 17112, 17116, "ARSB", "", "<http://scio/data/DefinedExperimentalGroup_105> <http://www.w3.org/2000/01/rdf-schema#comment> \"ARSB-treated group\". <http://scio/data/DefinedExperimentalGroup_105> <http://www.w3.org/2000/01/rdf-schema#label> \"ARSB\". <http://scio/data/DefinedExperimentalGroup_105> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://psink.de/scio/DefinedExperimentalGroup>."
 49726, GroupName, 24100, 24111, "ARSB groups", "", "<http://scio/data/DefinedExperimentalGroup_105> <http://psink.de/scio/hasGroupName> \"ARSB groups\"."
 49729, GroupName, 24360, 24380, "ARSB treated animals", "", "<http://scio/data/DefinedExperimentalGroup_105> <http://psink.de/scio/hasGroupName> \"ARSB treated animals\"."
-48320, Aged, 36431, 36445, "Eight-week-old", "", 
+48320, Aged, 36431, 36445, "Eight-week-old", "", <http://scio/data/MouseModel_1> <http://psink.de/scio/hasAge> "Eight-week-old" .
+
 48321, C57_BL6_Mouse, 36446, 36453, "C57BL/6", "", 
 48322, Female, 36454, 36460, "female", "", "<http://scio/data/RatModel_1> <http://psink.de/scio/hasGender> <http://psink.de/scio/Female> ."
 48323, MouseModel, 36461, 36465, "mice", "", 

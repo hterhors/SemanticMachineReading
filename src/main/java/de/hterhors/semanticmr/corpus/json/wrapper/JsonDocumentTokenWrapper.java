@@ -1,12 +1,20 @@
 package de.hterhors.semanticmr.corpus.json.wrapper;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonDocumentTokenWrapper {
 
+	@SerializedName("si")
 	private int sentenceIndex;
+	@SerializedName("sti")
 	private int senTokenIndex;
+	@SerializedName("dti")
 	private int docTokenIndex;
-	private int senCharOnset;
-	private int docCharOnset;
+	@SerializedName("sco")
+	private int senCharOffset;
+	@SerializedName("dco")
+	private int docCharOffset;
+	@SerializedName("txt")
 	private String text;
 
 	public JsonDocumentTokenWrapper(int sentenceIndex, int senTokenIndex, int docTokenIndex, int senCharOnset,
@@ -15,8 +23,8 @@ public class JsonDocumentTokenWrapper {
 		this.sentenceIndex = sentenceIndex;
 		this.senTokenIndex = senTokenIndex;
 		this.docTokenIndex = docTokenIndex;
-		this.senCharOnset = senCharOnset;
-		this.docCharOnset = docCharOnset;
+		this.senCharOffset = senCharOnset;
+		this.docCharOffset = docCharOnset;
 		this.text = text;
 	}
 
@@ -43,8 +51,8 @@ public class JsonDocumentTokenWrapper {
 	@Override
 	public String toString() {
 		return "JsonDocumentTokenWrapper [sentenceIndex=" + sentenceIndex + ", senTokenIndex=" + senTokenIndex
-				+ ", docTokenIndex=" + docTokenIndex + ", senCharOnset=" + senCharOnset + ", docCharOnset="
-				+ docCharOnset + ", text=" + text + "]";
+				+ ", docTokenIndex=" + docTokenIndex + ", senCharOnset=" + senCharOffset + ", docCharOnset="
+				+ docCharOffset + ", text=" + text + "]";
 	}
 
 	public void setDocTokenIndex(int docTokenIndex) {
@@ -52,19 +60,19 @@ public class JsonDocumentTokenWrapper {
 	}
 
 	public int getSenCharOnset() {
-		return senCharOnset;
+		return senCharOffset;
 	}
 
 	public void setSenCharOnset(int senCharOnset) {
-		this.senCharOnset = senCharOnset;
+		this.senCharOffset = senCharOnset;
 	}
 
 	public int getDocCharOnset() {
-		return docCharOnset;
+		return docCharOffset;
 	}
 
 	public void setDocCharOnset(int docCharOnset) {
-		this.docCharOnset = docCharOnset;
+		this.docCharOffset = docCharOnset;
 	}
 
 	public String getText() {
@@ -79,9 +87,9 @@ public class JsonDocumentTokenWrapper {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + docCharOnset;
+		result = prime * result + docCharOffset;
 		result = prime * result + docTokenIndex;
-		result = prime * result + senCharOnset;
+		result = prime * result + senCharOffset;
 		result = prime * result + senTokenIndex;
 		result = prime * result + sentenceIndex;
 		result = prime * result + ((text == null) ? 0 : text.hashCode());
@@ -97,11 +105,11 @@ public class JsonDocumentTokenWrapper {
 		if (getClass() != obj.getClass())
 			return false;
 		JsonDocumentTokenWrapper other = (JsonDocumentTokenWrapper) obj;
-		if (docCharOnset != other.docCharOnset)
+		if (docCharOffset != other.docCharOffset)
 			return false;
 		if (docTokenIndex != other.docTokenIndex)
 			return false;
-		if (senCharOnset != other.senCharOnset)
+		if (senCharOffset != other.senCharOffset)
 			return false;
 		if (senTokenIndex != other.senTokenIndex)
 			return false;

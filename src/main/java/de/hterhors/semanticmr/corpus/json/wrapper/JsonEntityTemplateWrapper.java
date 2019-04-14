@@ -2,18 +2,23 @@ package de.hterhors.semanticmr.corpus.json.wrapper;
 
 import java.util.Map;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonEntityTemplateWrapper {
 
+	@SerializedName("ra")
 	private JsonRootAnnotationWrapper rootAnnotation;
 
 	/**
 	 * An unmodifiable map of slots to fill.
 	 */
+	@SerializedName("sfs")
 	private Map<JsonSlotTypeWrapper, JsonSingleFillerSlotWrapper> singleFillerSlots;
 
 	/**
 	 * An unmodifiable map of slots to fill.
 	 */
+	@SerializedName("mfs")
 	private Map<JsonSlotTypeWrapper, JsonMultiFillerSlotWrapper> multiFillerSlots;
 
 	public JsonEntityTemplateWrapper(JsonRootAnnotationWrapper entityType,

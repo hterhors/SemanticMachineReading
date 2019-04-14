@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.santo;
+package de.hterhors.semanticmr.santo.container;
 
 public class RDFRelatedAnnotation {
 

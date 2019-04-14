@@ -11,7 +11,7 @@ import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
 
 public class MultiFillerSlot extends AbstractSlot {
 
-	private final LinkedHashSet<AbstractSlotFiller<?>> slotFiller;
+	private final LinkedHashSet<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller;
 
 	public MultiFillerSlot(SlotType slotType) {
 		super(slotType);
@@ -24,12 +24,13 @@ public class MultiFillerSlot extends AbstractSlot {
 	 * @param slotType
 	 * @param slotFiller
 	 */
-	private MultiFillerSlot(final SlotType slotType, final LinkedHashSet<AbstractSlotFiller<?>> slotFiller) {
+	private MultiFillerSlot(final SlotType slotType,
+			final LinkedHashSet<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller) {
 		super(slotType);
 		this.slotFiller = slotFiller;
 	}
 
-	public LinkedHashSet<AbstractSlotFiller<?>> getSlotFiller() {
+	public LinkedHashSet<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> getSlotFiller() {
 		return slotFiller;
 	}
 
@@ -50,7 +51,8 @@ public class MultiFillerSlot extends AbstractSlot {
 		return !slotFiller.isEmpty();
 	}
 
-	public void add(AbstractSlotFiller<?> slotFiller) throws ExceedsMaxSlotFillerException {
+	public void add(AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller)
+			throws ExceedsMaxSlotFillerException {
 
 		if (containsMaximumFiller())
 			throw new ExceedsMaxSlotFillerException(
@@ -151,7 +153,8 @@ public class MultiFillerSlot extends AbstractSlot {
 	 * @param slotFiller          the old filler to remove
 	 * @param slotFillerCandidate the new filler to add
 	 */
-	public void replace(AbstractSlotFiller<?> slotFiller, AbstractSlotFiller<?> slotFillerCandidate) {
+	public void replace(AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller,
+			AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFillerCandidate) {
 
 		if (slotFiller == slotFillerCandidate)
 			return;
