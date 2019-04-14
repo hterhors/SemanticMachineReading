@@ -104,6 +104,9 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	public EntityTemplate setSingleSlotFiller(SlotType slotType,
 			final AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
 
+		if (slotFiller == null)
+			return this;
+
 		if (slotFiller == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
 
@@ -112,6 +115,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 					+ "\" with slot filler: \"" + slotFiller.toPrettyString() + "\"");
 
 		getSingleFillerSlot(slotType).set(slotFiller);
+
 		return this;
 	}
 

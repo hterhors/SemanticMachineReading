@@ -72,25 +72,26 @@ public class InstancesToJsonInstanceWrapper {
 	}
 
 	private List<JsonEntityTemplateWrapper> extractEntityTemplateWrapper(
-			Collection<AbstractSlotFiller<?extends AbstractSlotFiller<?>>> annotations) {
-		return annotations.stream().filter(a -> a instanceof EntityTemplate)
+			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations) {
+		return annotations.stream().filter(a -> a.getClass() == EntityTemplate.class)
 				.map(a -> toEntityTemplateWrapper((EntityTemplate) a)).collect(Collectors.toList());
 	}
 
-	private List<JsonEntityTypeWrapper> extractEntityTypeWrapper(Collection<AbstractSlotFiller<?extends AbstractSlotFiller<?>>> annotations) {
-		return annotations.stream().filter(a -> a instanceof EntityTypeAnnotation)
+	private List<JsonEntityTypeWrapper> extractEntityTypeWrapper(
+			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations) {
+		return annotations.stream().filter(a -> a.getClass() == EntityTypeAnnotation.class)
 				.map(a -> toEntityTypeAnnotationWrapper((EntityTypeAnnotation) a)).collect(Collectors.toList());
 	}
 
 	private List<JsonLiteralAnnotationWrapper> extractLiteralAnnotationWrapper(
-			Collection<AbstractSlotFiller<?extends AbstractSlotFiller<?>>> annotations) {
-		return annotations.stream().filter(a -> a instanceof LiteralAnnotation)
+			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations) {
+		return annotations.stream().filter(a -> a.getClass() == LiteralAnnotation.class)
 				.map(a -> toLiteralAnnotationWrapper((LiteralAnnotation) a)).collect(Collectors.toList());
 	}
 
 	private List<JsonDocumentLinkedAnnotationWrapper> extractDocLinkedAnnotationWrapper(
-			Collection<AbstractSlotFiller<?extends AbstractSlotFiller<?>>> annotations) {
-		return annotations.stream().filter(a -> a instanceof DocumentLinkedAnnotation)
+			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations) {
+		return annotations.stream().filter(a -> a.getClass() == DocumentLinkedAnnotation.class)
 				.map(a -> toDocumentLinkedAnnotationWrapper((DocumentLinkedAnnotation) a)).collect(Collectors.toList());
 	}
 
@@ -177,7 +178,7 @@ public class InstancesToJsonInstanceWrapper {
 		} else if (slotFiller instanceof EntityTemplate) {
 			singleFillerSlotWrapper.setEntityTemplateAnnotation(toEntityTemplateWrapper((EntityTemplate) slotFiller));
 		}
-		
+
 		return singleFillerSlotWrapper;
 	}
 

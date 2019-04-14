@@ -4,8 +4,8 @@
 <http://scio/data/RatModel_1> <http://www.w3.org/2000/01/rdf-schema#label> "mouse"
 <http://scio/data/RatModel_1> <http://psink.de/scio/hasAgeCategory> <http://psink.de/scio/Adult> .
 <http://scio/data/RatModel_1> <http://psink.de/scio/hasGender> <http://psink.de/scio/Female> .
-<http://scio/data/RatModel_1> <http://psink.de/scio/hasWeight> "200 g" .
+<http://scio/data/RatModel_1> <http://psink.de/scio/hasWeight> "recovery" .
 <http://scio/data/RatModel_1> <http://psink.de/scio/hasSubAnimal> <http://scio/data/MouseModel_1> .
-<http://scio/data/RatModel_1> <http://psink.de/scio/hasMentions> "rats in da hood" .
-<http://scio/data/RatModel_1> <http://psink.de/scio/hasMentions> "rat in da hood" .
+<http://scio/data/RatModel_1> <http://psink.de/scio/hasMentions> "ChaseABC" .
+<http://scio/data/RatModel_1> <http://psink.de/scio/hasMentions> "locomotor" .
 <http://scio/data/MouseModel_1> <http://psink.de/scio/hasAge> "Eight-week-old" .

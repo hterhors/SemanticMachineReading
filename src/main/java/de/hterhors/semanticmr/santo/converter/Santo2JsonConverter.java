@@ -67,14 +67,17 @@ public class Santo2JsonConverter {
 				resourceNameSpace);
 	}
 
-	public void convert(final File writeToFile, String rootEntityTypes, boolean includeSubEntities) throws IOException {
-		convert(writeToFile, new HashSet<>(Arrays.asList(rootEntityTypes)), includeSubEntities);
+	public void convert(final File writeToFile, String rootEntityTypes, boolean includeSubEntities,
+			boolean jsonPrettyString) throws IOException {
+		convert(writeToFile, new HashSet<>(Arrays.asList(rootEntityTypes)), includeSubEntities, jsonPrettyString);
 	}
 
-	public void convert(final File writeToFile, Set<String> rootEntityTypes, boolean includeSubEntities)
-			throws IOException {
+	public void convert(final File writeToFile, Set<String> rootEntityTypes, boolean includeSubEntities,
+			boolean jsonPrettyString) throws IOException {
+
 		final List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> rdfAnnotations = rdfConverter
 				.extract(rootEntityTypes, includeSubEntities);
+
 
 		List<Instance> instances = new ArrayList<>();
 
@@ -84,7 +87,7 @@ public class Santo2JsonConverter {
 
 		InstancesToJsonInstanceWrapper conv = new InstancesToJsonInstanceWrapper(instances);
 
-		JsonWriter writer = new JsonWriter(true);
+		JsonWriter writer = new JsonWriter(jsonPrettyString);
 		String json = writer.writeInstances(conv.convertToWrapperInstances(initializer));
 
 		final PrintStream ps = new PrintStream(writeToFile);

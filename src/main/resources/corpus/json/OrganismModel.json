@@ -93404,8 +93404,16 @@
                 "stn": "hasWeight"
               },
               {
-                "ea": {
-                  "etn": "Weight"
+                "dla": {
+                  "txt": {
+                    "sff": "recovery"
+                  },
+                  "et": {
+                    "etn": "Weight"
+                  },
+                  "dp": {
+                    "off": 1329
+                  }
                 }
               }
             ],
@@ -93541,33 +93549,32 @@
                 "stn": "hasMentions"
               },
               {
-                "dla": [],
-                "la": [
+                "dla": [
                   {
-                    "txtc": {
-                      "sff": "rats in da hood"
+                    "txt": {
+                      "sff": "ChaseABC"
                     },
                     "et": {
                       "etn": "Mention"
+                    },
+                    "dp": {
+                      "off": 1814
                     }
                   },
                   {
-                    "txtc": {
-                      "sff": "rat in da hood"
+                    "txt": {
+                      "sff": "locomotor"
                     },
                     "et": {
                       "etn": "Mention"
+                    },
+                    "dp": {
+                      "off": 1319
                     }
                   }
                 ],
-                "ea": [
-                  {
-                    "etn": "Mention"
-                  },
-                  {
-                    "etn": "Mention"
-                  }
-                ],
+                "la": [],
+                "ea": [],
                 "eta": []
               }
             ]

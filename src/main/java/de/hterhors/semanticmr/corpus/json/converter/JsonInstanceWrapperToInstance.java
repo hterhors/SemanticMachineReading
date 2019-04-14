@@ -169,7 +169,7 @@ public class JsonInstanceWrapperToInstance {
 		} else if (wrapper.getLiteralAnnotation() != null) {
 			return toLiteralAnnotation(wrapper.getLiteralAnnotation());
 		}
-		throw new IllegalStateException("Single filler slot has no value.");
+		return null;
 	}
 
 	private SlotType toSlotType(JsonSlotTypeWrapper wrapper) {

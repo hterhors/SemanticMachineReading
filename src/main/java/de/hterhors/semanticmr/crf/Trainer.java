@@ -119,6 +119,9 @@ public class Trainer {
 				finalStates.put(instance, producedStateChain.get(producedStateChain.size() - 1));
 			}
 		}
+		
+		System.out.println(model);
+		
 		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 		return finalStates;
 	}
