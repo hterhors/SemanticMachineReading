@@ -22,6 +22,10 @@ import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.learner.optimizer.SGD;
 import de.hterhors.semanticmr.crf.learner.regularizer.L2;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
+import de.hterhors.semanticmr.crf.sampling.AcceptStrategy;
+import de.hterhors.semanticmr.crf.sampling.ISamplingStrategy;
+import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
+import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.stopcrit.impl.MaxChainLength;
@@ -67,7 +71,9 @@ public class SemanticMRMain {
 
 		int numberOfEpochs = 10;
 
-		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
+//		AbstractSampler sampler = SamplerCollection.greedyModelStrategy();
+//		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
+		AbstractSampler sampler = new EpochSwitchSampler(e -> e % 2 == 0);
 
 		IStoppingCriterion stoppingCriterion = new MaxChainLength(10);
 
@@ -82,6 +88,8 @@ public class SemanticMRMain {
 		results.entrySet().forEach(System.out::println);
 
 		trainer.printTrainingStatistics(System.out);
+
+		System.out.println(model);
 
 	}
 

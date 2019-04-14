@@ -7,7 +7,9 @@ import de.hterhors.semanticmr.crf.variables.State;
 
 public abstract class AbstractSampler {
 
-	final private ISamplingStrategy samplingStrategy;
+	final protected ISamplingStrategy samplingStrategy;
+
+	protected int currentEpoch;
 
 	public AbstractSampler(ISamplingStrategy samplingStrategy) {
 		this.samplingStrategy = samplingStrategy;
@@ -20,6 +22,7 @@ public abstract class AbstractSampler {
 	public abstract State sampleCandidate(List<State> proposalStates);
 
 	public boolean sampleBasedOnObjectiveScore(int epoch) {
+		this.currentEpoch = epoch;
 		return samplingStrategy.sampleBasedOnObjectiveScore(epoch);
 	}
 

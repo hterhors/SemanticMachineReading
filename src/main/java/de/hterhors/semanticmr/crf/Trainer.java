@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import de.hterhors.semanticmr.crf.exploration.EntityTemplateExploration;
 import de.hterhors.semanticmr.crf.factor.Model;
@@ -74,6 +73,8 @@ public class Trainer {
 
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
 
+			final boolean sampleBasedOnObjectiveFunction = sampler.sampleBasedOnObjectiveScore(epoch);
+
 			for (Instance instance : trainingInstances) {
 
 				final List<State> producedStateChain = new ArrayList<>();
@@ -86,44 +87,67 @@ public class Trainer {
 
 					final List<State> proposalStates = explorer.explore(currentState);
 
-					final boolean sampleBasedOnObjectiveFunction = sampler.sampleBasedOnObjectiveScore(epoch);
+					scoreProposalStates(sampleBasedOnObjectiveFunction, proposalStates);
 
-					if (sampleBasedOnObjectiveFunction) {
-						objectiveFunction.score(proposalStates);
-					} else {
-						model.score(proposalStates);
-					}
+					final State candidateState = selectCandidateState(proposalStates);
 
-					State candidateState = sampler.sampleCandidate(proposalStates);
+					scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
 
-					if (sampleBasedOnObjectiveFunction) {
-						model.score(candidateState);
-					} else {
-						objectiveFunction.score(candidateState);
-						objectiveFunction.score(currentState);
-					}
-
-					boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState, currentState);
-
-					if (isAccepted) {
-						model.updateWeights(currentState, candidateState);
-						currentState = candidateState;
-					}
+					currentState = selectNextState(epoch, currentState, candidateState);
 
 					producedStateChain.add(currentState);
 
-					if (stoppingCriterion.checkCondition(producedStateChain))
+					if (checkStoppingCriterion(producedStateChain))
 						break;
 
 				}
 				finalStates.put(instance, producedStateChain.get(producedStateChain.size() - 1));
 			}
 		}
-		
-		System.out.println(model);
-		
+
 		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 		return finalStates;
+	}
+
+	private boolean checkStoppingCriterion(final List<State> producedStateChain) {
+		if (stoppingCriterion.checkCondition(producedStateChain))
+			return true;
+
+		return false;
+	}
+
+	private State selectCandidateState(final List<State> proposalStates) {
+		State candidateState = sampler.sampleCandidate(proposalStates);
+		return candidateState;
+	}
+
+	private State selectNextState(int epoch, State currentState, State candidateState) {
+		boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState, currentState);
+
+		if (isAccepted) {
+			model.updateWeights(currentState, candidateState);
+			currentState = candidateState;
+		}
+
+		return currentState;
+	}
+
+	private void scoreSelectedStates(final boolean sampleBasedOnObjectiveFunction, State currentState,
+			State candidateState) {
+		if (sampleBasedOnObjectiveFunction) {
+			model.score(candidateState);
+		} else {
+			objectiveFunction.score(candidateState);
+			objectiveFunction.score(currentState);
+		}
+	}
+
+	private void scoreProposalStates(final boolean sampleBasedOnObjectiveFunction, final List<State> proposalStates) {
+		if (sampleBasedOnObjectiveFunction) {
+			objectiveFunction.score(proposalStates);
+		} else {
+			model.score(proposalStates);
+		}
 	}
 
 	public void printTrainingStatistics(final PrintStream ps) {

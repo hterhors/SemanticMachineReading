@@ -1,4 +1,6 @@
-package de.hterhors.semanticmr.crf.sampling;
+package de.hterhors.semanticmr.crf.sampling.impl;
+
+import de.hterhors.semanticmr.crf.sampling.AcceptStrategy;
 
 public class AcceptStrategies {
 	/**
