@@ -46,12 +46,12 @@ public class EntityTemplateExploration {
 
 		final List<State> proposalStates = new ArrayList<>(averageNumberOfNewProposalStates);
 
-		for (int annotationIndex = 0; annotationIndex < currentState.currentPredictions.getAnnotations()
+		for (int annotationIndex = 0; annotationIndex < currentState.getCurrentPredictions().getAnnotations()
 				.size(); annotationIndex++) {
 
 			final AbstractSlotFiller<?> annotation;
 
-			if (!((annotation = currentState.currentPredictions.getAnnotations()
+			if (!((annotation = currentState.getCurrentPredictions().getAnnotations()
 					.get(annotationIndex)) instanceof EntityTemplate))
 				throw new IllegalStateException("Can not handle non-EntityTemplate annotations in this explorer!");
 
@@ -84,7 +84,6 @@ public class EntityTemplateExploration {
 			System.out.println("WARN no states generated for instance: " + currentState.getInstance().getDocument());
 			proposalStates.add(currentState);
 		}
-//		proposalStates.forEach(System.out::println);
 
 		return proposalStates;
 

@@ -70,7 +70,7 @@ public class TestTemplate extends AbstractFeatureTemplate<Scope> {
 	public List<Scope> generateFactorScopes(State state) {
 		List<Scope> factors = new ArrayList<>();
 
-		for (EntityTemplate annotation : state.currentPredictions.<EntityTemplate>getAnnotations()) {
+		for (EntityTemplate annotation : state.getCurrentPredictions().<EntityTemplate>getAnnotations()) {
 			for (SlotType slot : annotation.getSingleFillerSlots().keySet()) {
 
 				if (annotation.getSingleFillerSlot(slot).containsSlotFiller()) {

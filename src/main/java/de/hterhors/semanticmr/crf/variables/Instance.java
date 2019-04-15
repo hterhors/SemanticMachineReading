@@ -34,6 +34,10 @@ public class Instance implements Comparable<Instance> {
 		this.goldAnnotations.unmodifiable();
 	}
 
+	public String getName() {
+		return getDocument().documentID;
+	}
+
 	public EInstanceContext getContext() {
 		return context;
 	}

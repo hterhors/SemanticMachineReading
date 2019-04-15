@@ -17,7 +17,11 @@ public class State {
 
 	private static final double DEFAULT_MODEL_SCORE = 1.0D;
 
-	final public Annotations currentPredictions;
+	final private Annotations currentPredictions;
+
+	public Annotations getCurrentPredictions() {
+		return currentPredictions;
+	}
 
 	final private Map<AbstractFeatureTemplate<?>, FactorGraph> factorGraphs;
 

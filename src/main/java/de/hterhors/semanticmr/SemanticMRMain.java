@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.hterhors.semanticmr.candprov.DocumentCandidateProviderCollection;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
@@ -19,8 +20,7 @@ import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.learner.optimizer.SGD;
 import de.hterhors.semanticmr.crf.learner.regularizer.L2;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
-import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
-import de.hterhors.semanticmr.crf.sampling.impl.RandomSwitchSamplingStrategy;
+import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.stopcrit.impl.MaxChainLength;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -46,7 +46,7 @@ public class SemanticMRMain {
 				.addNormalizationFunction(EntityType.get("Weight"), new WeightNormalization()).apply();
 
 		IInstanceDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
-				.setCorpusSizeFraction(0.1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
+				.setCorpusSizeFraction(0.1F).setTrainingProportion(1).setTestProportion(280).setSeed(100L).build();
 
 		InstanceProvider instanceProvider = new InstanceProvider(new File("src/main/resources/corpus/data/instances/"),
 				shuffleCorpusDistributor);
@@ -73,12 +73,12 @@ public class SemanticMRMain {
 				new Annotations(new EntityTemplate(AbstractSlotFiller
 						.toSlotFiller(instance.getGoldAnnotations().getAnnotations().get(0).getEntityType())))));
 
-		int numberOfEpochs = 10;
+		int numberOfEpochs = 1;
 
 //		AbstractSampler sampler = SamplerCollection.greedyModelStrategy();
-//		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
+		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
 //		AbstractSampler sampler = new EpochSwitchSampler(epoch -> epoch % 2 == 0);
-		AbstractSampler sampler = new EpochSwitchSampler(new RandomSwitchSamplingStrategy(100L));
+//		AbstractSampler sampler = new EpochSwitchSampler(new RandomSwitchSamplingStrategy(100L));
 //		AbstractSampler sampler = new EpochSwitchSampler(e -> new Random(e).nextBoolean());
 
 		IStoppingCriterion stoppingCriterion = new MaxChainLength(10);
@@ -90,7 +90,21 @@ public class SemanticMRMain {
 
 		Map<Instance, State> results = trainer.trainModel(instanceProvider.getRedistributedTrainingInstances());
 
-		results.entrySet().forEach(System.out::println);
+		for (Entry<Instance, State> res : results.entrySet()) {
+
+			System.out.println(res.getKey().getName());
+			System.out.println("Model score: " + res.getValue().getModelScore());
+			System.out.println("Objective score: " + res.getValue().getObjectiveScore());
+			for (AbstractSlotFiller<?> goldAnnotations : res.getKey().getGoldAnnotations().getAnnotations()) {
+				System.out.println(goldAnnotations.toPrettyString());
+			}
+			for (AbstractSlotFiller<?> finalAnnotations : res.getValue().getCurrentPredictions().getAnnotations()) {
+				System.out.println(finalAnnotations.toPrettyString());
+			}
+			System.out.println();
+			System.out.println();
+			System.out.println();
+		}
 
 		trainer.printStatistics(System.out);
 

@@ -21,7 +21,7 @@ public class ScioSanto2Json {
 
 		SystemInitializer initializer = SystemInitializer.initialize(new CSVSpecs().specificationProvider).apply();
 
-		final String dir = "data/export_" + exportDate + "/";
+		final String dir = "rawData/export_" + exportDate + "/";
 		List<String> fileNames = Arrays.stream(new File(dir).listFiles()).filter(f -> f.getName().endsWith(".csv"))
 				.map(f -> f.getName().substring(0, f.getName().length() - 11)).collect(Collectors.toList());
 		Collections.sort(fileNames);
@@ -31,15 +31,16 @@ public class ScioSanto2Json {
 			System.out.println(name);
 
 			Santo2JsonConverter converter = new Santo2JsonConverter(initializer, name,
-					new File("data/export_10012019/" + name + "_export.csv"),
-					new File("data/export_10012019/" + name + "_Jessica.annodb"),
-					new File("data/export_10012019/" + name + "_Jessica.n-triples"), scioNameSpace, resourceNameSpace);
+					new File("rawData/export_10012019/" + name + "_export.csv"),
+					new File("rawData/export_10012019/" + name + "_Jessica.annodb"),
+					new File("rawData/export_10012019/" + name + "_Jessica.n-triples"), scioNameSpace,
+					resourceNameSpace);
 
 			converter.addIgnoreProperty("<http://www.w3.org/2000/01/rdf-schema#comment>");
 			converter.addIgnoreProperty("<http://www.w3.org/2000/01/rdf-schema#label>");
 
-			converter.convert(new File("src/main/resources/corpus/json/" + name + "_OrganismModel.json"),
-					"OrganismModel", true, false);
+			converter.convert(new File("src/main/resources/" + name + "_OrganismModel.json"), "OrganismModel", true,
+					false);
 		}
 
 	}

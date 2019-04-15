@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 
 import org.apache.jena.ext.com.google.common.collect.Collections2;
 
-import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.annotations.DocumentLinkedAnnotation;
@@ -87,7 +86,13 @@ public class EvaluationHelper {
 	public static Score scoreSingle(final AbstractSlotFiller<?> val, final AbstractSlotFiller<?> otherVal) {
 		if (val instanceof DocumentLinkedAnnotation
 				&& (otherVal instanceof DocumentLinkedAnnotation || otherVal == null)) {
-			return ((DocumentLinkedAnnotation) val).evaluate((DocumentLinkedAnnotation) otherVal);
+
+			if (otherVal == null)
+				return ((DocumentLinkedAnnotation) val).evaluate((DocumentLinkedAnnotation) otherVal);
+
+			return ((EntityTypeAnnotation) EntityTypeAnnotation.get(val.getEntityType()))
+					.evaluate((EntityTypeAnnotation) EntityTypeAnnotation.get(otherVal.getEntityType()));
+//			return ((DocumentLinkedAnnotation) val).evaluate((DocumentLinkedAnnotation) otherVal);
 		} else if (val instanceof LiteralAnnotation && (otherVal instanceof LiteralAnnotation || otherVal == null)) {
 			return ((LiteralAnnotation) val).evaluate((LiteralAnnotation) otherVal);
 		} else if (val instanceof EntityTypeAnnotation
