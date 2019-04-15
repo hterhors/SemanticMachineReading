@@ -1,5 +1,7 @@
 package de.hterhors.semanticmr.crf.variables;
 
+import de.hterhors.semanticmr.corpus.EInstanceContext;
+
 /**
  * The Instance object couples a document and the gold annotation of that
  * document. This class is used during training as training instance, during
@@ -8,7 +10,7 @@ package de.hterhors.semanticmr.crf.variables;
  * @author hterhors
  *
  */
-public class Instance {
+public class Instance implements Comparable<Instance> {
 
 	/**
 	 * The instance document.
@@ -20,10 +22,20 @@ public class Instance {
 	 */
 	private final Annotations goldAnnotations;
 
-	public Instance(Document document, Annotations goldAnnotations) {
+	/**
+	 * The context of this instance, whether it belongs to train dev or test set.
+	 */
+	private final EInstanceContext context;
+
+	public Instance(EInstanceContext context, Document document, Annotations goldAnnotations) {
+		this.context = context;
 		this.goldAnnotations = goldAnnotations;
 		this.document = document;
 		this.goldAnnotations.unmodifiable();
+	}
+
+	public EInstanceContext getContext() {
+		return context;
 	}
 
 	public Document getDocument() {
@@ -36,7 +48,13 @@ public class Instance {
 
 	@Override
 	public String toString() {
-		return "Instance [document=" + document + ", goldAnnotations=" + goldAnnotations + "]";
+		return "Instance [context=" + context + ", document=" + document.documentID + ", goldAnnotations="
+				+ goldAnnotations + "]";
+	}
+
+	@Override
+	public int compareTo(Instance o) {
+		return document.documentID.compareTo(o.document.documentID);
 	}
 
 }

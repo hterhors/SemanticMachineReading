@@ -1,29 +1,29 @@
-package de.hterhors.semanticmr.corpus.json.converter;
+package de.hterhors.semanticmr.json.converter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonAnnotationsWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonDocumentLinkedAnnotationWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonDocumentPositionWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonDocumentTokenWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonDocumentWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonEntityTemplateWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonRootAnnotationWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonEntityTypeWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonInstanceWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonLiteralAnnotationWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonMultiFillerSlotWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonSingleFillerSlotWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonSlotTypeWrapper;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonTextualContentWrapper;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonAnnotationsWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonDocumentLinkedAnnotationWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonDocumentPositionWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonDocumentTokenWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonDocumentWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonEntityTemplateWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonEntityTypeWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonInstanceWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonLiteralAnnotationWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonMultiFillerSlotWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonRootAnnotationWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonSingleFillerSlotWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonSlotTypeWrapper;
+import de.hterhors.semanticmr.json.structure.wrapper.JsonTextualContentWrapper;
 import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.annotations.DocumentLinkedAnnotation;
@@ -47,7 +47,7 @@ public class JsonInstanceWrapperToInstance {
 	}
 
 	private Instance toInstance(JsonInstanceWrapper instanceWrapper) {
-		return new Instance(toDocument(instanceWrapper.getDocument()),
+		return new Instance(instanceWrapper.getContext(), toDocument(instanceWrapper.getDocument()),
 				toAnnotations(instanceWrapper.getGoldAnnotations()));
 	}
 

@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.hterhors.semanticmr.candprov.DocumentCandidateProviderCollection;
 import de.hterhors.semanticmr.candprov.ISlotFillerCandidateProvider;
+import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.IHardConstraintsProvider;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.structure.EntityType;
@@ -22,17 +23,17 @@ public class EntityTemplateExploration {
 
 	final private DocumentCandidateProviderCollection candidateProvider;
 
-	final private List<IHardConstraintsProvider> hardConstraintsProviders;
+	final private HardConstraintsProvider hardConstraintsProvider;
 
 	public EntityTemplateExploration(DocumentCandidateProviderCollection candidateProvider,
-			List<IHardConstraintsProvider> hardConstraintsProvders) {
+			HardConstraintsProvider hardConstraintsProvder) {
 		this.candidateProvider = candidateProvider;
-		this.hardConstraintsProviders = hardConstraintsProvders;
+		this.hardConstraintsProvider = hardConstraintsProvder;
 	}
 
 	public EntityTemplateExploration(DocumentCandidateProviderCollection candidateProvider) {
 		this.candidateProvider = candidateProvider;
-		this.hardConstraintsProviders = Collections.emptyList();
+		this.hardConstraintsProvider = null;
 	}
 
 	/**
@@ -270,11 +271,11 @@ public class EntityTemplateExploration {
 	 * @return false if the template does NOT violates any constraints, else true.
 	 */
 	private boolean violatesConstraints(EntityTemplate deepCopy) {
-		for (IHardConstraintsProvider hardConstraintsProvider : hardConstraintsProviders) {
-			if (hardConstraintsProvider.violatesConstraints(deepCopy))
-				return true;
-		}
-		return false;
+		if (hardConstraintsProvider == null)
+			return false;
+		else
+			return hardConstraintsProvider.violatesConstraints(deepCopy);
+
 	}
 
 }

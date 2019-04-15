@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.corpus.json.wrapper;
+package de.hterhors.semanticmr.json.structure.wrapper;
 
 import com.google.gson.annotations.SerializedName;
 

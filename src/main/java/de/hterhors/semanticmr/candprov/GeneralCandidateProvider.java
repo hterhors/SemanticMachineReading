@@ -25,7 +25,7 @@ public class GeneralCandidateProvider implements ISlotFillerCandidateProvider<En
 		this.relatedDocument = relatedDocument;
 	}
 
-	public void addSlotFiller(EntityTypeAnnotation slotFiller) {
+	public GeneralCandidateProvider addSlotFiller(EntityTypeAnnotation slotFiller) {
 		for (SlotType slotType : slotFiller.getEntityType().getSlotFillerOfSlotTypes()) {
 			entityAnnotationCache.putIfAbsent(slotType, new ArrayList<>());
 			if (slotType.matchesEntityType(slotFiller.getEntityType())) {
@@ -39,13 +39,14 @@ public class GeneralCandidateProvider implements ISlotFillerCandidateProvider<En
 			rootAnnotationsCache.putIfAbsent(relatedEntitytype, new HashSet<>());
 			rootAnnotationsCache.get(relatedEntitytype).add(slotFiller);
 		}
-
+		return this;
 	}
 
-	public void addBatchSlotFiller(Collection<EntityTypeAnnotation> slotFiller) {
+	public GeneralCandidateProvider addBatchSlotFiller(Collection<EntityTypeAnnotation> slotFiller) {
 		for (EntityTypeAnnotation literalSlotFiller : slotFiller) {
 			addSlotFiller(literalSlotFiller);
 		}
+		return this;
 	}
 
 	@Override

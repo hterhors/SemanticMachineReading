@@ -10,12 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.hterhors.semanticmr.corpus.json.JsonWriter;
-import de.hterhors.semanticmr.corpus.json.converter.InstancesToJsonInstanceWrapper;
+import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
+import de.hterhors.semanticmr.json.structure.JsonInstanceIO;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
 import de.hterhors.semanticmr.santo.container.Triple;
 import de.hterhors.semanticmr.santo.converter.reader.TextualAnnotationsReader;
@@ -44,9 +45,9 @@ public class Santo2JsonConverter {
 
 	private final String documentID;
 
-	public Santo2JsonConverter(SystemInitializer initializer, File documentFile, File textualAnnotationsFile,
-			File rdfAnnotationsFile, final String ontologyNameSpace, final String resourceNameSpace)
-			throws IOException {
+	public Santo2JsonConverter(SystemInitializer initializer, final String documentID, File documentFile,
+			File textualAnnotationsFile, File rdfAnnotationsFile, final String ontologyNameSpace,
+			final String resourceNameSpace) throws IOException {
 		this.initializer = initializer;
 		this.documentFile = documentFile;
 		this.textualAnnotationsFile = textualAnnotationsFile;
@@ -57,8 +58,7 @@ public class Santo2JsonConverter {
 
 		this.validateFiles();
 
-		this.documentID = textualAnnotationsFile.getName().replaceAll("_export", "");
-
+		this.documentID = documentID;
 		this.document = new Document(this.documentID, SantoDocumentConverter.convert(documentFile));
 
 		this.annotations = new TextualAnnotationsReader(this.document, textualAnnotationsFile).getAnnotations();
@@ -78,16 +78,15 @@ public class Santo2JsonConverter {
 		final List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> rdfAnnotations = rdfConverter
 				.extract(rootEntityTypes, includeSubEntities);
 
-
 		List<Instance> instances = new ArrayList<>();
 
 		Annotations goldAnnotations = new Annotations(rdfAnnotations);
 
-		instances.add(new Instance(document, goldAnnotations));
+		instances.add(new Instance(EInstanceContext.UNSPECIFIED, document, goldAnnotations));
 
 		InstancesToJsonInstanceWrapper conv = new InstancesToJsonInstanceWrapper(instances);
 
-		JsonWriter writer = new JsonWriter(jsonPrettyString);
+		JsonInstanceIO writer = new JsonInstanceIO(jsonPrettyString);
 		String json = writer.writeInstances(conv.convertToWrapperInstances(initializer));
 
 		final PrintStream ps = new PrintStream(writeToFile);
@@ -98,12 +97,15 @@ public class Santo2JsonConverter {
 	private void validateFiles() {
 		if (!this.documentFile.exists())
 			throw new IllegalArgumentException("Document file does not exist: " + documentFile.getAbsolutePath());
+
 		if (!this.textualAnnotationsFile.exists())
 			throw new IllegalArgumentException(
 					"Textual annotations file does not exist: " + documentFile.getAbsolutePath());
+
 		if (!this.rdfAnnotationsFile.exists())
 			throw new IllegalArgumentException(
 					"RDF annotations file does not exist: " + documentFile.getAbsolutePath());
+
 		if (!documentFile.getName().endsWith(documentFileNameEnding))
 			System.out.println("WARN: unexpected file ending of document file: " + documentFile.getName());
 		if (!textualAnnotationsFile.getName().endsWith(textualAnnotationsFileNameEnding))

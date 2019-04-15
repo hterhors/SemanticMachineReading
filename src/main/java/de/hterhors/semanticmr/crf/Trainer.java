@@ -150,7 +150,7 @@ public class Trainer {
 		}
 	}
 
-	public void printTrainingStatistics(final PrintStream ps) {
+	public void printStatistics(final PrintStream ps) {
 		ps.println(this.trainingStatistics);
 	}
 }

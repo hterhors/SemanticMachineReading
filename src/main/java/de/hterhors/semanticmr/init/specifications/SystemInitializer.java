@@ -97,19 +97,5 @@ public class SystemInitializer {
 		}
 	}
 
-	public List<IHardConstraintsProvider> getHardConstraints() {
-
-		List<ExcludePairConstraint> hardConstraints = new ArrayList<>();
-		for (ExcludeSlotTypePairNames constraint : specifications.getSpecifications().getExcludeSlotTypePairs()) {
-
-			hardConstraints.add(new ExcludePairConstraint(
-					constraint.onTemplateType.isEmpty() ? null : EntityType.get(constraint.onTemplateType),
-					new SlotEntityPair(SlotType.get(constraint.withSlotTypeName),
-							EntityType.get(constraint.withEntityTypeName)),
-					new SlotEntityPair(SlotType.get(constraint.excludeSlotTypeName),
-							EntityType.get(constraint.excludeEntityTypeName))));
-		}
-
-		return Arrays.asList(new HardConstraintsProvider(hardConstraints));
-	}
+	
 }

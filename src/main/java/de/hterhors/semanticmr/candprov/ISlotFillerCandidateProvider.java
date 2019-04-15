@@ -13,9 +13,9 @@ public interface ISlotFillerCandidateProvider<T extends AbstractSlotFiller<T>> {
 
 	public List<? extends AbstractSlotFiller<T>> getSlotFillerCandidates(SlotType slot);
 
-	public void addSlotFiller(T slotFiller);
+	public ISlotFillerCandidateProvider<T> addSlotFiller(T slotFiller);
 
-	public void addBatchSlotFiller(Collection<T> slotFiller);
+	public ISlotFillerCandidateProvider<T> addBatchSlotFiller(Collection<T> slotFiller);
 
 	/**
 	 * TODO: UGLY PROGRAMMING HERE: Separate somehow.

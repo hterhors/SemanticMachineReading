@@ -67,13 +67,13 @@ public class EntityTypeCandidateProvider implements ISlotFillerCandidateProvider
 	}
 
 	@Override
-	public void addSlotFiller(EntityTypeAnnotation slotFiller) {
+	public EntityTypeCandidateProvider addSlotFiller(EntityTypeAnnotation slotFiller) {
 		throw new IllegalStateException(
 				"Can not add slot filler to enitty type candiate provider. Candidates are based on the specification.");
 	}
 
 	@Override
-	public void addBatchSlotFiller(Collection<EntityTypeAnnotation> slotFiller) {
+	public EntityTypeCandidateProvider addBatchSlotFiller(Collection<EntityTypeAnnotation> slotFiller) {
 		throw new IllegalStateException(
 				"Can not add slot filler to enitty type candiate provider. Candidates are based on the specification.");
 	}

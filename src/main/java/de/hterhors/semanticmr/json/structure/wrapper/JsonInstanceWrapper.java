@@ -1,13 +1,20 @@
-package de.hterhors.semanticmr.corpus.json.wrapper;
+package de.hterhors.semanticmr.json.structure.wrapper;
 
 import com.google.gson.annotations.SerializedName;
+
+import de.hterhors.semanticmr.corpus.EInstanceContext;
 
 public class JsonInstanceWrapper {
 
 	/**
+	 * The context to which this instance belongs one of TRAIN, DEVELOPMENT, TEST.
+	 */
+	@SerializedName("context")
+	private EInstanceContext context;
+
+	/**
 	 * The document.
 	 */
-
 	@SerializedName("doc")
 	private JsonDocumentWrapper document;
 
@@ -17,10 +24,20 @@ public class JsonInstanceWrapper {
 	@SerializedName("ganns")
 	private JsonAnnotationsWrapper goldAnnotations;
 
-	public JsonInstanceWrapper(JsonDocumentWrapper document, JsonAnnotationsWrapper goldAnnotations) {
+	public JsonInstanceWrapper(EInstanceContext context, JsonDocumentWrapper document,
+			JsonAnnotationsWrapper goldAnnotations) {
 		super();
+		this.context = context;
 		this.document = document;
 		this.goldAnnotations = goldAnnotations;
+	}
+
+	public EInstanceContext getContext() {
+		return context;
+	}
+
+	public void setContext(EInstanceContext context) {
+		this.context = context;
 	}
 
 	public JsonDocumentWrapper getDocument() {
@@ -41,13 +58,15 @@ public class JsonInstanceWrapper {
 
 	@Override
 	public String toString() {
-		return "JsonInstanceWrapper [document=" + document + ", goldAnnotations=" + goldAnnotations + "]";
+		return "JsonInstanceWrapper [context=" + context + ", document=" + document + ", goldAnnotations="
+				+ goldAnnotations + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((context == null) ? 0 : context.hashCode());
 		result = prime * result + ((document == null) ? 0 : document.hashCode());
 		result = prime * result + ((goldAnnotations == null) ? 0 : goldAnnotations.hashCode());
 		return result;
@@ -62,6 +81,8 @@ public class JsonInstanceWrapper {
 		if (getClass() != obj.getClass())
 			return false;
 		JsonInstanceWrapper other = (JsonInstanceWrapper) obj;
+		if (context != other.context)
+			return false;
 		if (document == null) {
 			if (other.document != null)
 				return false;

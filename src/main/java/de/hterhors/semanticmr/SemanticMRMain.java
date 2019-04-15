@@ -2,27 +2,23 @@ package de.hterhors.semanticmr;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.hterhors.semanticmr.candprov.DocumentCandidateProviderCollection;
-import de.hterhors.semanticmr.candprov.EntityTemplateCandidateProvider;
-import de.hterhors.semanticmr.candprov.EntityTypeCandidateProvider;
-import de.hterhors.semanticmr.candprov.GeneralCandidateProvider;
-import de.hterhors.semanticmr.corpus.json.JsonReader;
-import de.hterhors.semanticmr.corpus.json.converter.JsonInstanceWrapperToInstance;
-import de.hterhors.semanticmr.corpus.json.wrapper.JsonInstanceWrapper;
+import de.hterhors.semanticmr.corpus.InstanceProvider;
+import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
+import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;
 import de.hterhors.semanticmr.crf.ObjectiveFunction;
 import de.hterhors.semanticmr.crf.Trainer;
 import de.hterhors.semanticmr.crf.exploration.EntityTemplateExploration;
+import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.learner.optimizer.SGD;
 import de.hterhors.semanticmr.crf.learner.regularizer.L2;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
-import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
+import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.stopcrit.impl.MaxChainLength;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -37,7 +33,6 @@ import de.hterhors.semanticmr.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class SemanticMRMain {
 
@@ -46,10 +41,14 @@ public class SemanticMRMain {
 		SystemInitializer initializer = SystemInitializer.initialize(new CSVSpecs().specificationProvider)
 				.addNormalizationFunction(EntityType.get("Weight"), new WeightNormalization()).apply();
 
-		List<Instance> trainingInstances = readTrainingInstances(initializer);
+		IInstanceDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
+				.setCorpusSizeFraction(0.1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
 
-		DocumentCandidateProviderCollection documentCandidateProviderCollection = buildCandidateProvider(
-				trainingInstances);
+		InstanceProvider instanceProvider = new InstanceProvider(initializer,
+				new File("src/main/resources/corpus/json/"), new File("src/main/resources/corpus/nerla/nerla.json"),
+				shuffleCorpusDistributor);
+
+		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider(initializer);
 
 		ObjectiveFunction objectiveFunction = new ObjectiveFunction();
 
@@ -65,67 +64,30 @@ public class SemanticMRMain {
 				new Annotations(new EntityTemplate(AbstractSlotFiller
 						.toSlotFiller(instance.getGoldAnnotations().getAnnotations().get(0).getEntityType())))));
 
-		int numberOfEpochs = 10;
+		int numberOfEpochs = 1;
 
 //		AbstractSampler sampler = SamplerCollection.greedyModelStrategy();
-//		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
-		AbstractSampler sampler = new EpochSwitchSampler(epoch -> epoch % 2 == 0);
+		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
+//		AbstractSampler sampler = new EpochSwitchSampler(epoch -> epoch % 2 == 0);
 //		AbstractSampler sampler = new EpochSwitchSampler(new RandomSwitchSamplingStrategy(100L));
 //		AbstractSampler sampler = new EpochSwitchSampler(e -> new Random(e).nextBoolean());
 
 		IStoppingCriterion stoppingCriterion = new MaxChainLength(10);
 
-		EntityTemplateExploration explorer = new EntityTemplateExploration(documentCandidateProviderCollection,
-				initializer.getHardConstraints());
+		EntityTemplateExploration explorer = new EntityTemplateExploration(instanceProvider.getCandidateProvider(),
+				constraintsProvider);
 
 		Trainer trainer = new Trainer(model, explorer, sampler, stateInitializer, stoppingCriterion, objectiveFunction,
 				numberOfEpochs);
 
-		Map<Instance, State> results = trainer.trainModel(trainingInstances);
+		Map<Instance, State> results = trainer.trainModel(instanceProvider.getRedistributedTrainingInstances());
 
 		results.entrySet().forEach(System.out::println);
 
-		trainer.printTrainingStatistics(System.out);
+		trainer.printStatistics(System.out);
 
 		System.out.println(model);
 
-	}
-
-	private static DocumentCandidateProviderCollection buildCandidateProvider(List<Instance> trainingInstances) {
-		EntityTemplate subTemplate = new EntityTemplate(AbstractSlotFiller.toSlotFiller("MouseModel"))
-				.setSingleSlotFiller(SlotType.get("hasAge"),
-						AbstractSlotFiller.toSlotFiller("Age", "Eight-week-old", 36431));
-
-		EntityTemplateCandidateProvider entityTemplateCandidateProvider = new EntityTemplateCandidateProvider(
-				trainingInstances.get(0).getDocument());
-		entityTemplateCandidateProvider.addSlotFiller(subTemplate);
-
-		EntityTypeCandidateProvider entityCandidateProvider = EntityTypeCandidateProvider.getInstance();
-
-		GeneralCandidateProvider literalCandidateProvider = new GeneralCandidateProvider(
-				trainingInstances.get(0).getDocument());
-		literalCandidateProvider.addSlotFiller(AbstractSlotFiller.toSlotFiller("Weight", "recovery", 1329));
-		literalCandidateProvider.addSlotFiller(AbstractSlotFiller.toSlotFiller("Adult", "Department", 253));
-		literalCandidateProvider.addSlotFiller(AbstractSlotFiller.toSlotFiller("Female", "female", 36454));
-		literalCandidateProvider.addSlotFiller(AbstractSlotFiller.toSlotFiller("Mention", "ChaseABC", 1814));
-		literalCandidateProvider.addSlotFiller(AbstractSlotFiller.toSlotFiller("Mention", "locomotor", 1319));
-		literalCandidateProvider.addSlotFiller(AbstractSlotFiller.toSlotFiller("Mention", "blabla", 1234));
-		literalCandidateProvider.addSlotFiller(AbstractSlotFiller.toSlotFiller("Mention", "blabla2", 2345));
-
-		DocumentCandidateProviderCollection documentCandidateProviderCollection = new DocumentCandidateProviderCollection();
-		documentCandidateProviderCollection.setEntityTypeCandidateProvider(entityCandidateProvider);
-		documentCandidateProviderCollection.addEntityTemplateCandidateProvider(entityTemplateCandidateProvider);
-		documentCandidateProviderCollection.addLiteralCandidateProvider(literalCandidateProvider);
-		return documentCandidateProviderCollection;
-	}
-
-	private static List<Instance> readTrainingInstances(SystemInitializer initializer) throws IOException {
-		List<JsonInstanceWrapper> jsonInstances = new JsonReader().readInstances(
-				new String(Files.readAllBytes(new File("src/main/resources/corpus/json/OrganismModel.json").toPath())));
-
-		List<Instance> trainingInstances = new JsonInstanceWrapperToInstance(jsonInstances)
-				.convertToInstances(initializer);
-		return trainingInstances;
 	}
 
 }

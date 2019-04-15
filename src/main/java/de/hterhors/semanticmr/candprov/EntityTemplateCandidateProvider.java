@@ -23,19 +23,21 @@ public class EntityTemplateCandidateProvider implements ISlotFillerCandidateProv
 		this.relatedDocument = relatedDocument;
 	}
 
-	public void addSlotFiller(EntityTemplate slotFiller) {
+	public EntityTemplateCandidateProvider addSlotFiller(EntityTemplate slotFiller) {
 		for (SlotType slotType : slotFiller.getEntityType().getSlotFillerOfSlotTypes()) {
 			entityAnnotationCache.putIfAbsent(slotType, new ArrayList<>());
 			if (slotType.matchesEntityType(slotFiller.getEntityType())) {
 				entityAnnotationCache.get(slotType).add(slotFiller);
 			}
 		}
+		return this;
 	}
 
-	public void addBatchSlotFiller(Collection<EntityTemplate> slotFiller) {
+	public EntityTemplateCandidateProvider addBatchSlotFiller(Collection<EntityTemplate> slotFiller) {
 		for (EntityTemplate literalSlotFiller : slotFiller) {
 			addSlotFiller(literalSlotFiller);
 		}
+		return this;
 	}
 
 	@Override
