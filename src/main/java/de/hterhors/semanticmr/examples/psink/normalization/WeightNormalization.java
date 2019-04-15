@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.psink.normalization;
+package de.hterhors.semanticmr.examples.psink.normalization;
 
 import de.hterhors.semanticmr.structure.annotations.normalization.INormalizationFunction;
 

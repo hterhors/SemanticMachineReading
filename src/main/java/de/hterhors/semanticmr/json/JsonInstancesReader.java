@@ -20,11 +20,8 @@ public class JsonInstancesReader {
 
 	private final File corpusDirectory;
 
-	private final SystemInitializer initializer;
-
-	public JsonInstancesReader(final SystemInitializer initializer, final File corpusDirectory) {
+	public JsonInstancesReader(final File corpusDirectory) {
 		this.corpusDirectory = corpusDirectory;
-		this.initializer = initializer;
 	}
 
 	public List<Instance> readInstances() throws IOException {
@@ -49,7 +46,7 @@ public class JsonInstancesReader {
 			List<JsonInstanceWrapper> jsonInstances = new JsonInstanceIO(true)
 					.readInstances(new String(Files.readAllBytes(jsonFile.toPath())));
 
-			trainingInstances.addAll(new JsonInstanceWrapperToInstance(jsonInstances).convertToInstances(initializer));
+			trainingInstances.addAll(new JsonInstanceWrapperToInstance(jsonInstances).convertToInstances());
 		}
 		System.out.println("... done");
 		System.out.println("Total number of instances loaded: " + count);

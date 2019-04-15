@@ -15,19 +15,16 @@ import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 import de.hterhors.semanticmr.json.JsonInstancesReader;
-import de.hterhors.semanticmr.json.JsonNerlaReader;
+import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
 
 public class InstanceProvider {
 
-	final private File jsonNerlaAnnotationsFile;
 	final private File jsonInstancesDirectory;
 
 	final private List<Instance> instances;
 
-	final private DocumentCandidateProviderCollection candidateProvider;
-
-	public List<Instance> getAllInstances() {
+	public List<Instance> getInstances() {
 		return instances;
 	}
 
@@ -55,37 +52,19 @@ public class InstanceProvider {
 		return Collections.unmodifiableList(redistTestInstances);
 	}
 
-	public DocumentCandidateProviderCollection getCandidateProvider() {
-		return candidateProvider;
+	public InstanceProvider(final File jsonInstancesDirectory, final File jsonNerlaAnnotationsFile) {
+		this(jsonInstancesDirectory, new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build());
 	}
 
-	public InstanceProvider(final SystemInitializer initializer, final File jsonInstancesDirectory,
-			final File jsonNerlaAnnotationsFile) {
-		this(initializer, jsonInstancesDirectory, jsonNerlaAnnotationsFile,
-				new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build());
-	}
-
-	public InstanceProvider(final SystemInitializer initializer, final File jsonInstancesDirectory,
-			final File jsonNerlaAnnotationsFile, final IInstanceDistributor distributor) {
+	public InstanceProvider(final File jsonInstancesDirectory, final IInstanceDistributor distributor) {
 		try {
 			this.jsonInstancesDirectory = jsonInstancesDirectory;
-			this.jsonNerlaAnnotationsFile = jsonNerlaAnnotationsFile;
 
 			this.distributor = distributor;
 
 			this.validateFiles();
 
-			this.instances = new JsonInstancesReader(initializer, jsonInstancesDirectory).readInstances();
-
-			this.candidateProvider = new DocumentCandidateProviderCollection();
-
-			final Map<String, List<EntityTypeAnnotation>> nerla = new JsonNerlaReader(initializer,
-					jsonNerlaAnnotationsFile).read();
-
-			for (Instance instance : instances) {
-				candidateProvider.addLiteralCandidateProvider(new GeneralCandidateProvider(instance.getDocument())
-						.addBatchSlotFiller(nerla.get(instance.getDocument().documentID)));
-			}
+			this.instances = new JsonInstancesReader(jsonInstancesDirectory).readInstances();
 
 			redistribute(distributor);
 
@@ -99,13 +78,8 @@ public class InstanceProvider {
 		if (!jsonInstancesDirectory.exists())
 			throw new IllegalArgumentException("File does not exist: " + jsonInstancesDirectory.getAbsolutePath());
 
-		if (!jsonNerlaAnnotationsFile.exists())
-			throw new IllegalArgumentException("File does not exist: " + jsonNerlaAnnotationsFile.getAbsolutePath());
-
 		if (!jsonInstancesDirectory.isDirectory())
 			System.out.println("Warn! Expected directory: " + jsonInstancesDirectory.getName());
-		if (!jsonNerlaAnnotationsFile.getName().endsWith(".json"))
-			System.out.println("Warn! Unexpected file format: " + jsonNerlaAnnotationsFile.getName());
 
 	}
 

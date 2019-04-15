@@ -169,10 +169,10 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 	@Override
 	public IDistributorStrategy distributeInstances(InstanceProvider corpusProvider) {
 
-		Collections.sort(corpusProvider.getAllInstances());
-		Collections.shuffle(corpusProvider.getAllInstances(), rnd);
+		Collections.sort(corpusProvider.getInstances());
+		Collections.shuffle(corpusProvider.getInstances(), rnd);
 
-		final int totalNumberOfDocuments = corpusProvider.getAllInstances().size();
+		final int totalNumberOfDocuments = corpusProvider.getInstances().size();
 
 		final int numberForTraining = numberOfTrainingData(totalNumberOfDocuments);
 		final int numberForDevelopment = numberOfDevelopmentData(totalNumberOfDocuments);
@@ -182,20 +182,20 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 
 			@Override
 			public IDistributorStrategy distributeTrainingInstances(List<Instance> trainingDocuments) {
-				trainingDocuments.addAll(corpusProvider.getAllInstances().subList(0, numberForTraining));
+				trainingDocuments.addAll(corpusProvider.getInstances().subList(0, numberForTraining));
 				return this;
 			}
 
 			@Override
 			public IDistributorStrategy distributeDevelopmentInstances(List<Instance> developmentDocuments) {
-				developmentDocuments.addAll(corpusProvider.getAllInstances().subList(numberForTraining,
+				developmentDocuments.addAll(corpusProvider.getInstances().subList(numberForTraining,
 						numberForTraining + numberForDevelopment));
 				return this;
 			}
 
 			@Override
 			public IDistributorStrategy distributeTestInstances(List<Instance> testDocuments) {
-				testDocuments.addAll(corpusProvider.getAllInstances().subList(numberForTraining + numberForDevelopment,
+				testDocuments.addAll(corpusProvider.getInstances().subList(numberForTraining + numberForDevelopment,
 						numberForTraining + numberForDevelopment + numberForTest));
 				return this;
 			}

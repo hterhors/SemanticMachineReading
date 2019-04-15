@@ -42,7 +42,7 @@ public class JsonInstanceWrapperToInstance {
 		this.jsonInstances = jsonInstances;
 	}
 
-	public List<Instance> convertToInstances(SystemInitializer initializer) {
+	public List<Instance> convertToInstances() {
 		return jsonInstances.stream().map(instanceWrapper -> toInstance(instanceWrapper)).collect(Collectors.toList());
 	}
 

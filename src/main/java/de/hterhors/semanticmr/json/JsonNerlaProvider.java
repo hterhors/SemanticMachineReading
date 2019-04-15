@@ -7,46 +7,53 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.SynchronousQueue;
 
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.json.nerla.JsonNerlaIO;
 import de.hterhors.semanticmr.json.nerla.wrapper.JsonEntityAnnotationWrapper;
+import de.hterhors.semanticmr.nerla.INerlaProvider;
 import de.hterhors.semanticmr.structure.EntityType;
 import de.hterhors.semanticmr.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.structure.annotations.container.DocumentPosition;
 import de.hterhors.semanticmr.structure.annotations.container.TextualContent;
 
-public class JsonNerlaReader {
+public class JsonNerlaProvider implements INerlaProvider {
 
 	private final File nerlaFile;
 
-	private final SystemInitializer initializer;
-
-	public JsonNerlaReader(final SystemInitializer initializer, final File nerlaFile) {
+	public JsonNerlaProvider(final File nerlaFile) {
 		this.nerlaFile = nerlaFile;
-		this.initializer = initializer;
+
+		this.validateFiles();
 	}
 
-	public Map<String, List<EntityTypeAnnotation>> read() throws IOException {
+	@Override
+	public Map<Instance, List<EntityTypeAnnotation>> get(List<Instance> instances) throws IOException {
 
-		final List<JsonEntityAnnotationWrapper> jsonInstances = new JsonNerlaIO(true)
+		final List<JsonEntityAnnotationWrapper> jsonNerla = new JsonNerlaIO(true)
 				.readInstances(new String(Files.readAllBytes(nerlaFile.toPath())));
 
-		final Map<String, List<EntityTypeAnnotation>> nerla = new HashMap<>();
+		final Map<String, Instance> map = new HashMap<>();
+
+		for (Instance instance : instances) {
+			map.put(instance.getDocument().documentID, instance);
+		}
+
+		final Map<Instance, List<EntityTypeAnnotation>> nerla = new HashMap<>();
+
 		System.out.println("#######################LOAD NERLA#######################");
 		System.out.print("Read nerla");
 		int count = 0;
-		for (JsonEntityAnnotationWrapper jsonEntityAnnotationWrapper : jsonInstances) {
+		for (JsonEntityAnnotationWrapper jsonEntityAnnotationWrapper : jsonNerla) {
 			count++;
 			if (count % 500 == 0)
 				System.out.print(".");
 			if (count % 5000 == 0)
 				System.out.print(" - " + count + " - ");
 
-			nerla.putIfAbsent(jsonEntityAnnotationWrapper.getDocumentID(), new ArrayList<>());
-			nerla.get(jsonEntityAnnotationWrapper.getDocumentID())
+			nerla.putIfAbsent(map.get(jsonEntityAnnotationWrapper.getDocumentID()), new ArrayList<>());
+			nerla.get(map.get(jsonEntityAnnotationWrapper.getDocumentID()))
 					.add(toEntityTypeAnnotation(jsonEntityAnnotationWrapper));
 		}
 		System.out.println("... done");
@@ -59,6 +66,16 @@ public class JsonNerlaReader {
 
 		return new DocumentLinkedAnnotation(EntityType.get(s.getEntityType()), new TextualContent(s.getSurfaceForm()),
 				new DocumentPosition(s.getOffset()));
+
+	}
+
+	private void validateFiles() {
+		if (!nerlaFile.exists())
+			throw new IllegalArgumentException("File does not exist: " + nerlaFile.getAbsolutePath());
+
+		if (!nerlaFile.getName().endsWith(".json"))
+			System.out.println("Warn! Unexpected file format: " + nerlaFile.getName());
+
 	}
 
 }
