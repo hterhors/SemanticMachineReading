@@ -51,7 +51,7 @@ public class InstancesToJsonInstanceWrapper {
 	}
 
 	private JsonInstanceWrapper toInstanceWrapper(Instance instance) {
-		return new JsonInstanceWrapper(instance.getContext(), toDocumentWrapper(instance.getDocument()),
+		return new JsonInstanceWrapper(instance.getOriginalContext(), toDocumentWrapper(instance.getDocument()),
 				toAnnotationsWrapper(instance.getGoldAnnotations()));
 	}
 

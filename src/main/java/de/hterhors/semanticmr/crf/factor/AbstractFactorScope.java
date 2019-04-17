@@ -16,14 +16,14 @@ import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
  *
  * @see {@link Factor}
  */
-public abstract class AbstractFactorScope {
+public abstract class AbstractFactorScope<S extends AbstractFactorScope<S>> {
 
 	/**
 	 * The template context of the list of variables.
 	 */
-	protected final AbstractFeatureTemplate template;
+	protected final AbstractFeatureTemplate<S> template;
 
-	public AbstractFactorScope(AbstractFeatureTemplate template) {
+	public AbstractFactorScope(AbstractFeatureTemplate<S> template) {
 		this.template = template;
 	}
 
@@ -32,7 +32,7 @@ public abstract class AbstractFactorScope {
 	 * 
 	 * @return the template
 	 */
-	public AbstractFeatureTemplate getTemplate() {
+	public AbstractFeatureTemplate<S> getTemplate() {
 		return template;
 	}
 
@@ -41,12 +41,12 @@ public abstract class AbstractFactorScope {
 	 * 
 	 * @return
 	 */
-	public abstract int getHashCode();
+	public abstract int implementHashCode();
 
 	/**
 	 * Reminder to proper implement equals function for all scopes!
 	 */
-	public abstract boolean getEquals(Object obj);
+	public abstract boolean implementEquals(Object obj);
 
 	@Override
 	public int hashCode() {
@@ -67,7 +67,7 @@ public abstract class AbstractFactorScope {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AbstractFactorScope other = (AbstractFactorScope) obj;
+		AbstractFactorScope<S> other = (AbstractFactorScope<S>) obj;
 		if (template == null) {
 			if (other.template != null)
 				return false;

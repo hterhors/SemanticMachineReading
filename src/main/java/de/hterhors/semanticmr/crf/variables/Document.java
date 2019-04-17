@@ -1,8 +1,10 @@
 package de.hterhors.semanticmr.crf.variables;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.hterhors.semanticmr.exce.DuplicateDocumentException;
@@ -24,6 +26,13 @@ public class Document {
 	final public String documentID;
 
 	final public List<DocumentToken> tokenList;
+
+	/**
+	 * Tokens indexed by position.
+	 */
+	final private Map<Integer, DocumentToken> startOffsetCharPositionTokens = new HashMap<>();
+
+	final private Map<Integer, DocumentToken> endOffsetCharPositionTokens = new HashMap<>();
 
 	/**
 	 * Create a new document without any textual content.
@@ -50,6 +59,10 @@ public class Document {
 
 		this.documentContent = builderDocumentContent(tokenList);
 
+		for (DocumentToken token : tokenList) {
+			startOffsetCharPositionTokens.put(new Integer(token.docCharOnset), token);
+			endOffsetCharPositionTokens.put(new Integer(token.docCharOnset + token.text.length()), token);
+		}
 	}
 
 	private String builderDocumentContent(List<DocumentToken> tokenList) {
@@ -79,6 +92,15 @@ public class Document {
 	@Override
 	public String toString() {
 		return "Document [documentID=" + documentID + "]";
+	}
+
+	public DocumentToken getTokenByCharOffset(Integer offset) {
+		final DocumentToken token = startOffsetCharPositionTokens.getOrDefault(offset,
+				endOffsetCharPositionTokens.get(offset));
+		if (token == null)
+			throw new IllegalArgumentException(
+					"Can not map charachter offset to token: " + offset + ", in document: " + documentID);
+		return token;
 	}
 
 }

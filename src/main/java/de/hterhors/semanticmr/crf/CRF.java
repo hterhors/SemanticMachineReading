@@ -9,8 +9,9 @@ import java.util.Map;
 import de.hterhors.semanticmr.crf.exploration.EntityTemplateExploration;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
+import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
-import de.hterhors.semanticmr.crf.stopcrit.IStoppingCriterion;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -27,19 +28,16 @@ public class CRF {
 			this.context = context;
 		}
 
-		private long getTotalTrainingDuration() {
+		private long getTotalDuration() {
 			return endTrainingTime - startTrainingTime;
 		}
 
 		@Override
 		public String toString() {
-			return "CRFStatistics [context=" + context + ", getTotalTrainingDuration()=" + getTotalTrainingDuration()
-					+ "]";
+			return "CRFStatistics [context=" + context + ", getTotalDuration()=" + getTotalDuration() + "]";
 		}
 
 	}
-
-	final int numberOfEpochs;
 
 	/**
 	 * The maximum number of sampling steps per instance. This prevents infinite
@@ -57,16 +55,12 @@ public class CRF {
 
 	private final IStateInitializer initializer;
 
-	private final IStoppingCriterion stoppingCriterion;
-
 	private CRFStatistics trainingStatistics;
 
 	private CRFStatistics testStatistics;
 
 	public CRF(Model model, EntityTemplateExploration explorer, AbstractSampler sampler, IStateInitializer initializer,
-			IStoppingCriterion stoppingCriterion, ObjectiveFunction objectiveFunction, final int numberOfEpochs) {
-		this.numberOfEpochs = numberOfEpochs;
-		this.stoppingCriterion = stoppingCriterion;
+			ObjectiveFunction objectiveFunction) {
 		this.model = model;
 		this.explorer = explorer;
 		this.objectiveFunction = objectiveFunction;
@@ -76,7 +70,8 @@ public class CRF {
 		this.testStatistics = new CRFStatistics("Test");
 	}
 
-	public Map<Instance, State> train(List<Instance> trainingInstances) {
+	public Map<Instance, State> train(List<Instance> trainingInstances, final int numberOfEpochs,
+			IStoppingCriterion... stoppingCriterion) {
 		this.trainingStatistics.startTrainingTime = System.currentTimeMillis();
 
 		final Map<Instance, State> finalStates = new LinkedHashMap<>();
@@ -118,7 +113,7 @@ public class CRF {
 
 					finalStates.put(instance, currentState);
 
-					if (checkStoppingCriterion(producedStateChain))
+					if (meetsStoppingCriterion(stoppingCriterion, producedStateChain))
 						break;
 
 				}
@@ -128,10 +123,12 @@ public class CRF {
 		return finalStates;
 	}
 
-	private boolean checkStoppingCriterion(final List<State> producedStateChain) {
-		if (stoppingCriterion.checkCondition(producedStateChain))
-			return true;
-
+	private boolean meetsStoppingCriterion(IStoppingCriterion[] stoppingCriterion,
+			final List<State> producedStateChain) {
+		for (IStoppingCriterion sc : stoppingCriterion) {
+			if (sc.meetsCondition(producedStateChain))
+				return true;
+		}
 		return false;
 	}
 
@@ -182,53 +179,48 @@ public class CRF {
 		ps.println(this.testStatistics);
 	}
 
-	public Map<Instance, State> test(List<Instance> testInstances) {
+	public Map<Instance, State> test(List<Instance> testInstances, IStoppingCriterion... stoppingCriterion) {
 		this.testStatistics.startTrainingTime = System.currentTimeMillis();
 
 		final Map<Instance, State> finalStates = new LinkedHashMap<>();
 
-		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
-
-			for (Instance instance : testInstances) {
+		for (Instance instance : testInstances) {
 //				System.out.println(instance.getName());
 //				System.out.println(instance.getGoldAnnotations().getAnnotations().get(0).toPrettyString());
 //				System.out.println();
 
-				final List<State> producedStateChain = new ArrayList<>();
+			final List<State> producedStateChain = new ArrayList<>();
 
-				State currentState = initializer.getInitState(instance);
-				objectiveFunction.score(currentState);
-				finalStates.put(instance, currentState);
-				producedStateChain.add(currentState);
+			State currentState = initializer.getInitState(instance);
+			objectiveFunction.score(currentState);
+			finalStates.put(instance, currentState);
+			producedStateChain.add(currentState);
 
-				for (int samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
+			for (int samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
 //					System.out.println();
 //					System.out.println(currentState.getCurrentPredictions().getAnnotations().get(0).toPrettyString());
 //					System.out.println();
 
-					final List<State> proposalStates = explorer.explore(currentState);
+				final List<State> proposalStates = explorer.explore(currentState);
 
-					model.score(proposalStates);
+				model.score(proposalStates);
 
-					final State candidateState = SamplerCollection.greedyModelStrategy()
-							.sampleCandidate(proposalStates);
+				final State candidateState = SamplerCollection.greedyModelStrategy().sampleCandidate(proposalStates);
 
-					boolean accepted = SamplerCollection.greedyModelStrategy().getAcceptanceStrategy(epoch)
-							.isAccepted(candidateState, currentState);
+				boolean accepted = AcceptStrategies.strictModelAccept().isAccepted(candidateState, currentState);
 
-					if (accepted) {
-						currentState = candidateState;
-						objectiveFunction.score(currentState);
-					}
-
-					producedStateChain.add(currentState);
-
-					finalStates.put(instance, currentState);
-
-					if (checkStoppingCriterion(producedStateChain))
-						break;
-
+				if (accepted) {
+					currentState = candidateState;
+					objectiveFunction.score(currentState);
 				}
+
+				producedStateChain.add(currentState);
+
+				finalStates.put(instance, currentState);
+
+				if (meetsStoppingCriterion(stoppingCriterion, producedStateChain))
+					break;
+
 			}
 		}
 		this.testStatistics.endTrainingTime = System.currentTimeMillis();

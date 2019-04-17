@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.stopcrit;
+package de.hterhors.semanticmr.crf.sampling.stopcrit;
 
 import java.util.List;
 
@@ -19,6 +19,6 @@ public interface IStoppingCriterion {
 	 * 
 	 * @return true if the condition of stopping criterion is fulfilled else false.
 	 */
-	public boolean checkCondition(final List<State> producedStateChain);
+	public boolean meetsCondition(final List<State> producedStateChain);
 
 }

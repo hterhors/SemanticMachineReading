@@ -94,17 +94,17 @@ public class InstanceProvider {
 	}
 
 	public List<Instance> getOriginalTrainingInstances() {
-		return this.instances.stream().filter(i -> i.getContext() == EInstanceContext.TRAIN)
+		return this.instances.stream().filter(i -> i.getOriginalContext() == EInstanceContext.TRAIN)
 				.collect(Collectors.toList());
 	}
 
 	public List<Instance> getOriginalDevelopInstances() {
-		return this.instances.stream().filter(i -> i.getContext() == EInstanceContext.DEVELOPMENT)
+		return this.instances.stream().filter(i -> i.getOriginalContext() == EInstanceContext.DEVELOPMENT)
 				.collect(Collectors.toList());
 	}
 
 	public List<Instance> getOriginalTestInstances() {
-		return this.instances.stream().filter(i -> i.getContext() == EInstanceContext.TEST)
+		return this.instances.stream().filter(i -> i.getOriginalContext() == EInstanceContext.TEST)
 				.collect(Collectors.toList());
 	}
 

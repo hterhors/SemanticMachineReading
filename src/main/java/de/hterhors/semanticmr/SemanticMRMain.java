@@ -21,15 +21,16 @@ import de.hterhors.semanticmr.crf.learner.optimizer.SGD;
 import de.hterhors.semanticmr.crf.learner.regularizer.L2;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
-import de.hterhors.semanticmr.crf.sampling.impl.RandomSwitchSamplingStrategy;
-import de.hterhors.semanticmr.crf.stopcrit.IStoppingCriterion;
-import de.hterhors.semanticmr.crf.stopcrit.impl.MaxChainLength;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.crf.templates.TestTemplate;
+import de.hterhors.semanticmr.crf.templates.IntraTokenTemplate;
+import de.hterhors.semanticmr.crf.templates.TokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -58,8 +59,9 @@ public class SemanticMRMain {
 		nerlaProvider
 				.addNerlaProvider(new JsonNerlaProvider(new File("src/main/resources/corpus/data/nerla/nerla.json")));
 
-		InstanceCandidateProviderCollection candidateProvider = nerlaProvider.collect()
-				.setEntityTypeCandidateProvider();
+		InstanceCandidateProviderCollection candidateProvider = nerlaProvider.collect();
+
+//				candidateProvider.setEntityTypeCandidateProvider();
 
 		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider(initializer);
 
@@ -69,7 +71,8 @@ public class SemanticMRMain {
 
 		List<AbstractFeatureTemplate<?>> featureTemplates = new ArrayList<>();
 
-		featureTemplates.add(new TestTemplate());
+		featureTemplates.add(new IntraTokenTemplate());
+		featureTemplates.add(new TokenContextTemplate());
 
 		Model model = new Model(featureTemplates, learner);
 
@@ -81,24 +84,29 @@ public class SemanticMRMain {
 
 //		AbstractSampler sampler = SamplerCollection.greedyModelStrategy();
 //		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
-//		AbstractSampler sampler = new EpochSwitchSampler(epoch -> epoch % 2 == 0);
-		AbstractSampler sampler = new EpochSwitchSampler(new RandomSwitchSamplingStrategy());
+		AbstractSampler sampler = new EpochSwitchSampler(epoch -> epoch % 2 == 0);
+//		AbstractSampler sampler = new EpochSwitchSampler(new RandomSwitchSamplingStrategy());
 //		AbstractSampler sampler = new EpochSwitchSampler(e -> new Random(e).nextBoolean());
 
-		IStoppingCriterion stoppingCriterion = new MaxChainLength(10);
+		IStoppingCriterion maxStepCrit = new MaxChainLengthCrit(10);
+		IStoppingCriterion noModelChangeCrit = new NoChangeCrit(3, s -> s.getModelScore());
 
 		EntityTemplateExploration explorer = new EntityTemplateExploration(candidateProvider, constraintsProvider);
 
-		CRF crf = new CRF(model, explorer, sampler, stateInitializer, stoppingCriterion, objectiveFunction,
-				numberOfEpochs);
+		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
 
-		crf.train(instanceProvider.getRedistributedTrainingInstances());
+		crf.train(instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit, noModelChangeCrit);
+
+		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
+				noModelChangeCrit);
+
+		evaluate(crf, testResults);
+
 		crf.printTrainingStatistics(System.out);
+		crf.printTestStatistics(System.out);
+	}
 
-		System.out.println(model);
-
-		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances());
-
+	private static void evaluate(CRF crf, Map<Instance, State> testResults) {
 		Score mean = new Score();
 
 		for (Entry<Instance, State> res : testResults.entrySet()) {
@@ -120,8 +128,6 @@ public class SemanticMRMain {
 			System.out.println();
 		}
 		System.out.println("Mean Score: " + mean);
-
-		crf.printTestStatistics(System.out);
 
 	}
 

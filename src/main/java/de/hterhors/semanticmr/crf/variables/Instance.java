@@ -25,10 +25,10 @@ public class Instance implements Comparable<Instance> {
 	/**
 	 * The context of this instance, whether it belongs to train dev or test set.
 	 */
-	private final EInstanceContext context;
+	private final EInstanceContext originalContext;
 
 	public Instance(EInstanceContext context, Document document, Annotations goldAnnotations) {
-		this.context = context;
+		this.originalContext = context == null ? EInstanceContext.UNSPECIFIED : context;
 		this.goldAnnotations = goldAnnotations;
 		this.document = document;
 		this.goldAnnotations.unmodifiable();
@@ -38,8 +38,8 @@ public class Instance implements Comparable<Instance> {
 		return getDocument().documentID;
 	}
 
-	public EInstanceContext getContext() {
-		return context;
+	public EInstanceContext getOriginalContext() {
+		return originalContext;
 	}
 
 	public Document getDocument() {
@@ -52,7 +52,7 @@ public class Instance implements Comparable<Instance> {
 
 	@Override
 	public String toString() {
-		return "Instance [context=" + context + ", document=" + document.documentID + ", goldAnnotations="
+		return "Instance [context=" + originalContext + ", document=" + document.documentID + ", goldAnnotations="
 				+ goldAnnotations + "]";
 	}
 

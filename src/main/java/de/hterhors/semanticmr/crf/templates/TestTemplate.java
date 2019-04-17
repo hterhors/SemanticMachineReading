@@ -13,7 +13,7 @@ import de.hterhors.semanticmr.crf.variables.State;
 
 public class TestTemplate extends AbstractFeatureTemplate<Scope> {
 
-	class Scope extends AbstractFactorScope {
+	class Scope extends AbstractFactorScope<Scope> {
 
 		final String x;
 
@@ -51,12 +51,12 @@ public class TestTemplate extends AbstractFeatureTemplate<Scope> {
 		}
 
 		@Override
-		public int getHashCode() {
+		public int implementHashCode() {
 			return hashCode();
 		}
 
 		@Override
-		public boolean getEquals(Object obj) {
+		public boolean implementEquals(Object obj) {
 			return equals(obj);
 		}
 

@@ -20,8 +20,7 @@ public class SantoDocumentConverter {
 	 * Converts a given SANTO-document formatted file into a list of DocumentTokens.
 	 * 
 	 * @param documentFile
-	 * @return the list of DocumentTokens.
-	 *  * @throws IOException
+	 * @return the list of DocumentTokens. * @throws IOException
 	 */
 	public static List<DocumentToken> convert(File documentFile) throws IOException {
 		return Files.readAllLines(documentFile.toPath()).stream().filter(l -> !l.isEmpty() && !l.startsWith("#"))
@@ -49,9 +48,9 @@ public class SantoDocumentConverter {
 	 * @return new DocumentToken.
 	 */
 	private static DocumentToken line2DocumentToken(final String[] lineData) {
-		return new DocumentToken(Integer.parseInt(lineData[sentenceIndex]), Integer.parseInt(lineData[senTokenIndex]),
-				Integer.parseInt(lineData[docTokenIndex]), Integer.parseInt(lineData[senCharOnsetIndex]),
-				Integer.parseInt(lineData[docCharOnsetIndex]),
+		return new DocumentToken(Integer.parseInt(lineData[sentenceIndex]) - 1,
+				Integer.parseInt(lineData[senTokenIndex]) - 1, Integer.parseInt(lineData[docTokenIndex]) - 1,
+				Integer.parseInt(lineData[senCharOnsetIndex]), Integer.parseInt(lineData[docCharOnsetIndex]),
 				lineData[textIndex].substring(1, lineData[textIndex].length() - 1));
 	}
 

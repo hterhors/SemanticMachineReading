@@ -26,6 +26,23 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 		this.documentPosition = documentPosition;
 	}
 
+	public int getStartOffset() {
+		return documentPosition.charOffset;
+	}
+
+	/**
+	 * End offset of this annotation (start + length)
+	 * 
+	 * @return
+	 */
+	public int getEndOffset() {
+		return documentPosition.charOffset + getLength();
+	}
+
+	public int getLength() {
+		return textualContent.surfaceForm.length();
+	}
+
 	@Override
 	public String toString() {
 		return "DocumentLinkedSlotFiller [documentPosition=" + documentPosition + "]";
@@ -88,4 +105,5 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 		}
 		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + mode);
 	}
+
 }

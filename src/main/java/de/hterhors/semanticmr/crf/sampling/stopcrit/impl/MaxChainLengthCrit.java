@@ -1,8 +1,8 @@
-package de.hterhors.semanticmr.crf.stopcrit.impl;
+package de.hterhors.semanticmr.crf.sampling.stopcrit.impl;
 
 import java.util.List;
 
-import de.hterhors.semanticmr.crf.stopcrit.IStoppingCriterion;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.variables.State;
 
 /**
@@ -12,19 +12,19 @@ import de.hterhors.semanticmr.crf.variables.State;
  * @author hterhors
  *
  */
-public class MaxChainLength implements IStoppingCriterion {
+public class MaxChainLengthCrit implements IStoppingCriterion {
 
 	/**
 	 * Maximum number of sampling steps / chain length.
 	 */
 	final public int maxStateChain;
 
-	public MaxChainLength(final int maxSamplingSteps) {
+	public MaxChainLengthCrit(final int maxSamplingSteps) {
 		this.maxStateChain = maxSamplingSteps;
 	}
 
 	@Override
-	public boolean checkCondition(List<State> producedStateChain) {
+	public boolean meetsCondition(List<State> producedStateChain) {
 		return producedStateChain.size() == maxStateChain;
 	}
 
