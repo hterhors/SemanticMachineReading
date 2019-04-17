@@ -23,7 +23,7 @@ public class NerlaCollector {
 
 				for (Instance instance : nerla.keySet()) {
 					if (instance != null)
-						candidateProvider.registerLiteralCandidateProvider(
+						candidateProvider.registerCandidateProvider(
 								new GeneralCandidateProvider(instance).addBatchSlotFiller(nerla.get(instance)));
 				}
 

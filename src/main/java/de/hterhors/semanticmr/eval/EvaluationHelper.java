@@ -91,10 +91,36 @@ public class EvaluationHelper {
 	public static void test() {
 
 		SystemInitializer.initialize(new CSVSpecs().specificationProvider).apply();
-
 		DocumentLinkedAnnotation o1 = AbstractSlotFiller.toSlotFiller("Male", "male", 100);
 		LiteralAnnotation o2 = AbstractSlotFiller.toSlotFiller("Male", "male");
 		EntityTypeAnnotation o3 = AbstractSlotFiller.toSlotFiller("Male");
+
+		DocumentLinkedAnnotation dl1 = AbstractSlotFiller.toSlotFiller("Age", "Eight-week-old", 0);
+		DocumentLinkedAnnotation dl2 = AbstractSlotFiller.toSlotFiller("Age", "Eight-week-old", 1);
+		DocumentLinkedAnnotation dl3 = AbstractSlotFiller.toSlotFiller("Age", "Eight-week", 2);
+
+		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, dl1, o1));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, dl2, o2));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, dl3, o3));
+
+		System.out.println();
+
+		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, dl1, dl2));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, dl1, dl3));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, dl2, dl3));
+		System.out.println();
+
+		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, dl1, dl2));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, dl1, dl3));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, dl2, dl3));
+		System.out.println();
+
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, dl1, dl2));
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, dl1, dl3));
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, dl2, dl3));
+
+		System.out.println();
+		System.out.println();
 
 		System.out.println("true: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o1, o1));
 		System.out.println("true: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o2, o2));
@@ -110,7 +136,6 @@ public class EvaluationHelper {
 		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o3, o2));
 
 		System.out.println();
-
 		System.out.println();
 
 		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, o1, o1));
@@ -127,7 +152,6 @@ public class EvaluationHelper {
 		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, o3, o2));
 
 		System.out.println();
-
 		System.out.println();
 
 		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o1, o1));
@@ -144,16 +168,6 @@ public class EvaluationHelper {
 		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o3, o2));
 
 	}
-
-	/**
-	 * PROBLEM: compare val with other val if they are different classes but the
-	 * evaluation mode allows it.
-	 * 
-	 * @param evaluationMode
-	 * @param val
-	 * @param otherVal
-	 * @return
-	 */
 
 	public static Score scoreSingle(final EEvaluationMode evaluationMode, final AbstractSlotFiller<?> val,
 			final AbstractSlotFiller<?> otherVal) {

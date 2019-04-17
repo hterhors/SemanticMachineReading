@@ -73,7 +73,7 @@ public class EntityTypeAnnotation extends AbstractSlotFiller<EntityTypeAnnotatio
 		return true;
 	}
 
-	protected boolean equalsEval(Object obj) {
+	final protected boolean equalsEvalETA(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -89,7 +89,6 @@ public class EntityTypeAnnotation extends AbstractSlotFiller<EntityTypeAnnotatio
 		return true;
 	}
 
-	@Override
 	public Score evaluate(EEvaluationMode mode, EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
@@ -101,17 +100,19 @@ public class EntityTypeAnnotation extends AbstractSlotFiller<EntityTypeAnnotatio
 					return Score.TP;
 				return Score.FN_FP;
 			case ENTITY_TYPE:
-				if (getClass() == otherVal.getClass() && equals(otherVal))
-					return Score.TP;
 
-				if ((this.getClass() == DocumentLinkedAnnotation.class || this.getClass() == LiteralAnnotation.class)
-						&& otherVal.equalsEval(this))
-					return Score.TP;
-
-				if ((otherVal.getClass() == DocumentLinkedAnnotation.class
-						|| otherVal.getClass() == LiteralAnnotation.class) && this.equalsEval(otherVal))
-					return Score.TP;
-
+				if (getClass() == otherVal.getClass()) {
+					if (getClass() != EntityTypeAnnotation.class)
+						return equalsEvalETA(otherVal) ? Score.TP : Score.FN_FP;
+					else
+						return equals(otherVal) ? Score.TP : Score.FN_FP;
+				} else {
+					if (this.getClass().isAssignableFrom(otherVal.getClass())) {
+						return this.equalsEvalETA(otherVal) ? Score.TP : Score.FN_FP;
+					} else if (otherVal.getClass().isAssignableFrom(this.getClass())) {
+						return otherVal.equalsEvalETA(this) ? Score.TP : Score.FN_FP;
+					}
+				}
 				return Score.FN_FP;
 			}
 		}

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.hterhors.semanticmr.candprov.EntityTypeCandidateProvider;
+import de.hterhors.semanticmr.candprov.GeneralCandidateProvider;
 import de.hterhors.semanticmr.candprov.InstanceCandidateProviderCollection;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
@@ -61,6 +61,12 @@ public class SemanticMRMain {
 				instanceProvider.getInstances());
 
 		candidateProvider.setEntityTypeCandidateProvider();
+
+		GeneralCandidateProvider literalProvider = new GeneralCandidateProvider(instanceProvider.getInstances().get(0));
+
+		literalProvider.addSlotFiller(AbstractSlotFiller.toSlotFiller("Age", "Eight-week", 36431));
+
+		candidateProvider.registerCandidateProvider(literalProvider);
 
 		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider(initializer);
 

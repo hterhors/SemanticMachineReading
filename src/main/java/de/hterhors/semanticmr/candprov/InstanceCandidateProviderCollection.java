@@ -20,7 +20,7 @@ public class InstanceCandidateProviderCollection {
 		}
 	}
 
-	public void registerLiteralCandidateProvider(GeneralCandidateProvider candidateProvider) {
+	public void registerCandidateProvider(GeneralCandidateProvider candidateProvider) {
 		if (!candidateProviderPerInstance.containsKey(candidateProvider.getRelatedInstance()))
 			throw new IllegalArgumentException("Unkown instance: " + candidateProvider.getRelatedInstance().getName());
 		candidateProviderPerInstance.get(candidateProvider.getRelatedInstance()).add(candidateProvider);
