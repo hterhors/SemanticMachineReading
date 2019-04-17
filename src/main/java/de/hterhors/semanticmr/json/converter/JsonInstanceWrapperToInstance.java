@@ -5,6 +5,15 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
+import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
@@ -24,15 +33,6 @@ import de.hterhors.semanticmr.json.structure.wrapper.JsonRootAnnotationWrapper;
 import de.hterhors.semanticmr.json.structure.wrapper.JsonSingleFillerSlotWrapper;
 import de.hterhors.semanticmr.json.structure.wrapper.JsonSlotTypeWrapper;
 import de.hterhors.semanticmr.json.structure.wrapper.JsonTextualContentWrapper;
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.annotations.DocumentLinkedAnnotation;
-import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
-import de.hterhors.semanticmr.structure.annotations.LiteralAnnotation;
-import de.hterhors.semanticmr.structure.annotations.container.DocumentPosition;
-import de.hterhors.semanticmr.structure.annotations.container.TextualContent;
-import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class JsonInstanceWrapperToInstance {
 

@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
-import de.hterhors.semanticmr.structure.slots.SlotType;
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 
 public class EntityTypeCandidateProvider implements ISlotFillerCandidateProvider<EntityTypeAnnotation> {
 

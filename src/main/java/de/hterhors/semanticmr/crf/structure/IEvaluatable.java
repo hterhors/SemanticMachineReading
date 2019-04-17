@@ -1,4 +1,6 @@
-package de.hterhors.semanticmr.structure;
+package de.hterhors.semanticmr.crf.structure;
+
+import de.hterhors.semanticmr.eval.EEvaluationMode;
 
 public interface IEvaluatable<T> {
 
@@ -135,6 +137,10 @@ public interface IEvaluatable<T> {
 		}
 	}
 
-	public Score evaluate(T otherVal);
+	public default Score evaluate(T otherVal) {
+		return evaluate(EEvaluationMode.DOCUMENT_LINKED, otherVal);
+	}
+
+	public Score evaluate(EEvaluationMode mode, T otherVal);
 
 }

@@ -5,11 +5,11 @@ import java.util.List;
 
 import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint;
 import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint.SlotEntityPair;
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification.ExcludeSlotTypePairNames;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class HardConstraintsProvider {
 

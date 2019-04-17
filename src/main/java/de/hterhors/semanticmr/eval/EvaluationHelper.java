@@ -9,17 +9,18 @@ import java.util.stream.Stream;
 
 import org.apache.jena.ext.com.google.common.collect.Collections2;
 
-import de.hterhors.semanticmr.structure.IEvaluatable.Score;
-import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.annotations.DocumentLinkedAnnotation;
-import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
-import de.hterhors.semanticmr.structure.annotations.LiteralAnnotation;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 
 public class EvaluationHelper {
 
 	public static final int MAXIMUM_PERMUTATION_SIZE = 8;
 
+	@SuppressWarnings("unchecked")
 	private static final Collection<List<Integer>>[] permutationCache = new Collection[MAXIMUM_PERMUTATION_SIZE];
 
 	static {
@@ -37,7 +38,7 @@ public class EvaluationHelper {
 		return permutationCache[size].stream();
 	}
 
-	private static Score[][] computeScores(
+	private static Score[][] computeScores(EEvaluationMode evaluationMode,
 			final Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller,
 			final Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherSlotFiller, final int maxSize) {
 
@@ -71,9 +72,9 @@ public class EvaluationHelper {
 					otherSlotFillerVal = null;
 				}
 				if (slotFillerVal == null) {
-					scores[i][j] = scoreSingle(otherSlotFillerVal, slotFillerVal).invert();
+					scores[i][j] = scoreSingle(evaluationMode, otherSlotFillerVal, slotFillerVal).invert();
 				} else {
-					scores[i][j] = scoreSingle(slotFillerVal, otherSlotFillerVal);
+					scores[i][j] = scoreSingle(evaluationMode, slotFillerVal, otherSlotFillerVal);
 				}
 				j++;
 			}
@@ -83,34 +84,39 @@ public class EvaluationHelper {
 		return scores;
 	}
 
-	public static Score scoreSingle(final AbstractSlotFiller<?> val, final AbstractSlotFiller<?> otherVal) {
+	/**
+	 * PROBLEM: DOC vgl. mit Super class wenn mode auf entity type ist.
+	 * 
+	 * @param evaluationMode
+	 * @param val
+	 * @param otherVal
+	 * @return
+	 */
+
+	public static Score scoreSingle(final EEvaluationMode evaluationMode, final AbstractSlotFiller<?> val,
+			final AbstractSlotFiller<?> otherVal) {
 		if (val instanceof DocumentLinkedAnnotation
 				&& (otherVal instanceof DocumentLinkedAnnotation || otherVal == null)) {
-
-			if (otherVal == null)
-				return ((DocumentLinkedAnnotation) val).evaluate((DocumentLinkedAnnotation) otherVal);
-
-			return ((EntityTypeAnnotation) EntityTypeAnnotation.get(val.getEntityType()))
-					.evaluate((EntityTypeAnnotation) EntityTypeAnnotation.get(otherVal.getEntityType()));
-//			return ((DocumentLinkedAnnotation) val).evaluate((DocumentLinkedAnnotation) otherVal);
+			return ((DocumentLinkedAnnotation) val).evaluate(evaluationMode, (DocumentLinkedAnnotation) otherVal);
 		} else if (val instanceof LiteralAnnotation && (otherVal instanceof LiteralAnnotation || otherVal == null)) {
-			return ((LiteralAnnotation) val).evaluate((LiteralAnnotation) otherVal);
+			return ((LiteralAnnotation) val).evaluate(evaluationMode, (LiteralAnnotation) otherVal);
 		} else if (val instanceof EntityTypeAnnotation
 				&& (otherVal instanceof EntityTypeAnnotation || otherVal == null)) {
-			return ((EntityTypeAnnotation) val).evaluate((EntityTypeAnnotation) otherVal);
+			return ((EntityTypeAnnotation) val).evaluate(evaluationMode, (EntityTypeAnnotation) otherVal);
 		} else if (val instanceof EntityTemplate && (otherVal instanceof EntityTemplate || otherVal == null)) {
-			return ((EntityTemplate) val).evaluate((EntityTemplate) otherVal);
+			return ((EntityTemplate) val).evaluate(evaluationMode, (EntityTemplate) otherVal);
 		} else {
 			return Score.FN_FP;
 		}
 	}
 
-	public static Score scoreMax(Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations,
+	public static Score scoreMax(EEvaluationMode evaluationMode,
+			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations,
 			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherAnnotations) {
 
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
-		final Score[][] scores = EvaluationHelper.computeScores(annotations, otherAnnotations, maxSize);
+		final Score[][] scores = EvaluationHelper.computeScores(evaluationMode, annotations, otherAnnotations, maxSize);
 
 		final Score bestScore = new Score();
 

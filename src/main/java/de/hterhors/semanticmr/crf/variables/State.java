@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hterhors.semanticmr.crf.factor.FactorGraph;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.structure.IEvaluatable.Score;
-import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.eval.EEvaluationMode;
 
 public class State {
 
@@ -78,8 +79,7 @@ public class State {
 
 	@Override
 	public String toString() {
-		return "State [modelScore=" + modelScore + ", objectiveScore=" + objectiveScore
-				+ ", computeAnnotationsOverlapScore()=" + computeAnnotationsOverlapScore() + ", goldAnnotation="
+		return "State [modelScore=" + modelScore + ", objectiveScore=" + objectiveScore + ", goldAnnotation="
 				+ instance.getGoldAnnotations() + ", currentPredictions=" + currentPredictions + ", instance="
 				+ instance.getDocument().documentID + "]";
 	}
@@ -92,8 +92,8 @@ public class State {
 		return instance.getGoldAnnotations();
 	}
 
-	public Score computeAnnotationsOverlapScore() {
-		return instance.getGoldAnnotations().evaluate(currentPredictions);
+	public Score computeAnnotationsOverlapScore(EEvaluationMode evaluationMode) {
+		return instance.getGoldAnnotations().evaluate(evaluationMode, currentPredictions);
 	}
 
 	public Instance getInstance() {

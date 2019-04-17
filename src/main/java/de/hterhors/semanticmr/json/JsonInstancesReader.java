@@ -24,19 +24,24 @@ public class JsonInstancesReader {
 		this.corpusDirectory = corpusDirectory;
 	}
 
-	public List<Instance> readInstances() throws IOException {
+	public List<Instance> readInstances(final int numToRead) throws IOException {
 		System.out.println("#######################LOAD INSTANCES#######################");
 
 		System.out.print("Read instances");
 
 		List<File> jsonFiles = Arrays.stream(corpusDirectory.listFiles()).filter(f -> f.getName().endsWith(".json"))
 				.collect(Collectors.toList());
+
 		Collections.sort(jsonFiles);
 
 		final List<Instance> trainingInstances = new ArrayList<>();
 
 		int count = 0;
 		for (File jsonFile : jsonFiles) {
+
+			if (count == numToRead)
+				break;
+
 			count++;
 			if (count % 10 == 0)
 				System.out.print(".");

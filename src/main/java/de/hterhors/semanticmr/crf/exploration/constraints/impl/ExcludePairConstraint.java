@@ -1,10 +1,10 @@
 package de.hterhors.semanticmr.crf.exploration.constraints.impl;
 
 import de.hterhors.semanticmr.crf.exploration.constraints.AbstractHardConstraint;
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.slots.AbstractSlot;
-import de.hterhors.semanticmr.structure.slots.SlotType;
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.slots.AbstractSlot;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 
 /**
  * Implements a constraint on a pair of slot-entity pair.

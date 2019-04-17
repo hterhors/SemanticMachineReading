@@ -5,18 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import de.hterhors.semanticmr.candprov.DocumentCandidateProviderCollection;
-import de.hterhors.semanticmr.candprov.GeneralCandidateProvider;
+import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 import de.hterhors.semanticmr.json.JsonInstancesReader;
-import de.hterhors.semanticmr.json.JsonNerlaProvider;
-import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
 
 public class InstanceProvider {
 
@@ -36,8 +31,12 @@ public class InstanceProvider {
 
 	public void redistribute(final IInstanceDistributor distributor) {
 		this.distributor = distributor;
-		this.distributor.distributeInstances(this).distributeDevelopmentInstances(redistTrainInstances)
-				.distributeTestInstances(redistTestInstances).distributeTrainingInstances(redistTrainInstances);
+		this.distributor.distributeInstances(this).distributeTrainingInstances(redistTrainInstances)
+				.distributeDevelopmentInstances(redistDevInstances).distributeTestInstances(redistTestInstances);
+		System.out.println("Number of trainings instances: " + redistTrainInstances.size());
+		System.out.println("Number of develop instances: " + redistDevInstances.size());
+		System.out.println("Number of test instances: " + redistTestInstances.size());
+
 	}
 
 	public List<Instance> getRedistributedTrainingInstances() {
@@ -52,11 +51,23 @@ public class InstanceProvider {
 		return Collections.unmodifiableList(redistTestInstances);
 	}
 
-	public InstanceProvider(final File jsonInstancesDirectory, final File jsonNerlaAnnotationsFile) {
-		this(jsonInstancesDirectory, new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build());
+	public InstanceProvider(final File jsonInstancesDirectory) {
+		this(jsonInstancesDirectory, new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build(),
+				Integer.MAX_VALUE);
 	}
 
-	public InstanceProvider(final File jsonInstancesDirectory, final IInstanceDistributor distributor) {
+	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor) {
+		this(jsonInstancesDirectory, new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build(),
+				Integer.MAX_VALUE);
+	}
+
+	public InstanceProvider(final File jsonInstancesDirectory, final int numToRead) {
+		this(jsonInstancesDirectory, new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build(),
+				numToRead);
+	}
+
+	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
+			final int numToRead) {
 		try {
 			this.jsonInstancesDirectory = jsonInstancesDirectory;
 
@@ -64,9 +75,9 @@ public class InstanceProvider {
 
 			this.validateFiles();
 
-			this.instances = new JsonInstancesReader(jsonInstancesDirectory).readInstances();
+			this.instances = new JsonInstancesReader(jsonInstancesDirectory).readInstances(numToRead);
 
-			redistribute(distributor);
+			redistribute(this.distributor);
 
 		} catch (IOException e) {
 			e.printStackTrace();

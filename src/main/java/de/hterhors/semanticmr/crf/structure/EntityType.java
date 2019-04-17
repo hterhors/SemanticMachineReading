@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.structure;
+package de.hterhors.semanticmr.crf.structure;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,13 +8,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.normalization.INormalizationFunction;
+import de.hterhors.semanticmr.crf.structure.annotations.normalization.IRequiresInitialization;
+import de.hterhors.semanticmr.crf.structure.annotations.normalization.IdentityNormalization;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.exce.UnkownEnityTypeException;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification;
-import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.annotations.normalization.INormalizationFunction;
-import de.hterhors.semanticmr.structure.annotations.normalization.IRequiresInitialization;
-import de.hterhors.semanticmr.structure.annotations.normalization.IdentityNormalization;
-import de.hterhors.semanticmr.structure.slots.SlotType;
 
 final public class EntityType implements Comparable<EntityType>, IRequiresInitialization {
 	/**

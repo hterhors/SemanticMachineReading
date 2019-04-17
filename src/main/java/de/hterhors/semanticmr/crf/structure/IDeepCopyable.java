@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.structure;
+package de.hterhors.semanticmr.crf.structure;
 
 public interface IDeepCopyable<E> {
 

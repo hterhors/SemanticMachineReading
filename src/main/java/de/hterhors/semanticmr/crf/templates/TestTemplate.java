@@ -5,11 +5,11 @@ import java.util.List;
 
 import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.templates.TestTemplate.Scope;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class TestTemplate extends AbstractFeatureTemplate<Scope> {
 

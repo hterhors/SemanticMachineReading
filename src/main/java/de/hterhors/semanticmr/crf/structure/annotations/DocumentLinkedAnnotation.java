@@ -1,9 +1,10 @@
-package de.hterhors.semanticmr.structure.annotations;
+package de.hterhors.semanticmr.crf.structure.annotations;
 
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.IEvaluatable.Score;
-import de.hterhors.semanticmr.structure.annotations.container.DocumentPosition;
-import de.hterhors.semanticmr.structure.annotations.container.TextualContent;
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
+import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
+import de.hterhors.semanticmr.eval.EEvaluationMode;
 
 /**
  * Annotation object for entity-type based slots that are linked to the
@@ -53,6 +54,10 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	@Override
 	public boolean equals(Object obj) {
+		return equalsEval(obj);
+	}
+
+	final private boolean equalsEval(Object obj) {
 		if (this == obj)
 			return true;
 		if (!super.equals(obj))
@@ -69,13 +74,22 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 	}
 
 	@Override
-	public Score evaluate(EntityTypeAnnotation otherVal) {
+	public Score evaluate(EEvaluationMode mode, EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
-		} else if (equals(otherVal)) {
-			return Score.TP;
 		} else {
-			return Score.FN_FP;
+			switch (mode) {
+			case DOCUMENT_LINKED:
+				if (equalsEval(otherVal)) {
+					return Score.TP;
+				} else {
+					return Score.FN_FP;
+				}
+			case LITERAL:
+			case ENTITY_TYPE:
+				return super.evaluate(mode, otherVal);
+			}
 		}
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + mode);
 	}
 }

@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.structure.slots;
+package de.hterhors.semanticmr.crf.structure.slots;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.normalization.IRequiresInitialization;
 import de.hterhors.semanticmr.exce.UnkownEnityTypeException;
 import de.hterhors.semanticmr.exce.UnkownSlotTypeException;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification;
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.annotations.normalization.IRequiresInitialization;
 
 public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 

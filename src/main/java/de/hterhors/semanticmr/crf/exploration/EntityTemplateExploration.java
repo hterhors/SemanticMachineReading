@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.hterhors.semanticmr.candprov.DocumentCandidateProviderCollection;
+import org.apache.commons.collections.set.SynchronizedSet;
+
+import de.hterhors.semanticmr.candprov.InstanceCandidateProviderCollection;
 import de.hterhors.semanticmr.candprov.ISlotFillerCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.IHardConstraintsProvider;
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
-import de.hterhors.semanticmr.structure.slots.SlotType;
 
 /**
  * @author hterhors
@@ -21,17 +23,17 @@ import de.hterhors.semanticmr.structure.slots.SlotType;
  */
 public class EntityTemplateExploration {
 
-	final private DocumentCandidateProviderCollection candidateProvider;
+	final private InstanceCandidateProviderCollection candidateProvider;
 
 	final private HardConstraintsProvider hardConstraintsProvider;
 
-	public EntityTemplateExploration(DocumentCandidateProviderCollection candidateProvider,
+	public EntityTemplateExploration(InstanceCandidateProviderCollection candidateProvider,
 			HardConstraintsProvider hardConstraintsProvder) {
 		this.candidateProvider = candidateProvider;
 		this.hardConstraintsProvider = hardConstraintsProvder;
 	}
 
-	public EntityTemplateExploration(DocumentCandidateProviderCollection candidateProvider) {
+	public EntityTemplateExploration(InstanceCandidateProviderCollection candidateProvider) {
 		this.candidateProvider = candidateProvider;
 		this.hardConstraintsProvider = null;
 	}
@@ -58,7 +60,7 @@ public class EntityTemplateExploration {
 			final EntityTemplate entitytemplateAnnotation = (EntityTemplate) annotation;
 
 			for (ISlotFillerCandidateProvider<?> slotFillerCandidateProvider : candidateProvider
-					.getCandidateProviderForDocument(currentState.getInstance().getDocument())) {
+					.getCandidateProviderForInstance(currentState.getInstance())) {
 
 				changeTemplateType(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
 						annotationIndex);
@@ -229,7 +231,6 @@ public class EntityTemplateExploration {
 		for (SlotType slotType : entityTemplate.getSingleFillerSlots().keySet()) {
 			for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFillerCandidate : slotFillerCandidateProvider
 					.getSlotFillerCandidates(slotType)) {
-
 				/*
 				 * Do no add itself
 				 */

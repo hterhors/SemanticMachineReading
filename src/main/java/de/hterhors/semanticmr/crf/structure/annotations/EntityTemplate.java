@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.structure.annotations;
+package de.hterhors.semanticmr.crf.structure.annotations;
 
 import java.util.Collections;
 import java.util.Map;
@@ -7,14 +7,15 @@ import java.util.stream.Collectors;
 
 import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
 
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.slots.MultiFillerSlot;
+import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
+import de.hterhors.semanticmr.eval.EEvaluationMode;
 import de.hterhors.semanticmr.eval.EvaluationHelper;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 import de.hterhors.semanticmr.exce.UnkownMultiSlotException;
 import de.hterhors.semanticmr.exce.UnkownSingleSlotException;
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.slots.MultiFillerSlot;
-import de.hterhors.semanticmr.structure.slots.SingleFillerSlot;
-import de.hterhors.semanticmr.structure.slots.SlotType;
 
 /**
  * The information extraction template that needs to be filled.
@@ -263,25 +264,26 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	}
 
 	@Override
-	public Score evaluate(EntityTemplate other) {
+	public Score evaluate(EEvaluationMode evaluationMode, EntityTemplate other) {
 
 		final Score score = new Score();
 
 		if (other == null) {
 			score.increaseFalseNegative();
 		} else {
-			score.add(this.rootAnnotation.evaluate(other.rootAnnotation));
+			score.add(this.rootAnnotation.evaluate(evaluationMode, other.rootAnnotation));
 		}
 
-		addScoresForSingleFillerSlots(other, score);
+		addScoresForSingleFillerSlots(evaluationMode, other, score);
 
-		addScoresForMultiFillerSlots(other, score);
+		addScoresForMultiFillerSlots(evaluationMode, other, score);
 
 		return score;
 
 	}
 
-	private void addScoresForSingleFillerSlots(EntityTemplate other, final Score score) {
+	private void addScoresForSingleFillerSlots(EEvaluationMode evaluationMode, EntityTemplate other,
+			final Score score) {
 		for (SlotType singleSlotType : this.singleFillerSlots.keySet()) {
 
 			final SingleFillerSlot singleSlotFiller = this.getSingleFillerSlot(singleSlotType);
@@ -298,7 +300,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 				final AbstractSlotFiller<?> otherVal = otherSingleSlotFiller == null ? null
 						: otherSingleSlotFiller.getSlotFiller();
 
-				score.add(EvaluationHelper.scoreSingle(val, otherVal));
+				score.add(EvaluationHelper.scoreSingle(evaluationMode, val, otherVal));
 			} else if (otherSingleSlotFiller != null && otherSingleSlotFiller.containsSlotFiller()) {
 				score.increaseFalsePositive();
 			}
@@ -306,7 +308,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		}
 	}
 
-	private void addScoresForMultiFillerSlots(EntityTemplate other, final Score score) {
+	private void addScoresForMultiFillerSlots(EEvaluationMode evaluationMode, EntityTemplate other, final Score score) {
 
 		for (SlotType multiSlotType : this.multiFillerSlots.keySet()) {
 
@@ -322,7 +324,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 			if (slotFiller.isEmpty() && (otherSlotFiller == null || otherSlotFiller.isEmpty()))
 				continue;
 
-			final Score bestScore = EvaluationHelper.scoreMax(slotFiller, otherSlotFiller);
+			final Score bestScore = EvaluationHelper.scoreMax(evaluationMode, slotFiller, otherSlotFiller);
 
 			score.add(bestScore);
 		}

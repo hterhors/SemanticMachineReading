@@ -1,10 +1,10 @@
-package de.hterhors.semanticmr.structure.annotations;
+package de.hterhors.semanticmr.crf.structure.annotations;
 
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.IDeepCopyable;
-import de.hterhors.semanticmr.structure.IEvaluatable;
-import de.hterhors.semanticmr.structure.annotations.container.DocumentPosition;
-import de.hterhors.semanticmr.structure.annotations.container.TextualContent;
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.IDeepCopyable;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable;
+import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
+import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
 
 public abstract class AbstractSlotFiller<T> implements IEvaluatable<T>, IDeepCopyable<AbstractSlotFiller<T>> {
 

@@ -85,17 +85,17 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 		/**
 		 * The proportion of the training data.
 		 */
-		int trainingProportion = 70;
+		int trainingProportion = 0;
 
 		/**
 		 * The proportion of the development data.
 		 */
-		int developmentProportion = 10;
+		int developmentProportion = 0;
 
 		/**
 		 * The proportion of the test data.
 		 */
-		int testProportion = 20;
+		int testProportion = 0;
 
 		/**
 		 * The seed that was used to initialize the random.

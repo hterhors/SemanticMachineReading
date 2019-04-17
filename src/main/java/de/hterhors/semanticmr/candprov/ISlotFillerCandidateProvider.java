@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
-import de.hterhors.semanticmr.structure.slots.SlotType;
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 
 public interface ISlotFillerCandidateProvider<T extends AbstractSlotFiller<T>> {
 

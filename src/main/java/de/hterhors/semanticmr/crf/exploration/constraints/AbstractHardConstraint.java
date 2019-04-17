@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.crf.exploration.constraints;
 
-import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 
 public abstract class AbstractHardConstraint {
 

@@ -5,25 +5,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.hterhors.semanticmr.candprov.DocumentCandidateProviderCollection;
+import de.hterhors.semanticmr.candprov.InstanceCandidateProviderCollection;
 import de.hterhors.semanticmr.candprov.GeneralCandidateProvider;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
 
 public class NerlaCollector {
 
-	public DocumentCandidateProviderCollection collect() {
+	public InstanceCandidateProviderCollection collect() {
 
-		DocumentCandidateProviderCollection candidateProvider = new DocumentCandidateProviderCollection();
+		InstanceCandidateProviderCollection candidateProvider = new InstanceCandidateProviderCollection(this.instances);
 
 		for (INerlaProvider provider : nerlaProvider) {
 
 			try {
-				final Map<Instance, List<EntityTypeAnnotation>> nerla = provider.get(this.instances);
+				final Map<Instance, List<EntityTypeAnnotation>> nerla = provider.getForInstances(this.instances);
 
 				for (Instance instance : nerla.keySet()) {
-					candidateProvider.addLiteralCandidateProvider(new GeneralCandidateProvider(instance.getDocument())
-							.addBatchSlotFiller(nerla.get(instance)));
+					if (instance != null)
+						candidateProvider.registerLiteralCandidateProvider(
+								new GeneralCandidateProvider(instance).addBatchSlotFiller(nerla.get(instance)));
 				}
 
 			} catch (IOException e) {

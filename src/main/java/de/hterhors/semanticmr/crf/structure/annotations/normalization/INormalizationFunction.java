@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.structure.annotations.normalization;
+package de.hterhors.semanticmr.crf.structure.annotations.normalization;
 
 public interface INormalizationFunction {
 

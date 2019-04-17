@@ -6,9 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import de.hterhors.semanticmr.crf.structure.IEvaluatable;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.eval.EEvaluationMode;
 import de.hterhors.semanticmr.eval.EvaluationHelper;
-import de.hterhors.semanticmr.structure.IEvaluatable;
-import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
 
 public class Annotations implements IEvaluatable<Annotations> {
 
@@ -43,15 +44,15 @@ public class Annotations implements IEvaluatable<Annotations> {
 	}
 
 	@Override
-	public Score evaluate(Annotations otherVal) {
+	public Score evaluate(EEvaluationMode evaluationMode, Annotations otherVal) {
 
 		if (this.annotations.size() == 0 || otherVal.annotations.size() == 0 || otherVal == null)
 			return Score.ZERO;
 
 		if (this.annotations.size() == 1 && otherVal.annotations.size() == 1)
-			return EvaluationHelper.scoreSingle(this.annotations.get(0), otherVal.annotations.get(0));
+			return EvaluationHelper.scoreSingle(evaluationMode, this.annotations.get(0), otherVal.annotations.get(0));
 
-		return EvaluationHelper.scoreMax(this.annotations, otherVal.annotations);
+		return EvaluationHelper.scoreMax(evaluationMode, this.annotations, otherVal.annotations);
 
 	}
 

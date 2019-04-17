@@ -154,12 +154,12 @@ public class Trainer {
 	private void scoreProposalStates(final boolean sampleBasedOnObjectiveFunction, final List<State> proposalStates) {
 		if (sampleBasedOnObjectiveFunction) {
 			objectiveFunction.score(proposalStates);
-//			System.out.println("#############################################");
-//			for (State state : proposalStates) {
-//				System.out.println(state.getObjectiveScore() + ":"
-//						+ state.getCurrentPredictions().getAnnotations().get(0).toPrettyString());
-//			}
-//			System.out.println("#############################################");
+			System.out.println("#############################################");
+			for (State state : proposalStates) {
+				System.out.println(state.getObjectiveScore() + ":"
+						+ state.getCurrentPredictions().getAnnotations().get(0).toPrettyString());
+			}
+			System.out.println("#############################################");
 		} else {
 			model.score(proposalStates);
 		}

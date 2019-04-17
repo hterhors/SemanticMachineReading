@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.hterhors.semanticmr.corpus.EInstanceContext;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -20,7 +21,6 @@ import de.hterhors.semanticmr.json.structure.JsonInstanceIO;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
 import de.hterhors.semanticmr.santo.container.Triple;
 import de.hterhors.semanticmr.santo.converter.reader.TextualAnnotationsReader;
-import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
 
 public class Santo2JsonConverter {
 

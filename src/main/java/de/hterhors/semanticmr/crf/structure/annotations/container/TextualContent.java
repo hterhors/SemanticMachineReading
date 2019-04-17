@@ -1,6 +1,6 @@
-package de.hterhors.semanticmr.structure.annotations.container;
+package de.hterhors.semanticmr.crf.structure.annotations.container;
 
-import de.hterhors.semanticmr.structure.annotations.normalization.INormalizationFunction;
+import de.hterhors.semanticmr.crf.structure.annotations.normalization.INormalizationFunction;
 
 /**
  * 

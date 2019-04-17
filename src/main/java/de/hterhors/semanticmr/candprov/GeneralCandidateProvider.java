@@ -9,20 +9,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.hterhors.semanticmr.crf.variables.Document;
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
-import de.hterhors.semanticmr.structure.slots.SlotType;
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
+import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class GeneralCandidateProvider implements ISlotFillerCandidateProvider<EntityTypeAnnotation> {
 
 	private final Map<SlotType, List<EntityTypeAnnotation>> entityAnnotationCache = new HashMap<>();
 	private final Map<EntityType, Set<EntityTypeAnnotation>> rootAnnotationsCache = new HashMap<>();
 
-	private final Document relatedDocument;
+	private final Instance relatedInstance;
 
-	public GeneralCandidateProvider(Document relatedDocument) {
-		this.relatedDocument = relatedDocument;
+	public GeneralCandidateProvider(Instance relatedInstance) {
+		this.relatedInstance = relatedInstance;
 	}
 
 	public GeneralCandidateProvider addSlotFiller(EntityTypeAnnotation slotFiller) {
@@ -59,8 +59,8 @@ public class GeneralCandidateProvider implements ISlotFillerCandidateProvider<En
 		return rootAnnotationsCache.getOrDefault(templateType, Collections.emptySet());
 	}
 
-	public Document getRelatedDocument() {
-		return relatedDocument;
+	public Instance getRelatedInstance() {
+		return relatedInstance;
 	}
 
 }

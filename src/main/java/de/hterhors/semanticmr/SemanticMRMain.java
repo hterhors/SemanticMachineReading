@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.hterhors.semanticmr.candprov.DocumentCandidateProviderCollection;
+import de.hterhors.semanticmr.candprov.EntityTypeCandidateProvider;
+import de.hterhors.semanticmr.candprov.InstanceCandidateProviderCollection;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
-import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
+import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;
 import de.hterhors.semanticmr.crf.ObjectiveFunction;
 import de.hterhors.semanticmr.crf.Trainer;
@@ -23,20 +24,19 @@ import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.stopcrit.impl.MaxChainLength;
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.TestTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
+import de.hterhors.semanticmr.eval.EEvaluationMode;
 import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 import de.hterhors.semanticmr.init.specifications.impl.CSVSpecs;
-import de.hterhors.semanticmr.json.JsonNerlaProvider;
-import de.hterhors.semanticmr.nerla.NerlaCollector;
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
 
 public class SemanticMRMain {
 
@@ -45,21 +45,26 @@ public class SemanticMRMain {
 		SystemInitializer initializer = SystemInitializer.initialize(new CSVSpecs().specificationProvider)
 				.addNormalizationFunction(EntityType.get("Weight"), new WeightNormalization()).apply();
 
-		IInstanceDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
-				.setCorpusSizeFraction(0.1F).setTrainingProportion(1).setTestProportion(280).setSeed(100L).build();
+		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
+				.setCorpusSizeFraction(1F).setTrainingProportion(1).setTestProportion(9).setSeed(100L).build();
 
 		InstanceProvider instanceProvider = new InstanceProvider(new File("src/main/resources/corpus/data/instances/"),
-				shuffleCorpusDistributor);
+				shuffleCorpusDistributor, 10);
 
-		NerlaCollector nerlaProvider = new NerlaCollector(instanceProvider.getInstances());
-		nerlaProvider
-				.addNerlaProvider(new JsonNerlaProvider(new File("src/main/resources/corpus/data/nerla/nerla.json")));
+//		NerlaCollector nerlaProvider = new NerlaCollector(instanceProvider.getInstances());
+//		nerlaProvider
+//				.addNerlaProvider(new JsonNerlaProvider(new File("src/main/resources/corpus/data/nerla/nerla.json")));
+//
+//		InstanceCandidateProviderCollection candidateProvider = nerlaProvider.collect();
 
-		DocumentCandidateProviderCollection candidateProvider = nerlaProvider.collect();
+		InstanceCandidateProviderCollection candidateProvider = new InstanceCandidateProviderCollection(
+				instanceProvider.getInstances());
+
+		candidateProvider.setEntityTypeCandidateProvider();
 
 		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider(initializer);
 
-		ObjectiveFunction objectiveFunction = new ObjectiveFunction();
+		ObjectiveFunction objectiveFunction = new ObjectiveFunction(EEvaluationMode.ENTITY_TYPE);
 
 		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
 
@@ -88,6 +93,8 @@ public class SemanticMRMain {
 		Trainer trainer = new Trainer(model, explorer, sampler, stateInitializer, stoppingCriterion, objectiveFunction,
 				numberOfEpochs);
 
+		System.out.println(instanceProvider.getRedistributedTrainingInstances().size());
+
 		Map<Instance, State> results = trainer.trainModel(instanceProvider.getRedistributedTrainingInstances());
 
 		for (Entry<Instance, State> res : results.entrySet()) {
@@ -98,6 +105,7 @@ public class SemanticMRMain {
 			for (AbstractSlotFiller<?> goldAnnotations : res.getKey().getGoldAnnotations().getAnnotations()) {
 				System.out.println(goldAnnotations.toPrettyString());
 			}
+			System.out.println("-----------");
 			for (AbstractSlotFiller<?> finalAnnotations : res.getValue().getCurrentPredictions().getAnnotations()) {
 				System.out.println(finalAnnotations.toPrettyString());
 			}

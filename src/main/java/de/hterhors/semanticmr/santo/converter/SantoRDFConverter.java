@@ -13,16 +13,16 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
 import de.hterhors.semanticmr.santo.container.Triple;
 import de.hterhors.semanticmr.santo.helper.PatternCollection;
 import de.hterhors.semanticmr.santo.helper.SantoHelper;
-import de.hterhors.semanticmr.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
-import de.hterhors.semanticmr.structure.annotations.LiteralAnnotation;
-import de.hterhors.semanticmr.structure.slots.SlotType;
 
 public class SantoRDFConverter {
 

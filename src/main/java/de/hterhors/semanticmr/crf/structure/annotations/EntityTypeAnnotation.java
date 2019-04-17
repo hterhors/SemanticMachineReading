@@ -1,9 +1,11 @@
-package de.hterhors.semanticmr.structure.annotations;
+package de.hterhors.semanticmr.crf.structure.annotations;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import de.hterhors.semanticmr.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.eval.EEvaluationMode;
 
 /**
  * Annotation object for literal based slots that are NOT linked to the
@@ -56,6 +58,10 @@ public class EntityTypeAnnotation extends AbstractSlotFiller<EntityTypeAnnotatio
 
 	@Override
 	public boolean equals(Object obj) {
+		return equalsEval(obj);
+	}
+
+	final private boolean equalsEval(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -77,14 +83,19 @@ public class EntityTypeAnnotation extends AbstractSlotFiller<EntityTypeAnnotatio
 	}
 
 	@Override
-	public Score evaluate(EntityTypeAnnotation otherVal) {
+	public Score evaluate(EEvaluationMode mode, EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
-		} else if (equals(otherVal)) {
+		} else if (equalsEval(otherVal)) {
 			return Score.TP;
 		} else {
 			return Score.FN_FP;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "EntityTypeAnnotation [entityType=" + entityType + "]";
 	}
 
 }

@@ -8,15 +8,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
+import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.json.nerla.JsonNerlaIO;
 import de.hterhors.semanticmr.json.nerla.wrapper.JsonEntityAnnotationWrapper;
 import de.hterhors.semanticmr.nerla.INerlaProvider;
-import de.hterhors.semanticmr.structure.EntityType;
-import de.hterhors.semanticmr.structure.annotations.DocumentLinkedAnnotation;
-import de.hterhors.semanticmr.structure.annotations.EntityTypeAnnotation;
-import de.hterhors.semanticmr.structure.annotations.container.DocumentPosition;
-import de.hterhors.semanticmr.structure.annotations.container.TextualContent;
 
 public class JsonNerlaProvider implements INerlaProvider {
 
@@ -29,7 +29,7 @@ public class JsonNerlaProvider implements INerlaProvider {
 	}
 
 	@Override
-	public Map<Instance, List<EntityTypeAnnotation>> get(List<Instance> instances) throws IOException {
+	public Map<Instance, List<EntityTypeAnnotation>> getForInstances(List<Instance> instances) throws IOException {
 
 		final List<JsonEntityAnnotationWrapper> jsonNerla = new JsonNerlaIO(true)
 				.readInstances(new String(Files.readAllBytes(nerlaFile.toPath())));
