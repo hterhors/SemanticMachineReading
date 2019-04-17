@@ -43,7 +43,7 @@ public class SemanticMRMain {
 	public static void main(String[] args) throws IOException {
 
 		SystemInitializer initializer = SystemInitializer.initialize(new CSVSpecs().specificationProvider)
-				.addNormalizationFunction(EntityType.get("Weight"), new WeightNormalization()).apply();
+				.registerNormalizationFunction(EntityType.get("Weight"), new WeightNormalization()).apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(1).setTestProportion(9).setSeed(100L).build();

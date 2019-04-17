@@ -39,8 +39,8 @@ public class ScioSanto2Json {
 			converter.addIgnoreProperty("<http://www.w3.org/2000/01/rdf-schema#comment>");
 			converter.addIgnoreProperty("<http://www.w3.org/2000/01/rdf-schema#label>");
 
-			converter.convert(new File("src/main/resources/" + name + "_OrganismModel.json"), "OrganismModel", true,
-					false);
+			converter.convert(new File("src/main/resources/" + "name" + "_OrganismModel.json"), "OrganismModel", true,
+					true);
 		}
 
 	}

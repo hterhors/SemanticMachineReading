@@ -58,10 +58,6 @@ public class EntityTypeAnnotation extends AbstractSlotFiller<EntityTypeAnnotatio
 
 	@Override
 	public boolean equals(Object obj) {
-		return equalsEval(obj);
-	}
-
-	final private boolean equalsEval(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -77,20 +73,55 @@ public class EntityTypeAnnotation extends AbstractSlotFiller<EntityTypeAnnotatio
 		return true;
 	}
 
-	@Override
-	public EntityType getEntityType() {
-		return entityType;
+	protected boolean equalsEval(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!getClass().isAssignableFrom(obj.getClass()))
+			return false;
+		EntityTypeAnnotation other = (EntityTypeAnnotation) obj;
+		if (entityType == null) {
+			if (other.entityType != null)
+				return false;
+		} else if (!entityType.equals(other.entityType))
+			return false;
+		return true;
 	}
 
 	@Override
 	public Score evaluate(EEvaluationMode mode, EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
-		} else if (equalsEval(otherVal)) {
-			return Score.TP;
 		} else {
-			return Score.FN_FP;
+			switch (mode) {
+			case DOCUMENT_LINKED:
+			case LITERAL:
+				if (equals(otherVal))
+					return Score.TP;
+				return Score.FN_FP;
+			case ENTITY_TYPE:
+				if (getClass() == otherVal.getClass() && equals(otherVal))
+					return Score.TP;
+
+				if ((this.getClass() == DocumentLinkedAnnotation.class || this.getClass() == LiteralAnnotation.class)
+						&& otherVal.equalsEval(this))
+					return Score.TP;
+
+				if ((otherVal.getClass() == DocumentLinkedAnnotation.class
+						|| otherVal.getClass() == LiteralAnnotation.class) && this.equalsEval(otherVal))
+					return Score.TP;
+
+				return Score.FN_FP;
+			}
 		}
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + mode);
+
+	}
+
+	@Override
+	public EntityType getEntityType() {
+		return entityType;
 	}
 
 	@Override

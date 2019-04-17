@@ -9,12 +9,16 @@ import java.util.stream.Stream;
 
 import org.apache.jena.ext.com.google.common.collect.Collections2;
 
+import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
+import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
+import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.init.specifications.impl.CSVSpecs;
 
 public class EvaluationHelper {
 
@@ -84,8 +88,66 @@ public class EvaluationHelper {
 		return scores;
 	}
 
+	public static void test() {
+
+		SystemInitializer.initialize(new CSVSpecs().specificationProvider).apply();
+
+		DocumentLinkedAnnotation o1 = AbstractSlotFiller.toSlotFiller("Male", "male", 100);
+		LiteralAnnotation o2 = AbstractSlotFiller.toSlotFiller("Male", "male");
+		EntityTypeAnnotation o3 = AbstractSlotFiller.toSlotFiller("Male");
+
+		System.out.println("true: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o1, o1));
+		System.out.println("true: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o2, o2));
+		System.out.println("true: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o3, o3));
+
+		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o1, o2));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o1, o3));
+
+		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o2, o1));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o2, o3));
+
+		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o3, o1));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o3, o2));
+
+		System.out.println();
+
+		System.out.println();
+
+		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, o1, o1));
+		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, o2, o2));
+		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, o3, o3));
+
+		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, o1, o2));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, o1, o3));
+
+		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, o2, o1));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, o2, o3));
+
+		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, o3, o1));
+		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, o3, o2));
+
+		System.out.println();
+
+		System.out.println();
+
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o1, o1));
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o2, o2));
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o3, o3));
+
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o1, o2));
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o1, o3));
+
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o2, o1));
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o2, o3));
+
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o3, o1));
+		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o3, o2));
+
+	}
+
 	/**
-	 * PROBLEM: DOC vgl. mit Super class wenn mode auf entity type ist.
+	 * PROBLEM: compare val with other val if they are different classes but the
+	 * evaluation mode allows it.
 	 * 
 	 * @param evaluationMode
 	 * @param val

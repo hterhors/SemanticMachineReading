@@ -54,10 +54,6 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	@Override
 	public boolean equals(Object obj) {
-		return equalsEval(obj);
-	}
-
-	final private boolean equalsEval(Object obj) {
 		if (this == obj)
 			return true;
 		if (!super.equals(obj))
@@ -80,7 +76,7 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 		} else {
 			switch (mode) {
 			case DOCUMENT_LINKED:
-				if (equalsEval(otherVal)) {
+				if (equals(otherVal)) {
 					return Score.TP;
 				} else {
 					return Score.FN_FP;

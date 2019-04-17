@@ -78,7 +78,7 @@ public class SystemInitializer {
 		 * @param normalizationFunction
 		 * @return returns the previous normalization function, if any.
 		 */
-		public NormalizationFunctionHandler addNormalizationFunction(EntityType entityType,
+		public NormalizationFunctionHandler registerNormalizationFunction(EntityType entityType,
 				INormalizationFunction normalizationFunction) {
 
 			normalizationFunctions.put(entityType, normalizationFunction);

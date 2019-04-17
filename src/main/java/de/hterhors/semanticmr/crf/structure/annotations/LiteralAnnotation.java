@@ -53,15 +53,27 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 
 	@Override
 	public boolean equals(Object obj) {
-		return equalsEval(obj);
-	}
-
-	final private boolean equalsEval(Object obj) {
 		if (this == obj)
 			return true;
 		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
+			return false;
+		LiteralAnnotation other = (LiteralAnnotation) obj;
+		if (textualContent == null) {
+			if (other.textualContent != null)
+				return false;
+		} else if (!textualContent.equals(other.textualContent))
+			return false;
+		return true;
+	}
+
+	protected boolean equalsEval(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equalsEval(obj))
+			return false;
+		if (!getClass().isAssignableFrom(obj.getClass()))
 			return false;
 		LiteralAnnotation other = (LiteralAnnotation) obj;
 		if (textualContent == null) {
@@ -79,12 +91,22 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 		} else {
 			switch (mode) {
 			case DOCUMENT_LINKED:
-			case LITERAL:
-				if (equalsEval(otherVal)) {
+				if (equals(otherVal))
 					return Score.TP;
-				} else {
-					return Score.FN_FP;
-				}
+				return Score.FN_FP;
+			case LITERAL:
+				if (getClass() == otherVal.getClass() && equals(otherVal))
+					return Score.TP;
+
+				if (this.getClass() == DocumentLinkedAnnotation.class && otherVal.getClass() == LiteralAnnotation.class
+						&& otherVal.equalsEval(this))
+					return Score.TP;
+
+				if (otherVal.getClass() == DocumentLinkedAnnotation.class && getClass() == LiteralAnnotation.class
+						&& this.equalsEval(otherVal))
+					return Score.TP;
+
+				return Score.FN_FP;
 			case ENTITY_TYPE:
 				return super.evaluate(mode, otherVal);
 			}
