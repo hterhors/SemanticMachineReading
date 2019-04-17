@@ -30,6 +30,8 @@ public class State {
 
 	private double objectiveScore;
 
+	private Score score;
+
 	public State(Instance instance, Annotations currentPredictions) {
 		this.instance = instance;
 		this.currentPredictions = currentPredictions;
@@ -92,8 +94,13 @@ public class State {
 		return instance.getGoldAnnotations();
 	}
 
-	public Score computeAnnotationsOverlapScore(EEvaluationMode evaluationMode) {
-		return instance.getGoldAnnotations().evaluate(evaluationMode, currentPredictions);
+	public Score score(EEvaluationMode evaluationMode) {
+		this.score = instance.getGoldAnnotations().evaluate(evaluationMode, currentPredictions);
+		return score;
+	}
+
+	public Score getScore() {
+		return score;
 	}
 
 	public Instance getInstance() {

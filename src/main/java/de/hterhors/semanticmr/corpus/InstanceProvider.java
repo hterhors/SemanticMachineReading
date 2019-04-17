@@ -57,8 +57,7 @@ public class InstanceProvider {
 	}
 
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor) {
-		this(jsonInstancesDirectory, new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build(),
-				Integer.MAX_VALUE);
+		this(jsonInstancesDirectory, distributor, Integer.MAX_VALUE);
 	}
 
 	public InstanceProvider(final File jsonInstancesDirectory, final int numToRead) {

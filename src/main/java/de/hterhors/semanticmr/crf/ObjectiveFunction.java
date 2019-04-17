@@ -18,7 +18,7 @@ public class ObjectiveFunction {
 	}
 
 	public void score(State state) {
-		state.setObjectiveScore(state.computeAnnotationsOverlapScore(evaluationMode).getF1());
+		state.setObjectiveScore(state.score(evaluationMode).getF1());
 	}
 
 	public void score(List<State> states) {

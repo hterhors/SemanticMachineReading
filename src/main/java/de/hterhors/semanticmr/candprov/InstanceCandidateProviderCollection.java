@@ -20,29 +20,33 @@ public class InstanceCandidateProviderCollection {
 		}
 	}
 
-	public void registerCandidateProvider(GeneralCandidateProvider candidateProvider) {
+	public InstanceCandidateProviderCollection registerCandidateProvider(GeneralCandidateProvider candidateProvider) {
 		if (!candidateProviderPerInstance.containsKey(candidateProvider.getRelatedInstance()))
 			throw new IllegalArgumentException("Unkown instance: " + candidateProvider.getRelatedInstance().getName());
 		candidateProviderPerInstance.get(candidateProvider.getRelatedInstance()).add(candidateProvider);
+		return this;
 	}
 
-	public void registerEntityTemplateCandidateProvider(EntityTemplateCandidateProvider candidateProvider) {
+	public InstanceCandidateProviderCollection registerEntityTemplateCandidateProvider(EntityTemplateCandidateProvider candidateProvider) {
 		if (!candidateProviderPerInstance.containsKey(candidateProvider.getRelatedInstance()))
 			throw new IllegalArgumentException("Unkown instance: " + candidateProvider.getRelatedInstance().getName());
 		candidateProviderPerInstance.get(candidateProvider.getRelatedInstance()).add(candidateProvider);
+		return this;
 	}
 
-	public void setEntityTypeCandidateProvider() {
+	public InstanceCandidateProviderCollection setEntityTypeCandidateProvider() {
 		for (Instance instance : instances) {
 			candidateProviderPerInstance.putIfAbsent(instance, new ArrayList<>());
 			candidateProviderPerInstance.get(instance).add(EntityTypeCandidateProvider.getInstance());
 		}
+		return this;
 	}
 
-	public void unsetEntityTypeCandidateProvider() {
+	public InstanceCandidateProviderCollection unsetEntityTypeCandidateProvider() {
 		for (Instance instance : instances) {
 			candidateProviderPerInstance.get(instance).remove(EntityTypeCandidateProvider.getInstance());
 		}
+		return this;
 	}
 
 	public List<ISlotFillerCandidateProvider<?>> getCandidateProviderForInstance(Instance relatedInstance) {
