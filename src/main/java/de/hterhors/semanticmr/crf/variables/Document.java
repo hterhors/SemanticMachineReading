@@ -94,7 +94,7 @@ public class Document {
 		return "Document [documentID=" + documentID + "]";
 	}
 
-	public DocumentToken getTokenByCharOffset(Integer offset) {
+	public DocumentToken getTokenByCharOffset(Integer offset) throws IllegalArgumentException {
 		final DocumentToken token = startOffsetCharPositionTokens.getOrDefault(offset,
 				endOffsetCharPositionTokens.get(offset));
 		if (token == null)

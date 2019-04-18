@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.factor.Factor;
@@ -13,9 +14,11 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.templates.IntraTokenTemplate.IntraTokenScope;
+import de.hterhors.semanticmr.crf.templates.TokenContextTemplate.TokenContextScope;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
 
@@ -114,26 +117,22 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 		List<IntraTokenScope> factors = new ArrayList<>();
 
 		for (EntityTemplate annotation : state.getCurrentPredictions().<EntityTemplate>getAnnotations()) {
-			for (SlotType slotType : annotation.getSingleFillerSlots().keySet()) {
 
-				SingleFillerSlot slot = annotation.getSingleFillerSlot(slotType);
+			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
+					.nonEmpty().literalAnnoation().build();
 
-				if (slot.containsSlotFiller()) {
+			for (Entry<SlotType, Set<AbstractSlotFiller<?>>> slot : filter.getMergedAnnotations().entrySet()) {
 
-					final AbstractSlotFiller<?> slotFiller = slot.getSlotFiller();
-					if (slotFiller instanceof DocumentLinkedAnnotation) {
-						factors.add(new IntraTokenScope(this, slotFiller.getEntityType(),
-								((LiteralAnnotation) slotFiller).getSurfaceForm()));
-					}
+				for (AbstractSlotFiller<?> slotFiller : slot.getValue()) {
+
+					final LiteralAnnotation docLinkedAnnotation = slotFiller.asInstanceOfLiteralAnnotation();
+
+					factors.add(new IntraTokenScope(this, docLinkedAnnotation.getEntityType(),
+							docLinkedAnnotation.getSurfaceForm()));
 				}
 			}
 		}
-
 		return factors;
-	}
-
-	private String cleanSurfaceForm(String textMention) {
-		return textMention.replaceAll("[0-9]", "#").replaceAll("[^\\x20-\\x7E]+", "§");
 	}
 
 	@Override
@@ -144,9 +143,9 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 
 	}
 
-	private void getTokenNgrams(DoubleVector featureVector, String name, String cleanedMention) {
+	private void getTokenNgrams(DoubleVector featureVector, String name, String surfaceForm) {
 
-		final String cM = START_SIGN + TOKEN_SPLITTER_SPACE + cleanedMention + TOKEN_SPLITTER_SPACE + END_SIGN;
+		final String cM = START_SIGN + TOKEN_SPLITTER_SPACE + surfaceForm + TOKEN_SPLITTER_SPACE + END_SIGN;
 
 		final String[] tokens = cM.split(TOKEN_SPLITTER_SPACE);
 

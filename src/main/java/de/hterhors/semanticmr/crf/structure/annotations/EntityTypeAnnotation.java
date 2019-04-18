@@ -5,6 +5,8 @@ import java.util.Map;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.annotations.filter.IAnnotationFilter;
+import de.hterhors.semanticmr.crf.structure.annotations.filter.IBuilder;
 import de.hterhors.semanticmr.eval.EEvaluationMode;
 
 /**
@@ -128,6 +130,12 @@ public class EntityTypeAnnotation extends AbstractSlotFiller<EntityTypeAnnotatio
 	@Override
 	public String toString() {
 		return "EntityTypeAnnotation [entityType=" + entityType + "]";
+	}
+
+	@Override
+	public <T extends IAnnotationFilter> IBuilder<T> filter() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

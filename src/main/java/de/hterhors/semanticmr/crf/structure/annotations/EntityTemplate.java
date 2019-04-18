@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.crf.structure.slots.MultiFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
@@ -337,6 +338,11 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 
 	public EntityTypeAnnotation getRootAnnotation() {
 		return rootAnnotation;
+	}
+
+	@Override
+	public EntityTemplateAnnotationFilter.Builder filter() {
+		return new EntityTemplateAnnotationFilter.Builder(this);
 	}
 
 }

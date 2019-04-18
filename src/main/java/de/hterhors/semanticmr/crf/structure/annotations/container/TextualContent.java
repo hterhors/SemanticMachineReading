@@ -11,8 +11,6 @@ import de.hterhors.semanticmr.crf.structure.annotations.normalization.INormaliza
  */
 public class TextualContent {
 
-	public static final TextualContent EMPTY_INSTANCE = new TextualContent(null, null);
-
 	/**
 	 * The textual content of an annotation.
 	 */
@@ -23,8 +21,15 @@ public class TextualContent {
 	 */
 	public String normalizedSurfaceForm;
 
+	final public String cleanedSurfaceForm;
+
 	public TextualContent(String surfaceForm) {
 		this.surfaceForm = surfaceForm;
+		this.cleanedSurfaceForm = cleanSurfaceForm(this.surfaceForm);
+	}
+
+	private String cleanSurfaceForm(String textMention) {
+		return textMention.replaceAll("[0-9]", "#").replaceAll("[^\\x20-\\x7E]+", "§");
 	}
 
 	/**
@@ -33,9 +38,10 @@ public class TextualContent {
 	 * @param surfaceForm
 	 * @param normalizedSurfaceForm
 	 */
-	private TextualContent(String surfaceForm, String normalizedSurfaceForm) {
+	private TextualContent(String surfaceForm, String normalizedSurfaceForm, String cleanedSurfaceForm) {
 		this.surfaceForm = surfaceForm;
 		this.normalizedSurfaceForm = normalizedSurfaceForm;
+		this.cleanedSurfaceForm = cleanedSurfaceForm;
 	}
 
 	@Override
@@ -73,15 +79,10 @@ public class TextualContent {
 	}
 
 	public TextualContent deepCopy() {
-		if (this == EMPTY_INSTANCE)
-			return EMPTY_INSTANCE;
-		return new TextualContent(surfaceForm, normalizedSurfaceForm);
+		return new TextualContent(surfaceForm, normalizedSurfaceForm, cleanedSurfaceForm);
 	}
 
 	public String toPrettyString() {
-		if (this == EMPTY_INSTANCE) {
-			return "";
-		}
 		final StringBuilder sb = new StringBuilder();
 		sb.append("\"");
 		sb.append(this.surfaceForm);

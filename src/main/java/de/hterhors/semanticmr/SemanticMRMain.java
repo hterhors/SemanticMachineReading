@@ -22,13 +22,14 @@ import de.hterhors.semanticmr.crf.learner.regularizer.L2;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
-import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
+import de.hterhors.semanticmr.crf.templates.InBetweenContextTemplate;
 import de.hterhors.semanticmr.crf.templates.IntraTokenTemplate;
 import de.hterhors.semanticmr.crf.templates.TokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
@@ -73,6 +74,7 @@ public class SemanticMRMain {
 
 		featureTemplates.add(new IntraTokenTemplate());
 		featureTemplates.add(new TokenContextTemplate());
+		featureTemplates.add(new InBetweenContextTemplate());
 
 		Model model = new Model(featureTemplates, learner);
 

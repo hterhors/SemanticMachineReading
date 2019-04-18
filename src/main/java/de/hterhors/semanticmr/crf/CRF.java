@@ -78,9 +78,12 @@ public class CRF {
 
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
 
+			System.out.print("Epoch: " + epoch + "... ");
+
 			final boolean sampleBasedOnObjectiveFunction = sampler.sampleBasedOnObjectiveScore(epoch);
 
 			for (Instance instance : trainingInstances) {
+				System.out.print(".");
 //				System.out.println(instance.getName());
 //				System.out.println(instance.getGoldAnnotations().getAnnotations().get(0).toPrettyString());
 //				System.out.println();
@@ -118,6 +121,7 @@ public class CRF {
 
 				}
 			}
+			System.out.println();
 		}
 		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 		return finalStates;
