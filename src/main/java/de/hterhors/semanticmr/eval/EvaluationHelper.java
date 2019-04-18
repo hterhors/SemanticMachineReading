@@ -18,7 +18,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
-import de.hterhors.semanticmr.init.specifications.impl.CSVSpecs;
+import de.hterhors.semanticmr.init.specifications.impl.CSVSlotFillingSpecs;
 
 public class EvaluationHelper {
 
@@ -90,7 +90,7 @@ public class EvaluationHelper {
 
 	public static void test() {
 
-		SystemInitializer.initialize(new CSVSpecs().specificationProvider).apply();
+		SystemInitializer.initialize(new CSVSlotFillingSpecs().specificationProvider).apply();
 		DocumentLinkedAnnotation o1 = AbstractSlotFiller.toSlotFiller("Male", "male", 100);
 		LiteralAnnotation o2 = AbstractSlotFiller.toSlotFiller("Male", "male");
 		EntityTypeAnnotation o3 = AbstractSlotFiller.toSlotFiller("Male");

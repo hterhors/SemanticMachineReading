@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.hterhors.semanticmr.candprov.InstanceCandidateProviderCollection;
-import de.hterhors.semanticmr.candprov.GeneralCandidateProvider;
+import de.hterhors.semanticmr.candprov.sf.GeneralCandidateProvider;
+import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateProviderCollection;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class NerlaCollector {
 
-	public InstanceCandidateProviderCollection collect() {
+	public AnnotationCandidateProviderCollection collect() {
 
-		InstanceCandidateProviderCollection candidateProvider = new InstanceCandidateProviderCollection(this.instances);
+		AnnotationCandidateProviderCollection candidateProvider = new AnnotationCandidateProviderCollection(this.instances);
 
 		for (INerlaProvider provider : nerlaProvider) {
 

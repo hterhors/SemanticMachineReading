@@ -60,8 +60,8 @@ public class Document {
 		this.documentContent = builderDocumentContent(tokenList);
 
 		for (DocumentToken token : tokenList) {
-			startOffsetCharPositionTokens.put(new Integer(token.docCharOnset), token);
-			endOffsetCharPositionTokens.put(new Integer(token.docCharOnset + token.text.length()), token);
+			startOffsetCharPositionTokens.put(new Integer(token.docCharOffset), token);
+			endOffsetCharPositionTokens.put(new Integer(token.docCharOffset + token.text.length()), token);
 		}
 	}
 
@@ -77,8 +77,8 @@ public class Document {
 
 		for (int i = 0; i < tokenList.size() - 1; i++) {
 			documentContentBuilder.append(tokenList.get(i).text);
-			final int gap = tokenList.get(i + 1).docCharOnset
-					- (tokenList.get(i).docCharOnset + tokenList.get(i).text.length());
+			final int gap = tokenList.get(i + 1).docCharOffset
+					- (tokenList.get(i).docCharOffset + tokenList.get(i).text.length());
 
 			for (int j = 0; j < gap; j++) {
 				documentContentBuilder.append(" ");

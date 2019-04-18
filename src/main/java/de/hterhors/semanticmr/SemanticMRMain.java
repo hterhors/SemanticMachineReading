@@ -5,15 +5,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import de.hterhors.semanticmr.candprov.InstanceCandidateProviderCollection;
+import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateProviderCollection;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;
 import de.hterhors.semanticmr.crf.CRF;
 import de.hterhors.semanticmr.crf.ObjectiveFunction;
-import de.hterhors.semanticmr.crf.exploration.EntityTemplateExploration;
+import de.hterhors.semanticmr.crf.exploration.EntityTemplateExplorer;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
@@ -25,7 +24,6 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -37,17 +35,20 @@ import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.EEvaluationMode;
+import de.hterhors.semanticmr.eval.Evaluator;
 import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
-import de.hterhors.semanticmr.init.specifications.impl.CSVSpecs;
+import de.hterhors.semanticmr.init.specifications.impl.CSVSlotFillingSpecs;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.nerla.NerlaCollector;
 
 public class SemanticMRMain {
 
+	
+	
 	public static void main(String[] args) throws IOException {
 
-		SystemInitializer initializer = SystemInitializer.initialize(new CSVSpecs().specificationProvider)
+		SystemInitializer initializer = SystemInitializer.initialize(new CSVSlotFillingSpecs().specificationProvider)
 				.registerNormalizationFunction(EntityType.get("Weight"), new WeightNormalization()).apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
@@ -60,7 +61,7 @@ public class SemanticMRMain {
 		nerlaProvider
 				.addNerlaProvider(new JsonNerlaProvider(new File("src/main/resources/corpus/data/nerla/nerla.json")));
 
-		InstanceCandidateProviderCollection candidateProvider = nerlaProvider.collect();
+		AnnotationCandidateProviderCollection candidateProvider = nerlaProvider.collect();
 
 //				candidateProvider.setEntityTypeCandidateProvider();
 
@@ -93,7 +94,7 @@ public class SemanticMRMain {
 		IStoppingCriterion maxStepCrit = new MaxChainLengthCrit(10);
 		IStoppingCriterion noModelChangeCrit = new NoChangeCrit(3, s -> s.getModelScore());
 
-		EntityTemplateExploration explorer = new EntityTemplateExploration(candidateProvider, constraintsProvider);
+		EntityTemplateExplorer explorer = new EntityTemplateExplorer(candidateProvider, constraintsProvider);
 
 		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
 
@@ -102,35 +103,10 @@ public class SemanticMRMain {
 		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
 				noModelChangeCrit);
 
-		evaluate(crf, testResults);
+		Evaluator.evaluate(crf, testResults);
 
 		crf.printTrainingStatistics(System.out);
 		crf.printTestStatistics(System.out);
-	}
-
-	private static void evaluate(CRF crf, Map<Instance, State> testResults) {
-		Score mean = new Score();
-
-		for (Entry<Instance, State> res : testResults.entrySet()) {
-
-			System.out.println(res.getKey().getName());
-			System.out.println("Model score: " + res.getValue().getModelScore());
-			System.out.println("Objective score: " + res.getValue().getObjectiveScore());
-			System.out.println("Score: " + res.getValue().getScore());
-			mean.add(res.getValue().getScore());
-			for (AbstractSlotFiller<?> goldAnnotations : res.getKey().getGoldAnnotations().getAnnotations()) {
-				System.out.println(goldAnnotations.toPrettyString());
-			}
-			System.out.println("-----------");
-			for (AbstractSlotFiller<?> finalAnnotations : res.getValue().getCurrentPredictions().getAnnotations()) {
-				System.out.println(finalAnnotations.toPrettyString());
-			}
-			System.out.println();
-			System.out.println();
-			System.out.println();
-		}
-		System.out.println("Mean Score: " + mean);
-
 	}
 
 }

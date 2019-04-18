@@ -17,6 +17,10 @@ public class Annotations implements IEvaluatable<Annotations> {
 
 	private List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations;
 
+	public Annotations() {
+		this(Collections.emptyList());
+	}
+
 	public Annotations(AbstractSlotFiller<? extends AbstractSlotFiller<?>> goldAnnotation) {
 		this(Arrays.asList(goldAnnotation));
 	}
@@ -69,6 +73,18 @@ public class Annotations implements IEvaluatable<Annotations> {
 			}
 			updatedList.add(annotations.get(index).deepCopy());
 		}
+
+		return new Annotations(updatedList);
+	}
+
+	public Annotations deepAddCopy(AbstractSlotFiller<? extends AbstractSlotFiller<?>> newCurrentPrediction) {
+
+		final List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> updatedList = new ArrayList<>(
+				annotations.size());
+		for (int index = 0; index < annotations.size(); index++) {
+			updatedList.add(annotations.get(index).deepCopy());
+		}
+		updatedList.add(newCurrentPrediction);
 
 		return new Annotations(updatedList);
 	}

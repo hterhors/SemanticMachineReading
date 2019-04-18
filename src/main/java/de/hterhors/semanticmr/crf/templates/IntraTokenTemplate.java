@@ -4,21 +4,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
-import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.templates.IntraTokenTemplate.IntraTokenScope;
-import de.hterhors.semanticmr.crf.templates.TokenContextTemplate.TokenContextScope;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
 
@@ -121,7 +118,8 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
 					.nonEmpty().literalAnnoation().build();
 
-			for (Entry<SlotType, Set<AbstractSlotFiller<?>>> slot : filter.getMergedAnnotations().entrySet()) {
+			for (Entry<SlotType, Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> slot : filter
+					.getMergedAnnotations().entrySet()) {
 
 				for (AbstractSlotFiller<?> slotFiller : slot.getValue()) {
 

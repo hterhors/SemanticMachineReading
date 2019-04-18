@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
-import de.hterhors.semanticmr.init.specifications.impl.CSVSpecs;
+import de.hterhors.semanticmr.init.specifications.impl.CSVSlotFillingSpecs;
 import de.hterhors.semanticmr.santo.converter.Santo2JsonConverter;
 
 public class ScioSanto2Json {
@@ -19,7 +19,7 @@ public class ScioSanto2Json {
 		final String scioNameSpace = "http://psink.de/scio";
 		final String resourceNameSpace = "http://scio/data";
 
-		SystemInitializer initializer = SystemInitializer.initialize(new CSVSpecs().specificationProvider).apply();
+		SystemInitializer initializer = SystemInitializer.initialize(new CSVSlotFillingSpecs().specificationProvider).apply();
 
 		final String dir = "rawData/export_" + exportDate + "/";
 		List<String> fileNames = Arrays.stream(new File(dir).listFiles()).filter(f -> f.getName().endsWith(".csv"))

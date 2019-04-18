@@ -5,8 +5,8 @@ public class DocumentToken {
 	final public int sentenceIndex;
 	final public int senTokenIndex;
 	final public int docTokenIndex;
-	final public int senCharOnset;
-	final public int docCharOnset;
+	final public int senCharOffset;
+	final public int docCharOffset;
 	final public String text;
 
 	public DocumentToken(int sentenceIndex, int senTokenIndex, int docTokenIndex, int senCharOnset, int docCharOnset,
@@ -14,16 +14,16 @@ public class DocumentToken {
 		this.sentenceIndex = sentenceIndex;
 		this.senTokenIndex = senTokenIndex;
 		this.docTokenIndex = docTokenIndex;
-		this.senCharOnset = senCharOnset;
-		this.docCharOnset = docCharOnset;
+		this.senCharOffset = senCharOnset;
+		this.docCharOffset = docCharOnset;
 		this.text = text;
 	}
 
 	@Override
 	public String toString() {
 		return "DocumentToken [sentenceIndex=" + sentenceIndex + ", senTokenIndex=" + senTokenIndex + ", docTokenIndex="
-				+ docTokenIndex + ", senCharOnset=" + senCharOnset + ", docCharOnset=" + docCharOnset + ", text=" + text
-				+ "]";
+				+ docTokenIndex + ", senCharOffset=" + senCharOffset + ", docCharOffset=" + docCharOffset + ", text="
+				+ text + "]";
 	}
 
 }

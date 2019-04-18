@@ -17,27 +17,28 @@ import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 
 public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 
-	final private Map<SlotType, AbstractSlotFiller<?>> singleAnnotations;
-	final private Map<SlotType, Set<AbstractSlotFiller<?>>> multiAnnotations;
-	final private Map<SlotType, Set<AbstractSlotFiller<?>>> mergedAnnotations;
+	final private Map<SlotType, AbstractSlotFiller<? extends AbstractSlotFiller<?>>> singleAnnotations;
+	final private Map<SlotType, Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> multiAnnotations;
+	final private Map<SlotType, Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> mergedAnnotations;
 
-	public EntityTemplateAnnotationFilter(Map<SlotType, AbstractSlotFiller<?>> singleAnnotations,
-			Map<SlotType, Set<AbstractSlotFiller<?>>> multiAnnotations,
-			Map<SlotType, Set<AbstractSlotFiller<?>>> mergedAnnotations) {
+	public EntityTemplateAnnotationFilter(
+			Map<SlotType, AbstractSlotFiller<? extends AbstractSlotFiller<?>>> singleAnnotations,
+			Map<SlotType, Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> multiAnnotations,
+			Map<SlotType, Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> mergedAnnotations) {
 		this.singleAnnotations = singleAnnotations;
 		this.multiAnnotations = multiAnnotations;
 		this.mergedAnnotations = mergedAnnotations;
 	}
 
-	public Map<SlotType, AbstractSlotFiller<?>> getSingleAnnotations() {
+	public Map<SlotType, AbstractSlotFiller<? extends AbstractSlotFiller<?>>> getSingleAnnotations() {
 		return singleAnnotations;
 	}
 
-	public Map<SlotType, Set<AbstractSlotFiller<?>>> getMultiAnnotations() {
+	public Map<SlotType, Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> getMultiAnnotations() {
 		return multiAnnotations;
 	}
 
-	public Map<SlotType, Set<AbstractSlotFiller<?>>> getMergedAnnotations() {
+	public Map<SlotType, Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> getMergedAnnotations() {
 		return mergedAnnotations;
 	}
 
@@ -53,9 +54,9 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 		private boolean entityTemplateAnnoation;
 		private boolean merge;
 
-		private Map<SlotType, AbstractSlotFiller<?>> singleAnnotations;
-		private Map<SlotType, Set<AbstractSlotFiller<?>>> multiAnnotations;
-		private Map<SlotType, Set<AbstractSlotFiller<?>>> mergedAnnotations;
+		private Map<SlotType, AbstractSlotFiller<? extends AbstractSlotFiller<?>>> singleAnnotations;
+		private Map<SlotType, Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> multiAnnotations;
+		private Map<SlotType, Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> mergedAnnotations;
 
 		public Builder(EntityTemplate entityTemplate) {
 			this.entityTemplate = entityTemplate;

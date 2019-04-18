@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.hterhors.semanticmr.crf.exploration.EntityTemplateExploration;
+import de.hterhors.semanticmr.crf.exploration.IExplorationStrategy;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
@@ -45,7 +45,7 @@ public class CRF {
 	 */
 	final static public int MAX_SAMPLING = 100;
 
-	final EntityTemplateExploration explorer;
+	final IExplorationStrategy explorer;
 
 	final Model model;
 
@@ -59,7 +59,7 @@ public class CRF {
 
 	private CRFStatistics testStatistics;
 
-	public CRF(Model model, EntityTemplateExploration explorer, AbstractSampler sampler, IStateInitializer initializer,
+	public CRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler, IStateInitializer initializer,
 			ObjectiveFunction objectiveFunction) {
 		this.model = model;
 		this.explorer = explorer;

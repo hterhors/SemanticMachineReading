@@ -60,7 +60,7 @@ public class TextualAnnotationsReader {
 			boolean found = false;
 			for (DocumentToken documentToken : document.tokenList) {
 
-				if (documentToken.docCharOnset == annotation.onset) {
+				if (documentToken.docCharOffset == annotation.onset) {
 					found = true;
 					if (!annotation.textMention.startsWith(documentToken.text) && document.documentContent
 							.substring(annotation.onset, annotation.offset).equals(annotation.textMention)) {

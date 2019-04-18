@@ -61,7 +61,7 @@ public class InstancesToJsonInstanceWrapper {
 
 	private List<JsonDocumentTokenWrapper> toTokenWrapperList(List<DocumentToken> tokenList) {
 		return tokenList.stream().map(w -> new JsonDocumentTokenWrapper(w.sentenceIndex, w.senTokenIndex,
-				w.docTokenIndex, w.senCharOnset, w.docCharOnset, w.text)).collect(Collectors.toList());
+				w.docTokenIndex, w.senCharOffset, w.docCharOffset, w.text)).collect(Collectors.toList());
 	}
 
 	private JsonAnnotationsWrapper toAnnotationsWrapper(Annotations annotations) {

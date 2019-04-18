@@ -40,6 +40,10 @@ public class State {
 		this.objectiveScore = DEFAULT_OBJECTIVE_SCORE;
 	}
 
+	public State deepAddCopy(AbstractSlotFiller<? extends AbstractSlotFiller<?>> newCurrentPrediction) {
+		return new State(this.instance, currentPredictions.deepAddCopy(newCurrentPrediction));
+	}
+
 	/**
 	 * Creates a new State instance copying all of its properties except the model
 	 * score, objective score and the current prediction. this is directly updated
