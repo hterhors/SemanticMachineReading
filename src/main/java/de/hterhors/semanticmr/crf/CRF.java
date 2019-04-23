@@ -8,6 +8,7 @@ import java.util.Map;
 
 import de.hterhors.semanticmr.crf.exploration.IExplorationStrategy;
 import de.hterhors.semanticmr.crf.factor.Model;
+import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
@@ -49,7 +50,7 @@ public class CRF {
 
 	final Model model;
 
-	final ObjectiveFunction objectiveFunction;
+	final IObjectiveFunction objectiveFunction;
 
 	final AbstractSampler sampler;
 
@@ -60,7 +61,7 @@ public class CRF {
 	private CRFStatistics testStatistics;
 
 	public CRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler, IStateInitializer initializer,
-			ObjectiveFunction objectiveFunction) {
+			IObjectiveFunction objectiveFunction) {
 		this.model = model;
 		this.explorer = explorer;
 		this.objectiveFunction = objectiveFunction;
@@ -101,6 +102,9 @@ public class CRF {
 //					System.out.println();
 
 					final List<State> proposalStates = explorer.explore(currentState);
+
+					if (proposalStates.isEmpty())
+						proposalStates.add(currentState);
 
 					scoreProposalStates(sampleBasedOnObjectiveFunction, proposalStates);
 
@@ -206,6 +210,9 @@ public class CRF {
 //					System.out.println();
 
 				final List<State> proposalStates = explorer.explore(currentState);
+
+				if (proposalStates.isEmpty())
+					proposalStates.add(currentState);
 
 				model.score(proposalStates);
 

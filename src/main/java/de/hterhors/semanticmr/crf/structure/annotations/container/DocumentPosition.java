@@ -1,5 +1,9 @@
 package de.hterhors.semanticmr.crf.structure.annotations.container;
 
+import java.util.List;
+
+import de.hterhors.semanticmr.crf.variables.DocumentToken;
+
 /**
  * Contains information of the document position of an annotation.
  * 
@@ -8,22 +12,20 @@ package de.hterhors.semanticmr.crf.structure.annotations.container;
  */
 public class DocumentPosition {
 
-	public static final DocumentPosition EMPTY_INSTANCE = new DocumentPosition(-1);
-
 	/**
 	 * The character offset position of its annotation.
 	 */
-	final public int charOffset;
+	final public int docCharOffset;
 
 	public DocumentPosition(int charOffset) {
-		this.charOffset = charOffset;
+		this.docCharOffset = charOffset;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + charOffset;
+		result = prime * result + docCharOffset;
 		return result;
 	}
 
@@ -36,27 +38,22 @@ public class DocumentPosition {
 		if (getClass() != obj.getClass())
 			return false;
 		DocumentPosition other = (DocumentPosition) obj;
-		if (charOffset != other.charOffset)
+		if (docCharOffset != other.docCharOffset)
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "DocumentPosition [charOffset=" + charOffset + "]";
+		return "DocumentPosition [charOffset=" + docCharOffset + "]";
 	}
 
 	public DocumentPosition deepCopy() {
-		if (this == EMPTY_INSTANCE)
-			return EMPTY_INSTANCE;
-		return new DocumentPosition(charOffset);
+		return new DocumentPosition(docCharOffset);
 	}
 
 	public String toPrettyString() {
-		if (this == EMPTY_INSTANCE) {
-			return "";
-		}
-		return String.valueOf(charOffset);
+		return String.valueOf(docCharOffset);
 	}
 
 }

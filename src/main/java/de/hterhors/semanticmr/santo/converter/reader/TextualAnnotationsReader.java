@@ -60,12 +60,12 @@ public class TextualAnnotationsReader {
 			boolean found = false;
 			for (DocumentToken documentToken : document.tokenList) {
 
-				if (documentToken.docCharOffset == annotation.onset) {
+				if (documentToken.getDocCharOffset() == annotation.onset) {
 					found = true;
-					if (!annotation.textMention.startsWith(documentToken.text) && document.documentContent
+					if (!annotation.textMention.startsWith(documentToken.getText()) && document.documentContent
 							.substring(annotation.onset, annotation.offset).equals(annotation.textMention)) {
-						System.out.println("WARN: Documents text does not match annotations text:" + documentToken.text
-								+ " != " + annotation.textMention);
+						System.out.println("WARN: Documents text does not match annotations text:"
+								+ documentToken.getText() + " != " + annotation.textMention);
 					}
 					continue;
 				}

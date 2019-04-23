@@ -75,8 +75,8 @@ public class Santo2JsonConverter {
 	public void convert(final File writeToFile, Set<String> rootEntityTypes, boolean includeSubEntities,
 			boolean jsonPrettyString) throws IOException {
 
-		final List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> rdfAnnotations = rdfConverter
-				.extract(rootEntityTypes, includeSubEntities);
+		final List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> rdfAnnotations = rdfConverter.extract(document,
+				rootEntityTypes, includeSubEntities);
 
 		List<Instance> instances = new ArrayList<>();
 

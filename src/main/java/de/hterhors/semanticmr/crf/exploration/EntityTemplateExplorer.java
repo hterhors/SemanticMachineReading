@@ -78,7 +78,6 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 
 		if (proposalStates.isEmpty()) {
 			System.out.println("WARN no states generated for instance: " + currentState.getInstance().getDocument());
-			proposalStates.add(currentState);
 		}
 
 		updateAverage(proposalStates);

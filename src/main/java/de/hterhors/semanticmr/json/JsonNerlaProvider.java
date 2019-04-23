@@ -13,7 +13,9 @@ import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
+import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
+import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 import de.hterhors.semanticmr.json.nerla.JsonNerlaIO;
 import de.hterhors.semanticmr.json.nerla.wrapper.JsonEntityAnnotationWrapper;
 import de.hterhors.semanticmr.nerla.INerlaProvider;
@@ -52,9 +54,14 @@ public class JsonNerlaProvider implements INerlaProvider {
 			if (count % 5000 == 0)
 				System.out.print(" - " + count + " - ");
 
-			nerla.putIfAbsent(map.get(jsonEntityAnnotationWrapper.getDocumentID()), new ArrayList<>());
-			nerla.get(map.get(jsonEntityAnnotationWrapper.getDocumentID()))
-					.add(toEntityTypeAnnotation(jsonEntityAnnotationWrapper));
+			Instance instance = map.get(jsonEntityAnnotationWrapper.getDocumentID());
+
+			nerla.putIfAbsent(instance, new ArrayList<>());
+			try {
+				nerla.get(instance).add(toEntityTypeAnnotation(instance.getDocument(), jsonEntityAnnotationWrapper));
+			} catch (DocumentLinkedAnnotationMismatchException e) {
+				e.printStackTrace();
+			}
 		}
 		System.out.println("... done");
 		System.out.println("Total number of nerla loaded: " + count);
@@ -62,10 +69,11 @@ public class JsonNerlaProvider implements INerlaProvider {
 		return nerla;
 	}
 
-	private EntityTypeAnnotation toEntityTypeAnnotation(JsonEntityAnnotationWrapper s) {
+	private EntityTypeAnnotation toEntityTypeAnnotation(Document document, JsonEntityAnnotationWrapper s)
+			throws DocumentLinkedAnnotationMismatchException {
 
-		return new DocumentLinkedAnnotation(EntityType.get(s.getEntityType()), new TextualContent(s.getSurfaceForm()),
-				new DocumentPosition(s.getOffset()));
+		return new DocumentLinkedAnnotation(document, EntityType.get(s.getEntityType()),
+				new TextualContent(s.getSurfaceForm()), new DocumentPosition(s.getOffset()));
 
 	}
 

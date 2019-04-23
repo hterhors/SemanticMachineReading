@@ -1,5 +1,6 @@
 package de.hterhors.semanticmr.eval;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -9,14 +10,16 @@ import java.util.stream.Stream;
 
 import org.apache.jena.ext.com.google.common.collect.Collections2;
 
-import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AnnotationCreationHelper;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
-import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
+import de.hterhors.semanticmr.crf.variables.Document;
+import de.hterhors.semanticmr.crf.variables.DocumentToken;
+import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 import de.hterhors.semanticmr.init.specifications.impl.CSVSlotFillingSpecs;
 
@@ -42,7 +45,7 @@ public class EvaluationHelper {
 		return permutationCache[size].stream();
 	}
 
-	private static Score[][] computeScores(EEvaluationMode evaluationMode,
+	private static Score[][] computeScores(EEvaluationDetail evaluationMode,
 			final Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller,
 			final Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherSlotFiller, final int maxSize) {
 
@@ -88,88 +91,95 @@ public class EvaluationHelper {
 		return scores;
 	}
 
-	public static void test() {
+	public static void test() throws DocumentLinkedAnnotationMismatchException {
 
+		List<DocumentToken> tokenList = new ArrayList<>	();
+		tokenList.add(new DocumentToken(0, 0, 0, 0, 0, "male"));
+		tokenList.add(new DocumentToken(0, 1, 1, 5, 5, "Eight-week-old"));
+		tokenList.add(new DocumentToken(0, 2, 2, 21, 21, "Eight-week-old"));
+		tokenList.add(new DocumentToken(0, 3, 3, 36, 36, "8 w"));
+		Document d = new Document("name1",tokenList );
+		
 		SystemInitializer.initialize(new CSVSlotFillingSpecs().specificationProvider).apply();
-		DocumentLinkedAnnotation o1 = AbstractSlotFiller.toSlotFiller("Male", "male", 100);
-		LiteralAnnotation o2 = AbstractSlotFiller.toSlotFiller("Male", "male");
-		EntityTypeAnnotation o3 = AbstractSlotFiller.toSlotFiller("Male");
+		DocumentLinkedAnnotation o1 = AnnotationCreationHelper.toAnnotation(d,"Male", "male", 0);
+		LiteralAnnotation o2 = AnnotationCreationHelper.toSlotFiller("Male", "male");
+		EntityTypeAnnotation o3 = AnnotationCreationHelper.toSlotFiller("Male");
 
-		DocumentLinkedAnnotation dl1 = AbstractSlotFiller.toSlotFiller("Age", "Eight-week-old", 0);
-		DocumentLinkedAnnotation dl2 = AbstractSlotFiller.toSlotFiller("Age", "Eight-week-old", 1);
-		DocumentLinkedAnnotation dl3 = AbstractSlotFiller.toSlotFiller("Age", "Eight-week", 2);
+		DocumentLinkedAnnotation dl1 = AnnotationCreationHelper.toAnnotation(d,"Age", "Eight-week-old", 5);
+		DocumentLinkedAnnotation dl2 = AnnotationCreationHelper.toAnnotation(d,"Age", "Eight-week-old", 21);
+		DocumentLinkedAnnotation dl3 = AnnotationCreationHelper.toAnnotation(d,"Age", "8 w", 21);
 
-		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, dl1, o1));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, dl2, o2));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, dl3, o3));
-
-		System.out.println();
-
-		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, dl1, dl2));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, dl1, dl3));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, dl2, dl3));
-		System.out.println();
-
-		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, dl1, dl2));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, dl1, dl3));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, dl2, dl3));
-		System.out.println();
-
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, dl1, dl2));
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, dl1, dl3));
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, dl2, dl3));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, dl1, o1));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.LITERAL, dl2, o2));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, dl3, o3));
 
 		System.out.println();
+
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, dl1, dl2));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, dl1, dl3));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, dl2, dl3));
 		System.out.println();
 
-		System.out.println("true: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o1, o1));
-		System.out.println("true: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o2, o2));
-		System.out.println("true: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o3, o3));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.LITERAL, dl1, dl2));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.LITERAL, dl1, dl3));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.LITERAL, dl2, dl3));
+		System.out.println();
 
-		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o1, o2));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o1, o3));
-
-		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o2, o1));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o2, o3));
-
-		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o3, o1));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.DOCUMENT_LINKED, o3, o2));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, dl1, dl2));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, dl1, dl3));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, dl2, dl3));
 
 		System.out.println();
 		System.out.println();
 
-		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, o1, o1));
-		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, o2, o2));
-		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, o3, o3));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, o1, o1));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, o2, o2));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, o3, o3));
 
-		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, o1, o2));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, o1, o3));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, o1, o2));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, o1, o3));
 
-		System.out.println("true: " + scoreSingle(EEvaluationMode.LITERAL, o2, o1));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, o2, o3));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, o2, o1));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, o2, o3));
 
-		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, o3, o1));
-		System.out.println("false: " + scoreSingle(EEvaluationMode.LITERAL, o3, o2));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, o3, o1));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, o3, o2));
 
 		System.out.println();
 		System.out.println();
 
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o1, o1));
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o2, o2));
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o3, o3));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.LITERAL, o1, o1));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.LITERAL, o2, o2));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.LITERAL, o3, o3));
 
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o1, o2));
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o1, o3));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.LITERAL, o1, o2));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.LITERAL, o1, o3));
 
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o2, o1));
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o2, o3));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.LITERAL, o2, o1));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.LITERAL, o2, o3));
 
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o3, o1));
-		System.out.println("true: " + scoreSingle(EEvaluationMode.ENTITY_TYPE, o3, o2));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.LITERAL, o3, o1));
+		System.out.println("false: " + scoreSingle(EEvaluationDetail.LITERAL, o3, o2));
+
+		System.out.println();
+		System.out.println();
+
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, o1, o1));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, o2, o2));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, o3, o3));
+
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, o1, o2));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, o1, o3));
+
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, o2, o1));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, o2, o3));
+
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, o3, o1));
+		System.out.println("true: " + scoreSingle(EEvaluationDetail.ENTITY_TYPE, o3, o2));
 
 	}
 
-	public static Score scoreSingle(final EEvaluationMode evaluationMode, final AbstractSlotFiller<?> val,
+	public static Score scoreSingle(final EEvaluationDetail evaluationMode, final AbstractSlotFiller<?> val,
 			final AbstractSlotFiller<?> otherVal) {
 		if (val instanceof DocumentLinkedAnnotation
 				&& (otherVal instanceof DocumentLinkedAnnotation || otherVal == null)) {
@@ -186,7 +196,7 @@ public class EvaluationHelper {
 		}
 	}
 
-	public static Score scoreMax(EEvaluationMode evaluationMode,
+	public static Score scoreMax(EEvaluationDetail evaluationMode,
 			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations,
 			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherAnnotations) {
 

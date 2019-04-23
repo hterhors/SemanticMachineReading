@@ -60,8 +60,10 @@ public class InstancesToJsonInstanceWrapper {
 	}
 
 	private List<JsonDocumentTokenWrapper> toTokenWrapperList(List<DocumentToken> tokenList) {
-		return tokenList.stream().map(w -> new JsonDocumentTokenWrapper(w.sentenceIndex, w.senTokenIndex,
-				w.docTokenIndex, w.senCharOffset, w.docCharOffset, w.text)).collect(Collectors.toList());
+		return tokenList
+				.stream().map(w -> new JsonDocumentTokenWrapper(w.getSentenceIndex(), w.getSenTokenIndex(),
+						w.getDocTokenIndex(), w.getSenCharOffset(), w.getDocCharOffset(), w.getText()))
+				.collect(Collectors.toList());
 	}
 
 	private JsonAnnotationsWrapper toAnnotationsWrapper(Annotations annotations) {
@@ -109,7 +111,7 @@ public class InstancesToJsonInstanceWrapper {
 	}
 
 	private JsonDocumentPositionWrapper toDocumentPositionWrapper(DocumentPosition documentPosition) {
-		return new JsonDocumentPositionWrapper(documentPosition.charOffset);
+		return new JsonDocumentPositionWrapper(documentPosition.docCharOffset);
 	}
 
 	private JsonTextualContentWrapper toTextualContentWrapper(TextualContent textualContent) {

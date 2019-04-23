@@ -9,7 +9,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 
-public class Evaluator {
+public class EvaluationResultPrinter {
 
 	public static void evaluate(CRF crf, Map<Instance, State> testResults) {
 		Score mean = new Score();

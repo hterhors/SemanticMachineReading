@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.templates;
+package de.hterhors.semanticmr.crf.templates.slotfilling;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +14,9 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
-import de.hterhors.semanticmr.crf.templates.InBetweenContextTemplate.InBetweenContextScope;
+import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
+import de.hterhors.semanticmr.crf.templates.slotfilling.InBetweenContextTemplate.InBetweenContextScope;
+import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -31,27 +33,15 @@ import de.hterhors.semanticmr.crf.variables.State;
  */
 public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenContextScope> {
 
-	public static final Set<String> STOP_WORDS = new HashSet<>(
-			Arrays.asList("a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it",
-					"no", "not", "of", "on", "or", "such", "that", "the", "their", "then", "there", "these", "they",
-					"this", "to", "was", "will", "with", "his", "her", "from", "who", "whom"));
-
-	private static final String SPLITTER = " ";
-
 	private static final String LEFT = "<";
 
 	private static final String RIGHT = ">";
 
-	private static final String END_DOLLAR = "$";
+	private static final DocumentToken END_DOLLAR = new DocumentToken(0, 0, 0, 0, 0, "$");
 
-	private static final String START_CIRCUMFLEX = "^";
+	private static final DocumentToken START_CIRCUMFLEX = new DocumentToken(0, 0, 0, 0, 0, "^");
 
 	private static final int MIN_TOKEN_LENGTH = 2;
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
 	private static final int MAX_TOKEN_DIST = 10;
 
@@ -184,8 +174,8 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 				for (int j = i + 1; j < slotFillers.size(); j++) {
 					AbstractSlotFiller<?> toSlotFiller = slotFillers.get(j);
 
-					final Integer fromOffset = ((DocumentLinkedAnnotation) fromSlotFiller).getStartOffset();
-					final Integer toOffset = ((DocumentLinkedAnnotation) toSlotFiller).getStartOffset();
+					final Integer fromOffset = ((DocumentLinkedAnnotation) fromSlotFiller).getStartDocCharOffset();
+					final Integer toOffset = ((DocumentLinkedAnnotation) toSlotFiller).getStartDocCharOffset();
 
 					if (fromOffset.intValue() > toOffset.intValue()) {
 						factors.add(new InBetweenContextScope(this, state.getInstance(), toSlotFiller.getEntityType(),
@@ -213,11 +203,11 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 
 			final String fromName = factor.getFactorScope().fromEntity.entityTypeName;
 			final int fromTokenIndex = factor.getFactorScope().instance.getDocument()
-					.getTokenByCharOffset(factor.getFactorScope().fromEntityCharacterOnset).docTokenIndex;
+					.getTokenByCharOffset(factor.getFactorScope().fromEntityCharacterOnset).getDocTokenIndex();
 
 			final String toName = factor.getFactorScope().toEntity.entityTypeName;
 			final int toTokenIndex = factor.getFactorScope().instance.getDocument()
-					.getTokenByCharOffset(factor.getFactorScope().toEntityCharacterOnset).docTokenIndex;
+					.getTokenByCharOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
 
 			if (toTokenIndex - fromTokenIndex > MAX_TOKEN_DIST)
 				return;
@@ -225,28 +215,30 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 			if (toTokenIndex - fromTokenIndex < MIN_TOKEN_DIST)
 				return;
 
-			StringBuffer fullTokenFeature = new StringBuffer(LEFT).append(fromName).append(RIGHT).append(SPLITTER);
+			StringBuffer fullTokenFeature = new StringBuffer(LEFT).append(fromName).append(RIGHT)
+					.append(Document.TOKEN_SPLITTER);
 
-			final String[] inBetweenContext = new String[toTokenIndex - fromTokenIndex + 1];
+			final DocumentToken[] inBetweenContext = new DocumentToken[toTokenIndex - fromTokenIndex + 1];
 			inBetweenContext[0] = START_CIRCUMFLEX;
 			int index = 1;
 			for (int i = fromTokenIndex + 1; i < toTokenIndex; i++) {
-				inBetweenContext[index++] = tokens.get(i).text;
+				inBetweenContext[index++] = tokens.get(i);
 
 				/*
 				 * Each token as single feature.
 				 */
-				final StringBuffer feature = new StringBuffer(LEFT).append(fromName).append(RIGHT).append(SPLITTER);
-				feature.append(inBetweenContext[index]);
-				feature.append(SPLITTER);
+				final StringBuffer feature = new StringBuffer(LEFT).append(fromName).append(RIGHT)
+						.append(Document.TOKEN_SPLITTER);
+				feature.append(inBetweenContext[index].getText());
+				feature.append(Document.TOKEN_SPLITTER);
 				feature.append(LEFT).append(toName).append(RIGHT);
 				featureVector.set(feature.toString(), true);
 
 				/*
 				 * Collect all in between tokens.
 				 */
-				fullTokenFeature.append(tokens.get(i).text);
-				fullTokenFeature.append(SPLITTER);
+				fullTokenFeature.append(tokens.get(i).getText());
+				fullTokenFeature.append(Document.TOKEN_SPLITTER);
 			}
 			fullTokenFeature.append(LEFT).append(toName).append(RIGHT);
 			featureVector.set(fullTokenFeature.toString(), true);
@@ -259,7 +251,8 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 		}
 	}
 
-	private void getTokenNgrams(DoubleVector featureVector, String fromClassName, String toClassName, String[] tokens) {
+	private void getTokenNgrams(DoubleVector featureVector, String fromClassName, String toClassName,
+			DocumentToken[] tokens) {
 
 		final int maxNgramSize = tokens.length;
 		for (int ngram = 1; ngram < maxNgramSize; ngram++) {
@@ -280,13 +273,16 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 				final StringBuffer fBuffer = new StringBuffer();
 				for (int t = i; t < i + ngram; t++) {
 
-					if (tokens[t].isEmpty())
+					if (tokens[t].getText().isEmpty())
 						continue;
 
-					if (STOP_WORDS.contains(tokens[t].toLowerCase()))
+					if (tokens[t].isStopWord())
 						continue;
 
-					fBuffer.append(tokens[t]).append(SPLITTER);
+//					if (Document.getStopWords().contains(tokens[t].toLowerCase()))
+//						continue;
+
+					fBuffer.append(tokens[t].getText()).append(Document.TOKEN_SPLITTER);
 
 				}
 
@@ -298,9 +294,8 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 				if (featureName.isEmpty())
 					continue;
 
-				featureVector.set(
-						LEFT + fromClassName + RIGHT + SPLITTER + featureName + SPLITTER + LEFT + toClassName + RIGHT,
-						true);
+				featureVector.set(LEFT + fromClassName + RIGHT + Document.TOKEN_SPLITTER + featureName
+						+ Document.TOKEN_SPLITTER + LEFT + toClassName + RIGHT, true);
 
 			}
 		}

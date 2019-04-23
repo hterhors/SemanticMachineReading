@@ -3,7 +3,7 @@ package de.hterhors.semanticmr.crf.structure.annotations;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
-import de.hterhors.semanticmr.eval.EEvaluationMode;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 /**
  * Annotation object for literal based slots that are NOT linked to the
@@ -85,7 +85,7 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 	}
 
 	@Override
-	public Score evaluate(EEvaluationMode mode, EntityTypeAnnotation otherVal) {
+	public Score evaluate(EEvaluationDetail mode, EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else {

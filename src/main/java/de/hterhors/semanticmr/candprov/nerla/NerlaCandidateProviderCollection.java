@@ -5,13 +5,13 @@ import java.util.List;
 
 public class NerlaCandidateProviderCollection {
 
-	final private List<INERLACandidateProvider> candidateProvider = new ArrayList<>();
+	final private List<INerlaCandidateProvider> candidateProvider = new ArrayList<>();
 
-	public NerlaCandidateProviderCollection(INERLACandidateProvider p) {
+	public NerlaCandidateProviderCollection(INerlaCandidateProvider p) {
 		candidateProvider.add(p);
 	}
 
-	public List<INERLACandidateProvider> getCandidateProvider() {
+	public List<INerlaCandidateProvider> getCandidateProvider() {
 		return candidateProvider;
 	}
 

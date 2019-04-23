@@ -8,7 +8,8 @@ import de.hterhors.semanticmr.crf.factor.FactorGraph;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.eval.EEvaluationMode;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
+import de.hterhors.semanticmr.eval.IEvaluator;
 
 public class State {
 
@@ -57,6 +58,10 @@ public class State {
 		return new State(this.instance, currentPredictions.deepUpdateCopy(annotationIndex, newCurrentPrediction));
 	}
 
+	public State deepRemoveCopy(int annotationIndex) {
+		return new State(this.instance, currentPredictions.deepRemoveCopy(annotationIndex));
+	}
+
 	public FactorGraph getFactorGraph(final AbstractFeatureTemplate<?> template) {
 		FactorGraph fg;
 		if ((fg = factorGraphs.get(template)) == null) {
@@ -98,8 +103,13 @@ public class State {
 		return instance.getGoldAnnotations();
 	}
 
-	public Score score(EEvaluationMode evaluationMode) {
+	public Score score(EEvaluationDetail evaluationMode) {
 		this.score = instance.getGoldAnnotations().evaluate(evaluationMode, currentPredictions);
+		return score;
+	}
+
+	public Score score(IEvaluator evaluator, EEvaluationDetail evaluationMode) {
+		this.score = evaluator.evaluate(evaluationMode, instance.getGoldAnnotations(), currentPredictions);
 		return score;
 	}
 
@@ -109,6 +119,10 @@ public class State {
 
 	public Instance getInstance() {
 		return instance;
+	}
+
+	public boolean containsAnnotationOnTokens(DocumentToken... tokens) {
+		return currentPredictions.containsAnnotationOnTokens(tokens);
 	}
 
 }

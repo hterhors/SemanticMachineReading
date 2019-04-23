@@ -7,7 +7,7 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.IAnnotationFilter;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.IBuilder;
-import de.hterhors.semanticmr.eval.EEvaluationMode;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 /**
  * Annotation object for literal based slots that are NOT linked to the
@@ -91,7 +91,7 @@ public class EntityTypeAnnotation extends AbstractSlotFiller<EntityTypeAnnotatio
 		return true;
 	}
 
-	public Score evaluate(EEvaluationMode mode, EntityTypeAnnotation otherVal) {
+	public Score evaluate(EEvaluationDetail mode, EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else {
@@ -130,12 +130,6 @@ public class EntityTypeAnnotation extends AbstractSlotFiller<EntityTypeAnnotatio
 	@Override
 	public String toString() {
 		return "EntityTypeAnnotation [entityType=" + entityType + "]";
-	}
-
-	@Override
-	public <T extends IAnnotationFilter> IBuilder<T> filter() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

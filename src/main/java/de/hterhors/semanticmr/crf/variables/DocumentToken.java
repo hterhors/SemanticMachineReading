@@ -2,12 +2,43 @@ package de.hterhors.semanticmr.crf.variables;
 
 public class DocumentToken {
 
-	final public int sentenceIndex;
-	final public int senTokenIndex;
-	final public int docTokenIndex;
-	final public int senCharOffset;
-	final public int docCharOffset;
-	final public String text;
+	final private int sentenceIndex;
+	final private int senTokenIndex;
+	final private int docTokenIndex;
+	final private int senCharOffset;
+	final private int docCharOffset;
+	final private String text;
+
+	private boolean isStopWord = false;
+	private boolean isPunctuation = false;
+
+	public int getSentenceIndex() {
+		return sentenceIndex;
+	}
+
+	public int getSenTokenIndex() {
+		return senTokenIndex;
+	}
+
+	public int getDocTokenIndex() {
+		return docTokenIndex;
+	}
+
+	public int getSenCharOffset() {
+		return senCharOffset;
+	}
+
+	public int getDocCharOffset() {
+		return docCharOffset;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public int getLength() {
+		return text.length();
+	}
 
 	public DocumentToken(int sentenceIndex, int senTokenIndex, int docTokenIndex, int senCharOnset, int docCharOnset,
 			String text) {
@@ -24,6 +55,22 @@ public class DocumentToken {
 		return "DocumentToken [sentenceIndex=" + sentenceIndex + ", senTokenIndex=" + senTokenIndex + ", docTokenIndex="
 				+ docTokenIndex + ", senCharOffset=" + senCharOffset + ", docCharOffset=" + docCharOffset + ", text="
 				+ text + "]";
+	}
+
+	public boolean isStopWord() {
+		return isStopWord;
+	}
+
+	public void setStopWord(boolean isStopWord) {
+		this.isStopWord = isStopWord;
+	}
+
+	public boolean isPunctuation() {
+		return isPunctuation;
+	}
+
+	public void setPunctuation(boolean isPunctuation) {
+		this.isPunctuation = isPunctuation;
 	}
 
 }

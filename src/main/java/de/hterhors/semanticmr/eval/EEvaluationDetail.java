@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.eval;
 
-public enum EEvaluationMode {
+public enum EEvaluationDetail {
 
 	/**
 	 * Most detailed annotation, checks the full fields of a document linked

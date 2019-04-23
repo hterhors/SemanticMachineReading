@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.templates;
+package de.hterhors.semanticmr.crf.templates.slotfilling;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,8 @@ import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
-import de.hterhors.semanticmr.crf.templates.TokenContextTemplate.TokenContextScope;
+import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
+import de.hterhors.semanticmr.crf.templates.slotfilling.TokenContextTemplate.TokenContextScope;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -118,7 +119,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 							.asInstanceOfDocumentLinkedAnnotation();
 
 					factors.add(new TokenContextScope(this, state.getInstance(), docLinkedAnnotation.getEntityType(),
-							docLinkedAnnotation.getStartOffset(), docLinkedAnnotation.getEndOffset()));
+							docLinkedAnnotation.getStartDocCharOffset(), docLinkedAnnotation.getEndDocCharOffset()));
 				}
 			}
 
@@ -139,8 +140,8 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 					.getTokenByCharOffset(factor.getFactorScope().endOffset);
 
 			addContextFeatures(featureVector, factor.getFactorScope().instance.getDocument().tokenList,
-					factor.getFactorScope().entityType.entityTypeName, beginToken.docTokenIndex,
-					endToken.docTokenIndex);
+					factor.getFactorScope().entityType.entityTypeName, beginToken.getDocTokenIndex(),
+					endToken.getDocTokenIndex());
 		} catch (Exception e) {
 //			System.out.println("WARN! " + e.getMessage());
 		}
@@ -161,7 +162,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 
 		for (int i = 1; i < 4; i++) {
 			if (beginTokenIndex - i >= 0) {
-				leftContext[i - 1] = tokens.get(beginTokenIndex - i).text;
+				leftContext[i - 1] = tokens.get(beginTokenIndex - i).getText();
 			} else {
 				break;
 			}
@@ -174,7 +175,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 
 		for (int i = 1; i < 4; i++) {
 			if (endTokenIndex + i < tokens.size()) {
-				rightContext[i - 1] = tokens.get(endTokenIndex + i).text;
+				rightContext[i - 1] = tokens.get(endTokenIndex + i).getText();
 			} else {
 				break;
 			}

@@ -12,7 +12,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnn
 import de.hterhors.semanticmr.crf.structure.slots.MultiFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
-import de.hterhors.semanticmr.eval.EEvaluationMode;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationHelper;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 import de.hterhors.semanticmr.exce.UnkownMultiSlotException;
@@ -265,7 +265,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	}
 
 	@Override
-	public Score evaluate(EEvaluationMode evaluationMode, EntityTemplate other) {
+	public Score evaluate(EEvaluationDetail evaluationMode, EntityTemplate other) {
 
 		final Score score = new Score();
 
@@ -283,7 +283,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 
 	}
 
-	private void addScoresForSingleFillerSlots(EEvaluationMode evaluationMode, EntityTemplate other,
+	private void addScoresForSingleFillerSlots(EEvaluationDetail evaluationMode, EntityTemplate other,
 			final Score score) {
 		for (SlotType singleSlotType : this.singleFillerSlots.keySet()) {
 
@@ -309,7 +309,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		}
 	}
 
-	private void addScoresForMultiFillerSlots(EEvaluationMode evaluationMode, EntityTemplate other, final Score score) {
+	private void addScoresForMultiFillerSlots(EEvaluationDetail evaluationMode, EntityTemplate other, final Score score) {
 
 		for (SlotType multiSlotType : this.multiFillerSlots.keySet()) {
 
@@ -340,7 +340,6 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		return rootAnnotation;
 	}
 
-	@Override
 	public EntityTemplateAnnotationFilter.Builder filter() {
 		return new EntityTemplateAnnotationFilter.Builder(this);
 	}

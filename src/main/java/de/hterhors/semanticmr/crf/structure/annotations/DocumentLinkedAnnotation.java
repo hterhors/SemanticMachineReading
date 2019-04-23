@@ -1,10 +1,14 @@
 package de.hterhors.semanticmr.crf.structure.annotations;
 
+import java.util.List;
+
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
-import de.hterhors.semanticmr.eval.EEvaluationMode;
+import de.hterhors.semanticmr.crf.variables.Document;
+import de.hterhors.semanticmr.crf.variables.DocumentToken;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
+import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 
 /**
  * Annotation object for entity-type based slots that are linked to the
@@ -20,23 +24,34 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 	 */
 	public final DocumentPosition documentPosition;
 
-	public DocumentLinkedAnnotation(EntityType entityType, TextualContent textualContent,
-			DocumentPosition documentPosition) {
+	/**
+	 * The document this annotation is related to.
+	 */
+	public final Document document;
+
+	public final List<DocumentToken> relatedTokens;
+
+	public DocumentLinkedAnnotation(Document document, EntityType entityType, TextualContent textualContent,
+			DocumentPosition documentPosition) throws DocumentLinkedAnnotationMismatchException {
 		super(entityType, textualContent);
+		this.document = document;
 		this.documentPosition = documentPosition;
+		this.relatedTokens = this.document.tokenList.subList(
+				this.document.getTokenByCharOffset(getStartDocCharOffset()).getDocTokenIndex(),
+				this.document.getTokenByCharOffset(getEndDocCharOffset()).getDocTokenIndex() + 1);
 	}
 
-	public int getStartOffset() {
-		return documentPosition.charOffset;
+	public int getStartDocCharOffset() {
+		return documentPosition.docCharOffset;
 	}
 
 	/**
-	 * End offset of this annotation (start + length)
+	 * End offset of this annotation (start + length) excluding
 	 * 
 	 * @return
 	 */
-	public int getEndOffset() {
-		return documentPosition.charOffset + getLength();
+	public int getEndDocCharOffset() {
+		return documentPosition.docCharOffset + getLength();
 	}
 
 	public int getLength() {
@@ -50,7 +65,12 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	@Override
 	public DocumentLinkedAnnotation deepCopy() {
-		return new DocumentLinkedAnnotation(entityType, textualContent.deepCopy(), documentPosition.deepCopy());
+		try {
+			return new DocumentLinkedAnnotation(document, entityType, textualContent.deepCopy(),
+					documentPosition.deepCopy());
+		} catch (DocumentLinkedAnnotationMismatchException e) {
+			throw new IllegalStateException("This can not happen!");
+		}
 	}
 
 	public String toPrettyString(int depth) {
@@ -65,6 +85,7 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
+		result = prime * result + ((document == null) ? 0 : document.hashCode());
 		result = prime * result + ((documentPosition == null) ? 0 : documentPosition.hashCode());
 		return result;
 	}
@@ -78,6 +99,11 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 		if (getClass() != obj.getClass())
 			return false;
 		DocumentLinkedAnnotation other = (DocumentLinkedAnnotation) obj;
+		if (document == null) {
+			if (other.document != null)
+				return false;
+		} else if (!document.equals(other.document))
+			return false;
 		if (documentPosition == null) {
 			if (other.documentPosition != null)
 				return false;
@@ -87,7 +113,7 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 	}
 
 	@Override
-	public Score evaluate(EEvaluationMode mode, EntityTypeAnnotation otherVal) {
+	public Score evaluate(EEvaluationDetail mode, EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else {

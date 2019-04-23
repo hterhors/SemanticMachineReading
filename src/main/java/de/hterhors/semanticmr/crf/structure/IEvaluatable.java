@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.crf.structure;
 
-import de.hterhors.semanticmr.eval.EEvaluationMode;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 public interface IEvaluatable<T> {
 
@@ -36,6 +36,13 @@ public interface IEvaluatable<T> {
 			this.fp = fp;
 			this.fn = fn;
 			this.tn = tn;
+		}
+
+		public Score(int tp, int fp, int fn) {
+			this.tp = tp;
+			this.fp = fp;
+			this.fn = fn;
+			this.tn = 0;
 		}
 
 		@Override
@@ -138,9 +145,9 @@ public interface IEvaluatable<T> {
 	}
 
 	public default Score evaluate(T otherVal) {
-		return evaluate(EEvaluationMode.DOCUMENT_LINKED, otherVal);
+		return evaluate(EEvaluationDetail.DOCUMENT_LINKED, otherVal);
 	}
 
-	public Score evaluate(EEvaluationMode mode, T otherVal);
+	public Score evaluate(EEvaluationDetail mode, T otherVal);
 
 }

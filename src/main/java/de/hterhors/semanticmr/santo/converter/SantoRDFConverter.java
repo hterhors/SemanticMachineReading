@@ -14,10 +14,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AnnotationCreationHelper;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
+import de.hterhors.semanticmr.crf.variables.Document;
+import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
 import de.hterhors.semanticmr.santo.container.Triple;
@@ -53,8 +56,8 @@ public class SantoRDFConverter {
 		this.rdfData = readRDFData(rdfAnnotationsFile);
 	}
 
-	public List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> extract(final Set<String> rootEntities,
-			final boolean includeSubEntities) {
+	public List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> extract(final Document document,
+			final Set<String> rootEntities, final boolean includeSubEntities) {
 
 		setRootEntityTypes(rootEntities, includeSubEntities);
 
@@ -70,12 +73,16 @@ public class SantoRDFConverter {
 
 			final RDFRelatedAnnotation annotation = annotations.get(linkedID);
 
-			final EntityTemplate entityTemplate = new EntityTemplate(
-					toEntityTypeAnnotation(SantoHelper.getResource(object), annotation));
+			try {
+				EntityTemplate entityTemplate = new EntityTemplate(
+						toEntityTypeAnnotation(document, SantoHelper.getResource(object), annotation));
 
-			fillRec(entityTemplate, rootDataPoint);
+				fillRec(document, entityTemplate, rootDataPoint);
 
-			instances.add(entityTemplate);
+				instances.add(entityTemplate);
+			} catch (DocumentLinkedAnnotationMismatchException e) {
+				e.printStackTrace();
+			}
 
 		}
 
@@ -83,7 +90,7 @@ public class SantoRDFConverter {
 
 	}
 
-	private void fillRec(final EntityTemplate object, String subject) {
+	private void fillRec(Document document, final EntityTemplate object, String subject) {
 		/*
 		 * Read rdf type separately to create new instance.
 		 */
@@ -106,8 +113,8 @@ public class SantoRDFConverter {
 			/*
 			 * Get all values.
 			 */
-			List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFillers = extractValuesFromPredicates(subject,
-					slot, props.getKey(), props.getValue());
+			List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFillers = extractValuesFromPredicates(
+					document, subject, slot, props.getKey(), props.getValue());
 
 			if (slotFillers.size() == 0)
 				continue;
@@ -126,8 +133,8 @@ public class SantoRDFConverter {
 		}
 	}
 
-	private List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> extractValuesFromPredicates(String subject,
-			SlotType slotType, String slotName, Set<String> slotFiller) {
+	private List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> extractValuesFromPredicates(Document document,
+			String subject, SlotType slotType, String slotName, Set<String> slotFiller) {
 
 		List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> predicateValues = new ArrayList<>();
 
@@ -140,46 +147,63 @@ public class SantoRDFConverter {
 			}
 			final Triple linkedID = new Triple(subject, slotName, object);
 			if (nameSpace == null) {
-				final LiteralAnnotation literalAnnotation = toLiteralAnnotation(slotType, linkedID);
-				predicateValues.add(literalAnnotation);
+				LiteralAnnotation literalAnnotation;
+				try {
+					literalAnnotation = toLiteralAnnotation(document, slotType, linkedID);
+					predicateValues.add(literalAnnotation);
+				} catch (DocumentLinkedAnnotationMismatchException e) {
+					e.printStackTrace();
+				}
 			} else if (nameSpace.equals(ontologyNameSpace)) {
-				final EntityTypeAnnotation entityTypeAnnotation = toEntityTypeAnnotation(linkedID);
-				predicateValues.add(entityTypeAnnotation);
+				try {
+					final EntityTypeAnnotation entityTypeAnnotation = toEntityTypeAnnotation(document, linkedID);
+					predicateValues.add(entityTypeAnnotation);
+				} catch (DocumentLinkedAnnotationMismatchException e) {
+					e.printStackTrace();
+				}
 			} else if (nameSpace.equals(dataNameSpace)) {
-				final EntityTemplate entityTemplateAnnotation = toEntityTemplate(slotName, linkedID);
-				fillRec(entityTemplateAnnotation, linkedID.object);
-				predicateValues.add(entityTemplateAnnotation);
+				try {
+					final EntityTemplate entityTemplateAnnotation = toEntityTemplate(document, slotName, linkedID);
+					fillRec(document, entityTemplateAnnotation, linkedID.object);
+					predicateValues.add(entityTemplateAnnotation);
+				} catch (DocumentLinkedAnnotationMismatchException e) {
+					e.printStackTrace();
+				}
 			}
 
 		}
 		return predicateValues;
 	}
 
-	private EntityTemplate toEntityTemplate(String slotName, Triple linkedID) {
+	private EntityTemplate toEntityTemplate(Document document, String slotName, Triple linkedID)
+			throws DocumentLinkedAnnotationMismatchException {
 
 		final String objectType = rdfData.get(linkedID.object).get(RDF_TYPE_NAMESPACE).iterator().next();
 
 		if (annotations.containsKey(linkedID)) {
-			return new EntityTemplate(AbstractSlotFiller.toSlotFiller(SantoHelper.getResource(objectType),
-					annotations.get(linkedID).textMention, annotations.get(linkedID).onset));
+			return new EntityTemplate(
+					AnnotationCreationHelper.toAnnotation(document, SantoHelper.getResource(objectType),
+							annotations.get(linkedID).textMention, annotations.get(linkedID).onset));
 		} else {
-			return new EntityTemplate(AbstractSlotFiller.toSlotFiller(SantoHelper.getResource(objectType)));
+			return new EntityTemplate(AnnotationCreationHelper.toSlotFiller(SantoHelper.getResource(objectType)));
 		}
 
 	}
 
-	private EntityTypeAnnotation toEntityTypeAnnotation(final Triple linkedID) {
+	private EntityTypeAnnotation toEntityTypeAnnotation(Document document, final Triple linkedID)
+			throws DocumentLinkedAnnotationMismatchException {
 
 		final String entityTypeName = SantoHelper.getResource(linkedID.object);
 		if (annotations.containsKey(linkedID)) {
-			return AbstractSlotFiller.toSlotFiller(entityTypeName, annotations.get(linkedID).textMention,
-					annotations.get(linkedID).onset);
+			return AnnotationCreationHelper.toAnnotation(document, entityTypeName,
+					annotations.get(linkedID).textMention, annotations.get(linkedID).onset);
 		} else {
-			return AbstractSlotFiller.toSlotFiller(entityTypeName);
+			return AnnotationCreationHelper.toSlotFiller(entityTypeName);
 		}
 	}
 
-	private LiteralAnnotation toLiteralAnnotation(SlotType slot, final Triple linkedID) {
+	private LiteralAnnotation toLiteralAnnotation(Document document, SlotType slot, final Triple linkedID)
+			throws DocumentLinkedAnnotationMismatchException {
 
 		/**
 		 * If the property was of datatype, we have to assume the entity type by taking
@@ -189,17 +213,19 @@ public class SantoRDFConverter {
 		final String entityTypeName = slot.getSlotFillerEntityTypes().iterator().next().entityTypeName;
 
 		if (annotations.containsKey(linkedID)) {
-			return AbstractSlotFiller.toSlotFiller(entityTypeName, linkedID.object, annotations.get(linkedID).onset);
+			return AnnotationCreationHelper.toAnnotation(document, entityTypeName, linkedID.object,
+					annotations.get(linkedID).onset);
 		} else {
-			return AbstractSlotFiller.toSlotFiller(entityTypeName, linkedID.object);
+			return AnnotationCreationHelper.toSlotFiller(entityTypeName, linkedID.object);
 		}
 	}
 
-	private EntityTypeAnnotation toEntityTypeAnnotation(String resource, RDFRelatedAnnotation annotation) {
+	private EntityTypeAnnotation toEntityTypeAnnotation(Document document, String resource,
+			RDFRelatedAnnotation annotation) throws DocumentLinkedAnnotationMismatchException {
 		if (annotation == null) {
-			return AbstractSlotFiller.toSlotFiller(resource);
+			return AnnotationCreationHelper.toSlotFiller(resource);
 		} else {
-			return AbstractSlotFiller.toSlotFiller(resource, annotation.textMention, annotation.onset);
+			return AnnotationCreationHelper.toAnnotation(document, resource, annotation.textMention, annotation.onset);
 		}
 	}
 

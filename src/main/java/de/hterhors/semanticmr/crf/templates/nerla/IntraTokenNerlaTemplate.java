@@ -1,21 +1,15 @@
-package de.hterhors.semanticmr.crf.templates;
+package de.hterhors.semanticmr.crf.templates.nerla;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
-import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
-import de.hterhors.semanticmr.crf.structure.slots.SlotType;
-import de.hterhors.semanticmr.crf.templates.IntraTokenTemplate.IntraTokenScope;
+import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
+import de.hterhors.semanticmr.crf.templates.nerla.IntraTokenNerlaTemplate.IntraTokenNerlaScope;
+import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
 
@@ -24,7 +18,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  *
  * @date Nov 15, 2017
  */
-public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope> {
+public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenNerlaScope> {
 
 	/**
 	 * 
@@ -42,17 +36,12 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 
 	private static final String RIGHT = ">";
 
-	public static final Set<String> STOP_WORDS = new HashSet<>(
-			Arrays.asList("a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it",
-					"no", "not", "of", "on", "or", "such", "that", "the", "their", "then", "there", "these", "they",
-					"this", "to", "was", "will", "with", "his", "her", "from", "who", "whom"));
-
-	class IntraTokenScope extends AbstractFactorScope<IntraTokenScope> {
+	class IntraTokenNerlaScope extends AbstractFactorScope<IntraTokenNerlaScope> {
 
 		public EntityType entityType;
 		public final String surfaceForm;
 
-		public IntraTokenScope(AbstractFeatureTemplate<IntraTokenScope> template, EntityType entityType,
+		public IntraTokenNerlaScope(AbstractFeatureTemplate<IntraTokenNerlaScope> template, EntityType entityType,
 				String surfaceForm) {
 			super(template);
 			this.entityType = entityType;
@@ -77,7 +66,7 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			IntraTokenScope other = (IntraTokenScope) obj;
+			IntraTokenNerlaScope other = (IntraTokenNerlaScope) obj;
 			if (!getOuterType().equals(other.getOuterType()))
 				return false;
 			if (entityType == null) {
@@ -103,38 +92,26 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 			return equals(obj);
 		}
 
-		private IntraTokenTemplate getOuterType() {
-			return IntraTokenTemplate.this;
+		private IntraTokenNerlaTemplate getOuterType() {
+			return IntraTokenNerlaTemplate.this;
 		}
 
 	}
 
 	@Override
-	public List<IntraTokenScope> generateFactorScopes(State state) {
-		List<IntraTokenScope> factors = new ArrayList<>();
+	public List<IntraTokenNerlaScope> generateFactorScopes(State state) {
+		List<IntraTokenNerlaScope> factors = new ArrayList<>();
 
-		for (EntityTemplate annotation : state.getCurrentPredictions().<EntityTemplate>getAnnotations()) {
+		for (LiteralAnnotation annotation : state.getCurrentPredictions().<LiteralAnnotation>getAnnotations()) {
 
-			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
-					.nonEmpty().literalAnnoation().build();
+			factors.add(new IntraTokenNerlaScope(this, annotation.getEntityType(), annotation.getSurfaceForm()));
 
-			for (Entry<SlotType, Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> slot : filter
-					.getMergedAnnotations().entrySet()) {
-
-				for (AbstractSlotFiller<?> slotFiller : slot.getValue()) {
-
-					final LiteralAnnotation docLinkedAnnotation = slotFiller.asInstanceOfLiteralAnnotation();
-
-					factors.add(new IntraTokenScope(this, docLinkedAnnotation.getEntityType(),
-							docLinkedAnnotation.getSurfaceForm()));
-				}
-			}
 		}
 		return factors;
 	}
 
 	@Override
-	public void generateFeatureVector(Factor<IntraTokenScope> factor) {
+	public void generateFeatureVector(Factor<IntraTokenNerlaScope> factor) {
 
 		getTokenNgrams(factor.getFeatureVector(), factor.getFactorScope().entityType.entityTypeName,
 				factor.getFactorScope().surfaceForm);
@@ -172,7 +149,7 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 					if (tokens[t].isEmpty())
 						continue;
 
-					if (STOP_WORDS.contains(tokens[t].toLowerCase()))
+					if (Document.getStopWords().contains(tokens[t].toLowerCase()))
 						continue;
 
 					fBuffer.append(tokens[t]).append(TOKEN_SPLITTER_SPACE);

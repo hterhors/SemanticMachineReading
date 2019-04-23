@@ -18,7 +18,7 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 import de.hterhors.semanticmr.json.structure.wrapper.JsonAnnotationsWrapper;
 import de.hterhors.semanticmr.json.structure.wrapper.JsonDocumentLinkedAnnotationWrapper;
 import de.hterhors.semanticmr.json.structure.wrapper.JsonDocumentPositionWrapper;
@@ -47,8 +47,9 @@ public class JsonInstanceWrapperToInstance {
 	}
 
 	private Instance toInstance(JsonInstanceWrapper instanceWrapper) {
-		return new Instance(instanceWrapper.getContext(), toDocument(instanceWrapper.getDocument()),
-				toAnnotations(instanceWrapper.getGoldAnnotations()));
+		Document document = toDocument(instanceWrapper.getDocument());
+		return new Instance(instanceWrapper.getContext(), document,
+				toAnnotations(document, instanceWrapper.getGoldAnnotations()));
 	}
 
 	private Document toDocument(JsonDocumentWrapper document) {
@@ -61,14 +62,14 @@ public class JsonInstanceWrapperToInstance {
 				.collect(Collectors.toList());
 	}
 
-	private Annotations toAnnotations(JsonAnnotationsWrapper goldAnnotationsWrapper) {
+	private Annotations toAnnotations(Document document, JsonAnnotationsWrapper goldAnnotationsWrapper) {
 
-		return new Annotations(collectAnnotations(goldAnnotationsWrapper.getDocLinkedAnnotations(),
+		return new Annotations(collectAnnotations(document, goldAnnotationsWrapper.getDocLinkedAnnotations(),
 				goldAnnotationsWrapper.getLiteralAnnotations(), goldAnnotationsWrapper.getEntityTypeAnnotations(),
 				goldAnnotationsWrapper.getEntityTemplateAnnotations()));
 	}
 
-	private List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> collectAnnotations(
+	private List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> collectAnnotations(Document document,
 			List<JsonDocumentLinkedAnnotationWrapper> docLinkedAnnotations,
 			List<JsonLiteralAnnotationWrapper> literalAnnotations, List<JsonEntityTypeWrapper> entityTypeAnnotations,
 			List<JsonEntityTemplateWrapper> entityTemplateAnnotations) {
@@ -77,7 +78,11 @@ public class JsonInstanceWrapperToInstance {
 
 		if (docLinkedAnnotations != null)
 			for (JsonDocumentLinkedAnnotationWrapper wrapper : docLinkedAnnotations) {
-				annotations.add(toDocumentLinkedAnnotation(wrapper));
+				try {
+					annotations.add(toDocumentLinkedAnnotation(document, wrapper));
+				} catch (Exception e) {
+					System.out.println("Can not map annotation to document: " + e.getMessage());
+				}
 			}
 		if (literalAnnotations != null)
 			for (JsonLiteralAnnotationWrapper wrapper : literalAnnotations) {
@@ -89,7 +94,7 @@ public class JsonInstanceWrapperToInstance {
 			}
 		if (entityTemplateAnnotations != null)
 			for (JsonEntityTemplateWrapper wrapper : entityTemplateAnnotations) {
-				annotations.add(toEntityTemplate(wrapper));
+				annotations.add(toEntityTemplate(document, wrapper));
 			}
 		return annotations;
 	}
@@ -99,8 +104,9 @@ public class JsonInstanceWrapperToInstance {
 				toTextualContent(wrapper.getTextualContent()));
 	}
 
-	private DocumentLinkedAnnotation toDocumentLinkedAnnotation(JsonDocumentLinkedAnnotationWrapper wrapper) {
-		return new DocumentLinkedAnnotation(toEntityType(wrapper.getEntityType()),
+	private DocumentLinkedAnnotation toDocumentLinkedAnnotation(Document document,
+			JsonDocumentLinkedAnnotationWrapper wrapper) throws DocumentLinkedAnnotationMismatchException {
+		return new DocumentLinkedAnnotation(document, toEntityType(wrapper.getEntityType()),
 				toTextualContent(wrapper.getTextualContent()), toDocumentPosition(wrapper.getDocumentPosition()));
 	}
 
@@ -120,20 +126,20 @@ public class JsonInstanceWrapperToInstance {
 		return EntityTypeAnnotation.get(EntityType.get(wrapper.getEntityTypeName()));
 	}
 
-	private EntityTemplate toEntityTemplate(JsonEntityTemplateWrapper wrapper) {
+	private EntityTemplate toEntityTemplate(Document document, JsonEntityTemplateWrapper wrapper) {
 
-		EntityTemplate entityTemplate = new EntityTemplate(toRootAnnotation(wrapper.getRootAnnotation()));
+		EntityTemplate entityTemplate = new EntityTemplate(toRootAnnotation(document, wrapper.getRootAnnotation()));
 
 		for (Entry<JsonSlotTypeWrapper, JsonSingleFillerSlotWrapper> singleSlotWrapper : wrapper.getSingleFillerSlots()
 				.entrySet()) {
 			entityTemplate.setSingleSlotFiller(toSlotType(singleSlotWrapper.getKey()),
-					toSlotFiller(singleSlotWrapper.getValue()));
+					toSlotFiller(document, singleSlotWrapper.getValue()));
 		}
 
 		for (Entry<JsonSlotTypeWrapper, JsonMultiFillerSlotWrapper> multiSlotWrapper : wrapper.getMultiFillerSlots()
 				.entrySet()) {
 
-			List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations = collectAnnotations(
+			List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations = collectAnnotations(document,
 					multiSlotWrapper.getValue().getDocLinkedAnnotations(),
 					multiSlotWrapper.getValue().getLiteralAnnotations(),
 					multiSlotWrapper.getValue().getEntityTypeAnnotations(),
@@ -148,9 +154,13 @@ public class JsonInstanceWrapperToInstance {
 		return entityTemplate;
 	}
 
-	private EntityTypeAnnotation toRootAnnotation(JsonRootAnnotationWrapper wrapper) {
+	private EntityTypeAnnotation toRootAnnotation(Document document, JsonRootAnnotationWrapper wrapper) {
 		if (wrapper.getDocLinkedAnnotation() != null) {
-			return toDocumentLinkedAnnotation(wrapper.getDocLinkedAnnotation());
+			try {
+				return toDocumentLinkedAnnotation(document, wrapper.getDocLinkedAnnotation());
+			} catch (Exception e) {
+				System.out.println("Can not map annotation to document: " + e.getMessage());
+			}
 		} else if (wrapper.getEntityTypeAnnotation() != null) {
 			return toEntityTypeAnnotation(wrapper.getEntityTypeAnnotation());
 		} else if (wrapper.getLiteralAnnotation() != null) {
@@ -159,11 +169,16 @@ public class JsonInstanceWrapperToInstance {
 		throw new IllegalStateException("Root annotation has no value.");
 	}
 
-	private AbstractSlotFiller<? extends AbstractSlotFiller<?>> toSlotFiller(JsonSingleFillerSlotWrapper wrapper) {
+	private AbstractSlotFiller<? extends AbstractSlotFiller<?>> toSlotFiller(Document document,
+			JsonSingleFillerSlotWrapper wrapper) {
 		if (wrapper.getDocLinkedAnnotation() != null) {
-			return toDocumentLinkedAnnotation(wrapper.getDocLinkedAnnotation());
+			try {
+				return toDocumentLinkedAnnotation(document, wrapper.getDocLinkedAnnotation());
+			} catch (Exception e) {
+				System.out.println("Can not map annotation to document: " + e.getMessage());
+			}
 		} else if (wrapper.getEntityTemplateAnnotation() != null) {
-			return toEntityTemplate(wrapper.getEntityTemplateAnnotation());
+			return toEntityTemplate(document, wrapper.getEntityTemplateAnnotation());
 		} else if (wrapper.getEntityTypeAnnotation() != null) {
 			return toEntityTypeAnnotation(wrapper.getEntityTypeAnnotation());
 		} else if (wrapper.getLiteralAnnotation() != null) {
