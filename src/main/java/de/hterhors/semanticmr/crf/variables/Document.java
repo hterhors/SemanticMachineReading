@@ -23,7 +23,7 @@ import de.hterhors.semanticmr.exce.DuplicateDocumentException;
  */
 public class Document {
 
-	final static public char TOKEN_SPLITTER = ' ';
+	final static public String TOKEN_SPLITTER = " ";
 
 	final static private Map<String, Document> documents = new HashMap<>();
 
@@ -152,7 +152,7 @@ public class Document {
 		final DocumentToken token = startOffsetCharPositionTokens.getOrDefault(offset,
 				endOffsetCharPositionTokens.get(offset));
 		if (token == null)
-			throw new IllegalArgumentException(
+			throw new DocumentLinkedAnnotationMismatchException(
 					"Can not map charachter offset: " + offset + " to token in document: " + documentID);
 		return token;
 	}

@@ -24,13 +24,11 @@ public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenN
 	 * 
 	 */
 
-	private static final String TOKEN_SPLITTER_SPACE = " ";
-
 	private static final String END_SIGN = "$";
 
 	private static final String START_SIGN = "^";
 
-	private static final int MIN_TOKEN_LENGTH = 2;
+	private static final int MIN_TOKEN_CHAR_LENGTH = 2;
 
 	private static final String LEFT = "<";
 
@@ -120,13 +118,13 @@ public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenN
 
 	private void getTokenNgrams(DoubleVector featureVector, String name, String surfaceForm) {
 
-		final String cM = START_SIGN + TOKEN_SPLITTER_SPACE + surfaceForm + TOKEN_SPLITTER_SPACE + END_SIGN;
+		final String cM = START_SIGN + Document.TOKEN_SPLITTER + surfaceForm + Document.TOKEN_SPLITTER + END_SIGN;
 
-		final String[] tokens = cM.split(TOKEN_SPLITTER_SPACE);
+		final String[] tokens = cM.split(Document.TOKEN_SPLITTER);
 
 		final int maxNgramSize = tokens.length;
 
-		featureVector.set(LEFT + name + RIGHT + TOKEN_SPLITTER_SPACE + cM, true);
+		featureVector.set(LEFT + name + RIGHT + Document.TOKEN_SPLITTER + cM, true);
 
 		for (int ngram = 1; ngram < maxNgramSize; ngram++) {
 			for (int i = 0; i < maxNgramSize - 1; i++) {
@@ -152,19 +150,19 @@ public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenN
 					if (Document.getStopWords().contains(tokens[t].toLowerCase()))
 						continue;
 
-					fBuffer.append(tokens[t]).append(TOKEN_SPLITTER_SPACE);
+					fBuffer.append(tokens[t]).append(Document.TOKEN_SPLITTER);
 
 				}
 
 				final String featureName = fBuffer.toString().trim();
 
-				if (featureName.length() < MIN_TOKEN_LENGTH)
+				if (featureName.length() < MIN_TOKEN_CHAR_LENGTH)
 					continue;
 
 				if (featureName.isEmpty())
 					continue;
 
-				featureVector.set(LEFT + name + RIGHT + TOKEN_SPLITTER_SPACE + featureName, true);
+				featureVector.set(LEFT + name + RIGHT + Document.TOKEN_SPLITTER + featureName, true);
 
 			}
 		}

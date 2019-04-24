@@ -76,8 +76,6 @@ public class SemanticMRMain {
 		featureTemplates.add(new TokenContextTemplate());
 		featureTemplates.add(new InBetweenContextTemplate());
 
-		Model model = new Model(featureTemplates, learner);
-
 		IStateInitializer stateInitializer = ((instance) -> new State(instance,
 				new Annotations(new EntityTemplate(AnnotationCreationHelper
 						.toSlotFiller(instance.getGoldAnnotations().getAnnotations().get(0).getEntityType())))));
@@ -95,9 +93,23 @@ public class SemanticMRMain {
 
 		EntityTemplateExplorer explorer = new EntityTemplateExplorer(candidateProvider, constraintsProvider);
 
+		final File modelDir = new File("models/slotfill/test1/");
+		final String modelName = "Model1";
+
+		Model model;
+		try {
+			model = Model.load(modelDir, modelName);
+		} catch (Exception e) {
+			model = new Model(featureTemplates);
+		}
+
 		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
 
-		crf.train(instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit, noModelChangeCrit);
+		if (!model.wasLoaded()) {
+			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,
+					noModelChangeCrit);
+			model.save(modelDir, modelName, true);
+		}
 
 		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
 				noModelChangeCrit);

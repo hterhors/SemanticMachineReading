@@ -1,14 +1,29 @@
 package de.hterhors.semanticmr.crf.factor;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.hterhors.semanticmr.crf.factor.Model.SerializableModelWrapper.GenericTemplate;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
+import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
+import de.hterhors.semanticmr.exce.ModelLoadException;
 
 public class Model {
 
@@ -19,10 +34,15 @@ public class Model {
 	 */
 	private final static Map<String, Integer> featureNameIndex = new ConcurrentHashMap<>();
 
+	private boolean wasLoaded = false;
 	/**
 	 * Converts an index to its feature name.
 	 */
 	private final static Map<Integer, String> indexFeatureName = new ConcurrentHashMap<>();
+
+	private static final String DEFAULT_READABLE_DIR = "/readable/";
+
+	private static final String MODEL_SUFFIX = ".crf";
 
 	public static Integer getIndexForFeatureName(String feature) {
 		Integer index;
@@ -44,11 +64,8 @@ public class Model {
 
 	final private List<AbstractFeatureTemplate<?>> factorTemplates;
 
-	final private AdvancedLearner learner;
-
-	public Model(List<AbstractFeatureTemplate<?>> factorTemplates, AdvancedLearner learner) {
+	public Model(List<AbstractFeatureTemplate<?>> factorTemplates) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
-		this.learner = learner;
 	}
 
 	public void score(State state) {
@@ -151,8 +168,8 @@ public class Model {
 
 	}
 
-	public void updateWeights(final State currentState, final State candidateState) {
-		this.learner.updateWeights(this.factorTemplates, currentState, candidateState);
+	public void updateWeights(final AdvancedLearner learner, final State currentState, final State candidateState) {
+		learner.updateWeights(this.factorTemplates, currentState, candidateState);
 	}
 
 	@Override
@@ -160,6 +177,153 @@ public class Model {
 		factorTemplates.get(0).getWeights().getFeatures().entrySet()
 				.forEach(f -> System.out.println(indexFeatureName.get(f.getKey()) + ":" + f.getValue()));
 		return "";
+	}
+
+	public void print(File modelDir, String modelName) throws IOException {
+		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
+			File parentDir = new File(modelDir, modelName + "/" + DEFAULT_READABLE_DIR);
+			parentDir.mkdirs();
+
+			PrintStream ps = new PrintStream(new File(parentDir, template.getClass().getSimpleName()));
+
+			List<Entry<Integer, Double>> sortedWeights = new ArrayList<>(
+					template.getWeights().getFeatures().entrySet());
+			Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
+			for (Entry<Integer, Double> feature : sortedWeights) {
+				ps.println(indexFeatureName.get(feature.getKey()) + "\t" + feature.getValue());
+			}
+			ps.close();
+
+		}
+
+	}
+
+	public void save(final File modelDir, final String modelName, boolean printAsReadable) throws IOException {
+
+		if (!modelDir.exists())
+			modelDir.mkdirs();
+
+		if (!modelDir.isDirectory())
+			throw new IllegalArgumentException("Model directory s not a directory: " + modelDir);
+
+		final File modelFile;
+
+		if ((modelFile = new File(modelDir, modelName + MODEL_SUFFIX)).exists())
+			System.out.println("Warn: model already exists override model!");
+
+		if (printAsReadable)
+			print(modelDir, modelName);
+		// Serialization
+		try {
+			// Saving of object in a file
+			FileOutputStream file = new FileOutputStream(modelFile);
+			ObjectOutputStream out = new ObjectOutputStream(file);
+
+			// Method for serialization of object
+			out.writeObject(new SerializableModelWrapper(this.factorTemplates));
+
+			out.close();
+			file.close();
+
+			System.out.println("Object has been serialized");
+
+		}
+
+		catch (IOException ex) {
+			ex.printStackTrace();
+
+		}
+
+	}
+
+	public static Model load(final File modelDir, final String modelName) throws IOException, ClassNotFoundException {
+
+		SerializableModelWrapper modelWrapper = null;
+
+		FileInputStream file = new FileInputStream(new File(modelDir, modelName + MODEL_SUFFIX));
+		ObjectInputStream in = new ObjectInputStream(file);
+
+		modelWrapper = (SerializableModelWrapper) in.readObject();
+
+		in.close();
+		file.close();
+		System.out.println("Object has been deserialized ");
+		return toModel(modelWrapper);
+
+	}
+
+	private static Model toModel(SerializableModelWrapper modelWrapper) {
+		Model model = new Model(
+				modelWrapper.templates.stream().map(t -> toAbstractFeaturetemplate(t)).collect(Collectors.toList()));
+		model.wasLoaded = true;
+		return model;
+	}
+
+	private static AbstractFeatureTemplate<?> toAbstractFeaturetemplate(final GenericTemplate t) {
+		try {
+			final AbstractFeatureTemplate<?> template = (AbstractFeatureTemplate<?>) Class
+					.forName(t.packageName + "." + t.templateName).newInstance();
+
+			final DoubleVector v = new DoubleVector();
+
+			for (Entry<String, Double> fw : t.features.entrySet()) {
+				v.set(fw.getKey(), fw.getValue());
+			}
+
+			template.setWeights(v);
+
+			return template;
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			e.printStackTrace();
+			throw new ModelLoadException(e.getMessage());
+		}
+	}
+
+	static public class SerializableModelWrapper implements Serializable {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		final List<GenericTemplate> templates;
+
+		public SerializableModelWrapper(List<AbstractFeatureTemplate<?>> templates) {
+			this.templates = templates.stream().map(t -> convert(t)).collect(Collectors.toList());
+		}
+
+		private GenericTemplate convert(AbstractFeatureTemplate<?> t) {
+			final Map<String, Double> features = new HashMap<>();
+			for (Entry<Integer, Double> e : t.getWeights().getFeatures().entrySet()) {
+				features.put(indexFeatureName.get(e.getKey()), e.getValue());
+			}
+			return new GenericTemplate(features, t.getClass().getPackage().getName(), t.getClass().getSimpleName());
+
+		}
+
+		static public class GenericTemplate implements Serializable {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			final private Map<String, Double> features;
+			final private String packageName;
+			final private String templateName;
+
+			public GenericTemplate(Map<String, Double> features, String packageName, String templateName) {
+				this.features = features;
+				this.packageName = packageName;
+				this.templateName = templateName;
+			}
+
+		}
+
+	}
+
+	public boolean wasLoaded() {
+		return wasLoaded;
 	}
 
 }

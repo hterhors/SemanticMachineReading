@@ -8,6 +8,7 @@ import java.util.Map;
 
 import de.hterhors.semanticmr.crf.exploration.IExplorationStrategy;
 import de.hterhors.semanticmr.crf.factor.Model;
+import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
@@ -71,8 +72,8 @@ public class CRF {
 		this.testStatistics = new CRFStatistics("Test");
 	}
 
-	public Map<Instance, State> train(List<Instance> trainingInstances, final int numberOfEpochs,
-			IStoppingCriterion... stoppingCriterion) {
+	public Map<Instance, State> train(final AdvancedLearner learner, final List<Instance> trainingInstances,
+			final int numberOfEpochs, final IStoppingCriterion... stoppingCriterion) {
 		this.trainingStatistics.startTrainingTime = System.currentTimeMillis();
 
 		final Map<Instance, State> finalStates = new LinkedHashMap<>();
@@ -106,15 +107,30 @@ public class CRF {
 					if (proposalStates.isEmpty())
 						proposalStates.add(currentState);
 
-					scoreProposalStates(sampleBasedOnObjectiveFunction, proposalStates);
+					if (sampleBasedOnObjectiveFunction) {
+						objectiveFunction.score(proposalStates);
+//						System.out.println("#############################################");
+//						for (State state : proposalStates) {
+//							System.out.println(state.getObjectiveScore() + ":"
+//									+ state.getCurrentPredictions().getAnnotations().get(0).toPrettyString());
+//						}
+//						System.out.println("#############################################");
+					} else {
+						model.score(proposalStates);
+					}
 
-					final State candidateState = selectCandidateState(proposalStates);
+					final State candidateState = sampler.sampleCandidate(proposalStates);
 
 //					System.out.println(candidateState.getCurrentPredictions().getAnnotations().get(0).toPrettyString());
 //					System.out.println();
 					scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
 
-					currentState = selectNextState(epoch, currentState, candidateState);
+					boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState, currentState);
+
+					if (isAccepted) {
+						model.updateWeights(learner, currentState, candidateState);
+						currentState = candidateState;
+					}
 
 					producedStateChain.add(currentState);
 
@@ -140,21 +156,6 @@ public class CRF {
 		return false;
 	}
 
-	private State selectCandidateState(final List<State> proposalStates) {
-		return sampler.sampleCandidate(proposalStates);
-	}
-
-	private State selectNextState(int epoch, State currentState, State candidateState) {
-		boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState, currentState);
-
-		if (isAccepted) {
-			model.updateWeights(currentState, candidateState);
-			currentState = candidateState;
-		}
-
-		return currentState;
-	}
-
 	private void scoreSelectedStates(final boolean sampleBasedOnObjectiveFunction, State currentState,
 			State candidateState) {
 		if (sampleBasedOnObjectiveFunction) {
@@ -162,20 +163,6 @@ public class CRF {
 		} else {
 			objectiveFunction.score(candidateState);
 			objectiveFunction.score(currentState);
-		}
-	}
-
-	private void scoreProposalStates(final boolean sampleBasedOnObjectiveFunction, final List<State> proposalStates) {
-		if (sampleBasedOnObjectiveFunction) {
-			objectiveFunction.score(proposalStates);
-//			System.out.println("#############################################");
-//			for (State state : proposalStates) {
-//				System.out.println(state.getObjectiveScore() + ":"
-//						+ state.getCurrentPredictions().getAnnotations().get(0).toPrettyString());
-//			}
-//			System.out.println("#############################################");
-		} else {
-			model.score(proposalStates);
 		}
 	}
 

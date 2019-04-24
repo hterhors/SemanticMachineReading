@@ -47,6 +47,9 @@ public class JsonNerlaProvider implements INerlaProvider {
 		System.out.println("#######################LOAD NERLA#######################");
 		System.out.print("Read nerla");
 		int count = 0;
+
+		List<String> exceptions = new ArrayList<>();
+
 		for (JsonEntityAnnotationWrapper jsonEntityAnnotationWrapper : jsonNerla) {
 			count++;
 			if (count % 500 == 0)
@@ -57,24 +60,29 @@ public class JsonNerlaProvider implements INerlaProvider {
 			Instance instance = map.get(jsonEntityAnnotationWrapper.getDocumentID());
 
 			nerla.putIfAbsent(instance, new ArrayList<>());
+
 			try {
 				nerla.get(instance).add(toEntityTypeAnnotation(instance.getDocument(), jsonEntityAnnotationWrapper));
 			} catch (DocumentLinkedAnnotationMismatchException e) {
-				e.printStackTrace();
+				exceptions.add(e.getMessage());
 			}
 		}
 		System.out.println("... done");
-		System.out.println("Total number of nerla loaded: " + count);
+		if (!exceptions.isEmpty()) {
+			System.out.println("WARN: Could not load all annotations. " + exceptions.size()
+					+ " exceptions were thrown during loading: ");
+			exceptions.stream().limit(10).forEach(System.out::println);
+			System.out.println("...");
+		}
+		System.out.println("Total number of nerla loaded: " + (count - exceptions.size()) + " / " + count);
 		System.out.println("########################################################");
 		return nerla;
 	}
 
 	private EntityTypeAnnotation toEntityTypeAnnotation(Document document, JsonEntityAnnotationWrapper s)
 			throws DocumentLinkedAnnotationMismatchException {
-
 		return new DocumentLinkedAnnotation(document, EntityType.get(s.getEntityType()),
 				new TextualContent(s.getSurfaceForm()), new DocumentPosition(s.getOffset()));
-
 	}
 
 	private void validateFiles() {

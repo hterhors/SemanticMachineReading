@@ -73,11 +73,9 @@ public class NamedEntityRecognitionAndLinkingExample {
 
 		featureTemplates.add(new IntraTokenNerlaTemplate());
 
-		Model model = new Model(featureTemplates, learner);
-
 		IStateInitializer stateInitializer = ((instance) -> new State(instance, new Annotations()));
 
-		int numberOfEpochs = 10;
+		int numberOfEpochs = 1;
 
 //		AbstractSampler sampler = SamplerCollection.greedyModelStrategy();
 //		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
@@ -90,9 +88,24 @@ public class NamedEntityRecognitionAndLinkingExample {
 
 		EntityRecLinkExplorer explorer = new EntityRecLinkExplorer(candidateProvider);
 
+		final File modelDir = new File("models/nerla/test1/");
+		final String modelName = "ModelName3";
+
+		Model model;
+		try {
+			model = Model.load(modelDir, modelName);
+		} catch (Exception e) {
+			model = new Model(featureTemplates);
+		}
+
 		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
 
-		crf.train(instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit, noModelChangeCrit);
+		if (!model.wasLoaded()) {
+			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,
+					noModelChangeCrit);
+		}
+
+		model.save(modelDir, modelName, true);
 
 		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
 				noModelChangeCrit);

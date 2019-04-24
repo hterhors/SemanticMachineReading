@@ -1,6 +1,7 @@
 package de.hterhors.semanticmr.crf.templates;
 
 import java.util.List;
+import java.util.Map;
 
 import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.factor.Factor;
@@ -47,5 +48,9 @@ public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S>> 
 	 * @param factor
 	 */
 	public abstract void generateFeatureVector(Factor<S> factor);
+
+	public void setWeights(DoubleVector weights) {
+		this.weights = weights;
+	}
 
 }

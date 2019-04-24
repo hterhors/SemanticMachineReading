@@ -19,10 +19,6 @@ import de.hterhors.semanticmr.crf.factor.Model;
  *
  */
 public class DoubleVector {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
 	private static final Double DEFAULT_VALUE_ZERO = new Double(0.0);
 	private static final Double DEFAULT_VALUE_ONE = new Double(1.0);
