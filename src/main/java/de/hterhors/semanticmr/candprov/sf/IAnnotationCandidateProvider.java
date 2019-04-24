@@ -8,15 +8,15 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
-import de.hterhors.semanticmr.crf.variables.Instance;
 
-public interface IAnnotationCandidateProvider<T extends AbstractSlotFiller<T>> {
+public interface IAnnotationCandidateProvider {
 
-	public List<? extends AbstractSlotFiller<T>> getSlotFillerCandidates(SlotType slot);
+	public List<? extends AbstractSlotFiller<?extends AbstractSlotFiller<?>>> getSlotFillerCandidates(SlotType slot);
 
-	public IAnnotationCandidateProvider<T> addSlotFiller(T slotFiller);
+	public IAnnotationCandidateProvider addSlotFiller(AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller);
 
-	public IAnnotationCandidateProvider<T> addBatchSlotFiller(Collection<T> slotFiller);
+	public IAnnotationCandidateProvider addBatchSlotFiller(
+			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller);
 
 	/**
 	 * TODO: UGLY PROGRAMMING HERE: Separate somehow.

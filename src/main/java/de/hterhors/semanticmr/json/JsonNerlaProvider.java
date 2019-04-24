@@ -31,7 +31,7 @@ public class JsonNerlaProvider implements INerlaProvider {
 	}
 
 	@Override
-	public Map<Instance, List<EntityTypeAnnotation>> getForInstances(List<Instance> instances) throws IOException {
+	public Map<Instance, List<DocumentLinkedAnnotation>> getForInstances(List<Instance> instances) throws IOException {
 
 		final List<JsonEntityAnnotationWrapper> jsonNerla = new JsonNerlaIO(true)
 				.readInstances(new String(Files.readAllBytes(nerlaFile.toPath())));
@@ -42,7 +42,7 @@ public class JsonNerlaProvider implements INerlaProvider {
 			map.put(instance.getDocument().documentID, instance);
 		}
 
-		final Map<Instance, List<EntityTypeAnnotation>> nerla = new HashMap<>();
+		final Map<Instance, List<DocumentLinkedAnnotation>> nerla = new HashMap<>();
 
 		System.out.println("#######################LOAD NERLA#######################");
 		System.out.print("Read nerla");
@@ -62,7 +62,8 @@ public class JsonNerlaProvider implements INerlaProvider {
 			nerla.putIfAbsent(instance, new ArrayList<>());
 
 			try {
-				nerla.get(instance).add(toEntityTypeAnnotation(instance.getDocument(), jsonEntityAnnotationWrapper));
+				nerla.get(instance)
+						.add(toDocumentLinkedAnnotation(instance.getDocument(), jsonEntityAnnotationWrapper));
 			} catch (DocumentLinkedAnnotationMismatchException e) {
 				exceptions.add(e.getMessage());
 			}
@@ -79,7 +80,7 @@ public class JsonNerlaProvider implements INerlaProvider {
 		return nerla;
 	}
 
-	private EntityTypeAnnotation toEntityTypeAnnotation(Document document, JsonEntityAnnotationWrapper s)
+	private DocumentLinkedAnnotation toDocumentLinkedAnnotation(Document document, JsonEntityAnnotationWrapper s)
 			throws DocumentLinkedAnnotationMismatchException {
 		return new DocumentLinkedAnnotation(document, EntityType.get(s.getEntityType()),
 				new TextualContent(s.getSurfaceForm()), new DocumentPosition(s.getOffset()));

@@ -10,13 +10,14 @@ import java.util.Map;
 import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
-public class GeneralCandidateProvider implements IAnnotationCandidateProvider<EntityTypeAnnotation> {
+public class GeneralCandidateProvider implements IAnnotationCandidateProvider {
 
-	private final Map<SlotType, List<EntityTypeAnnotation>> entityAnnotationCache = new HashMap<>();
+	private final Map<SlotType, List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> entityAnnotationCache = new HashMap<>();
 	private final Map<EntityType, Set<EntityTypeAnnotation>> rootAnnotationsCache = new HashMap<>();
 
 	private final Instance relatedInstance;
@@ -25,7 +26,8 @@ public class GeneralCandidateProvider implements IAnnotationCandidateProvider<En
 		this.relatedInstance = relatedInstance;
 	}
 
-	public GeneralCandidateProvider addSlotFiller(EntityTypeAnnotation slotFiller) {
+	@Override
+	public GeneralCandidateProvider addSlotFiller(AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
 		for (SlotType slotType : slotFiller.getEntityType().getSlotFillerOfSlotTypes()) {
 			entityAnnotationCache.putIfAbsent(slotType, new ArrayList<>());
 			if (slotType.matchesEntityType(slotFiller.getEntityType())) {
@@ -33,24 +35,26 @@ public class GeneralCandidateProvider implements IAnnotationCandidateProvider<En
 			}
 		}
 
-		rootAnnotationsCache.putIfAbsent(slotFiller.entityType, new HashSet<>());
-		rootAnnotationsCache.get(slotFiller.entityType).add(slotFiller);
-		for (EntityType relatedEntitytype : slotFiller.entityType.getRelatedEntityTypes()) {
+		rootAnnotationsCache.putIfAbsent(slotFiller.getEntityType(), new HashSet<>());
+		rootAnnotationsCache.get(slotFiller.getEntityType()).add((EntityTypeAnnotation) slotFiller);
+		for (EntityType relatedEntitytype : slotFiller.getEntityType().getRelatedEntityTypes()) {
 			rootAnnotationsCache.putIfAbsent(relatedEntitytype, new HashSet<>());
-			rootAnnotationsCache.get(relatedEntitytype).add(slotFiller);
+			rootAnnotationsCache.get(relatedEntitytype).add((EntityTypeAnnotation) slotFiller);
 		}
 		return this;
 	}
 
-	public GeneralCandidateProvider addBatchSlotFiller(Collection<EntityTypeAnnotation> slotFiller) {
-		for (EntityTypeAnnotation literalSlotFiller : slotFiller) {
+	@Override
+	public GeneralCandidateProvider addBatchSlotFiller(
+			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller) {
+		for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> literalSlotFiller : slotFiller) {
 			addSlotFiller(literalSlotFiller);
 		}
 		return this;
 	}
 
 	@Override
-	public List<EntityTypeAnnotation> getSlotFillerCandidates(SlotType slotType) {
+	public List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> getSlotFillerCandidates(SlotType slotType) {
 		return entityAnnotationCache.getOrDefault(slotType, Collections.emptyList());
 	}
 

@@ -32,7 +32,7 @@ import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
  *
  * @date Jan 15, 2018
  */
-public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenContextScope> {
+public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenContextScope, EntityTemplate> {
 
 	private static final String LEFT = "<";
 
@@ -69,7 +69,7 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 
 	}
 
-	class InBetweenContextScope extends AbstractFactorScope<InBetweenContextScope> {
+	class InBetweenContextScope extends AbstractFactorScope<InBetweenContextScope, EntityTemplate> {
 
 		public final Instance instance;
 		public final EntityType fromEntity;
@@ -77,8 +77,8 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 		public final EntityType toEntity;
 		public final Integer toEntityCharacterOnset;
 
-		public InBetweenContextScope(AbstractFeatureTemplate<InBetweenContextScope> template, Instance instance,
-				EntityType fromEntity, Integer fromEntityCharacterOnset, EntityType toEntity,
+		public InBetweenContextScope(AbstractFeatureTemplate<InBetweenContextScope, EntityTemplate> template,
+				Instance instance, EntityType fromEntity, Integer fromEntityCharacterOnset, EntityType toEntity,
 				Integer toEntityCharacterOnset) {
 			super(template);
 			this.instance = instance;
@@ -161,7 +161,7 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 
 		final List<InBetweenContextScope> factors = new ArrayList<>();
 
-		for (EntityTemplate annotation : state.getCurrentPredictions().<EntityTemplate>getAnnotations()) {
+		for (EntityTemplate annotation : getPredictedAnnotations(state)) {
 
 			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
 					.nonEmpty().literalAnnoation().build();

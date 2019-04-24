@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.nerl.corpus;
+package de.hterhors.semanticmr.examples.nerla.corpus;
 
 import java.io.File;
 import java.io.IOException;

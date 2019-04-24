@@ -9,7 +9,7 @@ import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class AnnotationCandidateProviderCollection {
 
-	final private Map<Instance, List<IAnnotationCandidateProvider<?>>> candidateProviderPerInstance = new HashMap<>();
+	final private Map<Instance, List<IAnnotationCandidateProvider>> candidateProviderPerInstance = new HashMap<>();
 
 	final private List<Instance> instances;
 
@@ -43,9 +43,9 @@ public class AnnotationCandidateProviderCollection {
 		return this;
 	}
 
-	public List<IAnnotationCandidateProvider<?>> getCandidateProviderForInstance(Instance relatedInstance) {
+	public List<IAnnotationCandidateProvider> getCandidateProviderForInstance(Instance relatedInstance) {
 
-		final List<IAnnotationCandidateProvider<?>> list = candidateProviderPerInstance.get(relatedInstance);
+		final List<IAnnotationCandidateProvider> list = candidateProviderPerInstance.get(relatedInstance);
 
 		if (list == null)
 			throw new IllegalArgumentException("Unkown instance: " + relatedInstance.getName());

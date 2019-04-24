@@ -54,7 +54,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 
 			final EntityTemplate entitytemplateAnnotation = (EntityTemplate) annotation;
 
-			for (IAnnotationCandidateProvider<?> slotFillerCandidateProvider : candidateProvider
+			for (IAnnotationCandidateProvider slotFillerCandidateProvider : candidateProvider
 					.getCandidateProviderForInstance(currentState.getInstance())) {
 
 				changeTemplateType(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
@@ -92,7 +92,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 	}
 
 	private void changeTemplateType(final List<State> proposalStates, State currentState,
-			IAnnotationCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			IAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 
 		for (EntityTypeAnnotation templateTypeCandidate : slotFillerCandidateProvider
@@ -128,7 +128,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 	}
 
 	private void changeMultiFiller(final List<State> proposalStates, State currentState,
-			IAnnotationCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			IAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
@@ -167,7 +167,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 	}
 
 	private void addMultiFiller(final List<State> proposalStates, State currentState,
-			IAnnotationCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			IAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
 			for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFillerCandidate : slotFillerCandidateProvider
@@ -221,7 +221,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 	}
 
 	private void changeSingleFiller(final List<State> proposalStates, State currentState,
-			IAnnotationCandidateProvider<?> slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			IAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 		for (SlotType slotType : entityTemplate.getSingleFillerSlots().keySet()) {
 			for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFillerCandidate : slotFillerCandidateProvider

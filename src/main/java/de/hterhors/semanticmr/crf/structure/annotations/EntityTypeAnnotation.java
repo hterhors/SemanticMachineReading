@@ -16,7 +16,7 @@ import de.hterhors.semanticmr.eval.EEvaluationDetail;
  * @author hterhors
  *
  */
-public class EntityTypeAnnotation extends AbstractSlotFiller<EntityTypeAnnotation> {
+public class EntityTypeAnnotation<A extends EntityTypeAnnotation<A>> extends AbstractSlotFiller<A> {
 
 	/**
 	 * Defines the entity type of this annotation.

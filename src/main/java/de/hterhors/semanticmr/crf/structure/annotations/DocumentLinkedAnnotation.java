@@ -17,7 +17,7 @@ import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
  * @author hterhors
  *
  */
-final public class DocumentLinkedAnnotation extends LiteralAnnotation {
+final public class DocumentLinkedAnnotation extends LiteralAnnotation<DocumentLinkedAnnotation> {
 
 	/**
 	 * Contains the document position of this annotation.

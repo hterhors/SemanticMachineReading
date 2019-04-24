@@ -6,7 +6,7 @@ import java.util.List;
 import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.nerla.IntraTokenNerlaTemplate.IntraTokenNerlaScope;
 import de.hterhors.semanticmr.crf.variables.Document;
@@ -18,7 +18,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  *
  * @date Nov 15, 2017
  */
-public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenNerlaScope> {
+public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenNerlaScope, DocumentLinkedAnnotation> {
 
 	/**
 	 * 
@@ -34,13 +34,13 @@ public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenN
 
 	private static final String RIGHT = ">";
 
-	class IntraTokenNerlaScope extends AbstractFactorScope<IntraTokenNerlaScope> {
+	static class IntraTokenNerlaScope extends AbstractFactorScope<IntraTokenNerlaScope, DocumentLinkedAnnotation> {
 
 		public EntityType entityType;
 		public final String surfaceForm;
 
-		public IntraTokenNerlaScope(AbstractFeatureTemplate<IntraTokenNerlaScope> template, EntityType entityType,
-				String surfaceForm) {
+		public IntraTokenNerlaScope(AbstractFeatureTemplate<IntraTokenNerlaScope, DocumentLinkedAnnotation> template,
+				EntityType entityType, String surfaceForm) {
 			super(template);
 			this.entityType = entityType;
 			this.surfaceForm = surfaceForm;
@@ -50,7 +50,6 @@ public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenN
 		public int hashCode() {
 			final int prime = 31;
 			int result = super.hashCode();
-			result = prime * result + getOuterType().hashCode();
 			result = prime * result + ((entityType == null) ? 0 : entityType.hashCode());
 			result = prime * result + ((surfaceForm == null) ? 0 : surfaceForm.hashCode());
 			return result;
@@ -65,8 +64,6 @@ public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenN
 			if (getClass() != obj.getClass())
 				return false;
 			IntraTokenNerlaScope other = (IntraTokenNerlaScope) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
 			if (entityType == null) {
 				if (other.entityType != null)
 					return false;
@@ -90,17 +87,13 @@ public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenN
 			return equals(obj);
 		}
 
-		private IntraTokenNerlaTemplate getOuterType() {
-			return IntraTokenNerlaTemplate.this;
-		}
-
 	}
 
 	@Override
 	public List<IntraTokenNerlaScope> generateFactorScopes(State state) {
 		List<IntraTokenNerlaScope> factors = new ArrayList<>();
 
-		for (LiteralAnnotation annotation : state.getCurrentPredictions().<LiteralAnnotation>getAnnotations()) {
+		for (DocumentLinkedAnnotation annotation : getPredictedAnnotations(state)) {
 
 			factors.add(new IntraTokenNerlaScope(this, annotation.getEntityType(), annotation.getSurfaceForm()));
 

@@ -70,7 +70,7 @@ public class SemanticMRMain {
 
 		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
 
-		List<AbstractFeatureTemplate<?>> featureTemplates = new ArrayList<>();
+		List<AbstractFeatureTemplate<?, ?>> featureTemplates = new ArrayList<>();
 
 		featureTemplates.add(new IntraTokenTemplate());
 		featureTemplates.add(new TokenContextTemplate());
@@ -94,7 +94,7 @@ public class SemanticMRMain {
 		EntityTemplateExplorer explorer = new EntityTemplateExplorer(candidateProvider, constraintsProvider);
 
 		final File modelDir = new File("models/slotfill/test1/");
-		final String modelName = "Model1";
+		final String modelName = "Model2";
 
 		Model model;
 		try {

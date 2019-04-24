@@ -24,7 +24,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  *
  * @date Nov 15, 2017
  */
-public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope> {
+public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope, EntityTemplate> {
 
 	/**
 	 * 
@@ -42,12 +42,12 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 
 	private static final String RIGHT = ">";
 
-	class IntraTokenScope extends AbstractFactorScope<IntraTokenScope> {
+	class IntraTokenScope extends AbstractFactorScope<IntraTokenScope, EntityTemplate> {
 
 		public EntityType entityType;
 		public final String surfaceForm;
 
-		public IntraTokenScope(AbstractFeatureTemplate<IntraTokenScope> template, EntityType entityType,
+		public IntraTokenScope(AbstractFeatureTemplate<IntraTokenScope, EntityTemplate> template, EntityType entityType,
 				String surfaceForm) {
 			super(template);
 			this.entityType = entityType;
@@ -108,7 +108,7 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 	public List<IntraTokenScope> generateFactorScopes(State state) {
 		List<IntraTokenScope> factors = new ArrayList<>();
 
-		for (EntityTemplate annotation : state.getCurrentPredictions().<EntityTemplate>getAnnotations()) {
+		for (EntityTemplate annotation : getPredictedAnnotations(state)) {
 
 			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
 					.nonEmpty().literalAnnoation().build();

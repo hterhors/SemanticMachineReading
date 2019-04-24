@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.nerl;
+package de.hterhors.semanticmr.examples.nerla;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +24,7 @@ import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
+import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.nerla.IntraTokenNerlaTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
@@ -69,7 +70,7 @@ public class NamedEntityRecognitionAndLinkingExample {
 
 		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
 
-		List<AbstractFeatureTemplate<?>> featureTemplates = new ArrayList<>();
+		List<AbstractFeatureTemplate<?, ?>> featureTemplates = new ArrayList<>();
 
 		featureTemplates.add(new IntraTokenNerlaTemplate());
 

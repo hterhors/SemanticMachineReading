@@ -12,7 +12,7 @@ import de.hterhors.semanticmr.eval.EEvaluationDetail;
  * @author hterhors
  *
  */
-public class LiteralAnnotation extends EntityTypeAnnotation {
+public class LiteralAnnotation<B extends LiteralAnnotation<B>> extends EntityTypeAnnotation<B> {
 
 	/**
 	 * Contains the textual content of this annotation.
@@ -122,8 +122,6 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + mode);
 	}
 
-
-	
 	public String getCleanedSurfaceForm() {
 		return textualContent.cleanedSurfaceForm;
 	}

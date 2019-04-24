@@ -20,13 +20,13 @@ import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 
-public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextScope> {
+public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextScope, EntityTemplate> {
 
 	private static final char SPLITTER = ' ';
 	private static final char RIGHT = '>';
 	private static final char LEFT = '<';
 
-	class TokenContextScope extends AbstractFactorScope<TokenContextScope> {
+	class TokenContextScope extends AbstractFactorScope<TokenContextScope, EntityTemplate> {
 
 		public final Instance instance;
 
@@ -36,7 +36,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 
 		public final int endOffset;
 
-		public TokenContextScope(AbstractFeatureTemplate<TokenContextScope> template, Instance instance,
+		public TokenContextScope(AbstractFeatureTemplate<TokenContextScope, EntityTemplate> template, Instance instance,
 				EntityType entityType, int startOffset, int endOffset) {
 			super(template);
 			this.instance = instance;
@@ -105,7 +105,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 	public List<TokenContextScope> generateFactorScopes(State state) {
 		List<TokenContextScope> factors = new ArrayList<>();
 
-		for (EntityTemplate annotation : state.getCurrentPredictions().<EntityTemplate>getAnnotations()) {
+		for (EntityTemplate annotation : getPredictedAnnotations(state)) {
 
 			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
 					.nonEmpty().docLinkedAnnoation().build();

@@ -5,26 +5,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.hterhors.semanticmr.candprov.sf.GeneralCandidateProvider;
 import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateProviderCollection;
-import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
+import de.hterhors.semanticmr.candprov.sf.GeneralCandidateProvider;
+import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class NerlaCollector {
 
 	public AnnotationCandidateProviderCollection collect() {
 
-		AnnotationCandidateProviderCollection candidateProvider = new AnnotationCandidateProviderCollection(this.instances);
+		AnnotationCandidateProviderCollection candidateProvider = new AnnotationCandidateProviderCollection(
+				this.instances);
 
 		for (INerlaProvider provider : nerlaProvider) {
 
 			try {
-				final Map<Instance, List<EntityTypeAnnotation>> nerla = provider.getForInstances(this.instances);
+				final Map<Instance, List<DocumentLinkedAnnotation>> nerla = provider.getForInstances(this.instances);
 
 				for (Instance instance : nerla.keySet()) {
-					if (instance != null)
-						candidateProvider.registerCandidateProvider(
-								new GeneralCandidateProvider(instance).addBatchSlotFiller(nerla.get(instance)));
+					if (instance != null) {
+						GeneralCandidateProvider ap = new GeneralCandidateProvider(instance);
+						for (DocumentLinkedAnnotation dla : nerla.get(instance)) {
+							ap.addSlotFiller(dla);
+						}
+						candidateProvider.registerCandidateProvider(ap);
+					}
 				}
 
 			} catch (IOException e) {

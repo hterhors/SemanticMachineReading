@@ -10,11 +10,13 @@ import java.util.Map;
 import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
-public class SlotEntityTypeCandidateProvider implements IAnnotationCandidateProvider<EntityTypeAnnotation> {
+public class SlotEntityTypeCandidateProvider implements IAnnotationCandidateProvider {
 
 	private static SlotEntityTypeCandidateProvider instance = null;
 
@@ -29,9 +31,9 @@ public class SlotEntityTypeCandidateProvider implements IAnnotationCandidateProv
 
 	private final Map<EntityType, Set<EntityTypeAnnotation>> rootAnnotationsCache = new HashMap<>();
 
-	private final Map<SlotType, List<EntityTypeAnnotation>> entityAnnotationCache = new HashMap<>();
+	private final Map<SlotType, List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> entityAnnotationCache = new HashMap<>();
 
-	public List<EntityTypeAnnotation> getSlotFillerCandidates(SlotType slot) {
+	public List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> getSlotFillerCandidates(SlotType slot) {
 		if (!entityAnnotationCache.containsKey(slot)) {
 
 			for (EntityType slotEntityType : slot.getSlotFillerEntityTypes()) {
@@ -68,13 +70,15 @@ public class SlotEntityTypeCandidateProvider implements IAnnotationCandidateProv
 	}
 
 	@Override
-	public SlotEntityTypeCandidateProvider addSlotFiller(EntityTypeAnnotation slotFiller) {
+	public SlotEntityTypeCandidateProvider addSlotFiller(
+			AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
 		throw new IllegalStateException(
 				"Can not add slot filler to enitty type candiate provider. Candidates are based on the specification.");
 	}
 
 	@Override
-	public SlotEntityTypeCandidateProvider addBatchSlotFiller(Collection<EntityTypeAnnotation> slotFiller) {
+	public SlotEntityTypeCandidateProvider addBatchSlotFiller(
+			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller) {
 		throw new IllegalStateException(
 				"Can not add slot filler to enitty type candiate provider. Candidates are based on the specification.");
 	}

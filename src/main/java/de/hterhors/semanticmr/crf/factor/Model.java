@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.crf.factor.Model.SerializableModelWrapper.GenericTemplate;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -62,9 +63,9 @@ public class Model {
 		return indexFeatureName.get(feature);
 	}
 
-	final private List<AbstractFeatureTemplate<?>> factorTemplates;
+	final private List<AbstractFeatureTemplate<?, ?>> factorTemplates;
 
-	public Model(List<AbstractFeatureTemplate<?>> factorTemplates) {
+	public Model(List<AbstractFeatureTemplate<?, ?>> factorTemplates) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
 	}
 
@@ -73,7 +74,7 @@ public class Model {
 		/**
 		 * TODO: measure efficiency of streams
 		 */
-		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
+		for (AbstractFeatureTemplate<?, ?> template : this.factorTemplates) {
 
 			/*
 			 * Collect all factor scopes of all states to that this template can be applied
@@ -100,7 +101,7 @@ public class Model {
 		/**
 		 * TODO: measure efficiency of streams
 		 */
-		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
+		for (AbstractFeatureTemplate<?, ?> template : this.factorTemplates) {
 
 			/*
 			 * Collect all factor scopes of all states to that this template can be applied
@@ -126,7 +127,8 @@ public class Model {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void computeRemainingFactors(AbstractFeatureTemplate<?> template, Stream<AbstractFactorScope> stream) {
+	private void computeRemainingFactors(AbstractFeatureTemplate<?, ?> template,
+			@SuppressWarnings("rawtypes") Stream<AbstractFactorScope> stream) {
 		stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs)).map(remainingFactorScope -> {
 			@SuppressWarnings({ "rawtypes" })
 			Factor f = new Factor(remainingFactorScope);
@@ -135,7 +137,7 @@ public class Model {
 		}).sequential().forEach(factor -> FACTOR_POOL_INSTANCE.addFactor(factor));
 	}
 
-	private void collectFactorScopesForState(AbstractFeatureTemplate<?> template, State state) {
+	private void collectFactorScopesForState(AbstractFeatureTemplate<?, ?> template, State state) {
 		state.getFactorGraph(template).addFactorScopes(template.generateFactorScopes(state));
 	}
 
@@ -180,7 +182,7 @@ public class Model {
 	}
 
 	public void print(File modelDir, String modelName) throws IOException {
-		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
+		for (AbstractFeatureTemplate<?, ?> template : this.factorTemplates) {
 			File parentDir = new File(modelDir, modelName + "/" + DEFAULT_READABLE_DIR);
 			parentDir.mkdirs();
 
@@ -259,9 +261,9 @@ public class Model {
 		return model;
 	}
 
-	private static AbstractFeatureTemplate<?> toAbstractFeaturetemplate(final GenericTemplate t) {
+	private static AbstractFeatureTemplate<?, ?> toAbstractFeaturetemplate(final GenericTemplate t) {
 		try {
-			final AbstractFeatureTemplate<?> template = (AbstractFeatureTemplate<?>) Class
+			final AbstractFeatureTemplate<?, ?> template = (AbstractFeatureTemplate<?, ?>) Class
 					.forName(t.packageName + "." + t.templateName).newInstance();
 
 			final DoubleVector v = new DoubleVector();
@@ -288,11 +290,11 @@ public class Model {
 
 		final List<GenericTemplate> templates;
 
-		public SerializableModelWrapper(List<AbstractFeatureTemplate<?>> templates) {
+		public SerializableModelWrapper(List<AbstractFeatureTemplate<?, ?>> templates) {
 			this.templates = templates.stream().map(t -> convert(t)).collect(Collectors.toList());
 		}
 
-		private GenericTemplate convert(AbstractFeatureTemplate<?> t) {
+		private GenericTemplate convert(AbstractFeatureTemplate<?, ?> t) {
 			final Map<String, Double> features = new HashMap<>();
 			for (Entry<Integer, Double> e : t.getWeights().getFeatures().entrySet()) {
 				features.put(indexFeatureName.get(e.getKey()), e.getValue());

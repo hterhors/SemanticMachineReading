@@ -5,6 +5,7 @@ import java.util.Map;
 
 import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
 
@@ -15,7 +16,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  *
  * @param <S>
  */
-public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S>> {
+public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S, A>, A extends AbstractSlotFiller<A>> {
 
 	/**
 	 * Weights for the computation of factor scores. These weights are shared across
@@ -53,4 +54,8 @@ public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S>> 
 		this.weights = weights;
 	}
 
+	protected List<A> getPredictedAnnotations(State state) {
+		return state.getCurrentPredictions().<A>getAnnotations();
+
+	}
 }

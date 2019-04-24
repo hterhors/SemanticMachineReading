@@ -1,5 +1,6 @@
 package de.hterhors.semanticmr.crf.factor;
 
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 
 /**
@@ -16,14 +17,14 @@ import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
  *
  * @see {@link Factor}
  */
-public abstract class AbstractFactorScope<S extends AbstractFactorScope<S>> {
+public abstract class AbstractFactorScope<S extends AbstractFactorScope<S, A>, A extends AbstractSlotFiller<A>> {
 
 	/**
 	 * The template context of the list of variables.
 	 */
-	protected final AbstractFeatureTemplate<S> template;
+	protected final AbstractFeatureTemplate<S, A> template;
 
-	public AbstractFactorScope(AbstractFeatureTemplate<S> template) {
+	public AbstractFactorScope(AbstractFeatureTemplate<S, A> template) {
 		this.template = template;
 	}
 
@@ -32,7 +33,7 @@ public abstract class AbstractFactorScope<S extends AbstractFactorScope<S>> {
 	 * 
 	 * @return the template
 	 */
-	public AbstractFeatureTemplate<S> getTemplate() {
+	public AbstractFeatureTemplate<S, A> getTemplate() {
 		return template;
 	}
 
@@ -67,7 +68,7 @@ public abstract class AbstractFactorScope<S extends AbstractFactorScope<S>> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AbstractFactorScope<S> other = (AbstractFactorScope<S>) obj;
+		AbstractFactorScope<S, A> other = (AbstractFactorScope<S, A>) obj;
 		if (template == null) {
 			if (other.template != null)
 				return false;
