@@ -24,9 +24,9 @@ import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
-import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.nerla.IntraTokenNerlaTemplate;
+import de.hterhors.semanticmr.crf.templates.nerla.NerlaTokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -73,10 +73,11 @@ public class NamedEntityRecognitionAndLinkingExample {
 		List<AbstractFeatureTemplate<?, ?>> featureTemplates = new ArrayList<>();
 
 		featureTemplates.add(new IntraTokenNerlaTemplate());
+		featureTemplates.add(new NerlaTokenContextTemplate());
 
 		IStateInitializer stateInitializer = ((instance) -> new State(instance, new Annotations()));
 
-		int numberOfEpochs = 1;
+		int numberOfEpochs = 10;
 
 //		AbstractSampler sampler = SamplerCollection.greedyModelStrategy();
 //		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
@@ -90,14 +91,14 @@ public class NamedEntityRecognitionAndLinkingExample {
 		EntityRecLinkExplorer explorer = new EntityRecLinkExplorer(candidateProvider);
 
 		final File modelDir = new File("models/nerla/test1/");
-		final String modelName = "ModelName3";
+		final String modelName = "ModelName34";
 
 		Model model;
 		try {
 			model = Model.load(modelDir, modelName);
 		} catch (Exception e) {
-			model = new Model(featureTemplates);
 		}
+		model = new Model(featureTemplates);
 
 		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
 
@@ -106,7 +107,6 @@ public class NamedEntityRecognitionAndLinkingExample {
 					noModelChangeCrit);
 			model.save(modelDir, modelName, true);
 		}
-
 
 		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
 				noModelChangeCrit);
