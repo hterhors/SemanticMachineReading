@@ -104,9 +104,9 @@ public class NamedEntityRecognitionAndLinkingExample {
 		if (!model.wasLoaded()) {
 			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,
 					noModelChangeCrit);
+			model.save(modelDir, modelName, true);
 		}
 
-		model.save(modelDir, modelName, true);
 
 		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
 				noModelChangeCrit);
