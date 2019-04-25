@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -125,12 +126,28 @@ public class Model {
 	@SuppressWarnings("unchecked")
 	private void computeRemainingFactors(AbstractFeatureTemplate<?, ?> template,
 			@SuppressWarnings("rawtypes") Stream<AbstractFactorScope> stream) {
-		stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs)).map(remainingFactorScope -> {
-			@SuppressWarnings({ "rawtypes" })
-			Factor f = new Factor(remainingFactorScope);
-			template.generateFeatureVector(f);
-			return f;
-		}).sequential().forEach(factor -> FACTOR_POOL_INSTANCE.addFactor(factor));
+//
+//		Set<Factor<?>> tmp = stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs))
+//				.map(remainingFactorScope -> {
+//					@SuppressWarnings({ "rawtypes" })
+//					Factor f = new Factor(remainingFactorScope);
+//					template.generateFeatureVector(f);
+//					return f;
+//				}).collect(Collectors.toSet());
+//
+//		for (Factor<?> factor : tmp) {
+//			FACTOR_POOL_INSTANCE.addFactor(factor);
+//		}
+
+		Stream<Factor<?>> s = stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs))
+				.map(remainingFactorScope -> {
+					@SuppressWarnings({ "rawtypes" })
+					Factor f = new Factor(remainingFactorScope);
+					template.generateFeatureVector(f);
+					return f;
+				});
+
+		s.sequential().forEach(factor -> FACTOR_POOL_INSTANCE.addFactor(factor));
 	}
 
 	private void collectFactorScopesForState(AbstractFeatureTemplate<?, ?> template, State state) {
