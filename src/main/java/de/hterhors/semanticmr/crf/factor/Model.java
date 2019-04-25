@@ -126,7 +126,7 @@ public class Model {
 	@SuppressWarnings("unchecked")
 	private void computeRemainingFactors(AbstractFeatureTemplate<?, ?> template,
 			@SuppressWarnings("rawtypes") Stream<AbstractFactorScope> stream) {
-//
+
 //		Set<Factor<?>> tmp = stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs))
 //				.map(remainingFactorScope -> {
 //					@SuppressWarnings({ "rawtypes" })

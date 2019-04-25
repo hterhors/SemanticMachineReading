@@ -23,7 +23,6 @@ public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenN
 	/**
 	 * 
 	 */
-
 	private static final String END_SIGN = "$";
 
 	private static final String START_SIGN = "^";

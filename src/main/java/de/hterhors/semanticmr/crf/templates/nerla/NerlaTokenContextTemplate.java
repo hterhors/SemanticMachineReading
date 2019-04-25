@@ -97,8 +97,6 @@ public class NerlaTokenContextTemplate extends AbstractFeatureTemplate<TokenCont
 					+ startOffset + ", endOffset=" + endOffset + "]";
 		}
 
-		
-		
 	}
 
 	@Override
