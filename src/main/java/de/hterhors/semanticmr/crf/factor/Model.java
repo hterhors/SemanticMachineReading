@@ -127,18 +127,6 @@ public class Model {
 	private void computeRemainingFactors(AbstractFeatureTemplate<?, ?> template,
 			@SuppressWarnings("rawtypes") Stream<AbstractFactorScope> stream) {
 
-//		Set<Factor<?>> tmp = stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs))
-//				.map(remainingFactorScope -> {
-//					@SuppressWarnings({ "rawtypes" })
-//					Factor f = new Factor(remainingFactorScope);
-//					template.generateFeatureVector(f);
-//					return f;
-//				}).collect(Collectors.toSet());
-//
-//		for (Factor<?> factor : tmp) {
-//			FACTOR_POOL_INSTANCE.addFactor(factor);
-//		}
-
 		Stream<Factor<?>> s = stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs))
 				.map(remainingFactorScope -> {
 					@SuppressWarnings({ "rawtypes" })
