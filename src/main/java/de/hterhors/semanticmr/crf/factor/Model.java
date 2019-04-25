@@ -7,10 +7,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,9 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.hterhors.semanticmr.crf.factor.Model.SerializableModelWrapper.GenericTemplate;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -279,49 +275,6 @@ public class Model {
 			e.printStackTrace();
 			throw new ModelLoadException(e.getMessage());
 		}
-	}
-
-	static public class SerializableModelWrapper implements Serializable {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		final List<GenericTemplate> templates;
-
-		public SerializableModelWrapper(List<AbstractFeatureTemplate<?, ?>> templates) {
-			this.templates = templates.stream().map(t -> convert(t)).collect(Collectors.toList());
-		}
-
-		private GenericTemplate convert(AbstractFeatureTemplate<?, ?> t) {
-			final Map<String, Double> features = new HashMap<>();
-			for (Entry<Integer, Double> e : t.getWeights().getFeatures().entrySet()) {
-				features.put(indexFeatureName.get(e.getKey()), e.getValue());
-			}
-			return new GenericTemplate(features, t.getClass().getPackage().getName(), t.getClass().getSimpleName());
-
-		}
-
-		static public class GenericTemplate implements Serializable {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			final private Map<String, Double> features;
-			final private String packageName;
-			final private String templateName;
-
-			public GenericTemplate(Map<String, Double> features, String packageName, String templateName) {
-				this.features = features;
-				this.packageName = packageName;
-				this.templateName = templateName;
-			}
-
-		}
-
 	}
 
 	public boolean wasLoaded() {
