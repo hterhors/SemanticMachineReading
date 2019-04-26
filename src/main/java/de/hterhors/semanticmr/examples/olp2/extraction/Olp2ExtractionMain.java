@@ -40,6 +40,8 @@ import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
 import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.json.JsonNerlaProvider;
+import de.hterhors.semanticmr.nerla.NerlaCollector;
 
 public class Olp2ExtractionMain {
 	private static final File de_entitySpecifications = new File(
@@ -65,15 +67,15 @@ public class Olp2ExtractionMain {
 		InstanceProvider instanceProvider = new InstanceProvider(
 				new File("src/main/resources/examples/olp2/de/corpus/instances/"), shuffleCorpusDistributor);
 
-//		NerlaCollector nerlaProvider = new NerlaCollector(instanceProvider.getInstances());
-//		nerlaProvider
-//				.addNerlaProvider(new JsonNerlaProvider(new File("src/main/resources/corpus/data/nerla/nerla.json")));
-//
-//		AnnotationCandidateProviderCollection candidateProvider = nerlaProvider.collect();
+		NerlaCollector nerlaProvider = new NerlaCollector(instanceProvider.getInstances());
+		nerlaProvider
+				.addNerlaProvider(new JsonNerlaProvider(new File("src/main/resources/examples/olp2/de/nerla/nerla.json")));
 
-		AnnotationCandidateProviderCollection candidateProvider = new AnnotationCandidateProviderCollection(
-				instanceProvider.getInstances());
-		candidateProvider.setEntityTypeCandidateProvider();
+		AnnotationCandidateProviderCollection candidateProvider = nerlaProvider.collect();
+
+//		AnnotationCandidateProviderCollection candidateProvider = new AnnotationCandidateProviderCollection(
+//				instanceProvider.getInstances());
+//		candidateProvider.setEntityTypeCandidateProvider();
 
 		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider(initializer);
 

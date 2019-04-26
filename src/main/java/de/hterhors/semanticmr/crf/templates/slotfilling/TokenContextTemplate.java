@@ -25,6 +25,8 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 	private static final char SPLITTER = ' ';
 	private static final char RIGHT = '>';
 	private static final char LEFT = '<';
+	private static final String BOF = "BOF";
+	private static final String EOF = "EOF";
 
 	class TokenContextScope extends AbstractFactorScope<TokenContextScope, EntityTemplate> {
 
@@ -189,38 +191,68 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 
 		final StringBuffer lCs = new StringBuffer();
 		final StringBuffer rCs = new StringBuffer();
+		String context;
+		boolean bof;
+		boolean eof;
 		for (int i = 0; i < leftContext.length; i++) {
+			bof = leftContext[i] == null;
+			if (bof)
+				context = BOF;
+			else
+				context = leftContext[i];
+
 			rCs.setLength(0);
-			lCs.insert(0, leftContext[i] + SPLITTER);
+			lCs.insert(0, context + SPLITTER);
 			featureVector.set(
 					new StringBuffer(lCs).append(LEFT).append(contextClass).append(RIGHT).append(rCs).toString().trim(),
 					true);
 
 			for (int j = 0; j < rightContext.length; j++) {
-				rCs.append(SPLITTER).append(rightContext[j]);
+				eof = rightContext[j] == null;
+				if (eof)
+					context = EOF;
+				else
+					context = rightContext[j];
+				rCs.append(SPLITTER).append(context);
 				featureVector.set(new StringBuffer(lCs).append(LEFT).append(contextClass).append(RIGHT).append(rCs)
 						.toString().trim(), true);
 
 			}
+			if (bof)
+				break;
 		}
 
 		rCs.setLength(0);
 		lCs.setLength(0);
 
 		for (int i = 0; i < rightContext.length; i++) {
+			eof = rightContext[i] == null;
+			if (eof)
+				context = EOF;
+			else
+				context = rightContext[i];
 			lCs.setLength(0);
-			rCs.append(SPLITTER).append(rightContext[i]);
+			rCs.append(SPLITTER).append(context);
 			featureVector.set(
 					new StringBuffer(lCs).append(LEFT).append(contextClass).append(RIGHT).append(rCs).toString().trim(),
 					true);
 
 			for (int j = 0; j < leftContext.length; j++) {
-				lCs.insert(0, leftContext[j] + SPLITTER);
+				bof = leftContext[j] == null;
+				if (bof)
+					context = BOF;
+				else
+					context = leftContext[j];
+				lCs.insert(0, context + SPLITTER);
 				featureVector.set(new StringBuffer(lCs).append(LEFT).append(contextClass).append(RIGHT).append(rCs)
 						.toString().trim(), true);
 
+				if (bof)
+					break;
 			}
 
+			if (eof)
+				break;
 		}
 	}
 }
