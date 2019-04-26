@@ -26,6 +26,7 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.nerla.IntraTokenNerlaTemplate;
+import de.hterhors.semanticmr.crf.templates.nerla.MorphologicalNerlaTemplate;
 import de.hterhors.semanticmr.crf.templates.nerla.NerlaTokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
@@ -74,10 +75,11 @@ public class NamedEntityRecognitionAndLinkingExample {
 
 		featureTemplates.add(new IntraTokenNerlaTemplate());
 		featureTemplates.add(new NerlaTokenContextTemplate());
+		featureTemplates.add(new MorphologicalNerlaTemplate());
 
 		IStateInitializer stateInitializer = ((instance) -> new State(instance, new Annotations()));
 
-		int numberOfEpochs = 10;
+		int numberOfEpochs = 4;
 
 //		AbstractSampler sampler = SamplerCollection.greedyModelStrategy();
 //		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
@@ -105,6 +107,7 @@ public class NamedEntityRecognitionAndLinkingExample {
 		if (!model.wasLoaded()) {
 			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,
 					noModelChangeCrit);
+
 			model.save(modelDir, modelName, true);
 		}
 

@@ -91,6 +91,12 @@ public class NerlaTokenContextTemplate extends AbstractFeatureTemplate<TokenCont
 			return equals(obj);
 		}
 
+		@Override
+		public String toString() {
+			return "TokenContextScope [instance=" + instance + ", entityType=" + entityType + ", startOffset="
+					+ startOffset + ", endOffset=" + endOffset + "]";
+		}
+
 	}
 
 	@Override
