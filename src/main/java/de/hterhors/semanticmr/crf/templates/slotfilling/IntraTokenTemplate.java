@@ -8,7 +8,7 @@ import java.util.Set;
 import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
@@ -113,10 +113,10 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope,
 			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
 					.nonEmpty().literalAnnoation().build();
 
-			for (Entry<SlotType, Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> slot : filter
+			for (Entry<SlotType, Set<AbstractAnnotation<? extends AbstractAnnotation<?>>>> slot : filter
 					.getMergedAnnotations().entrySet()) {
 
-				for (AbstractSlotFiller<?> slotFiller : slot.getValue()) {
+				for (AbstractAnnotation<?> slotFiller : slot.getValue()) {
 
 					final LiteralAnnotation docLinkedAnnotation = slotFiller.asInstanceOfLiteralAnnotation();
 

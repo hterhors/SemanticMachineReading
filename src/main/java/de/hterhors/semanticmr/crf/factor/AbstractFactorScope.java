@@ -1,6 +1,6 @@
 package de.hterhors.semanticmr.crf.factor;
 
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 
 /**
@@ -17,7 +17,7 @@ import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
  *
  * @see {@link Factor}
  */
-public abstract class AbstractFactorScope<S extends AbstractFactorScope<S, A>, A extends AbstractSlotFiller<A>> {
+public abstract class AbstractFactorScope<S extends AbstractFactorScope<S, A>, A extends AbstractAnnotation<A>> {
 
 	/**
 	 * The template context of the list of variables.

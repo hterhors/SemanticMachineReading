@@ -1,0 +1,6 @@
+#Entity	Slot	SlotSuperEntityType	SlotCardinalityType MaxCardinality
+Goal	scorer	Player	Single	1
+Goal	forTeam	Team	Single	1
+Goal	scoreTeamA	ScoreTeamA	Single	1
+Goal	scoreTeamB	ScoreTeamB	Single	1
+Goal	minute	Minute	Single	1

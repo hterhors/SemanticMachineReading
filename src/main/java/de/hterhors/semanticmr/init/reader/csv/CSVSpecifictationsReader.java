@@ -32,14 +32,18 @@ public class CSVSpecifictationsReader implements ISpecificationsReader {
 	public StructureSpecification read() throws InvalidSpecificationFileFormatException {
 		try {
 			List<String[]> entities = Files.readAllLines(entitySpecificationFile.toPath()).stream()
-					.filter(l -> !l.startsWith("#")).map(l -> l.split("\t")).collect(Collectors.toList());
+					.filter(l -> !l.startsWith("#")).filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t"))
+					.collect(Collectors.toList());
 			List<String[]> entityStructure = Files.readAllLines(entityStructureSpecificationFile.toPath()).stream()
-					.filter(l -> !l.startsWith("#")).map(l -> l.split("\t")).collect(Collectors.toList());
+					.filter(l -> !l.startsWith("#")).filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t"))
+					.collect(Collectors.toList());
 			List<String[]> slots = Files.readAllLines(slotSpecificationFile.toPath()).stream()
-					.filter(l -> !l.startsWith("#")).map(l -> l.split("\t")).collect(Collectors.toList());
+					.filter(l -> !l.startsWith("#")).filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t"))
+					.collect(Collectors.toList());
 
 			List<String[]> slotPairConstriants = Files.readAllLines(slotPairConstriantsSpecificationFile.toPath())
-					.stream().filter(l -> !l.startsWith("#")).map(l -> l.split("\t")).collect(Collectors.toList());
+					.stream().filter(l -> !l.startsWith("#")).filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t"))
+					.collect(Collectors.toList());
 
 			Set<String> slotTypeNames = slots.stream().map(l -> l[1]).collect(Collectors.toSet());
 			Set<String> entityTypeNames = entities.stream().map(l -> l[0]).collect(Collectors.toSet());
@@ -85,9 +89,9 @@ public class CSVSpecifictationsReader implements ISpecificationsReader {
 			Set<ExcludeSlotTypePairNames> excludeSlotTypePairs = slotPairConstriants.stream()
 					.map(l -> new ExcludeSlotTypePairNames(l[0], l[1], l[2], l[3], l[4])).collect(Collectors.toSet());
 
-			return new StructureSpecification(entityTypeNames, slotTypeNames, isSingleValueSlotTypes, isLiteralValueSlotTypes,
-					slotFillerEntityTypes, superEntityTypes, subEntityTypes, slotsForEntity, multiAnnotationSlotMaxSize,
-					excludeSlotTypePairs);
+			return new StructureSpecification(entityTypeNames, slotTypeNames, isSingleValueSlotTypes,
+					isLiteralValueSlotTypes, slotFillerEntityTypes, superEntityTypes, subEntityTypes, slotsForEntity,
+					multiAnnotationSlotMaxSize, excludeSlotTypePairs);
 
 		} catch (Exception e) {
 			throw new InvalidSpecificationFileFormatException(e);

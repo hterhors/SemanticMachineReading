@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 
 import de.hterhors.semanticmr.crf.CRF;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 
@@ -21,11 +21,11 @@ public class EvaluationResultPrinter {
 			System.out.println("Objective score: " + res.getValue().getObjectiveScore());
 			System.out.println("Score: " + res.getValue().getScore());
 			mean.add(res.getValue().getScore());
-			for (AbstractSlotFiller<?> goldAnnotations : res.getKey().getGoldAnnotations().getAnnotations()) {
+			for (AbstractAnnotation<?> goldAnnotations : res.getKey().getGoldAnnotations().getAnnotations()) {
 				System.out.println(goldAnnotations.toPrettyString());
 			}
 			System.out.println("-----------");
-			for (AbstractSlotFiller<?> finalAnnotations : res.getValue().getCurrentPredictions().getAnnotations()) {
+			for (AbstractAnnotation<?> finalAnnotations : res.getValue().getCurrentPredictions().getAnnotations()) {
 				System.out.println(finalAnnotations.toPrettyString());
 			}
 			System.out.println();

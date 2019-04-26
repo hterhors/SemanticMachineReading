@@ -6,7 +6,7 @@ import java.util.Map;
 
 import de.hterhors.semanticmr.crf.factor.FactorGraph;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.IEvaluator;
@@ -41,7 +41,7 @@ public class State {
 		this.objectiveScore = DEFAULT_OBJECTIVE_SCORE;
 	}
 
-	public State deepAddCopy(AbstractSlotFiller<? extends AbstractSlotFiller<?>> newCurrentPrediction) {
+	public State deepAddCopy(AbstractAnnotation<? extends AbstractAnnotation<?>> newCurrentPrediction) {
 		return new State(this.instance, currentPredictions.deepAddCopy(newCurrentPrediction));
 	}
 
@@ -54,7 +54,7 @@ public class State {
 	 * @return a new State instance
 	 */
 	public State deepUpdateCopy(final int annotationIndex,
-			AbstractSlotFiller<? extends AbstractSlotFiller<?>> newCurrentPrediction) {
+			AbstractAnnotation<? extends AbstractAnnotation<?>> newCurrentPrediction) {
 		return new State(this.instance, currentPredictions.deepUpdateCopy(annotationIndex, newCurrentPrediction));
 	}
 

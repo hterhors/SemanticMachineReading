@@ -1,5 +1,0 @@
-#Entity	Slot	SlotSuperEntityType	SlotCardinalityType MaxCardinality
-Goal	hasScorer	Scorer	Single	1
-Goal	hasTeam	Team	Single	1
-Goal	hasScoreTeamA	ScoreTeamA	Single 1
-Goal	hasScoreTeamB	ScoreTeamA	Single 1

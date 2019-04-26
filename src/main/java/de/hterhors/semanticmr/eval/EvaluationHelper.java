@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 import org.apache.jena.ext.com.google.common.collect.Collections2;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.crf.structure.annotations.AnnotationCreationHelper;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
@@ -46,18 +46,18 @@ public class EvaluationHelper {
 	}
 
 	private static Score[][] computeScores(EEvaluationDetail evaluationMode,
-			final Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller,
-			final Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherSlotFiller, final int maxSize) {
+			final Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller,
+			final Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherSlotFiller, final int maxSize) {
 
 		final Score[][] scores = new Score[maxSize][maxSize];
 
-		final Iterator<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFillerIterator = slotFiller.iterator();
+		final Iterator<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFillerIterator = slotFiller.iterator();
 
 		int i = 0;
 
 		while (i != maxSize) {
 
-			final AbstractSlotFiller<?> slotFillerVal;
+			final AbstractAnnotation<?> slotFillerVal;
 
 			if (slotFillerIterator.hasNext()) {
 				slotFillerVal = slotFillerIterator.next();
@@ -67,12 +67,12 @@ public class EvaluationHelper {
 
 			int j = 0;
 
-			final Iterator<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherSlotFillerIterator = otherSlotFiller
+			final Iterator<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherSlotFillerIterator = otherSlotFiller
 					.iterator();
 
 			while (j != maxSize) {
 
-				final AbstractSlotFiller<?> otherSlotFillerVal;
+				final AbstractAnnotation<?> otherSlotFillerVal;
 				if (otherSlotFillerIterator.hasNext()) {
 					otherSlotFillerVal = otherSlotFillerIterator.next();
 				} else {
@@ -101,13 +101,13 @@ public class EvaluationHelper {
 		Document d = new Document("name1",tokenList );
 		
 		SystemInitializer.initialize(new CSVSlotFillingSpecs().specificationProvider).apply();
-		DocumentLinkedAnnotation o1 = AnnotationCreationHelper.toAnnotation(d,"Male", "male", 0);
-		LiteralAnnotation o2 = AnnotationCreationHelper.toSlotFiller("Male", "male");
-		EntityTypeAnnotation o3 = AnnotationCreationHelper.toSlotFiller("Male");
+		DocumentLinkedAnnotation o1 = AnnotationBuilder.toAnnotation(d,"Male", "male", 0);
+		LiteralAnnotation o2 = AnnotationBuilder.toAnnotation("Male", "male");
+		EntityTypeAnnotation o3 = AnnotationBuilder.toAnnotation("Male");
 
-		DocumentLinkedAnnotation dl1 = AnnotationCreationHelper.toAnnotation(d,"Age", "Eight-week-old", 5);
-		DocumentLinkedAnnotation dl2 = AnnotationCreationHelper.toAnnotation(d,"Age", "Eight-week-old", 21);
-		DocumentLinkedAnnotation dl3 = AnnotationCreationHelper.toAnnotation(d,"Age", "8 w", 21);
+		DocumentLinkedAnnotation dl1 = AnnotationBuilder.toAnnotation(d,"Age", "Eight-week-old", 5);
+		DocumentLinkedAnnotation dl2 = AnnotationBuilder.toAnnotation(d,"Age", "Eight-week-old", 21);
+		DocumentLinkedAnnotation dl3 = AnnotationBuilder.toAnnotation(d,"Age", "8 w", 21);
 
 		System.out.println("false: " + scoreSingle(EEvaluationDetail.DOCUMENT_LINKED, dl1, o1));
 		System.out.println("false: " + scoreSingle(EEvaluationDetail.LITERAL, dl2, o2));
@@ -179,8 +179,8 @@ public class EvaluationHelper {
 
 	}
 
-	public static Score scoreSingle(final EEvaluationDetail evaluationMode, final AbstractSlotFiller<?> val,
-			final AbstractSlotFiller<?> otherVal) {
+	public static Score scoreSingle(final EEvaluationDetail evaluationMode, final AbstractAnnotation<?> val,
+			final AbstractAnnotation<?> otherVal) {
 		if (val instanceof DocumentLinkedAnnotation
 				&& (otherVal instanceof DocumentLinkedAnnotation || otherVal == null)) {
 			return ((DocumentLinkedAnnotation) val).evaluate(evaluationMode, (DocumentLinkedAnnotation) otherVal);
@@ -197,8 +197,8 @@ public class EvaluationHelper {
 	}
 
 	public static Score scoreMax(EEvaluationDetail evaluationMode,
-			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations,
-			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherAnnotations) {
+			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
+			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherAnnotations) {
 
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
