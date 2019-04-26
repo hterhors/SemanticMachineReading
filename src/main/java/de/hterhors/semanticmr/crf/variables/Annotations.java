@@ -11,17 +11,13 @@ import java.util.Set;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
-import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationHelper;
 
 public class Annotations implements IEvaluatable<Annotations> {
 
-//	private boolean unmodifiable = false;
-
 	private List<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations;
 
-//	private final Instance instance;
 
 	private Set<DocumentToken> tokensWithAnnotations = new HashSet<>();
 
@@ -46,7 +42,6 @@ public class Annotations implements IEvaluatable<Annotations> {
 
 	public void unmodifiable() {
 		annotations = Collections.unmodifiableList(annotations);
-//		unmodifiable = true;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -54,12 +49,6 @@ public class Annotations implements IEvaluatable<Annotations> {
 		return (List<Annotation>) annotations;
 	}
 
-//	public void setAnnotations(List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations) {
-//		if (unmodifiable)
-//			throw new IllegalStateException("Annotations are unmodifiabled. Can not override them.");
-//
-//		this.annotations = annotations;
-//	}
 
 	@Override
 	public Score evaluate(EEvaluationDetail evaluationMode, Annotations otherVal) {
@@ -70,7 +59,7 @@ public class Annotations implements IEvaluatable<Annotations> {
 		if (this.annotations.size() == 1 && otherVal.annotations.size() == 1)
 			return EvaluationHelper.scoreSingle(evaluationMode, this.annotations.get(0), otherVal.annotations.get(0));
 
-		return EvaluationHelper.scoreMax(evaluationMode, this.annotations, otherVal.annotations);
+		return EvaluationHelper.scoreMultiValues(evaluationMode, this.annotations, otherVal.annotations);
 
 	}
 

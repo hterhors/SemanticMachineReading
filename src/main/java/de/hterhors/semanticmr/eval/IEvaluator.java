@@ -1,11 +1,14 @@
 package de.hterhors.semanticmr.eval;
 
+import java.util.Collection;
+
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
-import de.hterhors.semanticmr.crf.variables.Annotations;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 
 public interface IEvaluator {
 
-	public Score evaluate(EEvaluationDetail evaluationMode, Annotations goldAnnotations,
-			Annotations currentPredictions);
+	public Score scoreMax(EEvaluationDetail evaluationMode,
+			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
+			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherAnnotations);
 
 }

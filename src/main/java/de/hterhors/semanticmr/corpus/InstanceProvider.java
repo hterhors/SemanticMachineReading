@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,6 +12,8 @@ import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
+import de.hterhors.semanticmr.eval.CartesianEvaluator;
+import de.hterhors.semanticmr.eval.EvaluationHelper;
 import de.hterhors.semanticmr.json.JsonInstancesReader;
 
 public class InstanceProvider {
@@ -75,6 +78,19 @@ public class InstanceProvider {
 			this.validateFiles();
 
 			this.instances = new JsonInstancesReader(jsonInstancesDirectory).readInstances(numToRead);
+
+			for (Iterator<Instance> iterator = instances.iterator(); iterator.hasNext();) {
+				Instance instance = (Instance) iterator.next();
+				if (instance.getGoldAnnotations().getAnnotations().isEmpty())
+					System.out.println("WARN: Instance with no annotations detected!");
+
+				if (instance.getGoldAnnotations().getAnnotations()
+						.size() >= CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE) {
+					System.out.println("WARN: Instance with to many annotations detected!");
+//					iterator.remove();
+				}
+
+			}
 
 			redistribute(this.distributor);
 

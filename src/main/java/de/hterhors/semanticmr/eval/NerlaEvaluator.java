@@ -9,7 +9,7 @@ import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 
-public class NerlaEvaluator implements IEvaluator {
+public class NerlaEvaluator implements IEvaluatable {
 
 	public NerlaEvaluator() {
 	}

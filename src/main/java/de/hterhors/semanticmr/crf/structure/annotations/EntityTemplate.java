@@ -325,7 +325,7 @@ final public class EntityTemplate extends AbstractAnnotation<EntityTemplate> {
 			if (slotFiller.isEmpty() && (otherSlotFiller == null || otherSlotFiller.isEmpty()))
 				continue;
 
-			final Score bestScore = EvaluationHelper.scoreMax(evaluationMode, slotFiller, otherSlotFiller);
+			final Score bestScore = EvaluationHelper.scoreMultiValues(evaluationMode, slotFiller, otherSlotFiller);
 
 			score.add(bestScore);
 		}

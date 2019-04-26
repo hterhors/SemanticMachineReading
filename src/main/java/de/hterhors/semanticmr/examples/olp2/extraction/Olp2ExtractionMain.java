@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr;
+package de.hterhors.semanticmr.examples.olp2.extraction;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +24,6 @@ import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
-import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -36,34 +35,45 @@ import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
-import de.hterhors.semanticmr.eval.EvaluationHelper;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
-import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
+import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
+import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
+import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
-import de.hterhors.semanticmr.init.specifications.impl.CSVSlotFillingSpecs;
-import de.hterhors.semanticmr.json.JsonNerlaProvider;
-import de.hterhors.semanticmr.nerla.NerlaCollector;
 
-public class SemanticMRMain {
+public class Olp2ExtractionMain {
+	private static final File de_entitySpecifications = new File(
+			"src/main/resources/examples/olp2/de/specs/csv/entitySpecifications.csv");
+	private static final File de_slotSpecifications = new File(
+			"src/main/resources/examples/olp2/de/specs/csv/slotSpecifications.csv");
+	private static final File de_entityStructureSpecifications = new File(
+			"src/main/resources/examples/olp2/de/specs/csv/entityStructureSpecifications.csv");
+	private static final File de_slotPairConstraitsSpecifications = new File(
+			"src/main/resources/examples/olp2/de/specs/csv/slotPairExcludingConstraints.csv");
 
-	public static void main(String[] args) throws Exception {
+	public final static SpecificationsProvider de_specificationProvider = new SpecificationsProvider(
+			new CSVSpecifictationsReader(de_entitySpecifications, de_entityStructureSpecifications,
+					de_slotSpecifications, de_slotPairConstraitsSpecifications));
 
-		SystemInitializer initializer = SystemInitializer.initialize(new CSVSlotFillingSpecs().specificationProvider)
-				.registerNormalizationFunction(EntityType.get("Weight"), new WeightNormalization()).apply();
+	public static void main(String[] args) throws IOException, DocumentLinkedAnnotationMismatchException {
+
+		SystemInitializer initializer = SystemInitializer.initialize(de_specificationProvider).apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
 
-		InstanceProvider instanceProvider = new InstanceProvider(new File("src/main/resources/corpus/data/instances/"),
-				shuffleCorpusDistributor);
+		InstanceProvider instanceProvider = new InstanceProvider(
+				new File("src/main/resources/examples/olp2/de/corpus/instances/"), shuffleCorpusDistributor);
 
-		NerlaCollector nerlaProvider = new NerlaCollector(instanceProvider.getInstances());
-		nerlaProvider
-				.addNerlaProvider(new JsonNerlaProvider(new File("src/main/resources/corpus/data/nerla/nerla.json")));
+//		NerlaCollector nerlaProvider = new NerlaCollector(instanceProvider.getInstances());
+//		nerlaProvider
+//				.addNerlaProvider(new JsonNerlaProvider(new File("src/main/resources/corpus/data/nerla/nerla.json")));
+//
+//		AnnotationCandidateProviderCollection candidateProvider = nerlaProvider.collect();
 
-		AnnotationCandidateProviderCollection candidateProvider = nerlaProvider.collect();
-
-//				candidateProvider.setEntityTypeCandidateProvider();
+		AnnotationCandidateProviderCollection candidateProvider = new AnnotationCandidateProviderCollection(
+				instanceProvider.getInstances());
+		candidateProvider.setEntityTypeCandidateProvider();
 
 		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider(initializer);
 
@@ -77,9 +87,8 @@ public class SemanticMRMain {
 		featureTemplates.add(new TokenContextTemplate());
 		featureTemplates.add(new InBetweenContextTemplate());
 
-		IStateInitializer stateInitializer = ((instance) -> new State(instance,
-				new Annotations(new EntityTemplate(AnnotationBuilder
-						.toAnnotation(instance.getGoldAnnotations().getAnnotations().get(0).getEntityType())))));
+		IStateInitializer stateInitializer = (instance) -> new State(instance,
+				new Annotations(new EntityTemplate(AnnotationBuilder.toAnnotation("Goal"))));
 
 		int numberOfEpochs = 10;
 
@@ -94,7 +103,7 @@ public class SemanticMRMain {
 
 		EntityTemplateExplorer explorer = new EntityTemplateExplorer(candidateProvider, constraintsProvider);
 
-		final File modelDir = new File("models/slotfill/test1/");
+		final File modelDir = new File("models/olp2/test1/");
 		final String modelName = "Model3";
 
 		Model model;

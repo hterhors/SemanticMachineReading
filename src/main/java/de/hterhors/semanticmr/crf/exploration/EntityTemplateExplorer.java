@@ -95,7 +95,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 			IAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 
-		for (EntityTypeAnnotation templateTypeCandidate : slotFillerCandidateProvider
+		for (EntityTypeAnnotation<?> templateTypeCandidate : slotFillerCandidateProvider
 				.getTemplateRootAnnotationCandidates(entityTemplate.getEntityType())) {
 
 			if (templateTypeCandidate.equals(entityTemplate.getRootAnnotation()))

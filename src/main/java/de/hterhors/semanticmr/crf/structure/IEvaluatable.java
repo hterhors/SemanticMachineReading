@@ -45,6 +45,13 @@ public interface IEvaluatable<T> {
 			this.tn = 0;
 		}
 
+		public Score(Score score) {
+			this.tp = score.tp;
+			this.fp = score.fp;
+			this.fn = score.fn;
+			this.tn = score.tn;
+		}
+
 		@Override
 		public String toString() {
 			return "Score [getF1()=" + getF1() + ", getPrecision()=" + getPrecision() + ", getRecall()=" + getRecall()

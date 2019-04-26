@@ -66,7 +66,7 @@ public class SlotEntityTypeCandidateProvider implements IAnnotationCandidateProv
 				rootAnnotationsCache.get(templateType).add(EntityTypeAnnotation.get(slotEntityType));
 			}
 		}
-		return rootAnnotationsCache.get(templateType);
+		return rootAnnotationsCache.getOrDefault(templateType,Collections.emptySet());
 	}
 
 	@Override
