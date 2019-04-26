@@ -10,14 +10,14 @@ import java.util.Map;
 import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class GeneralCandidateProvider implements IAnnotationCandidateProvider {
 
-	private final Map<SlotType, List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>>> entityAnnotationCache = new HashMap<>();
+	private final Map<SlotType, List<AbstractAnnotation<? extends AbstractAnnotation<?>>>> entityAnnotationCache = new HashMap<>();
 	private final Map<EntityType, Set<EntityTypeAnnotation>> rootAnnotationsCache = new HashMap<>();
 
 	private final Instance relatedInstance;
@@ -27,7 +27,7 @@ public class GeneralCandidateProvider implements IAnnotationCandidateProvider {
 	}
 
 	@Override
-	public GeneralCandidateProvider addSlotFiller(AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
+	public GeneralCandidateProvider addSlotFiller(AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller) {
 		for (SlotType slotType : slotFiller.getEntityType().getSlotFillerOfSlotTypes()) {
 			entityAnnotationCache.putIfAbsent(slotType, new ArrayList<>());
 			if (slotType.matchesEntityType(slotFiller.getEntityType())) {
@@ -46,15 +46,15 @@ public class GeneralCandidateProvider implements IAnnotationCandidateProvider {
 
 	@Override
 	public GeneralCandidateProvider addBatchSlotFiller(
-			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller) {
-		for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> literalSlotFiller : slotFiller) {
+			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller) {
+		for (AbstractAnnotation<? extends AbstractAnnotation<?>> literalSlotFiller : slotFiller) {
 			addSlotFiller(literalSlotFiller);
 		}
 		return this;
 	}
 
 	@Override
-	public List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> getSlotFillerCandidates(SlotType slotType) {
+	public List<AbstractAnnotation<? extends AbstractAnnotation<?>>> getSlotFillerCandidates(SlotType slotType) {
 		return entityAnnotationCache.getOrDefault(slotType, Collections.emptyList());
 	}
 

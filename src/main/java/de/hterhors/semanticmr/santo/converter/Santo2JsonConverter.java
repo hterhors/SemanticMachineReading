@@ -11,13 +11,13 @@ import java.util.Map;
 import java.util.Set;
 
 import de.hterhors.semanticmr.corpus.EInstanceContext;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
-import de.hterhors.semanticmr.json.structure.JsonInstanceIO;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
 import de.hterhors.semanticmr.santo.container.Triple;
 import de.hterhors.semanticmr.santo.converter.reader.TextualAnnotationsReader;
@@ -75,7 +75,7 @@ public class Santo2JsonConverter {
 	public void convert(final File writeToFile, Set<String> rootEntityTypes, boolean includeSubEntities,
 			boolean jsonPrettyString) throws IOException {
 
-		final List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> rdfAnnotations = rdfConverter.extract(document,
+		final List<AbstractAnnotation<? extends AbstractAnnotation<?>>> rdfAnnotations = rdfConverter.extract(document,
 				rootEntityTypes, includeSubEntities);
 
 		List<Instance> instances = new ArrayList<>();

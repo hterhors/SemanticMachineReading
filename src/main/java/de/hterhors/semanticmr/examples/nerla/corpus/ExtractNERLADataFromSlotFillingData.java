@@ -11,7 +11,7 @@ import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
@@ -19,8 +19,8 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 import de.hterhors.semanticmr.init.specifications.impl.CSVSlotFillingSpecs;
+import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
-import de.hterhors.semanticmr.json.structure.JsonInstanceIO;
 
 public class ExtractNERLADataFromSlotFillingData {
 
@@ -37,14 +37,14 @@ public class ExtractNERLADataFromSlotFillingData {
 		for (Instance instance : instanceProvider.getInstances()) {
 			List<Instance> newInstances = new ArrayList<>();
 
-			List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations = new ArrayList<>();
+			List<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations = new ArrayList<>();
 
 			for (EntityTemplate annotation : instance.getGoldAnnotations().<EntityTemplate>getAnnotations()) {
 
 				EntityTemplateAnnotationFilter filter = annotation.filter().docLinkedAnnoation().nonEmpty()
 						.singleSlots().build();
 
-				for (Entry<SlotType, AbstractSlotFiller<? extends AbstractSlotFiller<?>>> a : filter
+				for (Entry<SlotType, AbstractAnnotation<? extends AbstractAnnotation<?>>> a : filter
 						.getSingleAnnotations().entrySet()) {
 					annotations.add(a.getValue());
 				}

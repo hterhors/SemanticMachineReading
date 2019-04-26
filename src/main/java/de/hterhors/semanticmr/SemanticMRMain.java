@@ -25,7 +25,7 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.AnnotationCreationHelper;
+import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.slotfilling.InBetweenContextTemplate;
@@ -77,8 +77,8 @@ public class SemanticMRMain {
 		featureTemplates.add(new InBetweenContextTemplate());
 
 		IStateInitializer stateInitializer = ((instance) -> new State(instance,
-				new Annotations(new EntityTemplate(AnnotationCreationHelper
-						.toSlotFiller(instance.getGoldAnnotations().getAnnotations().get(0).getEntityType())))));
+				new Annotations(new EntityTemplate(AnnotationBuilder
+						.toAnnotation(instance.getGoldAnnotations().getAnnotations().get(0).getEntityType())))));
 
 		int numberOfEpochs = 10;
 

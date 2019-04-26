@@ -24,7 +24,7 @@ import de.hterhors.semanticmr.exce.UnkownSingleSlotException;
  * @author hterhors
  *
  */
-final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
+final public class EntityTemplate extends AbstractAnnotation<EntityTemplate> {
 
 	/**
 	 * Defines the entity type of this annotation.
@@ -63,7 +63,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	 * 
 	 * @return a list of all direct slot filler values.
 	 */
-	public Set<AbstractSlotFiller<?>> getAllSlotFillerValues() {
+	public Set<AbstractAnnotation<?>> getAllSlotFillerValues() {
 		return Streams.concat(
 				this.singleFillerSlots.values().stream().filter(s -> s.containsSlotFiller())
 						.map(s -> s.getSlotFiller()),
@@ -104,7 +104,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	}
 
 	public EntityTemplate setSingleSlotFiller(SlotType slotType,
-			final AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
+			final AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller) {
 
 		if (slotFiller == null)
 			return this;
@@ -113,7 +113,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
 
 		if (!slotType.matchesEntityType(slotFiller.getEntityType()))
-			throw new IllegalSlotFillerException("Can not update slot .\"" + slotType.toPrettyString()
+			throw new IllegalSlotFillerException("Can not update slot \"" + slotType.toPrettyString()
 					+ "\" with slot filler: \"" + slotFiller.toPrettyString() + "\"");
 
 		getSingleFillerSlot(slotType).set(slotFiller);
@@ -121,8 +121,8 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 		return this;
 	}
 
-	public void updateMultiFillerSlot(SlotType slotType, AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller,
-			AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFillerCandidate) {
+	public void updateMultiFillerSlot(SlotType slotType, AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller,
+			AbstractAnnotation<? extends AbstractAnnotation<?>> slotFillerCandidate) {
 
 		if (slotFillerCandidate == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
@@ -137,7 +137,7 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 	}
 
 	public void addMultiSlotFiller(SlotType slotType,
-			final AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
+			final AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller) {
 
 		if (slotFiller == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
@@ -297,8 +297,8 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 				otherSingleSlotFiller = null;
 
 			if (singleSlotFiller.containsSlotFiller()) {
-				final AbstractSlotFiller<?> val = singleSlotFiller.getSlotFiller();
-				final AbstractSlotFiller<?> otherVal = otherSingleSlotFiller == null ? null
+				final AbstractAnnotation<?> val = singleSlotFiller.getSlotFiller();
+				final AbstractAnnotation<?> otherVal = otherSingleSlotFiller == null ? null
 						: otherSingleSlotFiller.getSlotFiller();
 
 				score.add(EvaluationHelper.scoreSingle(evaluationMode, val, otherVal));
@@ -313,9 +313,9 @@ final public class EntityTemplate extends AbstractSlotFiller<EntityTemplate> {
 
 		for (SlotType multiSlotType : this.multiFillerSlots.keySet()) {
 
-			final Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller = this
+			final Set<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller = this
 					.getMultiFillerSlot(multiSlotType).getSlotFiller();
-			final Set<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> otherSlotFiller;
+			final Set<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherSlotFiller;
 
 			if (other != null && other.containsMultiFillerSlot(multiSlotType))
 				otherSlotFiller = other.getMultiFillerSlot(multiSlotType).getSlotFiller();

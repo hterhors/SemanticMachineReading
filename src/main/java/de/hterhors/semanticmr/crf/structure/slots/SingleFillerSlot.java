@@ -1,7 +1,7 @@
 package de.hterhors.semanticmr.crf.structure.slots;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 
 public class SingleFillerSlot extends AbstractSlot {
@@ -9,7 +9,7 @@ public class SingleFillerSlot extends AbstractSlot {
 	/**
 	 * The single annotation of this slot.
 	 */
-	private AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller = null;
+	private AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller = null;
 
 	public SingleFillerSlot(SlotType slotType) {
 		super(slotType);
@@ -21,12 +21,12 @@ public class SingleFillerSlot extends AbstractSlot {
 	 * @param slotType
 	 * @param deepClone
 	 */
-	private SingleFillerSlot(SlotType slotType, AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
+	private SingleFillerSlot(SlotType slotType, AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller) {
 		super(slotType);
 		this.slotFiller = slotFiller;
 	}
 
-	public AbstractSlotFiller<?> getSlotFiller() {
+	public AbstractAnnotation<?> getSlotFiller() {
 		return slotFiller;
 	}
 
@@ -40,7 +40,7 @@ public class SingleFillerSlot extends AbstractSlot {
 	 * @param slotFiller
 	 * @return the old annotation.
 	 */
-	public void set(final AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
+	public void set(final AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller) {
 
 		if (this.slotFiller == slotFiller)
 			return;

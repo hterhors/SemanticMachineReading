@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
@@ -19,7 +19,7 @@ public class Annotations implements IEvaluatable<Annotations> {
 
 //	private boolean unmodifiable = false;
 
-	private List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations;
+	private List<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations;
 
 //	private final Instance instance;
 
@@ -29,15 +29,15 @@ public class Annotations implements IEvaluatable<Annotations> {
 		this(Collections.emptyList());
 	}
 
-	public Annotations(AbstractSlotFiller<? extends AbstractSlotFiller<?>> annotation) {
+	public Annotations(AbstractAnnotation<? extends AbstractAnnotation<?>> annotation) {
 		this(Arrays.asList(annotation));
 	}
 
-	public Annotations(List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> annotations) {
+	public Annotations(List<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations) {
 		Objects.requireNonNull(annotations);
 		this.annotations = annotations;
 //		this.instance = instance;
-		for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> abstractSlotFiller : this.annotations) {
+		for (AbstractAnnotation<? extends AbstractAnnotation<?>> abstractSlotFiller : this.annotations) {
 			if (abstractSlotFiller instanceof DocumentLinkedAnnotation) {
 				tokensWithAnnotations.addAll(((DocumentLinkedAnnotation) abstractSlotFiller).relatedTokens);
 			}
@@ -50,7 +50,7 @@ public class Annotations implements IEvaluatable<Annotations> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <Annotation extends AbstractSlotFiller<?>> List<Annotation> getAnnotations() {
+	public <Annotation extends AbstractAnnotation<?>> List<Annotation> getAnnotations() {
 		return (List<Annotation>) annotations;
 	}
 
@@ -75,9 +75,9 @@ public class Annotations implements IEvaluatable<Annotations> {
 	}
 
 	public Annotations deepUpdateCopy(int annotationIndex,
-			AbstractSlotFiller<? extends AbstractSlotFiller<?>> newCurrentPrediction) {
+			AbstractAnnotation<? extends AbstractAnnotation<?>> newCurrentPrediction) {
 
-		final List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> updatedList = new ArrayList<>(
+		final List<AbstractAnnotation<? extends AbstractAnnotation<?>>> updatedList = new ArrayList<>(
 				annotations.size());
 		for (int index = 0; index < annotations.size(); index++) {
 
@@ -92,7 +92,7 @@ public class Annotations implements IEvaluatable<Annotations> {
 	}
 
 	public Annotations deepRemoveCopy(int annotationIndex) {
-		final List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> updatedList = new ArrayList<>(
+		final List<AbstractAnnotation<? extends AbstractAnnotation<?>>> updatedList = new ArrayList<>(
 				annotations.size());
 		for (int index = 0; index < annotations.size(); index++) {
 
@@ -105,9 +105,9 @@ public class Annotations implements IEvaluatable<Annotations> {
 		return new Annotations(updatedList);
 	}
 
-	public Annotations deepAddCopy(AbstractSlotFiller<? extends AbstractSlotFiller<?>> newCurrentPrediction) {
+	public Annotations deepAddCopy(AbstractAnnotation<? extends AbstractAnnotation<?>> newCurrentPrediction) {
 
-		final List<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> updatedList = new ArrayList<>(
+		final List<AbstractAnnotation<? extends AbstractAnnotation<?>>> updatedList = new ArrayList<>(
 				annotations.size());
 		for (int index = 0; index < annotations.size(); index++) {
 			updatedList.add(annotations.get(index).deepCopy());

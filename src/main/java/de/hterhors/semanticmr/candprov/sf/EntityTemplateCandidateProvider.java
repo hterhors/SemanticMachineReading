@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
@@ -26,7 +26,7 @@ public class EntityTemplateCandidateProvider implements IAnnotationCandidateProv
 	}
 
 	public EntityTemplateCandidateProvider addSlotFiller(
-			AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller) {
+			AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller) {
 		for (SlotType slotType : slotFiller.getEntityType().getSlotFillerOfSlotTypes()) {
 			entityAnnotationCache.putIfAbsent(slotType, new ArrayList<>());
 			if (slotType.matchesEntityType(slotFiller.getEntityType())) {
@@ -37,8 +37,8 @@ public class EntityTemplateCandidateProvider implements IAnnotationCandidateProv
 	}
 
 	public EntityTemplateCandidateProvider addBatchSlotFiller(
-			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller) {
-		for (AbstractSlotFiller<? extends AbstractSlotFiller<?>> literalSlotFiller : slotFiller) {
+			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller) {
+		for (AbstractAnnotation<? extends AbstractAnnotation<?>> literalSlotFiller : slotFiller) {
 			addSlotFiller(literalSlotFiller);
 		}
 		return this;

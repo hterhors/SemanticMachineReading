@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.olp2.corpus;
+package de.hterhors.semanticmr.examples.olp2.corpus.preprocessing;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,12 +15,7 @@ import java.util.regex.Pattern;
  *
  */
 public class TextReader {
-	public static void main(String[] args) throws IOException {
-		TextReader crr = new TextReader();
-
-//		crr.de_textMap.entrySet().forEach(System.out::println);
-		crr.en_textMap.entrySet().forEach(System.out::println);
-	}
+	
 
 	private final Pattern textPattern = Pattern.compile("<bodyelem id=\"(.+?)\">(.*?)</bodyelem>");
 	private final Pattern idPattern = Pattern.compile("<document name=\"(.*?)\">");
@@ -29,9 +24,8 @@ public class TextReader {
 	public final Map<String, String> de_textMap = new HashMap<>();
 	public final Map<String, String> en_textMap = new HashMap<>();
 
-	public TextReader() throws IOException {
+	public TextReader(File crossRefDir) throws IOException {
 
-		File crossRefDir = new File("data/Text/");
 
 		for (File crossRefFile : crossRefDir.listFiles()) {
 

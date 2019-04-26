@@ -5,18 +5,18 @@ import java.util.List;
 import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 
 public interface IAnnotationCandidateProvider {
 
-	public List<? extends AbstractSlotFiller<?extends AbstractSlotFiller<?>>> getSlotFillerCandidates(SlotType slot);
+	public List<? extends AbstractAnnotation<?extends AbstractAnnotation<?>>> getSlotFillerCandidates(SlotType slot);
 
-	public IAnnotationCandidateProvider addSlotFiller(AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller);
+	public IAnnotationCandidateProvider addSlotFiller(AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller);
 
 	public IAnnotationCandidateProvider addBatchSlotFiller(
-			Collection<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller);
+			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller);
 
 	/**
 	 * TODO: UGLY PROGRAMMING HERE: Separate somehow.

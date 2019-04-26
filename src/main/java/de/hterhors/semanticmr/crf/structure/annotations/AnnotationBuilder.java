@@ -6,7 +6,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 
-public class AnnotationCreationHelper {
+public class AnnotationBuilder {
 
 	public static DocumentLinkedAnnotation toAnnotation(final Document document, final String entityTypeName,
 			final String textualContent, final int offset) throws DocumentLinkedAnnotationMismatchException {
@@ -14,16 +14,16 @@ public class AnnotationCreationHelper {
 				new TextualContent(textualContent), new DocumentPosition(offset));
 	}
 
-	public static LiteralAnnotation toSlotFiller(final String entityTypeName, final String literal) {
-		return new LiteralAnnotation(EntityType.get(entityTypeName), new TextualContent(literal));
+	public static LiteralAnnotation<?> toAnnotation(final String entityTypeName, final String literal) {
+		return new LiteralAnnotation<>(EntityType.get(entityTypeName), new TextualContent(literal));
 	}
 
-	public static EntityTypeAnnotation toSlotFiller(EntityType entityType) {
+	public static EntityTypeAnnotation<?> toAnnotation(EntityType entityType) {
 		return EntityTypeAnnotation.get(entityType);
 	}
 
-	public static EntityTypeAnnotation toSlotFiller(final String entityTypeName) {
-		return toSlotFiller(EntityType.get(entityTypeName));
+	public static EntityTypeAnnotation<?> toAnnotation(final String entityTypeName) {
+		return toAnnotation(EntityType.get(entityTypeName));
 	}
 
 }

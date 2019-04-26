@@ -7,8 +7,8 @@ import de.hterhors.semanticmr.candprov.nerla.INerlaCandidateProvider;
 import de.hterhors.semanticmr.candprov.nerla.NerlaCandidateProviderCollection;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
-import de.hterhors.semanticmr.crf.structure.annotations.AnnotationCreationHelper;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
@@ -109,7 +109,7 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 					for (EntityType entityType : cp.getEntityTypeCandidates(text)) {
 
 						try {
-							AbstractSlotFiller<? extends AbstractSlotFiller<?>> newCurrentPrediction = AnnotationCreationHelper
+							AbstractAnnotation<? extends AbstractAnnotation<?>> newCurrentPrediction = AnnotationBuilder
 									.toAnnotation(currentState.getInstance().getDocument(), entityType.entityTypeName,
 											text, fromToken.getDocCharOffset());
 							proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));

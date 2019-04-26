@@ -5,13 +5,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlotFiller;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.exce.ExceedsMaxSlotFillerException;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 
 public class MultiFillerSlot extends AbstractSlot {
 
-	private final LinkedHashSet<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller;
+	private final LinkedHashSet<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller;
 
 	public MultiFillerSlot(SlotType slotType) {
 		super(slotType);
@@ -25,12 +25,12 @@ public class MultiFillerSlot extends AbstractSlot {
 	 * @param slotFiller
 	 */
 	private MultiFillerSlot(final SlotType slotType,
-			final LinkedHashSet<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> slotFiller) {
+			final LinkedHashSet<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller) {
 		super(slotType);
 		this.slotFiller = slotFiller;
 	}
 
-	public LinkedHashSet<AbstractSlotFiller<? extends AbstractSlotFiller<?>>> getSlotFiller() {
+	public LinkedHashSet<AbstractAnnotation<? extends AbstractAnnotation<?>>> getSlotFiller() {
 		return slotFiller;
 	}
 
@@ -42,7 +42,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		return slotFiller.size() == slotType.multiFillerSlotMaxCapacity;
 	}
 
-	public boolean containsSlotFiller(AbstractSlotFiller<?> slotFillerCandidate) {
+	public boolean containsSlotFiller(AbstractAnnotation<?> slotFillerCandidate) {
 		return this.slotFiller.contains(slotFillerCandidate);
 	}
 
@@ -51,7 +51,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		return !slotFiller.isEmpty();
 	}
 
-	public void add(AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller)
+	public void add(AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller)
 			throws ExceedsMaxSlotFillerException {
 
 		if (containsMaximumFiller())
@@ -66,7 +66,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		this.slotFiller.add(slotFiller);
 	}
 
-	public void removeSlotFiller(AbstractSlotFiller<?> slotFiller) {
+	public void removeSlotFiller(AbstractAnnotation<?> slotFiller) {
 		this.slotFiller.remove(slotFiller);
 	}
 
@@ -113,7 +113,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		final StringBuilder sb = new StringBuilder(slotType.toPrettyString(depth));
 		sb.append("\t[\n");
 		final int newDepth = depth + 1;
-		for (AbstractSlotFiller<?> slotFiller : this.slotFiller) {
+		for (AbstractAnnotation<?> slotFiller : this.slotFiller) {
 			for (int d = 0; d < newDepth; d++) {
 				sb.append("\t");
 			}
@@ -138,7 +138,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		if (!containsSlotFiller())
 			return false;
 
-		for (AbstractSlotFiller<?> slotFiller : slotFiller) {
+		for (AbstractAnnotation<?> slotFiller : slotFiller) {
 			if (slotFiller.getEntityType() == entityType)
 				return true;
 		}
@@ -153,8 +153,8 @@ public class MultiFillerSlot extends AbstractSlot {
 	 * @param slotFiller          the old filler to remove
 	 * @param slotFillerCandidate the new filler to add
 	 */
-	public void replace(AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFiller,
-			AbstractSlotFiller<? extends AbstractSlotFiller<?>> slotFillerCandidate) {
+	public void replace(AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller,
+			AbstractAnnotation<? extends AbstractAnnotation<?>> slotFillerCandidate) {
 
 		if (slotFiller == slotFillerCandidate)
 			return;
