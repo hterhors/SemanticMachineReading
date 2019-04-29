@@ -20,7 +20,7 @@ import de.hterhors.semanticmr.crf.learner.regularizer.L2;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.of.SlotFillingObjectiveFunction;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
-import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
+import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
@@ -34,6 +34,8 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
+import de.hterhors.semanticmr.eval.BeamSearchEvaluator;
+import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
@@ -61,6 +63,9 @@ public class Olp2ExtractionMain {
 
 		SystemInitializer initializer = SystemInitializer.initialize(de_specificationProvider).apply();
 
+		CartesianEvaluator cartesian = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
+		BeamSearchEvaluator beam = new BeamSearchEvaluator(EEvaluationDetail.ENTITY_TYPE, 2);
+
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
 
@@ -68,8 +73,8 @@ public class Olp2ExtractionMain {
 				new File("src/main/resources/examples/olp2/de/corpus/instances/"), shuffleCorpusDistributor);
 
 		NerlaCollector nerlaProvider = new NerlaCollector(instanceProvider.getInstances());
-		nerlaProvider
-				.addNerlaProvider(new JsonNerlaProvider(new File("src/main/resources/examples/olp2/de/nerla/nerla.json")));
+		nerlaProvider.addNerlaProvider(
+				new JsonNerlaProvider(new File("src/main/resources/examples/olp2/de/nerla/nerla.json")));
 
 		AnnotationCandidateProviderCollection candidateProvider = nerlaProvider.collect();
 
@@ -79,7 +84,7 @@ public class Olp2ExtractionMain {
 
 		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider(initializer);
 
-		IObjectiveFunction objectiveFunction = new SlotFillingObjectiveFunction(EEvaluationDetail.ENTITY_TYPE);
+		IObjectiveFunction objectiveFunction = new SlotFillingObjectiveFunction(cartesian);
 
 		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
 
@@ -92,11 +97,11 @@ public class Olp2ExtractionMain {
 		IStateInitializer stateInitializer = (instance) -> new State(instance,
 				new Annotations(new EntityTemplate(AnnotationBuilder.toAnnotation("Goal"))));
 
-		int numberOfEpochs = 10;
+		int numberOfEpochs = 1;
 
 //		AbstractSampler sampler = SamplerCollection.greedyModelStrategy();
-//		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
-		AbstractSampler sampler = new EpochSwitchSampler(epoch -> epoch % 2 == 0);
+		AbstractSampler sampler = SamplerCollection.greedyObjectiveStrategy();
+//		AbstractSampler sampler = new EpochSwitchSampler(epoch -> epoch % 2 == 0);
 //		AbstractSampler sampler = new EpochSwitchSampler(new RandomSwitchSamplingStrategy());
 //		AbstractSampler sampler = new EpochSwitchSampler(e -> new Random(e).nextBoolean());
 

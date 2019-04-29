@@ -38,9 +38,9 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 
 	private static final String RIGHT = ">";
 
-	private static final DocumentToken END_DOLLAR = new DocumentToken(0, 0, 0, 0, 0, "$");
+	private static final String END_DOLLAR = "$";
 
-	private static final DocumentToken START_CIRCUMFLEX = new DocumentToken(0, 0, 0, 0, 0, "^");
+	private static final String START_CIRCUMFLEX = "^";
 
 	private static final int MIN_TOKEN_LENGTH = 2;
 
@@ -217,40 +217,6 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 			final List<DocumentToken> tokens = factor.getFactorScope().instance.getDocument().tokenList
 					.subList(fromTokenIndex + 1, toTokenIndex); // exclude start token.
 
-//			final StringBuffer fullTokenFeature = new StringBuffer(LEFT).append(fromEntityType).append(RIGHT)
-//					.append(Document.TOKEN_SPLITTER);
-
-//			final DocumentToken[] inBetweenContext = new DocumentToken[toTokenIndex - fromTokenIndex + 2];
-//			inBetweenContext[0] = START_CIRCUMFLEX;
-//			inBetweenContext[inBetweenContext.length - 1] = END_DOLLAR;
-//			int index = 1;
-//			for (int i = 0; i <= tokens.size() + 1; i++) {
-//				inBetweenContext[index] = tokens.get(i);
-
-			/*
-			 * Each token as single feature.
-			 */
-//				final StringBuffer feature = new StringBuffer(LEFT).append(fromEntityType).append(RIGHT)
-//						.append(Document.TOKEN_SPLITTER);
-//				if (i == 0) {
-//					feature.append(START_CIRCUMFLEX.getText());
-//					fullTokenFeature.append(START_CIRCUMFLEX.getText());
-//				} else if (i == tokens.size() + 1) {
-//					feature.append(END_DOLLAR.getText());
-//					fullTokenFeature.append(END_DOLLAR.getText());
-//				} else {
-//					feature.append(tokens.get(i - 1).getText());
-//					fullTokenFeature.append(tokens.get(i - 1).getText());
-//				}
-//				feature.append(Document.TOKEN_SPLITTER);
-//				feature.append(LEFT).append(toEntityType).append(RIGHT);
-//				featureVector.set(feature.toString(), true);
-//				fullTokenFeature.append(Document.TOKEN_SPLITTER);
-//
-//			}
-//			fullTokenFeature.append(LEFT).append(toEntityType).append(RIGHT);
-//			featureVector.set(fullTokenFeature.toString(), true);
-
 			if (tokens.size() > 2)
 				getTokenNgrams(featureVector, fromEntityType, toEntityType, tokens);
 		} catch (DocumentLinkedAnnotationMismatchException e) {
@@ -266,12 +232,6 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 		for (int ngram = 1; ngram < maxNgramSize; ngram++) {
 			for (int i = 0; i < maxNgramSize - 1; i++) {
 
-//				/*
-//				 * Do not include start symbol.
-//				 */
-//				if (i + ngram == 1)
-//					continue;
-
 				/*
 				 * Break if size exceeds token length
 				 */
@@ -281,23 +241,24 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 				final StringBuffer fBuffer = new StringBuffer();
 				for (int t = i; t < i + ngram; t++) {
 
-					final DocumentToken token;
+					final String text;
 					if (t == 0)
-						token = START_CIRCUMFLEX;
+						text = START_CIRCUMFLEX;
 					else if (t == tokens.size() + 1)
-						token = END_DOLLAR;
+						text = END_DOLLAR;
 					else {
 
-						token = tokens.get(t - 1);
+						final DocumentToken token = tokens.get(t - 1);
 
 						if (token.getText().isEmpty())
 							continue;
 
 						if (token.isStopWord())
 							continue;
+						text = token.getText();
 					}
 
-					fBuffer.append(token.getText());
+					fBuffer.append(text);
 					fBuffer.append(Document.TOKEN_SPLITTER);
 
 				}

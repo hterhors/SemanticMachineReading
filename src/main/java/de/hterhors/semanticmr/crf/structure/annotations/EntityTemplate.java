@@ -13,7 +13,7 @@ import de.hterhors.semanticmr.crf.structure.slots.MultiFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
-import de.hterhors.semanticmr.eval.EvaluationHelper;
+import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 import de.hterhors.semanticmr.exce.UnkownMultiSlotException;
 import de.hterhors.semanticmr.exce.UnkownSingleSlotException;
@@ -265,26 +265,25 @@ final public class EntityTemplate extends AbstractAnnotation<EntityTemplate> {
 	}
 
 	@Override
-	public Score evaluate(EEvaluationDetail evaluationMode, EntityTemplate other) {
+	public Score evaluate(AbstractEvaluator evaluator, EntityTemplate other) {
 
 		final Score score = new Score();
 
 		if (other == null) {
 			score.increaseFalseNegative();
 		} else {
-			score.add(this.rootAnnotation.evaluate(evaluationMode, other.rootAnnotation));
+			score.add(this.rootAnnotation.evaluate(evaluator, other.rootAnnotation));
 		}
 
-		addScoresForSingleFillerSlots(evaluationMode, other, score);
+		addScoresForSingleFillerSlots(evaluator, other, score);
 
-		addScoresForMultiFillerSlots(evaluationMode, other, score);
+		addScoresForMultiFillerSlots(evaluator, other, score);
 
 		return score;
 
 	}
 
-	private void addScoresForSingleFillerSlots(EEvaluationDetail evaluationMode, EntityTemplate other,
-			final Score score) {
+	private void addScoresForSingleFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, final Score score) {
 		for (SlotType singleSlotType : this.singleFillerSlots.keySet()) {
 
 			final SingleFillerSlot singleSlotFiller = this.getSingleFillerSlot(singleSlotType);
@@ -301,7 +300,7 @@ final public class EntityTemplate extends AbstractAnnotation<EntityTemplate> {
 				final AbstractAnnotation<?> otherVal = otherSingleSlotFiller == null ? null
 						: otherSingleSlotFiller.getSlotFiller();
 
-				score.add(EvaluationHelper.scoreSingle(evaluationMode, val, otherVal));
+				score.add(evaluator.scoreSingle(val, otherVal));
 			} else if (otherSingleSlotFiller != null && otherSingleSlotFiller.containsSlotFiller()) {
 				score.increaseFalsePositive();
 			}
@@ -309,7 +308,7 @@ final public class EntityTemplate extends AbstractAnnotation<EntityTemplate> {
 		}
 	}
 
-	private void addScoresForMultiFillerSlots(EEvaluationDetail evaluationMode, EntityTemplate other, final Score score) {
+	private void addScoresForMultiFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, final Score score) {
 
 		for (SlotType multiSlotType : this.multiFillerSlots.keySet()) {
 
@@ -325,7 +324,7 @@ final public class EntityTemplate extends AbstractAnnotation<EntityTemplate> {
 			if (slotFiller.isEmpty() && (otherSlotFiller == null || otherSlotFiller.isEmpty()))
 				continue;
 
-			final Score bestScore = EvaluationHelper.scoreMultiValues(evaluationMode, slotFiller, otherSlotFiller);
+			final Score bestScore = evaluator.scoreMultiValues(slotFiller, otherSlotFiller);
 
 			score.add(bestScore);
 		}

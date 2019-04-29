@@ -1,7 +1,6 @@
 package de.hterhors.semanticmr;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +34,9 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
+import de.hterhors.semanticmr.eval.AbstractEvaluator;
+import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
-import de.hterhors.semanticmr.eval.EvaluationHelper;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
@@ -67,7 +67,8 @@ public class SemanticMRMain {
 
 		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider(initializer);
 
-		IObjectiveFunction objectiveFunction = new SlotFillingObjectiveFunction(EEvaluationDetail.ENTITY_TYPE);
+		AbstractEvaluator evaluator = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
+		IObjectiveFunction objectiveFunction = new SlotFillingObjectiveFunction(evaluator);
 
 		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
 

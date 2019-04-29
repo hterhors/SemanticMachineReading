@@ -11,7 +11,11 @@ import org.apache.jena.ext.com.google.common.collect.Collections2;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 
-public class CartesianEvaluator implements IEvaluator {
+public class CartesianEvaluator extends AbstractEvaluator {
+
+	public CartesianEvaluator(EEvaluationDetail evaluationMode) {
+		super(evaluationMode);
+	}
 
 	public static final int MAXIMUM_PERMUTATION_SIZE = 8;
 
@@ -33,13 +37,12 @@ public class CartesianEvaluator implements IEvaluator {
 		return permutationCache[size].stream();
 	}
 
-	public Score scoreMax(EEvaluationDetail evaluationMode,
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
+	protected Score scoreMax(Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
 			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherAnnotations) {
 
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
-		final Score[][] scores = EvaluationHelper.computeScores(evaluationMode, annotations, otherAnnotations, maxSize);
+		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
 
 		final Score bestScore = new Score();
 

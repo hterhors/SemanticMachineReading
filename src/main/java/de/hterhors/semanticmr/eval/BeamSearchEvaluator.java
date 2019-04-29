@@ -8,23 +8,28 @@ import java.util.stream.Collectors;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 
-public class BeamSearchEvaluator implements IEvaluator {
+public class BeamSearchEvaluator extends AbstractEvaluator {
 
-	public Score scoreMax(EEvaluationDetail evaluationMode,
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
+	final public int beamSize;
+
+	public BeamSearchEvaluator(EEvaluationDetail evaluationMode, final int beamSize) {
+		super(evaluationMode);
+		this.beamSize = beamSize;
+	}
+
+	public Score scoreMax(Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
 			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherAnnotations) {
 
 		final List<BeamAssignmentTree> assignments = new ArrayList<>();
 
 		assignments.add(new BeamAssignmentTree(new ArrayList<>(annotations), new ArrayList<>(otherAnnotations)));
 
-		final BeamAssignmentTree bestAssignments = beamExploration(assignments, 2, evaluationMode).get(0);
+		final BeamAssignmentTree bestAssignments = beamExploration(assignments).get(0);
 
 		return bestAssignments.overallSimiliarity;
 	}
 
-	private List<BeamAssignmentTree> beamExploration(final List<BeamAssignmentTree> states, final int beamSize,
-			EEvaluationDetail evaluationMode) {
+	private List<BeamAssignmentTree> beamExploration(final List<BeamAssignmentTree> states) {
 
 		final List<BeamAssignmentTree> candidates = new ArrayList<>();
 
@@ -72,9 +77,9 @@ public class BeamSearchEvaluator implements IEvaluator {
 					 */
 					Score similarity;
 					if (goldThing == null) {
-						similarity = EvaluationHelper.scoreSingle(evaluationMode, predThing, goldThing).invert();
+						similarity = scoreSingle(predThing, goldThing).invert();
 					} else {
-						similarity = EvaluationHelper.scoreSingle(evaluationMode, goldThing, predThing);
+						similarity = scoreSingle(goldThing, predThing);
 					}
 
 					/*
@@ -98,7 +103,7 @@ public class BeamSearchEvaluator implements IEvaluator {
 		final List<BeamAssignmentTree> successorStates = candidates.stream().sorted().limit(beamSize)
 				.collect(Collectors.toList());
 
-		return beamExploration(successorStates, beamSize, evaluationMode);
+		return beamExploration(successorStates);
 
 	}
 

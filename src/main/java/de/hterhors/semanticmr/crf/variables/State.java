@@ -8,6 +8,7 @@ import de.hterhors.semanticmr.crf.factor.FactorGraph;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
+import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.IEvaluatable;
 
@@ -103,8 +104,8 @@ public class State {
 		return instance.getGoldAnnotations();
 	}
 
-	public Score score(EEvaluationDetail evaluationMode) {
-		this.score = instance.getGoldAnnotations().evaluate(evaluationMode, currentPredictions);
+	public Score score(AbstractEvaluator evaluator) {
+		this.score = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions);
 		return score;
 	}
 

@@ -12,12 +12,11 @@ import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
-import de.hterhors.semanticmr.eval.EvaluationHelper;
+import de.hterhors.semanticmr.eval.AbstractEvaluator;
 
 public class Annotations implements IEvaluatable<Annotations> {
 
 	private List<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations;
-
 
 	private Set<DocumentToken> tokensWithAnnotations = new HashSet<>();
 
@@ -49,17 +48,16 @@ public class Annotations implements IEvaluatable<Annotations> {
 		return (List<Annotation>) annotations;
 	}
 
-
 	@Override
-	public Score evaluate(EEvaluationDetail evaluationMode, Annotations otherVal) {
+	public Score evaluate(AbstractEvaluator evaluator, Annotations otherVal) {
 
 		if (this.annotations.size() == 0 || otherVal.annotations.size() == 0 || otherVal == null)
 			return Score.ZERO;
 
 		if (this.annotations.size() == 1 && otherVal.annotations.size() == 1)
-			return EvaluationHelper.scoreSingle(evaluationMode, this.annotations.get(0), otherVal.annotations.get(0));
+			return evaluator.scoreSingle(this.annotations.get(0), otherVal.annotations.get(0));
 
-		return EvaluationHelper.scoreMultiValues(evaluationMode, this.annotations, otherVal.annotations);
+		return evaluator.scoreMultiValues(this.annotations, otherVal.annotations);
 
 	}
 

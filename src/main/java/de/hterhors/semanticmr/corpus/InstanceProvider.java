@@ -13,7 +13,7 @@ import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
-import de.hterhors.semanticmr.eval.EvaluationHelper;
+import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.json.JsonInstancesReader;
 
 public class InstanceProvider {
@@ -87,7 +87,7 @@ public class InstanceProvider {
 				if (instance.getGoldAnnotations().getAnnotations()
 						.size() >= CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE) {
 					System.out.println("WARN: Instance with to many annotations detected!");
-//					iterator.remove();
+					iterator.remove();
 				}
 
 			}

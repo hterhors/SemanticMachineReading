@@ -75,7 +75,7 @@ public class Document {
 
 		this.documentContent = builderDocumentContent(tokenList);
 
-		for (DocumentToken token : tokenList) {
+		for (DocumentToken token : this.tokenList) {
 			startOffsetCharPositionTokens.put(new Integer(token.getDocCharOffset()), token);
 			endOffsetCharPositionTokens.put(new Integer(token.getDocCharOffset() + token.getText().length()), token);
 		}

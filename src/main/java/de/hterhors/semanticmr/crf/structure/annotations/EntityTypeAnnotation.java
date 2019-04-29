@@ -7,6 +7,7 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.IAnnotationFilter;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.IBuilder;
+import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 /**
@@ -91,11 +92,11 @@ public class EntityTypeAnnotation<A extends EntityTypeAnnotation<A>> extends Abs
 		return true;
 	}
 
-	public Score evaluate(EEvaluationDetail mode, EntityTypeAnnotation otherVal) {
+	public Score evaluate(AbstractEvaluator evaluator, EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else {
-			switch (mode) {
+			switch (evaluator.evaluationMode) {
 			case DOCUMENT_LINKED:
 			case LITERAL:
 				if (equals(otherVal))
@@ -118,7 +119,7 @@ public class EntityTypeAnnotation<A extends EntityTypeAnnotation<A>> extends Abs
 				return Score.FN_FP;
 			}
 		}
-		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + mode);
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationMode);
 
 	}
 

@@ -59,6 +59,9 @@ public class JsonNerlaProvider implements INerlaProvider {
 
 			Instance instance = map.get(jsonEntityAnnotationWrapper.getDocumentID());
 
+			if (instance == null)
+				continue;
+
 			nerla.putIfAbsent(instance, new ArrayList<>());
 
 			try {

@@ -2,11 +2,15 @@ package de.hterhors.semanticmr.crf.structure.annotations;
 
 import java.util.List;
 
+import org.apache.jena.riot.tokens.TokenCheckerLib;
+import org.apache.jena.sparql.function.library.eval;
+
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
+import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 
@@ -36,9 +40,15 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation<DocumentLi
 		super(entityType, textualContent);
 		this.document = document;
 		this.documentPosition = documentPosition;
+		System.out.println(documentPosition);
+		System.out.println(this.document.documentID + ":" + this.document.tokenList.size());
 		this.relatedTokens = this.document.tokenList.subList(
 				this.document.getTokenByCharOffset(getStartDocCharOffset()).getDocTokenIndex(),
 				this.document.getTokenByCharOffset(getEndDocCharOffset()).getDocTokenIndex() + 1);
+		relatedTokens.forEach(System.out::println);
+		System.out.println(textualContent.surfaceForm);
+		System.out.println();
+		System.out.println();
 	}
 
 	public int getStartDocCharOffset() {
@@ -113,11 +123,11 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation<DocumentLi
 	}
 
 	@Override
-	public Score evaluate(EEvaluationDetail mode, EntityTypeAnnotation otherVal) {
+	public Score evaluate(AbstractEvaluator evaluator, EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else {
-			switch (mode) {
+			switch (evaluator.evaluationMode) {
 			case DOCUMENT_LINKED:
 				if (equals(otherVal)) {
 					return Score.TP;
@@ -126,10 +136,10 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation<DocumentLi
 				}
 			case LITERAL:
 			case ENTITY_TYPE:
-				return super.evaluate(mode, otherVal);
+				return super.evaluate(evaluator, otherVal);
 			}
 		}
-		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + mode);
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationMode);
 	}
 
 }
