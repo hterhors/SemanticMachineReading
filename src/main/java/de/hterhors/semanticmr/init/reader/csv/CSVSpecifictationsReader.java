@@ -2,6 +2,7 @@ package de.hterhors.semanticmr.init.reader.csv;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;

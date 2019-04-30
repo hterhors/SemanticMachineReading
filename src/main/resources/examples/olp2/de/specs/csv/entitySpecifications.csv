@@ -4,8 +4,11 @@ Player	false
 Team	false
 Minute	false
 CurrentScore	false
-ScoreTeamA	false
-ScoreTeamB	false
+ScoreTeam	false
+YellowCard	false
+RedCard	false
+Card	false
+TeamStats	false
 0	false
 1	false
 2	false

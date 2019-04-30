@@ -52,8 +52,8 @@ public class StartPreprocessing {
 
 	public static void main(String[] args) throws Exception {
 
-//		de();
-		en();
+		de();
+//		en();
 
 	}
 
@@ -115,6 +115,12 @@ public class StartPreprocessing {
 			annotations.add(et);
 		}
 		for (EntityTemplate et : xml2json.readYellowCards(structureID)) {
+			annotations.add(et);
+		}
+		for (EntityTemplate et : xml2json.readTeamAStats(structureID)) {
+			annotations.add(et);
+		}
+		for (EntityTemplate et : xml2json.readTeamBStats(structureID)) {
 			annotations.add(et);
 		}
 		return new Instance(EInstanceContext.UNSPECIFIED,

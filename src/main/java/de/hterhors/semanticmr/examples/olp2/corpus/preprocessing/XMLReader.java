@@ -292,9 +292,9 @@ public class XMLReader {
 
 				templateEntity.setSingleSlotFiller(SlotType.get("player"),
 						AnnotationBuilder.toAnnotation(scorerEntityTyeName));
-				templateEntity.setSingleSlotFiller(SlotType.get("forTeam"),
+				templateEntity.setSingleSlotFiller(SlotType.get("cardForTeam"),
 						AnnotationBuilder.toAnnotation(teamEntityTyeName));
-				templateEntity.setSingleSlotFiller(SlotType.get("minute"),
+				templateEntity.setSingleSlotFiller(SlotType.get("cardMinute"),
 						AnnotationBuilder.toAnnotation(minuteEntityTyeName));
 
 			}
@@ -333,14 +333,14 @@ public class XMLReader {
 
 		doc.getDocumentElement().normalize();
 
-		NodeList nList = doc.getElementsByTagName(team);
+		Node l = doc.getElementsByTagName("MatchInfo").item(0);
+		Element e = (Element) l;
+		NodeList nList = e.getElementsByTagName(team);
 
 		List<EntityTemplate> templateEntities = new ArrayList<>();
 
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 
-			EntityTemplate templateEntity = new EntityTemplate(AnnotationBuilder.toAnnotation(EntityType.get(team)));
-			templateEntities.add(templateEntity);
 
 			Node nNode = nList.item(temp);
 
@@ -352,6 +352,9 @@ public class XMLReader {
 				final String minuteEntityTyeName = eElement.getElementsByTagName("FinalScoreResult").item(0)
 						.getTextContent().trim();
 
+				EntityTemplate templateEntity = new EntityTemplate(
+						AnnotationBuilder.toAnnotation(EntityType.get("TeamStats")));
+				templateEntities.add(templateEntity);
 				templateEntity.setSingleSlotFiller(SlotType.get("name"),
 						AnnotationBuilder.toAnnotation(teamEntityTyeName));
 				templateEntity.setSingleSlotFiller(SlotType.get("finalScore"),
