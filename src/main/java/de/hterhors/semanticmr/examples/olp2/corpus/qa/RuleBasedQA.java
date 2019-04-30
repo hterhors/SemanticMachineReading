@@ -3,17 +3,13 @@ package de.hterhors.semanticmr.examples.olp2.corpus.qa;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
 import java.util.Set;
-
-import org.apache.jena.sparql.function.library.min;
 
 import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
@@ -27,18 +23,22 @@ import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 
 public class RuleBasedQA {
 
-	private static final int NUM_OF_QUESTIONS = 31;
+	public static final int NUM_OF_QUESTIONS = 31;
+
+	final public List<Map<Instance, String>> instancesPerQuestion = new ArrayList<>();
+	final public Map<Instance, Set<Integer>> moi = new HashMap<>();
 
 	public static void main(String[] args) {
-		SystemInitializer.initialize(Olp2ExtractionMain.de_specificationProvider).apply();
+
+	}
+
+	public RuleBasedQA() {
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
 
 		InstanceProvider instanceProvider = new InstanceProvider(
-				new File("src/main/resources/examples/olp2/de/corpus/instances/"), shuffleCorpusDistributor);
-
-		final List<Map<Instance, String>> instancesPerQuestion = new ArrayList<>();
+				new File("src/main/resources/examples/olp2/de/corpus/sf/"), shuffleCorpusDistributor);
 
 		for (int i = 0; i < NUM_OF_QUESTIONS; i++) {
 			instancesPerQuestion.add(new HashMap<>());
@@ -202,11 +202,9 @@ public class RuleBasedQA {
 			}
 		}
 
-		Map<Instance, Set<Integer>> moi = new HashMap<>();
-
 		int qc = 1;
 		for (Map<Instance, String> map : instancesPerQuestion) {
-			System.out.println("Question: " + qc + " -> " + map.keySet().size());
+//			System.out.println("Question: " + qc + " -> " + map.keySet().size());
 			for (Entry<Instance, String> e : map.entrySet()) {
 				moi.putIfAbsent(e.getKey(), new HashSet<>());
 				moi.get(e.getKey()).add(qc);
@@ -216,10 +214,9 @@ public class RuleBasedQA {
 			qc++;
 		}
 
-		for (Entry<Instance, Set<Integer>> map : moi.entrySet()) {
-			System.out.println(map.getKey().getName() + "\t" + map.getValue());
-		}
-
+//		for (Entry<Instance, Set<Integer>> map : moi.entrySet()) {
+//			System.out.println(map.getKey().getName() + "\t" + map.getValue());
+//		}
 	}
 
 	/**

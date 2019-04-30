@@ -70,7 +70,7 @@ public class Olp2ExtractionMain {
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
 
 		InstanceProvider instanceProvider = new InstanceProvider(
-				new File("src/main/resources/examples/olp2/de/corpus/instances/"), shuffleCorpusDistributor);
+				new File("src/main/resources/examples/olp2/de/corpus/sf/"), shuffleCorpusDistributor);
 
 		NerlaCollector nerlaProvider = new NerlaCollector(instanceProvider.getInstances());
 		nerlaProvider.addNerlaProvider(

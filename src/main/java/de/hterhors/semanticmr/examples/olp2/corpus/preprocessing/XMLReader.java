@@ -34,6 +34,9 @@ public class XMLReader {
 
 	final private File xmlDir;
 
+	final public Map<String, Map<String, List<String>>> player = new HashMap<>();
+	final public Map<String, Map<String, String>> teams = new HashMap<>();
+
 	public XMLReader(File xmlDir) throws Exception {
 
 		fillDeMap();
@@ -42,40 +45,37 @@ public class XMLReader {
 
 		this.xmlDir = xmlDir;
 
-//		Set<String> player = new HashSet<>();
-//		Set<String> teams = new HashSet<>();
-//
-//		for (File xmlFile : xmlDir.listFiles()) {
-//
-//			if (!xmlFile.getName().startsWith("en_"))
-//				continue;
-//
-//			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-//			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-//			Document doc = dBuilder.parse(xmlFile);
-//
-//			doc.getDocumentElement().normalize();
-//
-//			player.addAll(readPlayer(doc, "Team1"));
-//			player.addAll(readPlayer(doc, "Team2"));
-////
-//			teams.addAll(readTeams(doc, "Team1"));
-//			teams.addAll(readTeams(doc, "Team2"));
-////
-////			readGoals(doc, xmlFile);
-//		}
+		for (File xmlFile : xmlDir.listFiles()) {
 
-//		List<String> sortedPlayer = new ArrayList<>(player);
-//		List<String> sortedTeams = new ArrayList<>(teams);
+			Set<String> playerA = new HashSet<>();
+			Set<String> playerB = new HashSet<>();
+			String teamA;
+			String teamB;
 
-////		Collections.sort(sortedPlayer);
-//		Collections.sort(sortedTeams);
-////
-//		for (String p : sortedTeams) {
-//			System.out.println(p+"\tfalse");
-////			System.out.println("Team\t" + p);
-//		}
-//		System.exit(1);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(xmlFile);
+
+			doc.getDocumentElement().normalize();
+
+			playerA.addAll(readPlayer(doc, "Team1"));
+			playerB.addAll(readPlayer(doc, "Team2"));
+			teamA = readTeams(doc, "Team1").iterator().next();
+			teamB = readTeams(doc, "Team2").iterator().next();
+
+			List<String> sortedPlayerA = new ArrayList<>(playerA);
+			List<String> sortedPlayerB = new ArrayList<>(playerB);
+
+			Collections.sort(sortedPlayerA);
+			Collections.sort(sortedPlayerB);
+
+			this.player.putIfAbsent(xmlFile.getName(), new HashMap<>());
+			this.player.get(xmlFile.getName()).putIfAbsent("Team1", sortedPlayerA);
+			this.player.get(xmlFile.getName()).putIfAbsent("Team2", sortedPlayerB);
+			this.teams.putIfAbsent(xmlFile.getName(), new HashMap<>());
+			this.teams.get(xmlFile.getName()).put("Team1", teamA);
+			this.teams.get(xmlFile.getName()).put("Team2", teamB);
+		}
 
 	}
 
@@ -146,14 +146,18 @@ public class XMLReader {
 				;
 //				;System.out.println("WARN GOALKEEPER MISSING");
 			else {
-				player.add(name(gk.getElementsByTagName("Name").item(0).getTextContent().trim()));
+				String N = name(gk.getElementsByTagName("Name").item(0).getTextContent().trim());
+				if (!N.isEmpty())
+					player.add(N);
 			}
 			for (int i = 0; i < n.getElementsByTagName("OtherFootballPlayer").getLength(); i++) {
 
 				Element of = (Element) n.getElementsByTagName("OtherFootballPlayer").item(i);
 
 //				System.out.println(of.getElementsByTagName("Name").item(0).getTextContent());
-				player.add(name(of.getElementsByTagName("Name").item(0).getTextContent().trim()));
+				String N = name(of.getElementsByTagName("Name").item(0).getTextContent().trim());
+				if (!N.isEmpty())
+					player.add(N);
 			}
 		}
 		return player;
@@ -340,7 +344,6 @@ public class XMLReader {
 		List<EntityTemplate> templateEntities = new ArrayList<>();
 
 		for (int temp = 0; temp < nList.getLength(); temp++) {
-
 
 			Node nNode = nList.item(temp);
 

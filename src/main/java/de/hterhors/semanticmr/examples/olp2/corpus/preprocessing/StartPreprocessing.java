@@ -76,7 +76,7 @@ public class StartPreprocessing {
 			final String ins = io.writeInstances(w.convertToWrapperInstances(initializer));
 
 			PrintStream ps = new PrintStream(new File(
-					"src/main/resources/examples/olp2/de/corpus/instances/" + crossRefEntry.getKey() + ".json"));
+					"src/main/resources/examples/olp2/de/corpus/sf/" + crossRefEntry.getKey() + ".json"));
 			ps.println(ins);
 			ps.close();
 		}
@@ -99,7 +99,7 @@ public class StartPreprocessing {
 			final String ins = io.writeInstances(w.convertToWrapperInstances(initializer));
 
 			PrintStream ps = new PrintStream(new File(
-					"src/main/resources/examples/olp2/en/corpus/instances/" + crossRefEntry.getKey() + ".json"));
+					"src/main/resources/examples/olp2/en/corpus/sf/instances/" + crossRefEntry.getKey() + ".json"));
 			ps.println(ins);
 			ps.close();
 

@@ -154,11 +154,11 @@ public class InstancesToJsonInstanceWrapper {
 		if (wrapper instanceof DocumentLinkedAnnotation) {
 			rootAnnotationWrapper
 					.setDocLinkedAnnotation(toDocumentLinkedAnnotationWrapper((DocumentLinkedAnnotation) wrapper));
+		} else if (wrapper instanceof LiteralAnnotation) {
+			rootAnnotationWrapper.setLiteralAnnotation(toLiteralAnnotationWrapper((LiteralAnnotation) wrapper));
 		} else if (wrapper instanceof EntityTypeAnnotation) {
 			rootAnnotationWrapper
 					.setEntityTypeAnnotation(toEntityTypeAnnotationWrapper((EntityTypeAnnotation) wrapper));
-		} else if (wrapper instanceof LiteralAnnotation) {
-			rootAnnotationWrapper.setLiteralAnnotation(toLiteralAnnotationWrapper((LiteralAnnotation) wrapper));
 		}
 		return rootAnnotationWrapper;
 	}
@@ -172,11 +172,11 @@ public class InstancesToJsonInstanceWrapper {
 		if (slotFiller instanceof DocumentLinkedAnnotation) {
 			singleFillerSlotWrapper
 					.setDocLinkedAnnotation(toDocumentLinkedAnnotationWrapper((DocumentLinkedAnnotation) slotFiller));
+		} else if (slotFiller instanceof LiteralAnnotation) {
+			singleFillerSlotWrapper.setLiteralAnnotation(toLiteralAnnotationWrapper((LiteralAnnotation) slotFiller));
 		} else if (slotFiller instanceof EntityTypeAnnotation) {
 			singleFillerSlotWrapper
 					.setEntityTypeAnnotation(toEntityTypeAnnotationWrapper((EntityTypeAnnotation) slotFiller));
-		} else if (slotFiller instanceof LiteralAnnotation) {
-			singleFillerSlotWrapper.setLiteralAnnotation(toLiteralAnnotationWrapper((LiteralAnnotation) slotFiller));
 		} else if (slotFiller instanceof EntityTemplate) {
 			singleFillerSlotWrapper.setEntityTemplateAnnotation(toEntityTemplateWrapper((EntityTemplate) slotFiller));
 		}
