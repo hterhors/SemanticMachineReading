@@ -87,7 +87,7 @@ public class InstanceProvider {
 				if (instance.getGoldAnnotations().getAnnotations()
 						.size() >= CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE) {
 					System.out.println("WARN: Instance with to many annotations detected!");
-					iterator.remove();
+//					iterator.remove();
 				}
 
 			}

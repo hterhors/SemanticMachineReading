@@ -24,7 +24,8 @@ public abstract class AbstractAnnotation<T> implements IEvaluatable<T>, IDeepCop
 		if (this instanceof DocumentLinkedAnnotation) {
 			return (DocumentLinkedAnnotation) this;
 		}
-		return null;
+		throw new ClassCastException(
+				"Annotation is not an instance of " + DocumentLinkedAnnotation.class.getSimpleName());
 	}
 
 	/**
@@ -37,7 +38,7 @@ public abstract class AbstractAnnotation<T> implements IEvaluatable<T>, IDeepCop
 		if (this instanceof LiteralAnnotation) {
 			return (LiteralAnnotation) this;
 		}
-		return null;
+		throw new ClassCastException("Annotation is not an instance of " + LiteralAnnotation.class.getSimpleName());
 	}
 
 	/**
@@ -50,7 +51,7 @@ public abstract class AbstractAnnotation<T> implements IEvaluatable<T>, IDeepCop
 		if (this instanceof EntityTypeAnnotation) {
 			return (EntityTypeAnnotation) this;
 		}
-		return null;
+		throw new ClassCastException("Annotation is not an instance of " + EntityTypeAnnotation.class.getSimpleName());
 	}
 
 	/**
@@ -63,7 +64,7 @@ public abstract class AbstractAnnotation<T> implements IEvaluatable<T>, IDeepCop
 		if (this instanceof EntityTemplate) {
 			return (EntityTemplate) this;
 		}
-		return null;
+		throw new ClassCastException("Annotation is not an instance of " + EntityTemplate.class.getSimpleName());
 	}
 
 }

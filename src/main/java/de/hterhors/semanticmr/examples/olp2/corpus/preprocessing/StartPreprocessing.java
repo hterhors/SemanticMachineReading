@@ -111,6 +111,12 @@ public class StartPreprocessing {
 		for (EntityTemplate et : xml2json.readGoals(structureID)) {
 			annotations.add(et);
 		}
+		for (EntityTemplate et : xml2json.readRedCards(structureID)) {
+			annotations.add(et);
+		}
+		for (EntityTemplate et : xml2json.readYellowCards(structureID)) {
+			annotations.add(et);
+		}
 		return new Instance(EInstanceContext.UNSPECIFIED,
 				new Document(structureID, StandardDocumentTokenizer.tokenizeDocumentsContent(docContent)),
 				new Annotations(annotations));

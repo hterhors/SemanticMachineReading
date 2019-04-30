@@ -14,11 +14,13 @@ import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
@@ -173,6 +175,13 @@ public class XMLReader {
 
 	static int counter = 0;
 
+//<Goals>
+//<Goal>
+//  <Scorer>TANA Elijah</Scorer>
+//  <Team>ZAM</Team>
+//  <Minute>1</Minute>
+//  <CurrentScore>1:0</CurrentScore>
+//</Goal>
 	public List<EntityTemplate> readGoals(String xmlFile) throws Exception {
 
 		final File file = new File(xmlDir, xmlFile + ".xml");
@@ -229,4 +238,128 @@ public class XMLReader {
 		}
 		return templateEntities;
 	}
+
+//	 <Cards>
+//	    <YellowCard>
+//	      <Player>TANA Elijah</Player>
+//	      <Team>ZAM</Team>
+//	      <Minute>27</Minute>
+//	    </YellowCard>
+	public List<EntityTemplate> readYellowCards(String xmlFile) throws Exception {
+		return readCard(xmlFile, "YellowCard");
+	}
+
+	public List<EntityTemplate> readRedCards(String xmlFile) throws Exception {
+		return readCard(xmlFile, "RedCard");
+	}
+
+	private List<EntityTemplate> readCard(String xmlFile, final String card)
+			throws ParserConfigurationException, SAXException, IOException {
+		final File file = new File(xmlDir, xmlFile + ".xml");
+
+		if (!file.exists())
+			return Collections.emptyList();
+
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document doc = dBuilder.parse(file);
+
+		doc.getDocumentElement().normalize();
+
+		NodeList nList = doc.getElementsByTagName(card);
+
+		List<EntityTemplate> templateEntities = new ArrayList<>();
+
+		for (int temp = 0; temp < nList.getLength(); temp++) {
+
+			EntityTemplate templateEntity = new EntityTemplate(AnnotationBuilder.toAnnotation(EntityType.get(card)));
+			templateEntities.add(templateEntity);
+
+			Node nNode = nList.item(temp);
+
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+				Element eElement = (Element) nNode;
+
+				Map<String, String> map = xmlFile.startsWith("de_") ? deMap : enMap;
+
+				final String scorerEntityTyeName = name(
+						eElement.getElementsByTagName("Player").item(0).getTextContent().trim());
+				final String teamEntityTyeName = map
+						.get(eElement.getElementsByTagName("Team").item(0).getTextContent().trim());
+				final String minuteEntityTyeName = eElement.getElementsByTagName("Minute").item(0).getTextContent()
+						.trim();
+
+				templateEntity.setSingleSlotFiller(SlotType.get("player"),
+						AnnotationBuilder.toAnnotation(scorerEntityTyeName));
+				templateEntity.setSingleSlotFiller(SlotType.get("forTeam"),
+						AnnotationBuilder.toAnnotation(teamEntityTyeName));
+				templateEntity.setSingleSlotFiller(SlotType.get("minute"),
+						AnnotationBuilder.toAnnotation(minuteEntityTyeName));
+
+			}
+		}
+		return templateEntities;
+	}
+
+//	<Team1>
+//    <Name>Peru</Name>
+//    <FinalScoreResult>4</FinalScoreResult>
+//  </Team1>
+//  <Team2>
+//    <Name>Paraguay</Name>
+//    <FinalScoreResult>1</FinalScoreResult>
+//  </Team2>
+	public List<EntityTemplate> readTeamAStats(String xmlFile)
+			throws ParserConfigurationException, SAXException, IOException {
+		return readTeamStats(xmlFile, "Team1");
+	}
+
+	public List<EntityTemplate> readTeamBStats(String xmlFile)
+			throws ParserConfigurationException, SAXException, IOException {
+		return readTeamStats(xmlFile, "Team2");
+	}
+
+	private List<EntityTemplate> readTeamStats(String xmlFile, final String team)
+			throws ParserConfigurationException, SAXException, IOException {
+		final File file = new File(xmlDir, xmlFile + ".xml");
+
+		if (!file.exists())
+			return Collections.emptyList();
+
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document doc = dBuilder.parse(file);
+
+		doc.getDocumentElement().normalize();
+
+		NodeList nList = doc.getElementsByTagName(team);
+
+		List<EntityTemplate> templateEntities = new ArrayList<>();
+
+		for (int temp = 0; temp < nList.getLength(); temp++) {
+
+			EntityTemplate templateEntity = new EntityTemplate(AnnotationBuilder.toAnnotation(EntityType.get(team)));
+			templateEntities.add(templateEntity);
+
+			Node nNode = nList.item(temp);
+
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+				Element eElement = (Element) nNode;
+
+				final String teamEntityTyeName = eElement.getElementsByTagName("Name").item(0).getTextContent().trim();
+				final String minuteEntityTyeName = eElement.getElementsByTagName("FinalScoreResult").item(0)
+						.getTextContent().trim();
+
+				templateEntity.setSingleSlotFiller(SlotType.get("name"),
+						AnnotationBuilder.toAnnotation(teamEntityTyeName));
+				templateEntity.setSingleSlotFiller(SlotType.get("finalScore"),
+						AnnotationBuilder.toAnnotation(minuteEntityTyeName));
+
+			}
+		}
+		return templateEntities;
+	}
+
 }
