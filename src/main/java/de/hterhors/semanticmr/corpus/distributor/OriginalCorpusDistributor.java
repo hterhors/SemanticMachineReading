@@ -25,7 +25,7 @@ public class OriginalCorpusDistributor extends AbstractCorpusDistributor {
 		super(corpusSizeFraction);
 	}
 
-	public static class Builder extends AbstractConfigBuilder<Builder> {
+	public static class Builder extends AbstractCorpusDistributorConfigBuilder<Builder> {
 
 		public OriginalCorpusDistributor build() {
 			return new OriginalCorpusDistributor(corpusSizeFraction);

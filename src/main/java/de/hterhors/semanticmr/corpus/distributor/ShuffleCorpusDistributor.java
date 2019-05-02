@@ -80,7 +80,7 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 				+ "]";
 	}
 
-	public static class Builder extends AbstractConfigBuilder<Builder> {
+	public static class Builder extends AbstractCorpusDistributorConfigBuilder<Builder> {
 
 		/**
 		 * The proportion of the training data.

@@ -68,9 +68,10 @@ public class SemanticMRMain {
 		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider(initializer);
 
 		AbstractEvaluator evaluator = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
+
 		IObjectiveFunction objectiveFunction = new SlotFillingObjectiveFunction(evaluator);
 
-		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
+		AdvancedLearner learner = new AdvancedLearner(new SGD(0.1, 0), new L2(0.01));
 
 		List<AbstractFeatureTemplate<?, ?>> featureTemplates = new ArrayList<>();
 
