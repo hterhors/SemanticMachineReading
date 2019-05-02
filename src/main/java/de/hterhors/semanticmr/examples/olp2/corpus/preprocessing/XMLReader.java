@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,6 +26,7 @@ import org.xml.sax.SAXException;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 
 public class XMLReader {
@@ -111,6 +113,14 @@ public class XMLReader {
 			enMap.put(d[1].trim(), d[0].trim());
 
 		}
+	}
+
+	public String getTeam(String name, String team) {
+		return teams.get(name + ".xml").get(team);
+	}
+
+	public List<String> getPlayerAnnotations(String instanceName, String team) {
+		return player.get(instanceName + ".xml").get(team);
 	}
 
 	private static Set<String> readTeams(Document doc, String string) {

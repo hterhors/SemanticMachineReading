@@ -1,5 +1,9 @@
 package de.hterhors.semanticmr.crf.structure.annotations;
 
+import java.util.Objects;
+
+import org.apache.jena.sparql.function.library.e;
+
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
@@ -23,6 +27,7 @@ public class AnnotationBuilder {
 	}
 
 	public static EntityTypeAnnotation<?> toAnnotation(final String entityTypeName) {
+		Objects.requireNonNull(entityTypeName);
 		return toAnnotation(EntityType.get(entityTypeName));
 	}
 

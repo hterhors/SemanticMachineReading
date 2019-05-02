@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.Set;
 
 import de.hterhors.semanticmr.corpus.InstanceProvider;
@@ -16,207 +17,483 @@ import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
+import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.XMLReader;
 import de.hterhors.semanticmr.examples.olp2.extraction.Olp2ExtractionMain;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 
 public class RuleBasedQA {
 
-	public static final int NUM_OF_QUESTIONS = 31;
+	public final static String[] question = new String[] { "Did the game ended in a draw?",
+			"What was the score at halftime?", "What was the score at the end of the game?",
+			"Which teams got at least one red card? ", "Which teams got at least one yellow card? ",
+			"Which team got the most yellow cards?", "Which team got the most red cards?",
+			"Which team got the first yellow card?", "Which team got the first red card?", "Which team won the game?",
+			"Which team lost the game?", "Which player got the first yellow card?",
+			"Which player got the first red card?", "Which player got the last yellow card?",
+			"Which player got the last red card?", "Which player scored the first goal?",
+			"Which player scored the last goal?", "In which minute were the first goal scored?",
+			"In which minute were the last goal scored?", "In which minute was the first yellow card?",
+			"In which minute was the last yellow card?", "In which minute was the first red card?",
+			"In which minute was the last red card?", "In which minute was the first equalizer scored?",
+			"In which minute was the last equalizer scored?", "How many equalizer were scored?",
+			"How many minutes of the regular time were played in a draw?",
+			"How many minutes of the regular time was Team A in the lead?",
+			"How many minutes of the regular time was Team B in the lead?",
+			"How many yellow cards were given in total?", "How many red cards were given in total?",
+			"In which minute did player X score a goal?", "How many goals did player X scored?",
+			"Did player X received a yellow card?", "Did player X received a red card?",
+			"How many yellow cards received Team A?", "How many red cards received Team A?",
+			"How many yellow cards received Team B?", "How many red cards received Team B?"
 
-	final public List<Map<Instance, String>> instancesPerQuestion = new ArrayList<>();
-	final public Map<Instance, Set<Integer>> moi = new HashMap<>();
+	};
 
-	public static void main(String[] args) {
+	final public Map<Instance, List<QuestionAnswerPair>> questionsForInstances = new HashMap<>();
 
-	}
+	final private XMLReader reader;
+	public final static String DEFAULT_NOT_EXISTENT_ANSWER = "N/A";
 
-	public RuleBasedQA() {
+	public RuleBasedQA(XMLReader reader, final List<Instance> instances) {
 
-		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
-				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
+		this.reader = reader;
 
-		InstanceProvider instanceProvider = new InstanceProvider(
-				new File("src/main/resources/examples/olp2/de/corpus/sf/"), shuffleCorpusDistributor);
+		for (Instance instance : instances) {
 
-		for (int i = 0; i < NUM_OF_QUESTIONS; i++) {
-			instancesPerQuestion.add(new HashMap<>());
+			questionsForInstances.putIfAbsent(instance, new ArrayList<>());
+
+			int questionIndex = 0;
+
+			String answer;
+			if ((answer = answerQ1(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ2(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ3(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ4(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ5(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ6(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ7(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ8(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ9(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ10(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ11(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ12(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ13(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ14(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ15(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ16(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ17(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ18(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ19(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ20(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ21(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ22(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ23(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ24(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ25(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ26(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ27(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ28(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ29(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ30(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			if ((answer = answerQ31(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+			questionIndex++;
+
+			String q = question[questionIndex];
+			int i = 0;
+
+			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team1")) {
+
+				if ((answer = answerQ32(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+				} else {
+//					questionsForInstances.get(instance)
+//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				}
+				i++;
+			}
+			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
+
+				if ((answer = answerQ32(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+				} else {
+//					questionsForInstances.get(instance)
+//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				}
+				i++;
+			}
+			questionIndex++;
+			q = question[questionIndex];
+			i = 0;
+			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team1")) {
+
+				if ((answer = answerQ33(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+				} else {
+//					questionsForInstances.get(instance)
+//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				}
+				i++;
+			}
+			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
+
+				if ((answer = answerQ33(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+				} else {
+//					questionsForInstances.get(instance)
+//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				}
+				i++;
+			}
+			questionIndex++;
+			q = question[questionIndex];
+			i = 0;
+			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team1")) {
+
+				if ((answer = answerQ34(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+
+				} else {
+//					questionsForInstances.get(instance)
+//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				}
+				i++;
+			}
+			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
+
+				if ((answer = answerQ34(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+
+				} else {
+//					questionsForInstances.get(instance)
+//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				}
+				i++;
+			}
+			questionIndex++;
+			q = question[questionIndex];
+			i = 0;
+			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team1")) {
+
+				if ((answer = answerQ35(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+
+				} else {
+//					questionsForInstances.get(instance)
+//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				}
+				i++;
+			}
+			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
+
+				if ((answer = answerQ35(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+				} else {
+//					questionsForInstances.get(instance)
+//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				}
+				i++;
+			}
+
+			questionIndex++;
+
+			if ((answer = answerQ36(instance.getGoldAnnotations().getAnnotations(),
+					reader.getTeam(instance.getName(), "Team1"))) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+
+			questionIndex++;
+
+			if ((answer = answerQ37(instance.getGoldAnnotations().getAnnotations(),
+					reader.getTeam(instance.getName(), "Team1"))) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+
+			questionIndex++;
+
+			if ((answer = answerQ36(instance.getGoldAnnotations().getAnnotations(),
+					reader.getTeam(instance.getName(), "Team2"))) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+
+			questionIndex++;
+
+			if ((answer = answerQ37(instance.getGoldAnnotations().getAnnotations(),
+					reader.getTeam(instance.getName(), "Team2"))) != null) {
+				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
 		}
 
-		for (Instance instance : instanceProvider.getInstances()) {
-
-			String answerQ1;
-			if ((answerQ1 = answerQ1(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(0).put(instance, answerQ1);
-			}
-
-			String answerQ2;
-			if ((answerQ2 = answerQ2(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(1).put(instance, answerQ2);
-			}
-
-			String answerQ3;
-			if ((answerQ3 = answerQ3(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(2).put(instance, answerQ3);
-			}
-
-			String answerQ4;
-			if ((answerQ4 = answerQ4(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(3).put(instance, answerQ4);
-			}
-
-			String answerQ5;
-			if ((answerQ5 = answerQ5(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(4).put(instance, answerQ5);
-			}
-
-			String answerQ6;
-			if ((answerQ6 = answerQ6(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(5).put(instance, answerQ6);
-			}
-
-			String answerQ7;
-			if ((answerQ7 = answerQ7(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(6).put(instance, answerQ7);
-			}
-
-			String answerQ8;
-			if ((answerQ8 = answerQ8(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(7).put(instance, answerQ8);
-			}
-
-			String answerQ9;
-			if ((answerQ9 = answerQ9(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(8).put(instance, answerQ9);
-			}
-
-			String answerQ10;
-			if ((answerQ10 = answerQ10(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(9).put(instance, answerQ10);
-			}
-
-			String answerQ11;
-			if ((answerQ11 = answerQ11(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(10).put(instance, answerQ11);
-			}
-
-			String answerQ12;
-			if ((answerQ12 = answerQ12(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(11).put(instance, answerQ12);
-			}
-
-			String answerQ13;
-			if ((answerQ13 = answerQ13(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(12).put(instance, answerQ13);
-			}
-
-			String answerQ14;
-			if ((answerQ14 = answerQ14(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(13).put(instance, answerQ14);
-			}
-
-			String answerQ15;
-			if ((answerQ15 = answerQ15(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(14).put(instance, answerQ15);
-			}
-
-			String answerQ16;
-			if ((answerQ16 = answerQ16(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(15).put(instance, answerQ16);
-			}
-
-			String answerQ17;
-			if ((answerQ17 = answerQ17(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(16).put(instance, answerQ17);
-			}
-
-			String answerQ18;
-			if ((answerQ18 = answerQ18(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(17).put(instance, answerQ18);
-			}
-
-			String answerQ19;
-			if ((answerQ19 = answerQ19(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(18).put(instance, answerQ19);
-			}
-
-			String answerQ20;
-			if ((answerQ20 = answerQ20(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(19).put(instance, answerQ20);
-			}
-
-			String answerQ21;
-			if ((answerQ21 = answerQ21(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(20).put(instance, answerQ21);
-			}
-
-			String answerQ22;
-			if ((answerQ22 = answerQ22(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(21).put(instance, answerQ22);
-			}
-
-			String answerQ23;
-			if ((answerQ23 = answerQ23(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(22).put(instance, answerQ23);
-			}
-
-			String answerQ24;
-			if ((answerQ24 = answerQ24(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(23).put(instance, answerQ24);
-			}
-
-			String answerQ25;
-			if ((answerQ25 = answerQ25(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(24).put(instance, answerQ25);
-			}
-
-			String answerQ26;
-			if ((answerQ26 = answerQ26(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(25).put(instance, answerQ26);
-			}
-
-			String answerQ27;
-			if ((answerQ27 = answerQ27(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(26).put(instance, answerQ27);
-			}
-
-			String answerQ28;
-			if ((answerQ28 = answerQ28(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(27).put(instance, answerQ28);
-			}
-
-			String answerQ29;
-			if ((answerQ29 = answerQ29(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(28).put(instance, answerQ29);
-			}
-
-			String answerQ30;
-			if ((answerQ30 = answerQ30(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(29).put(instance, answerQ30);
-			}
-
-			String answerQ31;
-			if ((answerQ31 = answerQ31(instance.getGoldAnnotations().getAnnotations())) != null) {
-				instancesPerQuestion.get(30).put(instance, answerQ31);
-			}
-		}
-
-		int qc = 1;
-		for (Map<Instance, String> map : instancesPerQuestion) {
-//			System.out.println("Question: " + qc + " -> " + map.keySet().size());
-			for (Entry<Instance, String> e : map.entrySet()) {
-				moi.putIfAbsent(e.getKey(), new HashSet<>());
-				moi.get(e.getKey()).add(qc);
-//				System.out.println("Question: " + qc + "->" + e.getKey().getName() + ": " + e.getValue());
-			}
-
-			qc++;
-		}
-
-//		for (Entry<Instance, Set<Integer>> map : moi.entrySet()) {
-//			System.out.println(map.getKey().getName() + "\t" + map.getValue());
-//		}
 	}
 
 	/**
@@ -1317,4 +1594,157 @@ public class RuleBasedQA {
 		return String.valueOf(count);
 
 	}
+
+	/**
+	 * Wann hat Spieler X ein Tor gemacht
+	 * 
+	 * @param annotations
+	 * @return
+	 */
+	public static String answerQ32(List<AbstractAnnotation<?>> annotations, String player) {
+
+		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+
+			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
+
+				final int min = Integer.parseInt(
+						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+
+				final String scoringPlayer = abstractAnnotation.asInstanceOfEntityTemplate()
+						.getSingleFillerSlot(SlotType.get("scorer")).getSlotFiller()
+						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+
+				if (scoringPlayer.equals(player))
+					return String.valueOf(min);
+
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Wie viele Tore hat Spieler X gemacht
+	 * 
+	 * @param annotations
+	 * @return
+	 */
+	public static String answerQ33(List<AbstractAnnotation<?>> annotations, String player) {
+
+		int count = 0;
+
+		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+
+			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
+
+				final String scoringPlayer = abstractAnnotation.asInstanceOfEntityTemplate()
+						.getSingleFillerSlot(SlotType.get("scorer")).getSlotFiller()
+						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+
+				if (scoringPlayer.equals(player))
+					count++;
+
+			}
+		}
+
+		return String.valueOf(count);
+	}
+
+	/**
+	 * Hat Spieler X eine Rotekarte bekommen
+	 * 
+	 * @param annotations
+	 * @return
+	 */
+	public static String answerQ34(List<AbstractAnnotation<?>> annotations, final String player) {
+
+		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
+				continue;
+
+			String cardForPlayer = abstractAnnotation.asInstanceOfEntityTemplate()
+					.getSingleFillerSlot(SlotType.get("player")).getSlotFiller()
+					.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+
+			if (player.equals(cardForPlayer))
+				return String.valueOf(true);
+
+		}
+
+		return String.valueOf(false);
+
+	}
+
+	/**
+	 * Hat Spieler x eine Gelbekarte bekommen
+	 * 
+	 * @param annotations
+	 * @return
+	 */
+	public static String answerQ35(List<AbstractAnnotation<?>> annotations, final String player) {
+
+		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("RedCard"))
+				continue;
+
+			String cardForPlayer = abstractAnnotation.asInstanceOfEntityTemplate()
+					.getSingleFillerSlot(SlotType.get("player")).getSlotFiller()
+					.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+
+			if (player.equals(cardForPlayer))
+				return String.valueOf(true);
+
+		}
+
+		return String.valueOf(false);
+
+	}
+
+	/**
+	 * How many yellow cards received Team A?
+	 * 
+	 * @param annotations
+	 * @return
+	 */
+	public static String answerQ36(List<AbstractAnnotation<?>> annotations, String team) {
+
+		int count = 0;
+		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+
+			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
+				continue;
+
+			if (!abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardForTeam"))
+					.getSlotFiller().getEntityType().entityTypeName.equals(team))
+				continue;
+
+			count++;
+		}
+		return String.valueOf(count);
+
+	}
+
+	/**
+	 * How many red cards received Team A?
+	 * 
+	 * @param annotations
+	 * @return
+	 */
+	public static String answerQ37(List<AbstractAnnotation<?>> annotations, String team) {
+
+		int count = 0;
+
+		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
+				continue;
+			if (!abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardForTeam"))
+					.getSlotFiller().getEntityType().entityTypeName.equals(team))
+				continue;
+
+			count++;
+		}
+		return String.valueOf(count);
+
+	}
+
 }

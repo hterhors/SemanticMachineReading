@@ -1,7 +1,6 @@
 package de.hterhors.semanticmr.crf.structure.slots;
 
 import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
@@ -15,7 +14,7 @@ public class MultiFillerSlot extends AbstractSlot {
 
 	public MultiFillerSlot(SlotType slotType) {
 		super(slotType);
-		this.slotFiller = new LinkedHashSet<>(slotType.multiFillerSlotMaxCapacity);
+		this.slotFiller = new LinkedHashSet<>();
 	}
 
 	/**

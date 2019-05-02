@@ -51,10 +51,15 @@ public class StartPreprocessing {
 					en_slotSpecifications, en_slotPairConstraitsSpecifications));
 
 	public static void main(String[] args) throws Exception {
+		new StartPreprocessing("de");
 
-		de();
-//		en();
+	}
 
+	public StartPreprocessing(String language) throws Exception {
+		if (language.equals("en"))
+			en();
+		if (language.equals("de"))
+			de();
 	}
 
 	public static void de() throws Exception {
@@ -75,8 +80,8 @@ public class StartPreprocessing {
 
 			final String ins = io.writeInstances(w.convertToWrapperInstances(initializer));
 
-			PrintStream ps = new PrintStream(new File(
-					"src/main/resources/examples/olp2/de/corpus/sf/" + crossRefEntry.getKey() + ".json"));
+			PrintStream ps = new PrintStream(
+					new File("src/main/resources/examples/olp2/de/corpus/sf/" + crossRefEntry.getKey() + ".json"));
 			ps.println(ins);
 			ps.close();
 		}
@@ -98,8 +103,8 @@ public class StartPreprocessing {
 
 			final String ins = io.writeInstances(w.convertToWrapperInstances(initializer));
 
-			PrintStream ps = new PrintStream(new File(
-					"src/main/resources/examples/olp2/en/corpus/sf/instances/" + crossRefEntry.getKey() + ".json"));
+			PrintStream ps = new PrintStream(
+					new File("src/main/resources/examples/olp2/en/corpus/sf/" + crossRefEntry.getKey() + ".json"));
 			ps.println(ins);
 			ps.close();
 
