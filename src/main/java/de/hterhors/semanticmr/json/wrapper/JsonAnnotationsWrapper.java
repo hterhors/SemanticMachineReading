@@ -1,10 +1,10 @@
-package de.hterhors.semanticmr.json.structure.wrapper;
+package de.hterhors.semanticmr.json.wrapper;
 
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
 
-public class JsonMultiFillerSlotWrapper {
+public class JsonAnnotationsWrapper {
 
 	@SerializedName("dla")
 	private List<JsonDocumentLinkedAnnotationWrapper> docLinkedAnnotations;
@@ -15,10 +15,9 @@ public class JsonMultiFillerSlotWrapper {
 	@SerializedName("eta")
 	private List<JsonEntityTemplateWrapper> entityTemplateAnnotations;
 
-	public JsonMultiFillerSlotWrapper(List<JsonDocumentLinkedAnnotationWrapper> docLinkedAnnotations,
+	public JsonAnnotationsWrapper(List<JsonDocumentLinkedAnnotationWrapper> docLinkedAnnotations,
 			List<JsonLiteralAnnotationWrapper> literalAnnotations, List<JsonEntityTypeWrapper> entityTypeAnnotations,
 			List<JsonEntityTemplateWrapper> entityTemplateAnnotations) {
-		super();
 		this.docLinkedAnnotations = docLinkedAnnotations;
 		this.literalAnnotations = literalAnnotations;
 		this.entityTypeAnnotations = entityTypeAnnotations;
@@ -76,7 +75,7 @@ public class JsonMultiFillerSlotWrapper {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		JsonMultiFillerSlotWrapper other = (JsonMultiFillerSlotWrapper) obj;
+		JsonAnnotationsWrapper other = (JsonAnnotationsWrapper) obj;
 		if (docLinkedAnnotations == null) {
 			if (other.docLinkedAnnotations != null)
 				return false;
@@ -102,8 +101,8 @@ public class JsonMultiFillerSlotWrapper {
 
 	@Override
 	public String toString() {
-		return "JsonMultiFillerSlotWrapper [docLinkedAnnotations=" + docLinkedAnnotations + ", literalAnnotations="
-				+ literalAnnotations + ", enittyTypeAnnotations=" + entityTypeAnnotations
+		return "JsonAnnotationsWrapper [docLinkedAnnotations=" + docLinkedAnnotations + ", literalAnnotations="
+				+ literalAnnotations + ", entityTypeAnnotations=" + entityTypeAnnotations
 				+ ", entityTemplateAnnotations=" + entityTemplateAnnotations + "]";
 	}
 

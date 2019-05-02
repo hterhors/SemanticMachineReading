@@ -8,7 +8,7 @@ import org.apache.jena.ext.com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import de.hterhors.semanticmr.json.structure.wrapper.JsonInstanceWrapper;
+import de.hterhors.semanticmr.json.wrapper.JsonInstanceWrapper;
 
 public class JsonInstanceIO {
 

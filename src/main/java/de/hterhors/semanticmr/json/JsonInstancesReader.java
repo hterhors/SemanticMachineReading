@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 import de.hterhors.semanticmr.json.converter.JsonInstanceWrapperToInstance;
-import de.hterhors.semanticmr.json.structure.wrapper.JsonInstanceWrapper;
+import de.hterhors.semanticmr.json.wrapper.JsonInstanceWrapper;
 
 public class JsonInstancesReader {
 

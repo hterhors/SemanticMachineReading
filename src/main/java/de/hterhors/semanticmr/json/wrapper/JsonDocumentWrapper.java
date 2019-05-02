@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.json.structure.wrapper;
+package de.hterhors.semanticmr.json.wrapper;
 
 import java.util.List;
 
