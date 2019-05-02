@@ -1,8 +1,13 @@
 package de.hterhors.semanticmr.examples.psink.normalization;
 
-import de.hterhors.semanticmr.crf.structure.annotations.normalization.INormalizationFunction;
+import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.annotations.normalization.AbstractNormalizationFunction;
 
-public class WeightNormalization implements INormalizationFunction {
+public class WeightNormalization extends AbstractNormalizationFunction {
+
+	public WeightNormalization(EntityType entityType) {
+		super(entityType);
+	}
 
 	@Override
 	public String normalize(String annotation) {

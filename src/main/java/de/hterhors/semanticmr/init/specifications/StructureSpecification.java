@@ -101,13 +101,15 @@ public class StructureSpecification {
 
 	private final Map<String, Set<String>> slotsForEntity;
 	private final Map<String, Integer> multiAnnotationSlotMaxSizes;
-	private final Set<ExcludeSlotTypePairNames> excludeSlotTypePairs;
+//	private final Set<ExcludeSlotTypePairNames> excludeSlotTypePairs;
 
 	public StructureSpecification(Set<String> entityTypeNames, Set<String> slotTypeNames,
 			Map<String, Boolean> isSingleValueSlotTypes, Map<String, Boolean> isLiteralValueSlotTypes,
 			Map<String, Set<String>> slotFillerEntityTypes, Map<String, Set<String>> superEntityTypes,
 			Map<String, Set<String>> subEntityTypes, Map<String, Set<String>> slotsForEntities,
-			Map<String, Integer> multiAnnotationSlotMaxSizes, Set<ExcludeSlotTypePairNames> excludeSlotTypePairs) {
+			Map<String, Integer> multiAnnotationSlotMaxSizes
+//			, Set<ExcludeSlotTypePairNames> excludeSlotTypePairs
+	) {
 
 		this.entityTypeNames = Collections.unmodifiableSet(new HashSet<>(entityTypeNames));
 		this.slotTypeNames = Collections.unmodifiableSet(new HashSet<>(slotTypeNames));
@@ -131,7 +133,7 @@ public class StructureSpecification {
 		resolveSlotTransitivity(slotsForEntities);
 
 		this.multiAnnotationSlotMaxSizes = Collections.unmodifiableMap(multiAnnotationSlotMaxSizes);
-		this.excludeSlotTypePairs = Collections.unmodifiableSet(excludeSlotTypePairs);
+//		this.excludeSlotTypePairs = Collections.unmodifiableSet(excludeSlotTypePairs);
 
 	}
 
@@ -206,10 +208,10 @@ public class StructureSpecification {
 	public Set<String> getSlotTypeNames() {
 		return slotTypeNames;
 	}
-
-	public Set<ExcludeSlotTypePairNames> getExcludeSlotTypePairs() {
-		return excludeSlotTypePairs;
-	}
+//
+//	public Set<ExcludeSlotTypePairNames> getExcludeSlotTypePairs() {
+//		return excludeSlotTypePairs;
+//	}
 
 	public boolean isSingleValueSlot(String slotTypeName) {
 		return isSingleValueSlotTypes.get(slotTypeName).booleanValue();

@@ -20,14 +20,16 @@ public class CSVSpecifictationsReader implements ISpecificationsReader {
 	private final File entitySpecificationFile;
 	private final File entityStructureSpecificationFile;
 	private final File slotSpecificationFile;
-	private final File slotPairConstriantsSpecificationFile;
+//	private final File slotPairConstriantsSpecificationFile;
 
 	public CSVSpecifictationsReader(File entitySpecificationFile, File entityStructureSpecificationFile,
-			File slotSpecificationFile, File slotPairConstriantsSpecificationFile) {
+			File slotSpecificationFile
+//			, File slotPairConstriantsSpecificationFile
+	) {
 		this.entitySpecificationFile = entitySpecificationFile;
 		this.entityStructureSpecificationFile = entityStructureSpecificationFile;
 		this.slotSpecificationFile = slotSpecificationFile;
-		this.slotPairConstriantsSpecificationFile = slotPairConstriantsSpecificationFile;
+//		this.slotPairConstriantsSpecificationFile = slotPairConstriantsSpecificationFile;
 	}
 
 	public StructureSpecification read() throws InvalidSpecificationFileFormatException {
@@ -42,9 +44,9 @@ public class CSVSpecifictationsReader implements ISpecificationsReader {
 					.filter(l -> !l.startsWith("#")).filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t"))
 					.collect(Collectors.toList());
 
-			List<String[]> slotPairConstriants = Files.readAllLines(slotPairConstriantsSpecificationFile.toPath())
-					.stream().filter(l -> !l.startsWith("#")).filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t"))
-					.collect(Collectors.toList());
+//			List<String[]> slotPairConstriants = Files.readAllLines(slotPairConstriantsSpecificationFile.toPath())
+//					.stream().filter(l -> !l.startsWith("#")).filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t"))
+//					.collect(Collectors.toList());
 
 			Set<String> slotTypeNames = slots.stream().map(l -> l[1]).collect(Collectors.toSet());
 			Set<String> entityTypeNames = entities.stream().map(l -> l[0]).collect(Collectors.toSet());
@@ -87,12 +89,14 @@ public class CSVSpecifictationsReader implements ISpecificationsReader {
 						return max;
 					}));
 
-			Set<ExcludeSlotTypePairNames> excludeSlotTypePairs = slotPairConstriants.stream()
-					.map(l -> new ExcludeSlotTypePairNames(l[0], l[1], l[2], l[3], l[4])).collect(Collectors.toSet());
+//			Set<ExcludeSlotTypePairNames> excludeSlotTypePairs = slotPairConstriants.stream()
+//					.map(l -> new ExcludeSlotTypePairNames(l[0], l[1], l[2], l[3], l[4])).collect(Collectors.toSet());
 
 			return new StructureSpecification(entityTypeNames, slotTypeNames, isSingleValueSlotTypes,
 					isLiteralValueSlotTypes, slotFillerEntityTypes, superEntityTypes, subEntityTypes, slotsForEntity,
-					multiAnnotationSlotMaxSize, excludeSlotTypePairs);
+					multiAnnotationSlotMaxSize
+//					, excludeSlotTypePairs
+			);
 
 		} catch (Exception e) {
 			throw new InvalidSpecificationFileFormatException(e);

@@ -39,17 +39,34 @@ import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
+import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
+import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 import de.hterhors.semanticmr.init.specifications.impl.CSVSlotFillingSpecs;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.nerla.NerlaCollector;
 
-public class SemanticMRMain {
+public class SlotFillingMain {
 
 	public static void main(String[] args) throws Exception {
+		new SlotFillingMain();
+	}
 
-		SystemInitializer initializer = SystemInitializer.initialize(new CSVSlotFillingSpecs().specificationProvider)
-				.registerNormalizationFunction(EntityType.get("Weight"), new WeightNormalization()).apply();
+	private final File entitySpecifications = new File(
+			"src/main/resources/specifications/csv/entitySpecifications.csv");
+	private final File slotSpecifications = new File("src/main/resources/specifications/csv/slotSpecifications.csv");
+	private final File entityStructureSpecifications = new File(
+			"src/main/resources/specifications/csv/entityStructureSpecifications.csv");
+
+	private final File slotPairConstraitsSpecifications = new File(
+			"src/main/resources/specifications/csv/slotPairExcludingConstraints.csv");
+
+	public final SpecificationsProvider specificationProvider = new SpecificationsProvider(
+			new CSVSpecifictationsReader(entitySpecifications, entityStructureSpecifications, slotSpecifications));
+
+	public SlotFillingMain() throws Exception {
+		SystemInitializer initializer = SystemInitializer.initialize(specificationProvider)
+				.registerNormalizationFunction(new WeightNormalization(EntityType.get("Weight"))).apply().apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
