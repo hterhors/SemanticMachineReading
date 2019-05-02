@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.hterhors.semanticmr.candprov.nerla.DictionaryBasedCandidateProvider;
+import de.hterhors.semanticmr.candprov.nerla.InMEMDictionaryBasedCandidateProvider;
 import de.hterhors.semanticmr.candprov.nerla.NerlaCandidateProviderCollection;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
@@ -64,7 +64,7 @@ public class NamedEntityRecognitionAndLinkingExample {
 				new File("src/main/resources/examples/nerla/corpus/instances/"), shuffleCorpusDistributor);
 
 		NerlaCandidateProviderCollection candidateProvider = new NerlaCandidateProviderCollection(
-				new DictionaryBasedCandidateProvider(
+				new InMEMDictionaryBasedCandidateProvider(
 						new File("src/main/resources/examples/nerla/dicts/organismModel.dict")));
 
 		IObjectiveFunction objectiveFunction = new NerlaObjectiveFunction(EEvaluationDetail.DOCUMENT_LINKED);

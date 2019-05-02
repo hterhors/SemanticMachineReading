@@ -15,7 +15,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
-public class EntityTemplateCandidateProvider implements IAnnotationCandidateProvider {
+public class EntityTemplateCandidateProvider implements ISlotTypeAnnotationCandidateProvider {
 
 	private final Map<SlotType, List<EntityTemplate>> entityAnnotationCache = new HashMap<>();
 
@@ -45,13 +45,8 @@ public class EntityTemplateCandidateProvider implements IAnnotationCandidateProv
 	}
 
 	@Override
-	public List<EntityTemplate> getSlotFillerCandidates(SlotType slot) {
+	public List<EntityTemplate> getCandidates(SlotType slot) {
 		return entityAnnotationCache.getOrDefault(slot, Collections.emptyList());
-	}
-
-	@Override
-	public Set<EntityTypeAnnotation> getTemplateRootAnnotationCandidates(EntityType templateType) {
-		return Collections.emptySet();
 	}
 
 	public Instance getRelatedInstance() {

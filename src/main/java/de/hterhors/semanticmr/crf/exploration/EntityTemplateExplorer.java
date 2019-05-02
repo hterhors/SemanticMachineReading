@@ -3,8 +3,9 @@ package de.hterhors.semanticmr.crf.exploration;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.hterhors.semanticmr.candprov.sf.IAnnotationCandidateProvider;
+import de.hterhors.semanticmr.candprov.sf.ISlotTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateProviderCollection;
+import de.hterhors.semanticmr.candprov.sf.IEntityTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
@@ -54,11 +55,14 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 
 			final EntityTemplate entitytemplateAnnotation = (EntityTemplate) annotation;
 
-			for (IAnnotationCandidateProvider slotFillerCandidateProvider : candidateProvider
-					.getCandidateProviderForInstance(currentState.getInstance())) {
-
+			for (IEntityTypeAnnotationCandidateProvider slotFillerCandidateProvider : candidateProvider
+					.getEntityTypeCandidateProvider(currentState.getInstance())) {
 				changeTemplateType(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
 						annotationIndex);
+			}
+
+			for (ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider : candidateProvider
+					.getSlotTypeCandidateProvider(currentState.getInstance())) {
 
 				changeSingleFiller(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
 						annotationIndex);
@@ -68,7 +72,6 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 
 				changeMultiFiller(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
 						annotationIndex);
-
 			}
 
 			deleteSingleFiller(proposalStates, currentState, entitytemplateAnnotation, annotationIndex);
@@ -92,11 +95,11 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 	}
 
 	private void changeTemplateType(final List<State> proposalStates, State currentState,
-			IAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			IEntityTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 
 		for (EntityTypeAnnotation<?> templateTypeCandidate : slotFillerCandidateProvider
-				.getTemplateRootAnnotationCandidates(entityTemplate.getEntityType())) {
+				.getCandidates(entityTemplate.getEntityType())) {
 
 			if (templateTypeCandidate.equals(entityTemplate.getRootAnnotation()))
 				continue;
@@ -128,13 +131,13 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 	}
 
 	private void changeMultiFiller(final List<State> proposalStates, State currentState,
-			IAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
 
 			for (AbstractAnnotation<? extends AbstractAnnotation<?>> slotFillerCandidate : slotFillerCandidateProvider
-					.getSlotFillerCandidates(slot)) {
+					.getCandidates(slot)) {
 
 				/*
 				 * Do no add itself
@@ -167,11 +170,11 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 	}
 
 	private void addMultiFiller(final List<State> proposalStates, State currentState,
-			IAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
 			for (AbstractAnnotation<? extends AbstractAnnotation<?>> slotFillerCandidate : slotFillerCandidateProvider
-					.getSlotFillerCandidates(slot)) {
+					.getCandidates(slot)) {
 
 				/*
 				 * Do not add if maximum number of fillers is reached.
@@ -221,11 +224,11 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 	}
 
 	private void changeSingleFiller(final List<State> proposalStates, State currentState,
-			IAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
+			ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 		for (SlotType slotType : entityTemplate.getSingleFillerSlots().keySet()) {
 			for (AbstractAnnotation<? extends AbstractAnnotation<?>> slotFillerCandidate : slotFillerCandidateProvider
-					.getSlotFillerCandidates(slotType)) {
+					.getCandidates(slotType)) {
 				/*
 				 * Do no add itself
 				 */

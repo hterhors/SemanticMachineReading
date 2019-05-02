@@ -11,14 +11,43 @@ import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 
-public class DictionaryBasedCandidateProvider implements INerlaCandidateProvider {
+/**
+ * The in memory dictionary based candidate provider is the simplest form of
+ * providing entity-candidates given free text.
+ * 
+ * Given an input text, we do a exact string match to entries of the dictionary
+ * and return all entity-types to that one or multiple matches exists.
+ * 
+ * @author hterhors
+ *
+ */
+public class InMEMDictionaryBasedCandidateProvider implements INerlaCandidateProvider {
 
+	/**
+	 * The dictionary.
+	 */
 	final private Map<EntityType, Set<String>> dictionary = new HashMap<>();
 
+	/**
+	 * The reversed dictionary for fast look up.
+	 */
 	final private Map<String, Set<EntityType>> reverseDictionary = new HashMap<>();
 
-	public DictionaryBasedCandidateProvider(final File dictionaryFile) throws IOException {
+	/**
+	 * The in memory dictionary based candidate provider is the simplest form of
+	 * providing entity-candidates given free text.
+	 * 
+	 * Given an input text, we do a exact string match to entries of the dictionary
+	 * and return all entity-types to that one or multiple matches exists.
+	 * 
+	 * @param dictionaryFile the dictionary file.
+	 * @throws IOException
+	 */
+	public InMEMDictionaryBasedCandidateProvider(final File dictionaryFile) throws IOException {
 
+		/**
+		 * TODO: check file contents format.
+		 */
 		for (String dictLine : Files.readAllLines(dictionaryFile.toPath())) {
 
 			final String data[] = dictLine.split("\t", 2);

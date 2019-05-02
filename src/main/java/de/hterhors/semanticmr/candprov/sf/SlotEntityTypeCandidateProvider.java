@@ -16,7 +16,8 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
-public class SlotEntityTypeCandidateProvider implements IAnnotationCandidateProvider {
+public class SlotEntityTypeCandidateProvider
+		implements ISlotTypeAnnotationCandidateProvider, IEntityTypeAnnotationCandidateProvider {
 
 	private static SlotEntityTypeCandidateProvider instance = null;
 
@@ -33,7 +34,7 @@ public class SlotEntityTypeCandidateProvider implements IAnnotationCandidateProv
 
 	private final Map<SlotType, List<AbstractAnnotation<? extends AbstractAnnotation<?>>>> entityAnnotationCache = new HashMap<>();
 
-	public List<AbstractAnnotation<? extends AbstractAnnotation<?>>> getSlotFillerCandidates(SlotType slot) {
+	public List<AbstractAnnotation<? extends AbstractAnnotation<?>>> getCandidates(SlotType slot) {
 		if (!entityAnnotationCache.containsKey(slot)) {
 
 			for (EntityType slotEntityType : slot.getSlotFillerEntityTypes()) {
@@ -52,7 +53,7 @@ public class SlotEntityTypeCandidateProvider implements IAnnotationCandidateProv
 	}
 
 	@Override
-	public Set<EntityTypeAnnotation> getTemplateRootAnnotationCandidates(EntityType templateType) {
+	public Set<EntityTypeAnnotation> getCandidates(EntityType templateType) {
 		if (!rootAnnotationsCache.containsKey(templateType)) {
 
 			for (EntityType slotEntityType : templateType.getRelatedEntityTypes()) {
@@ -66,7 +67,7 @@ public class SlotEntityTypeCandidateProvider implements IAnnotationCandidateProv
 				rootAnnotationsCache.get(templateType).add(EntityTypeAnnotation.get(slotEntityType));
 			}
 		}
-		return rootAnnotationsCache.getOrDefault(templateType,Collections.emptySet());
+		return rootAnnotationsCache.getOrDefault(templateType, Collections.emptySet());
 	}
 
 	@Override
@@ -81,6 +82,12 @@ public class SlotEntityTypeCandidateProvider implements IAnnotationCandidateProv
 			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller) {
 		throw new IllegalStateException(
 				"Can not add slot filler to enitty type candiate provider. Candidates are based on the specification.");
+	}
+
+	@Override
+	public Instance getRelatedInstance() {
+		throw new IllegalStateException(
+				"This candidate provider does not correspond to an individual instance but to all.");
 	}
 
 }

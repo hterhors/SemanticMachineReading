@@ -40,15 +40,9 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation<DocumentLi
 		super(entityType, textualContent);
 		this.document = document;
 		this.documentPosition = documentPosition;
-		System.out.println(documentPosition);
-		System.out.println(this.document.documentID + ":" + this.document.tokenList.size());
 		this.relatedTokens = this.document.tokenList.subList(
 				this.document.getTokenByCharOffset(getStartDocCharOffset()).getDocTokenIndex(),
 				this.document.getTokenByCharOffset(getEndDocCharOffset()).getDocTokenIndex() + 1);
-		relatedTokens.forEach(System.out::println);
-		System.out.println(textualContent.surfaceForm);
-		System.out.println();
-		System.out.println();
 	}
 
 	public int getStartDocCharOffset() {
