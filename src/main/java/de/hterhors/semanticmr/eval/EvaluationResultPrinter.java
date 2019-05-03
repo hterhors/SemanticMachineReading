@@ -21,11 +21,11 @@ public class EvaluationResultPrinter {
 			System.out.println("Objective score: " + res.getValue().getObjectiveScore());
 			System.out.println("Score: " + res.getValue().getScore());
 			mean.add(res.getValue().getScore());
-			for (AbstractAnnotation<?> goldAnnotations : res.getKey().getGoldAnnotations().getAnnotations()) {
+			for (AbstractAnnotation goldAnnotations : res.getKey().getGoldAnnotations().getAnnotations()) {
 				System.out.println(goldAnnotations.toPrettyString());
 			}
 			System.out.println("-----------");
-			for (AbstractAnnotation<?> finalAnnotations : res.getValue().getCurrentPredictions().getAnnotations()) {
+			for (AbstractAnnotation finalAnnotations : res.getValue().getCurrentPredictions().getAnnotations()) {
 				System.out.println(finalAnnotations.toPrettyString());
 			}
 			System.out.println();

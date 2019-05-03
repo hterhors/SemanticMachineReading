@@ -112,10 +112,9 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
 					.nonEmpty().docLinkedAnnoation().build();
 
-			for (Entry<SlotType, Set<AbstractAnnotation<? extends AbstractAnnotation<?>>>> slot : filter
-					.getMergedAnnotations().entrySet()) {
+			for (Entry<SlotType, Set<AbstractAnnotation>> slot : filter.getMergedAnnotations().entrySet()) {
 
-				for (AbstractAnnotation<?> slotFiller : slot.getValue()) {
+				for (AbstractAnnotation slotFiller : slot.getValue()) {
 
 					final DocumentLinkedAnnotation docLinkedAnnotation = slotFiller
 							.asInstanceOfDocumentLinkedAnnotation();

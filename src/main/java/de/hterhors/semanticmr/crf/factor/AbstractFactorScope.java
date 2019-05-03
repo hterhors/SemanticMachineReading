@@ -17,7 +17,7 @@ import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
  *
  * @see {@link Factor}
  */
-public abstract class AbstractFactorScope<S extends AbstractFactorScope<S, A>, A extends AbstractAnnotation<A>> {
+public abstract class AbstractFactorScope<S extends AbstractFactorScope<S, A>, A extends AbstractAnnotation> {
 
 	/**
 	 * The template context of the list of variables.

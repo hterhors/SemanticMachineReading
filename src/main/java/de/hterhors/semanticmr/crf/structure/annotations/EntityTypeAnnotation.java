@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 
 /**
@@ -13,7 +14,7 @@ import de.hterhors.semanticmr.eval.AbstractEvaluator;
  * @author hterhors
  *
  */
-public class EntityTypeAnnotation<A extends EntityTypeAnnotation<A>> extends AbstractAnnotation<A> {
+public class EntityTypeAnnotation extends AbstractAnnotation {
 
 	/**
 	 * Defines the entity type of this annotation.
@@ -90,7 +91,7 @@ public class EntityTypeAnnotation<A extends EntityTypeAnnotation<A>> extends Abs
 	}
 
 	@Override
-	public Score evaluate(AbstractEvaluator evaluator, EntityTypeAnnotation otherVal) {
+	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else {
@@ -111,7 +112,7 @@ public class EntityTypeAnnotation<A extends EntityTypeAnnotation<A>> extends Abs
 					if (this.getClass().isAssignableFrom(otherVal.getClass())) {
 						return this.equalsEvalETA(otherVal) ? Score.TP : Score.FN_FP;
 					} else if (otherVal.getClass().isAssignableFrom(this.getClass())) {
-						return otherVal.equalsEvalETA(this) ? Score.TP : Score.FN_FP;
+						return ((EntityTypeAnnotation) otherVal).equalsEvalETA(this) ? Score.TP : Score.FN_FP;
 					}
 				}
 				return Score.FN_FP;

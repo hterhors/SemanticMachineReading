@@ -15,7 +15,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  *
  * @param <S>
  */
-public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S, A>, A extends AbstractAnnotation<A>> {
+public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S, A>, A extends AbstractAnnotation> {
 
 	/**
 	 * Weights for the computation of factor scores. These weights are shared across

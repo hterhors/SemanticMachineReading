@@ -18,18 +18,18 @@ public abstract class AbstractEvaluator {
 		this.evaluationMode = evaluationMode;
 	}
 
-	protected Score[][] computeScores(final Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller,
-			final Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherSlotFiller, final int maxSize) {
+	protected Score[][] computeScores(final Collection<AbstractAnnotation> slotFiller,
+			final Collection<AbstractAnnotation> otherSlotFiller, final int maxSize) {
 
 		final Score[][] scores = new Score[maxSize][maxSize];
 
-		final Iterator<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFillerIterator = slotFiller.iterator();
+		final Iterator<AbstractAnnotation> slotFillerIterator = slotFiller.iterator();
 
 		int i = 0;
 
 		while (i != maxSize) {
 
-			final AbstractAnnotation<?> slotFillerVal;
+			final AbstractAnnotation slotFillerVal;
 
 			if (slotFillerIterator.hasNext()) {
 				slotFillerVal = slotFillerIterator.next();
@@ -39,12 +39,11 @@ public abstract class AbstractEvaluator {
 
 			int j = 0;
 
-			final Iterator<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherSlotFillerIterator = otherSlotFiller
-					.iterator();
+			final Iterator<AbstractAnnotation> otherSlotFillerIterator = otherSlotFiller.iterator();
 
 			while (j != maxSize) {
 
-				final AbstractAnnotation<?> otherSlotFillerVal;
+				final AbstractAnnotation otherSlotFillerVal;
 				if (otherSlotFillerIterator.hasNext()) {
 					otherSlotFillerVal = otherSlotFillerIterator.next();
 				} else {
@@ -63,7 +62,7 @@ public abstract class AbstractEvaluator {
 		return scores;
 	}
 
-	public Score scoreSingle(final AbstractAnnotation<?> val, final AbstractAnnotation<?> otherVal) {
+	public Score scoreSingle(final AbstractAnnotation val, final AbstractAnnotation otherVal) {
 		if (val instanceof DocumentLinkedAnnotation
 				&& (otherVal instanceof DocumentLinkedAnnotation || otherVal == null)) {
 			return ((DocumentLinkedAnnotation) val).evaluate(this, (DocumentLinkedAnnotation) otherVal);
@@ -79,11 +78,11 @@ public abstract class AbstractEvaluator {
 		}
 	}
 
-	protected abstract Score scoreMax(Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherAnnotations);
+	protected abstract Score scoreMax(Collection<AbstractAnnotation> annotations,
+			Collection<AbstractAnnotation> otherAnnotations);
 
-	public Score scoreMultiValues(Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherAnnotations) {
+	public Score scoreMultiValues(Collection<AbstractAnnotation> annotations,
+			Collection<AbstractAnnotation> otherAnnotations) {
 		return scoreMax(annotations, otherAnnotations);
 	}
 

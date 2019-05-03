@@ -23,8 +23,7 @@ public class EntityTemplateCandidateProvider implements ISlotTypeAnnotationCandi
 	}
 
 	@Override
-	public EntityTemplateCandidateProvider addSlotFiller(
-			AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller) {
+	public EntityTemplateCandidateProvider addSlotFiller(AbstractAnnotation slotFiller) {
 		for (SlotType slotType : slotFiller.getEntityType().getSlotFillerOfSlotTypes()) {
 			entityAnnotationCache.putIfAbsent(slotType, new ArrayList<>());
 			if (slotType.matchesEntityType(slotFiller.getEntityType())) {
@@ -35,9 +34,8 @@ public class EntityTemplateCandidateProvider implements ISlotTypeAnnotationCandi
 	}
 
 	@Override
-	public EntityTemplateCandidateProvider addBatchSlotFiller(
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller) {
-		for (AbstractAnnotation<? extends AbstractAnnotation<?>> literalSlotFiller : slotFiller) {
+	public EntityTemplateCandidateProvider addBatchSlotFiller(Collection<AbstractAnnotation> slotFiller) {
+		for (AbstractAnnotation literalSlotFiller : slotFiller) {
 			addSlotFiller(literalSlotFiller);
 		}
 		return this;

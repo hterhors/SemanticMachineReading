@@ -3,6 +3,7 @@ package de.hterhors.semanticmr.crf.structure.annotations;
 import java.util.List;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
 import de.hterhors.semanticmr.crf.variables.Document;
@@ -17,7 +18,7 @@ import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
  * @author hterhors
  *
  */
-final public class DocumentLinkedAnnotation extends LiteralAnnotation<DocumentLinkedAnnotation> {
+final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	/**
 	 * Contains the document position of this annotation.
@@ -114,7 +115,7 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation<DocumentLi
 	}
 
 	@Override
-	public Score evaluate(AbstractEvaluator evaluator, EntityTypeAnnotation otherVal) {
+	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else {

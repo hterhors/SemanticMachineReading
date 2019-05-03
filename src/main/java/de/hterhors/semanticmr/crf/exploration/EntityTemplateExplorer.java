@@ -48,7 +48,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 		for (int annotationIndex = 0; annotationIndex < currentState.getCurrentPredictions().getAnnotations()
 				.size(); annotationIndex++) {
 
-			final AbstractAnnotation<?> annotation;
+			final AbstractAnnotation annotation;
 
 			if (!((annotation = currentState.getCurrentPredictions().getAnnotations()
 					.get(annotationIndex)) instanceof EntityTemplate))
@@ -99,7 +99,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 			IEntityTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 
-		for (EntityTypeAnnotation<?> templateTypeCandidate : slotFillerCandidateProvider
+		for (EntityTypeAnnotation templateTypeCandidate : slotFillerCandidateProvider
 				.getCandidates(entityTemplate.getEntityType())) {
 
 			if (templateTypeCandidate.equals(entityTemplate.getRootAnnotation()))
@@ -117,7 +117,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 	private void deleteMultiFiller(final List<State> proposalStates, State currentState, EntityTemplate entityTemplate,
 			int annotationIndex) {
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
-			for (AbstractAnnotation<?> slotFiller : entityTemplate.getMultiFillerSlot(slot).getSlotFiller()) {
+			for (AbstractAnnotation slotFiller : entityTemplate.getMultiFillerSlot(slot).getSlotFiller()) {
 
 				final EntityTemplate deepCopy = entityTemplate.deepCopy();
 				deepCopy.getMultiFillerSlot(slot).removeSlotFiller(slotFiller);
@@ -137,8 +137,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
 
-			for (AbstractAnnotation<? extends AbstractAnnotation<?>> slotFillerCandidate : slotFillerCandidateProvider
-					.getCandidates(slot)) {
+			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slot)) {
 
 				/*
 				 * Do no add itself
@@ -154,8 +153,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 					continue;
 				}
 
-				for (AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller : entityTemplate
-						.getMultiFillerSlot(slot).getSlotFiller()) {
+				for (AbstractAnnotation slotFiller : entityTemplate.getMultiFillerSlot(slot).getSlotFiller()) {
 
 					final EntityTemplate deepCopy = entityTemplate.deepCopy();
 
@@ -174,8 +172,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 			ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
-			for (AbstractAnnotation<? extends AbstractAnnotation<?>> slotFillerCandidate : slotFillerCandidateProvider
-					.getCandidates(slot)) {
+			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slot)) {
 
 				/*
 				 * Do not add if maximum number of fillers is reached.
@@ -228,8 +225,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 			ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 		for (SlotType slotType : entityTemplate.getSingleFillerSlots().keySet()) {
-			for (AbstractAnnotation<? extends AbstractAnnotation<?>> slotFillerCandidate : slotFillerCandidateProvider
-					.getCandidates(slotType)) {
+			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slotType)) {
 				/*
 				 * Do no add itself
 				 */

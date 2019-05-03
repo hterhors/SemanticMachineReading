@@ -14,7 +14,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.examples.olp2.extraction.Olp2ExtractionMain;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.init.specifications.CRFInitializer;
 import de.hterhors.semanticmr.json.nerla.JsonNerlaIO;
 import de.hterhors.semanticmr.json.nerla.wrapper.JsonEntityAnnotationWrapper;
 
@@ -22,7 +22,7 @@ public class RegexNerl {
 
 	public static void main(String[] args) throws Exception {
 
-		SystemInitializer initializer = SystemInitializer.setSpecifications(Olp2ExtractionMain.de_specificationProvider)
+		CRFInitializer initializer = CRFInitializer.setSpecifications(Olp2ExtractionMain.de_specificationProvider)
 				.apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()

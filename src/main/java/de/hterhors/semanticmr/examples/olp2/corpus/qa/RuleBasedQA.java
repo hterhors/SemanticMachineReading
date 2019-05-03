@@ -493,12 +493,12 @@ public class RuleBasedQA {
 	 * 
 	 * @return
 	 */
-	public static String answerQ1(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ1(List<AbstractAnnotation> annotations) {
 
 		int maxDraw = 0;
 		int maxScore = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 				final int scoreTeamA = Integer.parseInt(
@@ -526,12 +526,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ2(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ2(List<AbstractAnnotation> annotations) {
 
 		int maxTeamA = 0;
 		int maxteamB = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -562,12 +562,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ3(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ3(List<AbstractAnnotation> annotations) {
 
 		int maxTeamA = 0;
 		int maxteamB = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 				final int scoreTeamA = Integer.parseInt(
@@ -591,11 +591,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ4(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ4(List<AbstractAnnotation> annotations) {
 
 		Set<String> teamsWithRedCards = new HashSet<>();
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("RedCard"))
 				teamsWithRedCards.add(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardForTeam"))
@@ -623,11 +623,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ5(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ5(List<AbstractAnnotation> annotations) {
 
 		Set<String> teamsWithYellowCards = new HashSet<>();
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("YellowCard"))
 				teamsWithYellowCards.add(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardForTeam"))
@@ -654,11 +654,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ6(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ6(List<AbstractAnnotation> annotations) {
 
 		Map<String, Integer> countYellowCards = new HashMap<>();
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("YellowCard")) {
 				final String team = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("cardForTeam")).getSlotFiller()
@@ -690,11 +690,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ7(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ7(List<AbstractAnnotation> annotations) {
 
 		Map<String, Integer> countRedCards = new HashMap<>();
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("RedCard")) {
 				final String team = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("cardForTeam")).getSlotFiller()
@@ -724,12 +724,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ8(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ8(List<AbstractAnnotation> annotations) {
 
 		String teamFirstYellowCard = null;
 		int minMin = Integer.MAX_VALUE;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
 				continue;
@@ -760,12 +760,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ9(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ9(List<AbstractAnnotation> annotations) {
 
 		String teamFirstYellowCard = null;
 		int minMin = Integer.MAX_VALUE;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("RedCard"))
 				continue;
 
@@ -794,12 +794,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return the winning team or null on draw
 	 */
-	public static String answerQ10(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ10(List<AbstractAnnotation> annotations) {
 
 		int winnerTeamScore = -1;
 		String winnerTeam = null;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("TeamStats")) {
 				final int scoreTeam = Integer.parseInt(
@@ -828,12 +828,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return the losing team or null on draw
 	 */
-	public static String answerQ11(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ11(List<AbstractAnnotation> annotations) {
 
 		int loserTeamScore = Integer.MAX_VALUE;
 		String loserTeam = null;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("TeamStats")) {
 				final int scoreTeam = Integer.parseInt(
@@ -862,12 +862,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ12(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ12(List<AbstractAnnotation> annotations) {
 
 		String playerFirstYellowCard = null;
 		int minMin = Integer.MAX_VALUE;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
 				continue;
 
@@ -896,12 +896,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ13(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ13(List<AbstractAnnotation> annotations) {
 
 		String playerFirstRedCard = null;
 		int minMin = Integer.MAX_VALUE;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("RedCard"))
 				continue;
 
@@ -930,12 +930,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ14(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ14(List<AbstractAnnotation> annotations) {
 
 		String playerLastYellowCard = null;
 		int maxMin = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
 				continue;
 
@@ -965,12 +965,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ15(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ15(List<AbstractAnnotation> annotations) {
 
 		String playerLastYellowCard = null;
 		int maxMin = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("RedCard"))
 				continue;
 
@@ -1001,12 +1001,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ16(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ16(List<AbstractAnnotation> annotations) {
 
 		int minMin = Integer.MAX_VALUE;
 		String scorer = null;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1036,12 +1036,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ17(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ17(List<AbstractAnnotation> annotations) {
 
 		int maxMin = 0;
 		String scorer = null;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1069,11 +1069,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ18(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ18(List<AbstractAnnotation> annotations) {
 
 		int minMin = Integer.MAX_VALUE;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1098,11 +1098,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ19(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ19(List<AbstractAnnotation> annotations) {
 
 		int maxMin = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1127,11 +1127,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ20(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ20(List<AbstractAnnotation> annotations) {
 
 		int minMin = Integer.MAX_VALUE;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
 				continue;
 
@@ -1159,11 +1159,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ21(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ21(List<AbstractAnnotation> annotations) {
 
 		int maxMin = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
 				continue;
 
@@ -1186,11 +1186,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ22(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ22(List<AbstractAnnotation> annotations) {
 
 		int minMin = Integer.MAX_VALUE;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("RedCard"))
 				continue;
 
@@ -1214,11 +1214,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ23(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ23(List<AbstractAnnotation> annotations) {
 
 		int maxMin = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("RedCard"))
 				continue;
 
@@ -1244,11 +1244,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ24(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ24(List<AbstractAnnotation> annotations) {
 
 		Integer minMin = Integer.MAX_VALUE;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1287,11 +1287,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ25(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ25(List<AbstractAnnotation> annotations) {
 
 		Integer maxMin = new Integer(0);
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1327,11 +1327,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ26(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ26(List<AbstractAnnotation> annotations) {
 
 		Integer count = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1359,7 +1359,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ27(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ27(List<AbstractAnnotation> annotations) {
 
 		class P implements Comparable<P> {
 			int min;
@@ -1378,7 +1378,7 @@ public class RuleBasedQA {
 
 		final List<P> pairs = new ArrayList<>();
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1422,7 +1422,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ28(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ28(List<AbstractAnnotation> annotations) {
 
 		class P implements Comparable<P> {
 			int min;
@@ -1441,7 +1441,7 @@ public class RuleBasedQA {
 
 		final List<P> pairs = new ArrayList<>();
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1486,7 +1486,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ29(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ29(List<AbstractAnnotation> annotations) {
 
 		class P implements Comparable<P> {
 			int min;
@@ -1505,7 +1505,7 @@ public class RuleBasedQA {
 
 		final List<P> pairs = new ArrayList<>();
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1550,11 +1550,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ30(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ30(List<AbstractAnnotation> annotations) {
 
 		int count = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
 				continue;
 
@@ -1570,11 +1570,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ31(List<AbstractAnnotation<?>> annotations) {
+	public static String answerQ31(List<AbstractAnnotation> annotations) {
 
 		int count = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("RedCard"))
 				continue;
 
@@ -1591,9 +1591,9 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ32(List<AbstractAnnotation<?>> annotations, String player) {
+	public static String answerQ32(List<AbstractAnnotation> annotations, String player) {
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1619,11 +1619,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ33(List<AbstractAnnotation<?>> annotations, String player) {
+	public static String answerQ33(List<AbstractAnnotation> annotations, String player) {
 
 		int count = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 
@@ -1646,9 +1646,9 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ34(List<AbstractAnnotation<?>> annotations, final String player) {
+	public static String answerQ34(List<AbstractAnnotation> annotations, final String player) {
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
 				continue;
 
@@ -1671,9 +1671,9 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ35(List<AbstractAnnotation<?>> annotations, final String player) {
+	public static String answerQ35(List<AbstractAnnotation> annotations, final String player) {
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("RedCard"))
 				continue;
 
@@ -1696,10 +1696,10 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ36(List<AbstractAnnotation<?>> annotations, String team) {
+	public static String answerQ36(List<AbstractAnnotation> annotations, String team) {
 
 		int count = 0;
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
 				continue;
@@ -1720,11 +1720,11 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ37(List<AbstractAnnotation<?>> annotations, String team) {
+	public static String answerQ37(List<AbstractAnnotation> annotations, String team) {
 
 		int count = 0;
 
-		for (AbstractAnnotation<?> abstractAnnotation : annotations) {
+		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
 				continue;
 			if (!abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardForTeam"))

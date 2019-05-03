@@ -1,7 +1,7 @@
 package de.hterhors.semanticmr.crf.structure;
 
-public interface IDeepCopyable<E> {
+public interface IDeepCopyable {
 
-	public E deepCopy();
+	public <A extends IDeepCopyable> A deepCopy();
 
 }

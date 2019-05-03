@@ -36,7 +36,7 @@ import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
 import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.init.specifications.CRFInitializer;
 
 public class NamedEntityRecognitionAndLinkingExample {
 
@@ -52,7 +52,7 @@ public class NamedEntityRecognitionAndLinkingExample {
 
 	public static void main(String[] args) throws IOException {
 
-		SystemInitializer.setSpecifications(specificationProvider).apply();
+		CRFInitializer crfInitializer = CRFInitializer.setSpecifications(specificationProvider).apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
@@ -99,7 +99,7 @@ public class NamedEntityRecognitionAndLinkingExample {
 		}
 		model = new Model(featureTemplates);
 
-		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
+		CRF crf = new CRF(crfInitializer, model, explorer, sampler, stateInitializer, objectiveFunction);
 
 		if (!model.wasLoaded()) {
 			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,

@@ -18,7 +18,7 @@ import de.hterhors.semanticmr.crf.variables.Instance;
 public class GeneralCandidateProvider
 		implements ISlotTypeAnnotationCandidateProvider, IEntityTypeAnnotationCandidateProvider {
 
-	private final Map<SlotType, List<AbstractAnnotation<? extends AbstractAnnotation<?>>>> entityAnnotationCache = new HashMap<>();
+	private final Map<SlotType, List<AbstractAnnotation>> entityAnnotationCache = new HashMap<>();
 	private final Map<EntityType, Set<EntityTypeAnnotation>> rootAnnotationsCache = new HashMap<>();
 
 	private final Instance relatedInstance;
@@ -28,7 +28,7 @@ public class GeneralCandidateProvider
 	}
 
 	@Override
-	public GeneralCandidateProvider addSlotFiller(AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller) {
+	public GeneralCandidateProvider addSlotFiller(AbstractAnnotation slotFiller) {
 		for (SlotType slotType : slotFiller.getEntityType().getSlotFillerOfSlotTypes()) {
 			entityAnnotationCache.putIfAbsent(slotType, new ArrayList<>());
 			if (slotType.matchesEntityType(slotFiller.getEntityType())) {
@@ -46,16 +46,15 @@ public class GeneralCandidateProvider
 	}
 
 	@Override
-	public GeneralCandidateProvider addBatchSlotFiller(
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller) {
-		for (AbstractAnnotation<? extends AbstractAnnotation<?>> literalSlotFiller : slotFiller) {
+	public GeneralCandidateProvider addBatchSlotFiller(Collection<AbstractAnnotation> slotFiller) {
+		for (AbstractAnnotation literalSlotFiller : slotFiller) {
 			addSlotFiller(literalSlotFiller);
 		}
 		return this;
 	}
 
 	@Override
-	public List<AbstractAnnotation<? extends AbstractAnnotation<?>>> getCandidates(SlotType slotType) {
+	public List<AbstractAnnotation> getCandidates(SlotType slotType) {
 		return entityAnnotationCache.getOrDefault(slotType, Collections.emptyList());
 	}
 

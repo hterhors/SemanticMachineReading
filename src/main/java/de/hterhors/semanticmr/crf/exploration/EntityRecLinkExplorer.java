@@ -110,7 +110,7 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 					for (EntityType entityType : cp.getEntityTypeCandidates(text)) {
 
 						try {
-							AbstractAnnotation<? extends AbstractAnnotation<?>> newCurrentPrediction = AnnotationBuilder
+							AbstractAnnotation newCurrentPrediction = AnnotationBuilder
 									.toAnnotation(currentState.getInstance().getDocument(), entityType.entityTypeName,
 											text, fromToken.getDocCharOffset());
 							proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));

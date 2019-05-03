@@ -22,7 +22,7 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.init.specifications.CRFInitializer;
 import de.hterhors.semanticmr.json.wrapper.JsonAnnotationsWrapper;
 import de.hterhors.semanticmr.json.wrapper.JsonDocumentLinkedAnnotationWrapper;
 import de.hterhors.semanticmr.json.wrapper.JsonDocumentPositionWrapper;
@@ -46,7 +46,7 @@ public class InstancesToJsonInstanceWrapper {
 		this.instances = instances;
 	}
 
-	public List<JsonInstanceWrapper> convertToWrapperInstances(SystemInitializer initializer) {
+	public List<JsonInstanceWrapper> convertToWrapperInstances(CRFInitializer initializer) {
 		return instances.stream().map(instance -> toInstanceWrapper(instance)).collect(Collectors.toList());
 	}
 
@@ -73,26 +73,24 @@ public class InstancesToJsonInstanceWrapper {
 				extractEntityTemplateWrapper(annotations.getAnnotations()));
 	}
 
-	private List<JsonEntityTemplateWrapper> extractEntityTemplateWrapper(
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations) {
+	private List<JsonEntityTemplateWrapper> extractEntityTemplateWrapper(Collection<AbstractAnnotation> annotations) {
 		return annotations.stream().filter(a -> a.getClass() == EntityTemplate.class)
 				.map(a -> toEntityTemplateWrapper((EntityTemplate) a)).collect(Collectors.toList());
 	}
 
-	private List<JsonEntityTypeWrapper> extractEntityTypeWrapper(
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations) {
+	private List<JsonEntityTypeWrapper> extractEntityTypeWrapper(Collection<AbstractAnnotation> annotations) {
 		return annotations.stream().filter(a -> a.getClass() == EntityTypeAnnotation.class)
 				.map(a -> toEntityTypeAnnotationWrapper((EntityTypeAnnotation) a)).collect(Collectors.toList());
 	}
 
 	private List<JsonLiteralAnnotationWrapper> extractLiteralAnnotationWrapper(
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations) {
+			Collection<AbstractAnnotation> annotations) {
 		return annotations.stream().filter(a -> a.getClass() == LiteralAnnotation.class)
 				.map(a -> toLiteralAnnotationWrapper((LiteralAnnotation) a)).collect(Collectors.toList());
 	}
 
 	private List<JsonDocumentLinkedAnnotationWrapper> extractDocLinkedAnnotationWrapper(
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations) {
+			Collection<AbstractAnnotation> annotations) {
 		return annotations.stream().filter(a -> a.getClass() == DocumentLinkedAnnotation.class)
 				.map(a -> toDocumentLinkedAnnotationWrapper((DocumentLinkedAnnotation) a)).collect(Collectors.toList());
 	}
@@ -157,8 +155,7 @@ public class InstancesToJsonInstanceWrapper {
 		} else if (wrapper instanceof LiteralAnnotation) {
 			rootAnnotationWrapper.setLiteralAnnotation(toLiteralAnnotationWrapper((LiteralAnnotation) wrapper));
 		} else if (wrapper instanceof EntityTypeAnnotation) {
-			rootAnnotationWrapper
-					.setEntityTypeAnnotation(toEntityTypeAnnotationWrapper(wrapper));
+			rootAnnotationWrapper.setEntityTypeAnnotation(toEntityTypeAnnotationWrapper(wrapper));
 		}
 		return rootAnnotationWrapper;
 	}
@@ -167,7 +164,7 @@ public class InstancesToJsonInstanceWrapper {
 		final JsonSingleFillerSlotWrapper singleFillerSlotWrapper = new JsonSingleFillerSlotWrapper(null, null, null,
 				null);
 
-		final AbstractAnnotation<?> slotFiller = singleFillerSlot.getSlotFiller();
+		final AbstractAnnotation slotFiller = singleFillerSlot.getSlotFiller();
 
 		if (slotFiller instanceof DocumentLinkedAnnotation) {
 			singleFillerSlotWrapper

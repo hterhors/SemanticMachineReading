@@ -69,12 +69,12 @@ public class JsonInstanceWrapperToInstance {
 				goldAnnotationsWrapper.getEntityTemplateAnnotations()));
 	}
 
-	private List<AbstractAnnotation<? extends AbstractAnnotation<?>>> collectAnnotations(Document document,
+	private List<AbstractAnnotation> collectAnnotations(Document document,
 			List<JsonDocumentLinkedAnnotationWrapper> docLinkedAnnotations,
 			List<JsonLiteralAnnotationWrapper> literalAnnotations, List<JsonEntityTypeWrapper> entityTypeAnnotations,
 			List<JsonEntityTemplateWrapper> entityTemplateAnnotations) {
 
-		final List<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations = new ArrayList<>();
+		final List<AbstractAnnotation> annotations = new ArrayList<>();
 
 		if (docLinkedAnnotations != null)
 			for (JsonDocumentLinkedAnnotationWrapper wrapper : docLinkedAnnotations) {
@@ -139,13 +139,13 @@ public class JsonInstanceWrapperToInstance {
 		for (Entry<JsonSlotTypeWrapper, JsonMultiFillerSlotWrapper> multiSlotWrapper : wrapper.getMultiFillerSlots()
 				.entrySet()) {
 
-			List<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations = collectAnnotations(document,
+			List<AbstractAnnotation> annotations = collectAnnotations(document,
 					multiSlotWrapper.getValue().getDocLinkedAnnotations(),
 					multiSlotWrapper.getValue().getLiteralAnnotations(),
 					multiSlotWrapper.getValue().getEntityTypeAnnotations(),
 					multiSlotWrapper.getValue().getEntityTemplateAnnotations());
 
-			for (AbstractAnnotation<? extends AbstractAnnotation<?>> abstractSlotFiller : annotations) {
+			for (AbstractAnnotation abstractSlotFiller : annotations) {
 				entityTemplate.addMultiSlotFiller(toSlotType(multiSlotWrapper.getKey()), abstractSlotFiller);
 			}
 
@@ -169,8 +169,7 @@ public class JsonInstanceWrapperToInstance {
 		throw new IllegalStateException("Root annotation has no value.");
 	}
 
-	private AbstractAnnotation<? extends AbstractAnnotation<?>> toSlotFiller(Document document,
-			JsonSingleFillerSlotWrapper wrapper) {
+	private AbstractAnnotation toSlotFiller(Document document, JsonSingleFillerSlotWrapper wrapper) {
 		if (wrapper.getDocLinkedAnnotation() != null) {
 			try {
 				return toDocumentLinkedAnnotation(document, wrapper.getDocLinkedAnnotation());
