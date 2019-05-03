@@ -38,8 +38,8 @@ public class CartesianEvaluator extends AbstractEvaluator {
 	}
 
 	@Override
-	protected Score scoreMax(Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherAnnotations) {
+	protected Score scoreMax(Collection<AbstractAnnotation> annotations,
+			Collection<AbstractAnnotation> otherAnnotations) {
 
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 

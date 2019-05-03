@@ -18,8 +18,7 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 	}
 
 	@Override
-	public Score scoreMax(Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherAnnotations) {
+	public Score scoreMax(Collection<AbstractAnnotation> annotations, Collection<AbstractAnnotation> otherAnnotations) {
 
 		final List<BeamAssignmentTree> assignments = new ArrayList<>();
 
@@ -50,7 +49,7 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 				/*
 				 * Get gold object if any, otherwise empty instance.
 				 */
-				final AbstractAnnotation<?> goldThing;
+				final AbstractAnnotation goldThing;
 				if (current.remainingGold.size() > goldListIndex)
 					goldThing = current.remainingGold.get(goldListIndex);
 				else
@@ -61,7 +60,7 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 					/*
 					 * Get prediction object if any, otherwise empty instance.
 					 */
-					final AbstractAnnotation<?> predThing;
+					final AbstractAnnotation predThing;
 
 					if (current.remainingPrediction.size() > predictionListIndex)
 						predThing = current.remainingPrediction.get(predictionListIndex);
@@ -111,8 +110,8 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 	class BeamAssignmentTree implements Comparable<BeamAssignmentTree> {
 
 		final private List<BeamAssignment> assignments;
-		final private List<? extends AbstractAnnotation<? extends AbstractAnnotation<?>>> remainingGold;
-		final private List<? extends AbstractAnnotation<? extends AbstractAnnotation<?>>> remainingPrediction;
+		final private List<AbstractAnnotation> remainingGold;
+		final private List<AbstractAnnotation> remainingPrediction;
 		final public Score overallSimiliarity;
 
 		/**
@@ -122,8 +121,7 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 		 * @param gold
 		 * @param prediction
 		 */
-		public BeamAssignmentTree(List<? extends AbstractAnnotation<? extends AbstractAnnotation<?>>> gold,
-				List<? extends AbstractAnnotation<? extends AbstractAnnotation<?>>> prediction) {
+		public BeamAssignmentTree(List<AbstractAnnotation> gold, List<AbstractAnnotation> prediction) {
 			this.assignments = new ArrayList<>();
 			this.remainingGold = gold;
 			this.remainingPrediction = prediction;
@@ -169,11 +167,11 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 
 	class BeamAssignment implements Comparable<BeamAssignment> {
 
-		final public AbstractAnnotation<?> gold;
-		final public AbstractAnnotation<?> pred;
+		final public AbstractAnnotation gold;
+		final public AbstractAnnotation pred;
 		final public Score similiarity;
 
-		public BeamAssignment(AbstractAnnotation<?> gold, AbstractAnnotation<?> pred, Score similiarity) {
+		public BeamAssignment(AbstractAnnotation gold, AbstractAnnotation pred, Score similiarity) {
 			this.gold = gold;
 			this.pred = pred;
 			this.similiarity = similiarity;

@@ -8,12 +8,10 @@ import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 
 public interface ISlotTypeAnnotationCandidateProvider extends ICandidateProvider {
 
-	public List<? extends AbstractAnnotation<? extends AbstractAnnotation<?>>> getCandidates(SlotType slot);
+	public List<? extends AbstractAnnotation> getCandidates(SlotType slot);
 
-	public ISlotTypeAnnotationCandidateProvider addSlotFiller(
-			AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller);
+	public ISlotTypeAnnotationCandidateProvider addSlotFiller(AbstractAnnotation slotFiller);
 
-	public ISlotTypeAnnotationCandidateProvider addBatchSlotFiller(
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller);
+	public ISlotTypeAnnotationCandidateProvider addBatchSlotFiller(Collection<AbstractAnnotation> slotFiller);
 
 }

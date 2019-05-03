@@ -1,6 +1,7 @@
 package de.hterhors.semanticmr.crf.structure.annotations;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 
@@ -11,7 +12,7 @@ import de.hterhors.semanticmr.eval.AbstractEvaluator;
  * @author hterhors
  *
  */
-public class LiteralAnnotation<B extends LiteralAnnotation<B>> extends EntityTypeAnnotation<B> {
+public class LiteralAnnotation extends EntityTypeAnnotation {
 
 	/**
 	 * Contains the textual content of this annotation.
@@ -85,7 +86,7 @@ public class LiteralAnnotation<B extends LiteralAnnotation<B>> extends EntityTyp
 	}
 
 	@Override
-	public Score evaluate(AbstractEvaluator evaluator, EntityTypeAnnotation otherVal) {
+	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal) {
 		if (otherVal == null) {
 			return Score.FN;
 		} else {

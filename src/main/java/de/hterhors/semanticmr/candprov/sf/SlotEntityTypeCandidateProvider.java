@@ -31,10 +31,10 @@ public class SlotEntityTypeCandidateProvider
 
 	private final Map<EntityType, Set<EntityTypeAnnotation>> rootAnnotationsCache = new HashMap<>();
 
-	private final Map<SlotType, List<AbstractAnnotation<? extends AbstractAnnotation<?>>>> entityAnnotationCache = new HashMap<>();
+	private final Map<SlotType, List<AbstractAnnotation>> entityAnnotationCache = new HashMap<>();
 
 	@Override
-	public List<AbstractAnnotation<? extends AbstractAnnotation<?>>> getCandidates(SlotType slot) {
+	public List<AbstractAnnotation> getCandidates(SlotType slot) {
 		if (!entityAnnotationCache.containsKey(slot)) {
 
 			for (EntityType slotEntityType : slot.getSlotFillerEntityTypes()) {
@@ -71,15 +71,13 @@ public class SlotEntityTypeCandidateProvider
 	}
 
 	@Override
-	public SlotEntityTypeCandidateProvider addSlotFiller(
-			AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller) {
+	public SlotEntityTypeCandidateProvider addSlotFiller(AbstractAnnotation slotFiller) {
 		throw new IllegalStateException(
 				"Can not add slot filler to enitty type candiate provider. Candidates are based on the specification.");
 	}
 
 	@Override
-	public SlotEntityTypeCandidateProvider addBatchSlotFiller(
-			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller) {
+	public SlotEntityTypeCandidateProvider addBatchSlotFiller(Collection<AbstractAnnotation> slotFiller) {
 		throw new IllegalStateException(
 				"Can not add slot filler to enitty type candiate provider. Candidates are based on the specification.");
 	}

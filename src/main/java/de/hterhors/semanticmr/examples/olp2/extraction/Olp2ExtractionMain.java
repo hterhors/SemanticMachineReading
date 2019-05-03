@@ -40,7 +40,7 @@ import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
 import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.init.specifications.CRFInitializer;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.nerla.NerlaCollector;
 
@@ -58,7 +58,7 @@ public class Olp2ExtractionMain {
 
 	public static void main(String[] args) throws IOException, DocumentLinkedAnnotationMismatchException {
 
-		SystemInitializer initializer = SystemInitializer.setSpecifications(de_specificationProvider).apply();
+		CRFInitializer crfInitializer = CRFInitializer.setSpecifications(de_specificationProvider).apply();
 
 		CartesianEvaluator cartesian = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
 		BeamSearchEvaluator beam = new BeamSearchEvaluator(EEvaluationDetail.ENTITY_TYPE, 2);
@@ -115,7 +115,7 @@ public class Olp2ExtractionMain {
 		}
 		model = new Model(featureTemplates);
 
-		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
+		CRF crf = new CRF(crfInitializer, model, explorer, sampler, stateInitializer, objectiveFunction);
 
 		if (!model.wasLoaded()) {
 			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,

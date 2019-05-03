@@ -4,7 +4,7 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IDeepCopyable;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 
-public abstract class AbstractAnnotation<T> implements IEvaluatable<T>, IDeepCopyable<AbstractAnnotation<T>> {
+public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable {
 
 	final public String toPrettyString() {
 		return toPrettyString(0);

@@ -163,14 +163,14 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
 					.nonEmpty().literalAnnoation().build();
 
-			final List<AbstractAnnotation<?>> slotFillers = filter.getMergedAnnotations().values().stream()
+			final List<AbstractAnnotation> slotFillers = filter.getMergedAnnotations().values().stream()
 					.flatMap(s -> s.stream()).collect(Collectors.toList());
 
 			for (int i = 0; i < slotFillers.size(); i++) {
-				AbstractAnnotation<?> fromSlotFiller = slotFillers.get(i);
+				AbstractAnnotation fromSlotFiller = slotFillers.get(i);
 
 				for (int j = i + 1; j < slotFillers.size(); j++) {
-					AbstractAnnotation<?> toSlotFiller = slotFillers.get(j);
+					AbstractAnnotation toSlotFiller = slotFillers.get(j);
 
 					final Integer fromOffset = ((DocumentLinkedAnnotation) fromSlotFiller).getStartDocCharOffset();
 					final Integer toOffset = ((DocumentLinkedAnnotation) toSlotFiller).getStartDocCharOffset();

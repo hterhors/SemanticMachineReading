@@ -1,8 +1,9 @@
 package de.hterhors.semanticmr.crf.structure;
 
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 
-public interface IEvaluatable<T> {
+public interface IEvaluatable {
 
 	public static class Score {
 
@@ -151,6 +152,6 @@ public interface IEvaluatable<T> {
 		}
 	}
 
-	public Score evaluate(AbstractEvaluator evaluator, T otherVal);
+	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal);
 
 }

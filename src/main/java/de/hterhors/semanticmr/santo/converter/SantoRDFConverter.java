@@ -21,7 +21,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.init.specifications.CRFInitializer;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
 import de.hterhors.semanticmr.santo.container.Triple;
 import de.hterhors.semanticmr.santo.helper.PatternCollection;
@@ -31,7 +31,7 @@ public class SantoRDFConverter {
 
 	public static final String RDF_TYPE_NAMESPACE = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>";
 
-	final private SystemInitializer initializer;
+	final private CRFInitializer initializer;
 
 	private Map<String, Map<String, Set<String>>> rdfData;
 
@@ -46,7 +46,7 @@ public class SantoRDFConverter {
 	final private String ontologyNameSpace;
 	final private String dataNameSpace;
 
-	public SantoRDFConverter(SystemInitializer initializer, Map<Triple, RDFRelatedAnnotation> annotations,
+	public SantoRDFConverter(CRFInitializer initializer, Map<Triple, RDFRelatedAnnotation> annotations,
 			File rdfAnnotationsFile, final String ontologyNameSpace, final String dataNameSpace) throws IOException {
 		this.initializer = initializer;
 		this.annotations = annotations;
@@ -56,12 +56,12 @@ public class SantoRDFConverter {
 		this.rdfData = readRDFData(rdfAnnotationsFile);
 	}
 
-	public List<AbstractAnnotation<? extends AbstractAnnotation<?>>> extract(final Document document,
-			final Set<String> rootEntities, final boolean includeSubEntities) {
+	public List<AbstractAnnotation> extract(final Document document, final Set<String> rootEntities,
+			final boolean includeSubEntities) {
 
 		setRootEntityTypes(rootEntities, includeSubEntities);
 
-		final List<AbstractAnnotation<? extends AbstractAnnotation<?>>> instances = new ArrayList<>();
+		final List<AbstractAnnotation> instances = new ArrayList<>();
 
 		for (String rootDataPoint : rootDataPoints) {
 
@@ -113,8 +113,8 @@ public class SantoRDFConverter {
 			/*
 			 * Get all values.
 			 */
-			List<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFillers = extractValuesFromPredicates(
-					document, subject, slot, props.getKey(), props.getValue());
+			List<AbstractAnnotation> slotFillers = extractValuesFromPredicates(document, subject, slot, props.getKey(),
+					props.getValue());
 
 			if (slotFillers.size() == 0)
 				continue;
@@ -123,20 +123,20 @@ public class SantoRDFConverter {
 				if (slotFillers.size() > 1) {
 					System.out.println("WARN! Multiple slot filler detected for single filler slot.");
 				}
-				final AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller = slotFillers.get(0);
+				final AbstractAnnotation slotFiller = slotFillers.get(0);
 				object.getSingleFillerSlot(slot).set(slotFiller);
 			} else {
-				for (AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller : slotFillers) {
+				for (AbstractAnnotation slotFiller : slotFillers) {
 					object.getMultiFillerSlot(slot).add(slotFiller);
 				}
 			}
 		}
 	}
 
-	private List<AbstractAnnotation<? extends AbstractAnnotation<?>>> extractValuesFromPredicates(Document document,
-			String subject, SlotType slotType, String slotName, Set<String> slotFiller) {
+	private List<AbstractAnnotation> extractValuesFromPredicates(Document document, String subject, SlotType slotType,
+			String slotName, Set<String> slotFiller) {
 
-		List<AbstractAnnotation<? extends AbstractAnnotation<?>>> predicateValues = new ArrayList<>();
+		List<AbstractAnnotation> predicateValues = new ArrayList<>();
 
 		for (String object : slotFiller) {
 

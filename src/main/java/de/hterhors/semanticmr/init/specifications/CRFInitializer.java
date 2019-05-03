@@ -12,13 +12,13 @@ import de.hterhors.semanticmr.crf.structure.annotations.normalization.INormaliza
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.IRequiresInitialization;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 
-public class SystemInitializer {
+public class CRFInitializer {
 
 	final static private List<IRequiresInitialization> requiresInitialization = new ArrayList<>();
 
 	private static SpecificationsProvider specifications;
 
-	private SystemInitializer() {
+	private CRFInitializer() {
 	}
 
 	private static void register(IRequiresInitialization object) {
@@ -31,7 +31,7 @@ public class SystemInitializer {
 
 	public static NormalizationFunctionHandler setSpecifications(SpecificationsProvider specificationProvider) {
 
-		SystemInitializer.specifications = specificationProvider;
+		CRFInitializer.specifications = specificationProvider;
 
 		register(SlotType.getInitializationInstance());
 		register(EntityType.getInitializationInstance());
@@ -85,11 +85,11 @@ public class SystemInitializer {
 			return this;
 		}
 
-		public SystemInitializer apply() {
+		public CRFInitializer apply() {
 			for (Entry<EntityType, INormalizationFunction> entry : normalizationFunctions.entrySet()) {
 				entry.getKey().setNormalizationFunction(entry.getValue());
 			}
-			return new SystemInitializer();
+			return new CRFInitializer();
 		}
 	}
 

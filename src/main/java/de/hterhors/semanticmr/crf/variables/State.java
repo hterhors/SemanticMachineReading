@@ -42,7 +42,7 @@ public class State {
 		this.objectiveScore = DEFAULT_OBJECTIVE_SCORE;
 	}
 
-	public State deepAddCopy(AbstractAnnotation<? extends AbstractAnnotation<?>> newCurrentPrediction) {
+	public State deepAddCopy(AbstractAnnotation newCurrentPrediction) {
 		return new State(this.instance, currentPredictions.deepAddCopy(newCurrentPrediction));
 	}
 
@@ -54,8 +54,7 @@ public class State {
 	 * @param newCurrentPrediction
 	 * @return a new State instance
 	 */
-	public State deepUpdateCopy(final int annotationIndex,
-			AbstractAnnotation<? extends AbstractAnnotation<?>> newCurrentPrediction) {
+	public State deepUpdateCopy(final int annotationIndex, AbstractAnnotation newCurrentPrediction) {
 		return new State(this.instance, currentPredictions.deepUpdateCopy(annotationIndex, newCurrentPrediction));
 	}
 

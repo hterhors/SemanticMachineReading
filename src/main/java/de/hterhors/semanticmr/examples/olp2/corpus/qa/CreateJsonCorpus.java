@@ -21,7 +21,7 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.StartPreprocessing;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.XMLReader;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.init.specifications.CRFInitializer;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 
@@ -35,12 +35,12 @@ public class CreateJsonCorpus {
 	}
 
 	public CreateJsonCorpus(final String language) throws Exception {
-		SystemInitializer init = null;
+		CRFInitializer init = null;
 		if (language.equals("en"))
-			init = SystemInitializer.setSpecifications(StartPreprocessing.en_specificationProvider).apply();
+			init = CRFInitializer.setSpecifications(StartPreprocessing.en_specificationProvider).apply();
 
 		if (language.equals("de"))
-			init = SystemInitializer.setSpecifications(StartPreprocessing.de_specificationProvider).apply();
+			init = CRFInitializer.setSpecifications(StartPreprocessing.de_specificationProvider).apply();
 
 		this.reader = new XMLReader(new File("olp2/SemiStructured/"));
 
@@ -60,7 +60,7 @@ public class CreateJsonCorpus {
 
 			System.out.println("Build instance: " + instance.getName());
 
-			List<AbstractAnnotation<? extends AbstractAnnotation<?>>> listOfAnnotations = new ArrayList<>();
+			List<AbstractAnnotation> listOfAnnotations = new ArrayList<>();
 
 			EntityTemplate ita = new EntityTemplate(AnnotationBuilder.toAnnotation("QAInstance"));
 

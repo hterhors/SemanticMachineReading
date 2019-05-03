@@ -17,7 +17,7 @@ import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.CrossRefReader.CrossRef;
 import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
 import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.init.specifications.CRFInitializer;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 import de.hterhors.semanticmr.tokenizer.StandardDocumentTokenizer;
@@ -60,7 +60,7 @@ public class StartPreprocessing {
 
 	public static void de() throws Exception {
 
-		SystemInitializer initializer = SystemInitializer.setSpecifications(de_specificationProvider).apply();
+		CRFInitializer initializer = CRFInitializer.setSpecifications(de_specificationProvider).apply();
 
 		CrossRefReader crr = new CrossRefReader(new File("olp2/Crossref/"));
 		TextReader tr = new TextReader(new File("olp2/Text/"));
@@ -84,7 +84,7 @@ public class StartPreprocessing {
 	}
 
 	public static void en() throws Exception {
-		SystemInitializer initializer = SystemInitializer.setSpecifications(en_specificationProvider).apply();
+		CRFInitializer initializer = CRFInitializer.setSpecifications(en_specificationProvider).apply();
 		CrossRefReader crr = new CrossRefReader(new File("olp2/Crossref/"));
 		TextReader tr = new TextReader(new File("olp2/Text/"));
 		XMLReader xml2json = new XMLReader(new File("olp2/SemiStructured/"));
@@ -108,7 +108,7 @@ public class StartPreprocessing {
 	}
 
 	private static Instance getInstances(XMLReader xml2json, String docContent, String structureID) throws Exception {
-		final List<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations = new ArrayList<>();
+		final List<AbstractAnnotation> annotations = new ArrayList<>();
 		for (EntityTemplate et : xml2json.readGoals(structureID)) {
 			annotations.add(et);
 		}

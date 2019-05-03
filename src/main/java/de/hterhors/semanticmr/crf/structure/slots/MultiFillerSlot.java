@@ -10,7 +10,7 @@ import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 
 public class MultiFillerSlot extends AbstractSlot {
 
-	private final LinkedHashSet<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller;
+	private final LinkedHashSet<AbstractAnnotation> slotFiller;
 
 	public MultiFillerSlot(SlotType slotType) {
 		super(slotType);
@@ -23,13 +23,12 @@ public class MultiFillerSlot extends AbstractSlot {
 	 * @param slotType
 	 * @param slotFiller
 	 */
-	private MultiFillerSlot(final SlotType slotType,
-			final LinkedHashSet<AbstractAnnotation<? extends AbstractAnnotation<?>>> slotFiller) {
+	private MultiFillerSlot(final SlotType slotType, final LinkedHashSet<AbstractAnnotation> slotFiller) {
 		super(slotType);
 		this.slotFiller = slotFiller;
 	}
 
-	public LinkedHashSet<AbstractAnnotation<? extends AbstractAnnotation<?>>> getSlotFiller() {
+	public LinkedHashSet<AbstractAnnotation> getSlotFiller() {
 		return slotFiller;
 	}
 
@@ -41,7 +40,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		return slotFiller.size() == slotType.multiFillerSlotMaxCapacity;
 	}
 
-	public boolean containsSlotFiller(AbstractAnnotation<?> slotFillerCandidate) {
+	public boolean containsSlotFiller(AbstractAnnotation slotFillerCandidate) {
 		return this.slotFiller.contains(slotFillerCandidate);
 	}
 
@@ -50,8 +49,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		return !slotFiller.isEmpty();
 	}
 
-	public void add(AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller)
-			throws ExceedsMaxSlotFillerException {
+	public void add(AbstractAnnotation slotFiller) throws ExceedsMaxSlotFillerException {
 
 		if (containsMaximumFiller())
 			throw new ExceedsMaxSlotFillerException(
@@ -65,7 +63,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		this.slotFiller.add(slotFiller);
 	}
 
-	public void removeSlotFiller(AbstractAnnotation<?> slotFiller) {
+	public void removeSlotFiller(AbstractAnnotation slotFiller) {
 		this.slotFiller.remove(slotFiller);
 	}
 
@@ -100,9 +98,12 @@ public class MultiFillerSlot extends AbstractSlot {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public MultiFillerSlot deepCopy() {
-		return new MultiFillerSlot(slotType, slotFiller == null ? null
-				: slotFiller.stream().map(a -> a.deepCopy()).collect(Collectors.toCollection(LinkedHashSet::new)));
+		return new MultiFillerSlot(slotType,
+				slotFiller == null ? null
+						: slotFiller.stream().map(a -> (AbstractAnnotation) a.deepCopy())
+								.collect(Collectors.toCollection(LinkedHashSet::new)));
 	}
 
 	public String toPrettyString(final int depth) {
@@ -113,7 +114,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		final StringBuilder sb = new StringBuilder(slotType.toPrettyString(depth));
 		sb.append("\t[\n");
 		final int newDepth = depth + 1;
-		for (AbstractAnnotation<?> slotFiller : this.slotFiller) {
+		for (AbstractAnnotation slotFiller : this.slotFiller) {
 			for (int d = 0; d < newDepth; d++) {
 				sb.append("\t");
 			}
@@ -138,7 +139,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		if (!containsSlotFiller())
 			return false;
 
-		for (AbstractAnnotation<?> slotFiller : slotFiller) {
+		for (AbstractAnnotation slotFiller : slotFiller) {
 			if (slotFiller.getEntityType() == entityType)
 				return true;
 		}
@@ -153,8 +154,7 @@ public class MultiFillerSlot extends AbstractSlot {
 	 * @param slotFiller          the old filler to remove
 	 * @param slotFillerCandidate the new filler to add
 	 */
-	public void replace(AbstractAnnotation<? extends AbstractAnnotation<?>> slotFiller,
-			AbstractAnnotation<? extends AbstractAnnotation<?>> slotFillerCandidate) {
+	public void replace(AbstractAnnotation slotFiller, AbstractAnnotation slotFillerCandidate) {
 
 		if (slotFiller == slotFillerCandidate)
 			return;

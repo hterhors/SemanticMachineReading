@@ -41,7 +41,7 @@ import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
 import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.init.specifications.CRFInitializer;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.nerla.NerlaCollector;
 
@@ -66,7 +66,7 @@ public class SlotFillingMain {
 
 	public SlotFillingMain() throws Exception {
 
-		SystemInitializer initializer = SystemInitializer.setSpecifications(specificationProvider)
+		CRFInitializer crfInitializer = CRFInitializer.setSpecifications(specificationProvider)
 				.registerNormalizationFunction(new WeightNormalization()).apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
@@ -120,13 +120,13 @@ public class SlotFillingMain {
 		final String modelName = "Model3";
 
 		Model model;
-		try {
-			model = Model.load(modelDir, modelName);
-		} catch (Exception e) {
-		}
+//		try {
+//			model = Model.load(modelDir, modelName);
+//		} catch (Exception e) {
+//		}
 		model = new Model(featureTemplates);
 
-		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
+		CRF crf = new CRF(crfInitializer, model, explorer, sampler, stateInitializer, objectiveFunction);
 
 		if (!model.wasLoaded()) {
 			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,

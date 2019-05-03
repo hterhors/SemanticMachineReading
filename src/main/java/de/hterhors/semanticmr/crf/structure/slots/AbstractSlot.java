@@ -13,7 +13,7 @@ import de.hterhors.semanticmr.crf.structure.IDeepCopyable;
  * @author hterhors
  *
  */
-public abstract class AbstractSlot implements IDeepCopyable<AbstractSlot> {
+public abstract class AbstractSlot implements IDeepCopyable {
 	/**
 	 * The slot type is specified by the specifications and can not be changed.
 	 */

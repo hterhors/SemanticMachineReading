@@ -13,9 +13,9 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 
-public class Annotations implements IEvaluatable<Annotations> {
+public class Annotations implements IEvaluatable {
 
-	private List<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations;
+	private List<AbstractAnnotation> annotations;
 
 	private Set<DocumentToken> tokensWithAnnotations = new HashSet<>();
 
@@ -23,15 +23,14 @@ public class Annotations implements IEvaluatable<Annotations> {
 		this(Collections.emptyList());
 	}
 
-	public Annotations(AbstractAnnotation<? extends AbstractAnnotation<?>> annotation) {
+	public Annotations(AbstractAnnotation annotation) {
 		this(Arrays.asList(annotation));
 	}
 
-	public Annotations(List<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations) {
+	public Annotations(List<AbstractAnnotation> annotations) {
 		Objects.requireNonNull(annotations);
 		this.annotations = annotations;
-//		this.instance = instance;
-		for (AbstractAnnotation<? extends AbstractAnnotation<?>> abstractSlotFiller : this.annotations) {
+		for (AbstractAnnotation abstractSlotFiller : this.annotations) {
 			if (abstractSlotFiller instanceof DocumentLinkedAnnotation) {
 				tokensWithAnnotations.addAll(((DocumentLinkedAnnotation) abstractSlotFiller).relatedTokens);
 			}
@@ -43,28 +42,31 @@ public class Annotations implements IEvaluatable<Annotations> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <Annotation extends AbstractAnnotation<?>> List<Annotation> getAnnotations() {
+	public <Annotation extends AbstractAnnotation> List<Annotation> getAnnotations() {
 		return (List<Annotation>) annotations;
 	}
 
 	@Override
-	public Score evaluate(AbstractEvaluator evaluator, Annotations otherVal) {
+	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal) {
 
-		if (this.annotations.size() == 0 || otherVal.annotations.size() == 0 || otherVal == null)
+		if (!(otherVal instanceof Annotations))
 			return Score.ZERO;
 
-		if (this.annotations.size() == 1 && otherVal.annotations.size() == 1)
-			return evaluator.scoreSingle(this.annotations.get(0), otherVal.annotations.get(0));
+		final Annotations otherAnnotations = (Annotations) otherVal;
 
-		return evaluator.scoreMultiValues(this.annotations, otherVal.annotations);
+		if (this.annotations.size() == 0 || otherAnnotations.annotations.size() == 0 || otherVal == null)
+			return Score.ZERO;
+
+		if (this.annotations.size() == 1 && otherAnnotations.annotations.size() == 1)
+			return evaluator.scoreSingle(this.annotations.get(0), otherAnnotations.annotations.get(0));
+
+		return evaluator.scoreMultiValues(this.annotations, otherAnnotations.annotations);
 
 	}
 
-	public Annotations deepUpdateCopy(int annotationIndex,
-			AbstractAnnotation<? extends AbstractAnnotation<?>> newCurrentPrediction) {
+	public Annotations deepUpdateCopy(int annotationIndex, AbstractAnnotation newCurrentPrediction) {
 
-		final List<AbstractAnnotation<? extends AbstractAnnotation<?>>> updatedList = new ArrayList<>(
-				annotations.size());
+		final List<AbstractAnnotation> updatedList = new ArrayList<>(annotations.size());
 		for (int index = 0; index < annotations.size(); index++) {
 
 			if (index == annotationIndex) {
@@ -78,8 +80,7 @@ public class Annotations implements IEvaluatable<Annotations> {
 	}
 
 	public Annotations deepRemoveCopy(int annotationIndex) {
-		final List<AbstractAnnotation<? extends AbstractAnnotation<?>>> updatedList = new ArrayList<>(
-				annotations.size());
+		final List<AbstractAnnotation> updatedList = new ArrayList<>(annotations.size());
 		for (int index = 0; index < annotations.size(); index++) {
 
 			if (index == annotationIndex)
@@ -91,10 +92,9 @@ public class Annotations implements IEvaluatable<Annotations> {
 		return new Annotations(updatedList);
 	}
 
-	public Annotations deepAddCopy(AbstractAnnotation<? extends AbstractAnnotation<?>> newCurrentPrediction) {
+	public Annotations deepAddCopy(AbstractAnnotation newCurrentPrediction) {
 
-		final List<AbstractAnnotation<? extends AbstractAnnotation<?>>> updatedList = new ArrayList<>(
-				annotations.size());
+		final List<AbstractAnnotation> updatedList = new ArrayList<>(annotations.size());
 		for (int index = 0; index < annotations.size(); index++) {
 			updatedList.add(annotations.get(index).deepCopy());
 		}

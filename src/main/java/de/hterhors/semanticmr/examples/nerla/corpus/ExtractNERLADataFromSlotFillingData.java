@@ -19,7 +19,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnn
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
+import de.hterhors.semanticmr.init.specifications.CRFInitializer;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 
@@ -31,7 +31,7 @@ public class ExtractNERLADataFromSlotFillingData {
 
 	public ExtractNERLADataFromSlotFillingData() throws FileNotFoundException {
 
-		SystemInitializer initializer = SystemInitializer.setSpecifications(SlotFillingMain.specificationProvider)
+		CRFInitializer initializer = CRFInitializer.setSpecifications(SlotFillingMain.specificationProvider)
 				.apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
@@ -43,15 +43,14 @@ public class ExtractNERLADataFromSlotFillingData {
 		for (Instance instance : instanceProvider.getInstances()) {
 			List<Instance> newInstances = new ArrayList<>();
 
-			List<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations = new ArrayList<>();
+			List<AbstractAnnotation> annotations = new ArrayList<>();
 
 			for (EntityTemplate annotation : instance.getGoldAnnotations().<EntityTemplate>getAnnotations()) {
 
 				EntityTemplateAnnotationFilter filter = annotation.filter().docLinkedAnnoation().nonEmpty()
 						.singleSlots().build();
 
-				for (Entry<SlotType, AbstractAnnotation<? extends AbstractAnnotation<?>>> a : filter
-						.getSingleAnnotations().entrySet()) {
+				for (Entry<SlotType, AbstractAnnotation> a : filter.getSingleAnnotations().entrySet()) {
 					annotations.add(a.getValue());
 				}
 
