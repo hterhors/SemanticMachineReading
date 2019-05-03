@@ -19,7 +19,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	/**
 	 * The name of this entity type.
 	 */
-	final public String entityTypeName;
+	final public String entityName;
 
 	/**
 	 * Whether this entity type is of type literal.
@@ -29,7 +29,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	/**
 	 * A sorted unmodifiable list of slots of that entity type.
 	 */
-	private Set<SlotType> slotTypes;
+	private Set<SlotType> slots;
 
 	/**
 	 * View of the unmodifiable list of all single annotation slot types of that
@@ -60,7 +60,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	/**
 	 * A sorted unmodifiable list of slots of that entity type.
 	 */
-	final private List<String> slotTypeNames;
+	final private List<String> slotNames;
 
 	final private Set<String> superEntityTypeNames;
 
@@ -71,24 +71,24 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	private Set<String> slotFillerOfSlotTypeNames;
 
 	private EntityType() {
-		this.entityTypeName = null;
-		this.slotTypes = Collections.emptySet();
+		this.entityName = null;
+		this.slots = Collections.emptySet();
 		this.singleAnnotationSlotTypes = Collections.emptyList();
 		this.multiAnnotationSlotTypes = Collections.emptyList();
 		this.superEntityTypeNames = Collections.emptySet();
 		this.subEntityTypeNames = Collections.emptySet();
-		this.slotTypeNames = Collections.emptyList();
+		this.slotNames = Collections.emptyList();
 		this.isLiteral = false;
 	}
 
 	private EntityType(final String internalizedEntityTypeName, StructureSpecification specifications) {
-		this.entityTypeName = internalizedEntityTypeName;
+		this.entityName = internalizedEntityTypeName;
 		this.isLiteral = specifications.isLiteralEntityType(internalizedEntityTypeName);
-		this.slotTypeNames = Collections.unmodifiableList(specifications.getSlotsForEntityType(this.entityTypeName)
+		this.slotNames = Collections.unmodifiableList(specifications.getSlotsForEntityType(this.entityName)
 				.stream().sorted().collect(Collectors.toList()));
 		this.superEntityTypeNames = Collections.unmodifiableSet(specifications
-				.getSuperEntityTypeNames(this.entityTypeName).stream().sorted().collect(Collectors.toSet()));
-		this.subEntityTypeNames = Collections.unmodifiableSet(specifications.getSubEntityTypeNames(this.entityTypeName)
+				.getSuperEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
+		this.subEntityTypeNames = Collections.unmodifiableSet(specifications.getSubEntityTypeNames(this.entityName)
 				.stream().sorted().collect(Collectors.toSet()));
 
 		this.slotFillerOfSlotTypeNames = specifications
@@ -97,13 +97,13 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 				.collect(Collectors.toSet());
 	}
 
-	public Set<SlotType> getSlotTypes() {
-		if (slotTypes == null) {
-			slotTypes = Collections.unmodifiableSet(this.slotTypeNames.stream()
+	public Set<SlotType> getSlots() {
+		if (slots == null) {
+			slots = Collections.unmodifiableSet(this.slotNames.stream()
 					.map(slotTypeName -> SlotType.get(slotTypeName)).sorted().collect(Collectors.toSet()));
 		}
 
-		return slotTypes;
+		return slots;
 	}
 
 	/**
@@ -122,7 +122,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	public List<SlotType> getSingleFillerSlotTypes() {
 		if (singleAnnotationSlotTypes == null) {
 			this.singleAnnotationSlotTypes = Collections.unmodifiableList(
-					getSlotTypes().stream().filter(slot -> slot.isSingleValueSlot()).collect(Collectors.toList()));
+					getSlots().stream().filter(slot -> slot.isSingleValueSlot()).collect(Collectors.toList()));
 		}
 
 		return singleAnnotationSlotTypes;
@@ -131,7 +131,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	public List<SlotType> getMultiFillerSlotTypes() {
 		if (multiAnnotationSlotTypes == null) {
 			this.multiAnnotationSlotTypes = Collections.unmodifiableList(
-					getSlotTypes().stream().filter(slot -> !slot.isSingleValueSlot()).collect(Collectors.toList()));
+					getSlots().stream().filter(slot -> !slot.isSingleValueSlot()).collect(Collectors.toList()));
 		}
 		return multiAnnotationSlotTypes;
 	}
@@ -249,19 +249,19 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 
 	@Override
 	public int compareTo(EntityType o) {
-		return o.entityTypeName.compareTo(this.entityTypeName);
+		return o.entityName.compareTo(this.entityName);
 	}
 
 	@Override
 	public String toString() {
-		return "EntityType [entityTypeName=" + entityTypeName + "]";
+		return "EntityType [entityTypeName=" + entityName + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((entityTypeName == null) ? 0 : entityTypeName.hashCode());
+		result = prime * result + ((entityName == null) ? 0 : entityName.hashCode());
 		return result;
 	}
 
@@ -273,7 +273,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	}
 
 	public boolean containsSlotType(SlotType slotType) {
-		return getSlotTypes().contains(slotType);
+		return getSlots().contains(slotType);
 	}
 
 	/**
@@ -282,7 +282,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	 * @return
 	 */
 	public boolean isLeafEntityType() {
-		return getSlotTypes().isEmpty();
+		return getSlots().isEmpty();
 	}
 
 }

@@ -46,7 +46,7 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 
 	@Override
 	public String toPrettyString(final int depth) {
-		return entityType.entityTypeName;
+		return entityType.entityName;
 	}
 
 	@Override

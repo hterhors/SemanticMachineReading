@@ -32,7 +32,7 @@ hasCurrent	1
 hasDeliveryMethod	1
 hasDepth	1
 hasDifference	1
-hasDirection	1
+hasDirection	-1
 hasDosage	1
 hasDuration	1
 hasElectricFieldStrength	1
@@ -79,6 +79,9 @@ hasTotalPopulationSize	1
 hasTrend	1
 hasUpperVertebrae	1
 hasValue	1
+hasVolume	1
 hasVoltage	1
 hasWeight	1
 relativeTo	1
+hasDistance	1
+hasPairwisedCompareGroups	-1

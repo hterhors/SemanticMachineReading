@@ -141,7 +141,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 					.getTokenByCharOffset(factor.getFactorScope().endOffset);
 
 			addContextFeatures(featureVector, factor.getFactorScope().instance.getDocument().tokenList,
-					factor.getFactorScope().entityType.entityTypeName, beginToken.getDocTokenIndex(),
+					factor.getFactorScope().entityType.entityName, beginToken.getDocTokenIndex(),
 					endToken.getDocTokenIndex());
 		} catch (Exception e) {
 //			System.out.println("WARN! " + e.getMessage());

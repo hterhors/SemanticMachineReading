@@ -503,10 +503,10 @@ public class RuleBasedQA {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 				final int scoreTeamA = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamA"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 				final int scoreTeamB = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamB"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				if (scoreTeamA == scoreTeamB)
 					maxDraw = Math.max(maxDraw, scoreTeamA);
@@ -537,16 +537,16 @@ public class RuleBasedQA {
 
 				final int min = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 				if (min > 45)
 					continue;
 
 				final int scoreTeamA = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamA"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 				final int scoreTeamB = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamB"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				maxTeamA = Math.max(maxTeamA, scoreTeamA);
 				maxteamB = Math.max(maxteamB, scoreTeamB);
@@ -572,10 +572,10 @@ public class RuleBasedQA {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("Goal")) {
 				final int scoreTeamA = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamA"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 				final int scoreTeamB = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamB"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				maxTeamA = Math.max(maxTeamA, scoreTeamA);
 				maxteamB = Math.max(maxteamB, scoreTeamB);
@@ -599,7 +599,7 @@ public class RuleBasedQA {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("RedCard"))
 				teamsWithRedCards.add(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardForTeam"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 		}
 
 		if (teamsWithRedCards.isEmpty())
@@ -631,7 +631,7 @@ public class RuleBasedQA {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("YellowCard"))
 				teamsWithYellowCards.add(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardForTeam"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 		}
 
 		if (teamsWithYellowCards.isEmpty())
@@ -662,7 +662,7 @@ public class RuleBasedQA {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("YellowCard")) {
 				final String team = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("cardForTeam")).getSlotFiller()
-						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 				countYellowCards.put(team, countYellowCards.getOrDefault(team, 0) + 1);
 
 			}
@@ -698,7 +698,7 @@ public class RuleBasedQA {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("RedCard")) {
 				final String team = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("cardForTeam")).getSlotFiller()
-						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 				countRedCards.put(team, countRedCards.getOrDefault(team, 0) + 1);
 
 			}
@@ -736,14 +736,14 @@ public class RuleBasedQA {
 
 			final int min = Integer.parseInt(
 					abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardMinute"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 			if (min == minMin)
 				return null;
 			if (min < minMin) {
 				teamFirstYellowCard = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("cardForTeam")).getSlotFiller()
-						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 				minMin = min;
 			}
@@ -771,13 +771,13 @@ public class RuleBasedQA {
 
 			final int min = Integer.parseInt(
 					abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardMinute"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 			if (min == minMin)
 				return null;
 			if (min < minMin) {
 				teamFirstYellowCard = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("cardForTeam")).getSlotFiller()
-						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 				minMin = min;
 			}
@@ -804,10 +804,10 @@ public class RuleBasedQA {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("TeamStats")) {
 				final int scoreTeam = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("finalScore"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				String team = abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("name"))
-						.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 				if (scoreTeam > 0 && scoreTeam == winnerTeamScore)
 					return null;
@@ -838,10 +838,10 @@ public class RuleBasedQA {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() == EntityType.get("TeamStats")) {
 				final int scoreTeam = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("finalScore"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				String team = abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("name"))
-						.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 				if (scoreTeam > 0 && scoreTeam == loserTeamScore)
 					return null;
@@ -873,13 +873,13 @@ public class RuleBasedQA {
 
 			final int min = Integer.parseInt(
 					abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardMinute"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 			if (min == minMin)
 				return null;
 			if (min < minMin) {
 				playerFirstYellowCard = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("player")).getSlotFiller()
-						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 				minMin = min;
 			}
@@ -907,13 +907,13 @@ public class RuleBasedQA {
 
 			final int min = Integer.parseInt(
 					abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardMinute"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 			if (min == minMin)
 				return null;
 			if (min < minMin) {
 				playerFirstRedCard = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("player")).getSlotFiller()
-						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 				minMin = min;
 			}
@@ -941,14 +941,14 @@ public class RuleBasedQA {
 
 			final int min = Integer.parseInt(
 					abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardMinute"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 			if (min == maxMin) {
 				return null;
 			}
 			if (min > maxMin) {
 				playerLastYellowCard = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("player")).getSlotFiller()
-						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 				maxMin = min;
 			}
@@ -976,14 +976,14 @@ public class RuleBasedQA {
 
 			final int min = Integer.parseInt(
 					abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardMinute"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 			if (min == maxMin) {
 				return null;
 			}
 			if (min > maxMin) {
 				playerLastYellowCard = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("player")).getSlotFiller()
-						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 				maxMin = min;
 			}
@@ -1012,13 +1012,13 @@ public class RuleBasedQA {
 
 				final int min = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				if (min == minMin)
 					return null;
 				if (min < minMin) {
 					scorer = abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scorer"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 					minMin = min;
 				}
@@ -1047,11 +1047,11 @@ public class RuleBasedQA {
 
 				final int min = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				if (min > maxMin) {
 					scorer = abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scorer"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 					maxMin = min;
 				}
@@ -1079,7 +1079,7 @@ public class RuleBasedQA {
 
 				final int min = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				if (min < minMin) {
 					minMin = min;
@@ -1108,7 +1108,7 @@ public class RuleBasedQA {
 
 				final int min = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 				if (min > maxMin) {
 					maxMin = min;
 				}
@@ -1137,7 +1137,7 @@ public class RuleBasedQA {
 
 			final int min = Integer.parseInt(
 					abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardMinute"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 			if (min == minMin) {
 				return null;
 			}
@@ -1169,7 +1169,7 @@ public class RuleBasedQA {
 
 			final int min = Integer.parseInt(
 					abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardMinute"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 			if (min > maxMin) {
 				maxMin = min;
 			}
@@ -1196,7 +1196,7 @@ public class RuleBasedQA {
 
 			final int min = Integer.parseInt(
 					abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardMinute"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 			if (min < minMin) {
 				minMin = min;
 			}
@@ -1224,7 +1224,7 @@ public class RuleBasedQA {
 
 			final int min = Integer.parseInt(
 					abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardMinute"))
-							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+							.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 			if (min == maxMin) {
 				return null;
 			}
@@ -1254,17 +1254,17 @@ public class RuleBasedQA {
 
 				final int min = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				if (minMin.intValue() < min)
 					continue;
 
 				final int scoreTeamA = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamA"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 				final int scoreTeamB = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamB"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				if (scoreTeamA != scoreTeamB)
 					continue;
@@ -1297,17 +1297,17 @@ public class RuleBasedQA {
 
 				final int min = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				if (maxMin.intValue() > min)
 					continue;
 
 				final int scoreTeamA = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamA"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 				final int scoreTeamB = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamB"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				if (scoreTeamA != scoreTeamB)
 					continue;
@@ -1337,10 +1337,10 @@ public class RuleBasedQA {
 
 				final int scoreTeamA = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamA"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 				final int scoreTeamB = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamB"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				if (scoreTeamA != scoreTeamB)
 					continue;
@@ -1384,14 +1384,14 @@ public class RuleBasedQA {
 
 				final int min = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				final int scoreTeamA = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamA"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 				final int scoreTeamB = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamB"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				pairs.add(new P(min, scoreTeamA == scoreTeamB));
 			}
@@ -1447,14 +1447,14 @@ public class RuleBasedQA {
 
 				final int min = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				final int scoreTeamA = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamA"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 				final int scoreTeamB = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamB"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				pairs.add(new P(min, scoreTeamA > scoreTeamB));
 			}
@@ -1511,14 +1511,14 @@ public class RuleBasedQA {
 
 				final int min = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				final int scoreTeamA = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamA"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 				final int scoreTeamB = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("scoreTeamB"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				pairs.add(new P(min, scoreTeamA < scoreTeamB));
 			}
@@ -1599,11 +1599,11 @@ public class RuleBasedQA {
 
 				final int min = Integer.parseInt(
 						abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("minute"))
-								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityTypeName);
+								.getSlotFiller().asInstanceOfEntityTypeAnnotation().entityType.entityName);
 
 				final String scoringPlayer = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("scorer")).getSlotFiller()
-						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 				if (scoringPlayer.equals(player))
 					return String.valueOf(min);
@@ -1629,7 +1629,7 @@ public class RuleBasedQA {
 
 				final String scoringPlayer = abstractAnnotation.asInstanceOfEntityTemplate()
 						.getSingleFillerSlot(SlotType.get("scorer")).getSlotFiller()
-						.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+						.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 				if (scoringPlayer.equals(player))
 					count++;
@@ -1654,7 +1654,7 @@ public class RuleBasedQA {
 
 			String cardForPlayer = abstractAnnotation.asInstanceOfEntityTemplate()
 					.getSingleFillerSlot(SlotType.get("player")).getSlotFiller()
-					.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+					.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 			if (player.equals(cardForPlayer))
 				return String.valueOf(true);
@@ -1679,7 +1679,7 @@ public class RuleBasedQA {
 
 			String cardForPlayer = abstractAnnotation.asInstanceOfEntityTemplate()
 					.getSingleFillerSlot(SlotType.get("player")).getSlotFiller()
-					.asInstanceOfEntityTypeAnnotation().entityType.entityTypeName;
+					.asInstanceOfEntityTypeAnnotation().entityType.entityName;
 
 			if (player.equals(cardForPlayer))
 				return String.valueOf(true);
@@ -1705,7 +1705,7 @@ public class RuleBasedQA {
 				continue;
 
 			if (!abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardForTeam"))
-					.getSlotFiller().getEntityType().entityTypeName.equals(team))
+					.getSlotFiller().getEntityType().entityName.equals(team))
 				continue;
 
 			count++;
@@ -1728,7 +1728,7 @@ public class RuleBasedQA {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
 				continue;
 			if (!abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardForTeam"))
-					.getSlotFiller().getEntityType().entityTypeName.equals(team))
+					.getSlotFiller().getEntityType().entityName.equals(team))
 				continue;
 
 			count++;

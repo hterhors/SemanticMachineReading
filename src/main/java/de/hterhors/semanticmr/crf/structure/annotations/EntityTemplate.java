@@ -98,7 +98,8 @@ final public class EntityTemplate extends AbstractAnnotation {
 		final SingleFillerSlot slot = singleFillerSlots.get(slotType);
 
 		if (slot == null)
-			throw new UnkownSingleSlotException("The requested single filler slot is unkown: " + slotType);
+			throw new UnkownSingleSlotException("The requested single filler slot is unkown: " + slotType
+					+ " for entity type: " + getEntityType().entityName);
 
 		return slot;
 	}
@@ -154,7 +155,8 @@ final public class EntityTemplate extends AbstractAnnotation {
 		final MultiFillerSlot slot = multiFillerSlots.get(slotType);
 
 		if (slot == null)
-			throw new UnkownMultiSlotException("The requested multi filler slot is unkown: " + slotType);
+			throw new UnkownMultiSlotException("The requested multi filler slot is unkown: " + slotType
+					+ " for entity: " + getEntityType().entityName);
 
 		return slot;
 	}

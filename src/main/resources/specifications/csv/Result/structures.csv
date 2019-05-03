@@ -7,6 +7,7 @@ Result	hasInvestigationMethod	InvestigationMethod
 Result	hasObservation	Observation
 Result	hasInvestigation	Investigation
 Result	hasTrend	Trend
+Result	hasPairwisedCompareGroups	ExperimentalGroup
 Result	hasJudgement	Judgement
 Experiment	hasStudyDesign	StudyDesign
 Experiment	hasResult	Result
@@ -100,6 +101,7 @@ Clip	hasForce	Force
 Clip	hasWeight	Weight
 Clip	hasDuration	Duration
 Balloon	hasForce	Force
+Conduit	hasOrganismSpecies	OrganismSpecies
 Balloon	hasVolume	Volume
 Balloon	hasPressure	Pressure
 CompoundTreatment	hasDosage	Dosage

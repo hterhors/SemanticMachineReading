@@ -117,11 +117,11 @@ public class InstancesToJsonInstanceWrapper {
 	}
 
 	private JsonEntityTypeWrapper toEntityTypeAnnotationWrapper(EntityTypeAnnotation entityType) {
-		return new JsonEntityTypeWrapper(entityType.entityType.entityTypeName);
+		return new JsonEntityTypeWrapper(entityType.entityType.entityName);
 	}
 
 	private JsonEntityTypeWrapper toEntityTypeAnnotationWrapper(EntityType entityType) {
-		return new JsonEntityTypeWrapper(entityType.entityTypeName);
+		return new JsonEntityTypeWrapper(entityType.entityName);
 	}
 
 	private JsonEntityTemplateWrapper toEntityTemplateWrapper(EntityTemplate wrapper) {
@@ -182,7 +182,7 @@ public class InstancesToJsonInstanceWrapper {
 	}
 
 	private JsonSlotTypeWrapper toSlotTypeWrapper(SlotType wrapper) {
-		return new JsonSlotTypeWrapper(wrapper.slotTypeName);
+		return new JsonSlotTypeWrapper(wrapper.slotName);
 	}
 
 }

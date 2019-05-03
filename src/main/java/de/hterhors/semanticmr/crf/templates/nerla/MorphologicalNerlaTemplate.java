@@ -101,7 +101,7 @@ public class MorphologicalNerlaTemplate
 			return;
 
 		factor.getFeatureVector().set("STARTS_WITH_CAPITAL", Character.isUpperCase(sf.charAt(0)));
-		factor.getFeatureVector().set("STARTS_WITH_CAPITAL_FOR_TYPE_" + type.entityTypeName,
+		factor.getFeatureVector().set("STARTS_WITH_CAPITAL_FOR_TYPE_" + type.entityName,
 				Character.isUpperCase(sf.charAt(0)));
 
 	}

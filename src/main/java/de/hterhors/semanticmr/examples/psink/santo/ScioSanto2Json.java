@@ -14,12 +14,10 @@ import de.hterhors.semanticmr.santo.converter.Santo2JsonConverter;
 
 public class ScioSanto2Json {
 
-	private static final File entities = new File("src/main/resources/specifications/csv/OrganismModel/entities.csv");
-	private static final File slots = new File("src/main/resources/specifications/csv/OrganismModel/slots.csv");
-	private static final File structures = new File(
-			"src/main/resources/specifications/csv/OrganismModel/structures.csv");
-	private static final File hierarchies = new File(
-			"src/main/resources/specifications/csv/OrganismModel/hierarchies.csv");
+	private static final File entities = new File("src/main/resources/specifications/csv/Result/entities.csv");
+	private static final File slots = new File("src/main/resources/specifications/csv/Result/slots.csv");
+	private static final File structures = new File("src/main/resources/specifications/csv/Result/structures.csv");
+	private static final File hierarchies = new File("src/main/resources/specifications/csv/Result/hierarchies.csv");
 
 	public final static SystemScope systemsScope = new SystemScope(
 			new CSVScopeReader(entities, hierarchies, slots, structures));
@@ -50,10 +48,9 @@ public class ScioSanto2Json {
 			converter.addIgnoreProperty("<http://www.w3.org/2000/01/rdf-schema#comment>");
 			converter.addIgnoreProperty("<http://www.w3.org/2000/01/rdf-schema#label>");
 
-//			converter.convert(new File("src/main/resources/corpus/data/instances/" + name + "_Result.json"), "Result",
-//					true, false);
-			converter.convert(new File("src/main/resources/corpus/data/instances/" + name + "_OrganismModel.json"),
-					"OrganismModel", true, false);
+			converter.convert(new File("test/" + name + "_Result.json"), "Result", true, true);
+//			converter.convert(new File("src/main/resources/corpus/data/instances/" + name + "_OrganismModel.json"),
+//					"OrganismModel", true, false);
 		}
 
 	}

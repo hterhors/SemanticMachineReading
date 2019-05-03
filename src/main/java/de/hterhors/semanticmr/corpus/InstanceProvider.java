@@ -114,6 +114,8 @@ public class InstanceProvider {
 					if (removeEmptyInstances) {
 						iterator.remove();
 						System.out.println("WARN: Remove instance!");
+					} else {
+						System.out.println("WARN: Ignore!");
 					}
 				}
 
@@ -123,6 +125,8 @@ public class InstanceProvider {
 					if (removeInstancesWithToManyAnnotations) {
 						iterator.remove();
 						System.out.println("WARN: Remove instance!");
+					} else {
+						System.out.println("WARN: Ignore!");
 					}
 				}
 

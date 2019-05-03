@@ -74,7 +74,7 @@ public class SlotFillingMain {
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
 
-		InstanceProvider.removeEmptyInstances = false;
+		InstanceProvider.removeEmptyInstances = true;
 		InstanceProvider.removeInstancesWithToManyAnnotations = true;
 
 		InstanceProvider instanceProvider = new InstanceProvider(instancesFileDir, shuffleCorpusDistributor);

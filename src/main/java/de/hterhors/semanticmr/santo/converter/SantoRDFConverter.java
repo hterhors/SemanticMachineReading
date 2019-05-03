@@ -121,7 +121,7 @@ public class SantoRDFConverter {
 
 			if (slot.isSingleValueSlot()) {
 				if (slotFillers.size() > 1) {
-					System.out.println("WARN! Multiple slot filler detected for single filler slot.");
+					System.out.println("WARN! Multiple slot filler detected for single filler slot: " + slot);
 				}
 				final AbstractAnnotation slotFiller = slotFillers.get(0);
 				object.getSingleFillerSlot(slot).set(slotFiller);
@@ -152,14 +152,16 @@ public class SantoRDFConverter {
 					literalAnnotation = toLiteralAnnotation(document, slotType, linkedID);
 					predicateValues.add(literalAnnotation);
 				} catch (DocumentLinkedAnnotationMismatchException e) {
-					e.printStackTrace();
+					System.out.println("WARN! " + e.getMessage());
+//					e.printStackTrace();
 				}
 			} else if (nameSpace.equals(ontologyNameSpace)) {
 				try {
 					final EntityTypeAnnotation entityTypeAnnotation = toEntityTypeAnnotation(document, linkedID);
 					predicateValues.add(entityTypeAnnotation);
 				} catch (DocumentLinkedAnnotationMismatchException e) {
-					e.printStackTrace();
+					System.out.println("WARN! " + e.getMessage());
+//					e.printStackTrace();
 				}
 			} else if (nameSpace.equals(dataNameSpace)) {
 				try {
@@ -167,7 +169,8 @@ public class SantoRDFConverter {
 					fillRec(document, entityTemplateAnnotation, linkedID.object);
 					predicateValues.add(entityTemplateAnnotation);
 				} catch (DocumentLinkedAnnotationMismatchException e) {
-					e.printStackTrace();
+					System.out.println("WARN! " + e.getMessage());
+//					e.printStackTrace();
 				}
 			}
 
@@ -209,7 +212,7 @@ public class SantoRDFConverter {
 		 * any ( in this case the first) entity type from the slots possible entity
 		 * types.
 		 */
-		final String entityTypeName = slot.getSlotFillerEntityTypes().iterator().next().entityTypeName;
+		final String entityTypeName = slot.getSlotFillerEntityTypes().iterator().next().entityName;
 
 		if (annotations.containsKey(linkedID)) {
 			return AnnotationBuilder.toAnnotation(document, entityTypeName, linkedID.object,

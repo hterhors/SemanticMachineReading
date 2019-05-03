@@ -103,7 +103,7 @@ public class IntraTokenNerlaTemplate extends AbstractFeatureTemplate<IntraTokenN
 	@Override
 	public void generateFeatureVector(Factor<IntraTokenNerlaScope> factor) {
 
-		getTokenNgrams(factor.getFeatureVector(), factor.getFactorScope().entityType.entityTypeName,
+		getTokenNgrams(factor.getFeatureVector(), factor.getFactorScope().entityType.entityName,
 				factor.getFactorScope().surfaceForm);
 
 	}

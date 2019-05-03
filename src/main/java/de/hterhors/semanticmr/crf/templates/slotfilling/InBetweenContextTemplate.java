@@ -197,11 +197,11 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 
 			DoubleVector featureVector = factor.getFeatureVector();
 
-			final String fromEntityType = factor.getFactorScope().fromEntity.entityTypeName;
+			final String fromEntityType = factor.getFactorScope().fromEntity.entityName;
 			final int fromTokenIndex = factor.getFactorScope().instance.getDocument()
 					.getTokenByCharOffset(factor.getFactorScope().fromEntityCharacterOnset).getDocTokenIndex();
 
-			final String toEntityType = factor.getFactorScope().toEntity.entityTypeName;
+			final String toEntityType = factor.getFactorScope().toEntity.entityName;
 			final int toTokenIndex = factor.getFactorScope().instance.getDocument()
 					.getTokenByCharOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
 
