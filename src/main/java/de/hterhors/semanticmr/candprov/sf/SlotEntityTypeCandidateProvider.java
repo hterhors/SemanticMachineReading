@@ -11,7 +11,6 @@ import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
-import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -34,6 +33,7 @@ public class SlotEntityTypeCandidateProvider
 
 	private final Map<SlotType, List<AbstractAnnotation<? extends AbstractAnnotation<?>>>> entityAnnotationCache = new HashMap<>();
 
+	@Override
 	public List<AbstractAnnotation<? extends AbstractAnnotation<?>>> getCandidates(SlotType slot) {
 		if (!entityAnnotationCache.containsKey(slot)) {
 

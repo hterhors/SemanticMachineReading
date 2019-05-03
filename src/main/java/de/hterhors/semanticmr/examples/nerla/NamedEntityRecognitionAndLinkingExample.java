@@ -46,16 +46,13 @@ public class NamedEntityRecognitionAndLinkingExample {
 			"src/main/resources/examples/nerla/specs/csv/slotSpecifications.csv");
 	private static final File entityStructureSpecifications = new File(
 			"src/main/resources/examples/nerla/specs/csv/entityStructureSpecifications.csv");
-	private static final File slotPairConstraitsSpecifications = new File(
-			"src/main/resources/examples/nerla/specs/csv/slotPairExcludingConstraints.csv");
 
 	public final static SpecificationsProvider specificationProvider = new SpecificationsProvider(
-			new CSVSpecifictationsReader(entitySpecifications, entityStructureSpecifications, slotSpecifications,
-					slotPairConstraitsSpecifications));
+			new CSVSpecifictationsReader(entitySpecifications, entityStructureSpecifications, slotSpecifications));
 
 	public static void main(String[] args) throws IOException {
 
-		SystemInitializer.initialize(specificationProvider).apply();
+		SystemInitializer.setSpecifications(specificationProvider).apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();

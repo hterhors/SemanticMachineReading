@@ -1,9 +1,5 @@
 package de.hterhors.semanticmr.crf.structure.annotations.container;
 
-import java.util.List;
-
-import de.hterhors.semanticmr.crf.variables.DocumentToken;
-
 /**
  * Contains information of the document position of an annotation.
  * 

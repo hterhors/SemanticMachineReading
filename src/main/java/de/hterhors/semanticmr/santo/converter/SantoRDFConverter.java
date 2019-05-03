@@ -181,9 +181,8 @@ public class SantoRDFConverter {
 		final String objectType = rdfData.get(linkedID.object).get(RDF_TYPE_NAMESPACE).iterator().next();
 
 		if (annotations.containsKey(linkedID)) {
-			return new EntityTemplate(
-					AnnotationBuilder.toAnnotation(document, SantoHelper.getResource(objectType),
-							annotations.get(linkedID).textMention, annotations.get(linkedID).onset));
+			return new EntityTemplate(AnnotationBuilder.toAnnotation(document, SantoHelper.getResource(objectType),
+					annotations.get(linkedID).textMention, annotations.get(linkedID).onset));
 		} else {
 			return new EntityTemplate(AnnotationBuilder.toAnnotation(SantoHelper.getResource(objectType)));
 		}
@@ -195,8 +194,8 @@ public class SantoRDFConverter {
 
 		final String entityTypeName = SantoHelper.getResource(linkedID.object);
 		if (annotations.containsKey(linkedID)) {
-			return AnnotationBuilder.toAnnotation(document, entityTypeName,
-					annotations.get(linkedID).textMention, annotations.get(linkedID).onset);
+			return AnnotationBuilder.toAnnotation(document, entityTypeName, annotations.get(linkedID).textMention,
+					annotations.get(linkedID).onset);
 		} else {
 			return AnnotationBuilder.toAnnotation(entityTypeName);
 		}

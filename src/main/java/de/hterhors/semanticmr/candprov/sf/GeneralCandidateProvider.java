@@ -64,6 +64,7 @@ public class GeneralCandidateProvider
 		return rootAnnotationsCache.getOrDefault(entityType, Collections.emptySet());
 	}
 
+	@Override
 	public Instance getRelatedInstance() {
 		return relatedInstance;
 	}

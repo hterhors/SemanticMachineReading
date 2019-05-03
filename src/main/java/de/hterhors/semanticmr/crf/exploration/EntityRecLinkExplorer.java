@@ -43,6 +43,7 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 	final int MAX_WINDOW_SIZE = 10;
 	final int MIN_WINDOW_SIZE = 1;
 
+	@Override
 	public List<State> explore(State currentState) {
 
 		final List<State> proposalStates = new ArrayList<>(averageNumberOfNewProposalStates);

@@ -108,7 +108,7 @@ public class InstanceProvider {
 			this.instances = new JsonInstancesReader(jsonInstancesDirectory).readInstances(numToRead);
 
 			for (Iterator<Instance> iterator = instances.iterator(); iterator.hasNext();) {
-				Instance instance = (Instance) iterator.next();
+				Instance instance = iterator.next();
 				if (instance.getGoldAnnotations().getAnnotations().isEmpty()) {
 					System.out.println("WARN: Instance with no annotations detected!");
 					if (removeEmptyInstances) {

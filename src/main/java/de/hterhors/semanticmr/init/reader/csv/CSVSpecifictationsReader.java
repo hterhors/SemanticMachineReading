@@ -2,7 +2,6 @@ package de.hterhors.semanticmr.init.reader.csv;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.stream.Collectors;
 import de.hterhors.semanticmr.exce.InvalidSpecificationFileFormatException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification;
-import de.hterhors.semanticmr.init.specifications.StructureSpecification.ExcludeSlotTypePairNames;
 
 public class CSVSpecifictationsReader implements ISpecificationsReader {
 
@@ -32,6 +30,7 @@ public class CSVSpecifictationsReader implements ISpecificationsReader {
 //		this.slotPairConstriantsSpecificationFile = slotPairConstriantsSpecificationFile;
 	}
 
+	@Override
 	public StructureSpecification read() throws InvalidSpecificationFileFormatException {
 		try {
 			List<String[]> entities = Files.readAllLines(entitySpecificationFile.toPath()).stream()
@@ -47,6 +46,8 @@ public class CSVSpecifictationsReader implements ISpecificationsReader {
 //			List<String[]> slotPairConstriants = Files.readAllLines(slotPairConstriantsSpecificationFile.toPath())
 //					.stream().filter(l -> !l.startsWith("#")).filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t"))
 //					.collect(Collectors.toList());
+//			Set<ExcludeSlotTypePairNames> excludeSlotTypePairs = slotPairConstriants.stream()
+//			.map(l -> new ExcludeSlotTypePairNames(l[0], l[1], l[2], l[3], l[4])).collect(Collectors.toSet());
 
 			Set<String> slotTypeNames = slots.stream().map(l -> l[1]).collect(Collectors.toSet());
 			Set<String> entityTypeNames = entities.stream().map(l -> l[0]).collect(Collectors.toSet());

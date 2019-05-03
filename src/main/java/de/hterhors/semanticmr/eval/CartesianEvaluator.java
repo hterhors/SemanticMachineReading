@@ -37,6 +37,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		return permutationCache[size].stream();
 	}
 
+	@Override
 	protected Score scoreMax(Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
 			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherAnnotations) {
 

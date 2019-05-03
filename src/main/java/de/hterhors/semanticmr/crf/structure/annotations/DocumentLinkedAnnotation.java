@@ -2,16 +2,12 @@ package de.hterhors.semanticmr.crf.structure.annotations;
 
 import java.util.List;
 
-import org.apache.jena.riot.tokens.TokenCheckerLib;
-import org.apache.jena.sparql.function.library.eval;
-
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
-import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 
 /**
@@ -77,6 +73,7 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation<DocumentLi
 		}
 	}
 
+	@Override
 	public String toPrettyString(int depth) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(super.toPrettyString(depth));

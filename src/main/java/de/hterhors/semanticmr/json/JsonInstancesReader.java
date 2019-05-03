@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.SynchronousQueue;
 import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 import de.hterhors.semanticmr.json.converter.JsonInstanceWrapperToInstance;
 import de.hterhors.semanticmr.json.wrapper.JsonInstanceWrapper;
 

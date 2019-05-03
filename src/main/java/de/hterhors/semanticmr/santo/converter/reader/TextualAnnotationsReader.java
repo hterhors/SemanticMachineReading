@@ -5,9 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
 import com.opencsv.CSVReader;
@@ -16,7 +14,6 @@ import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
 import de.hterhors.semanticmr.santo.container.Triple;
-import de.hterhors.semanticmr.santo.converter.SantoDocumentConverter;
 import de.hterhors.semanticmr.santo.helper.PatternCollection;
 
 public class TextualAnnotationsReader {

@@ -3,7 +3,7 @@ package de.hterhors.semanticmr.santo.helper;
 import java.util.regex.Matcher;
 
 public class SantoHelper {
-	
+
 	public static String getResource(String uri) {
 		/**
 		 * QUICK FIX:

@@ -12,7 +12,6 @@ import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;
 import de.hterhors.semanticmr.crf.CRF;
 import de.hterhors.semanticmr.crf.exploration.EntityTemplateExplorer;
-import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.learner.optimizer.SGD;
@@ -52,16 +51,14 @@ public class Olp2ExtractionMain {
 			"src/main/resources/examples/olp2/de/specs/csv/slotSpecifications.csv");
 	private static final File de_entityStructureSpecifications = new File(
 			"src/main/resources/examples/olp2/de/specs/csv/entityStructureSpecifications.csv");
-	private static final File de_slotPairConstraitsSpecifications = new File(
-			"src/main/resources/examples/olp2/de/specs/csv/slotPairExcludingConstraints.csv");
 
 	public final static SpecificationsProvider de_specificationProvider = new SpecificationsProvider(
 			new CSVSpecifictationsReader(de_entitySpecifications, de_entityStructureSpecifications,
-					de_slotSpecifications, de_slotPairConstraitsSpecifications));
+					de_slotSpecifications));
 
 	public static void main(String[] args) throws IOException, DocumentLinkedAnnotationMismatchException {
 
-		SystemInitializer initializer = SystemInitializer.initialize(de_specificationProvider).apply();
+		SystemInitializer initializer = SystemInitializer.setSpecifications(de_specificationProvider).apply();
 
 		CartesianEvaluator cartesian = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
 		BeamSearchEvaluator beam = new BeamSearchEvaluator(EEvaluationDetail.ENTITY_TYPE, 2);
@@ -81,8 +78,6 @@ public class Olp2ExtractionMain {
 //		AnnotationCandidateProviderCollection candidateProvider = new AnnotationCandidateProviderCollection(
 //				instanceProvider.getInstances());
 //		candidateProvider.setEntityTypeCandidateProvider();
-
-		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider(initializer);
 
 		IObjectiveFunction objectiveFunction = new SlotFillingObjectiveFunction(cartesian);
 
@@ -108,7 +103,7 @@ public class Olp2ExtractionMain {
 		IStoppingCriterion maxStepCrit = new MaxChainLengthCrit(10);
 		IStoppingCriterion noModelChangeCrit = new NoChangeCrit(3, s -> s.getModelScore());
 
-		EntityTemplateExplorer explorer = new EntityTemplateExplorer(candidateProvider, constraintsProvider);
+		EntityTemplateExplorer explorer = new EntityTemplateExplorer(candidateProvider);
 
 		final File modelDir = new File("models/olp2/test1/");
 		final String modelName = "Model3";

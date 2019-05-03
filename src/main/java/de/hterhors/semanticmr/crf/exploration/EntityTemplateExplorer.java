@@ -3,9 +3,9 @@ package de.hterhors.semanticmr.crf.exploration;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.hterhors.semanticmr.candprov.sf.ISlotTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateProviderCollection;
 import de.hterhors.semanticmr.candprov.sf.IEntityTypeAnnotationCandidateProvider;
+import de.hterhors.semanticmr.candprov.sf.ISlotTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
@@ -40,6 +40,7 @@ public class EntityTemplateExplorer implements IExplorationStrategy {
 	 */
 	int averageNumberOfNewProposalStates = 16;
 
+	@Override
 	public List<State> explore(State currentState) {
 
 		final List<State> proposalStates = new ArrayList<>(averageNumberOfNewProposalStates);

@@ -20,6 +20,7 @@ public class NerlaObjectiveFunction implements IObjectiveFunction {
 		this.evaluationMode = EEvaluationDetail.DOCUMENT_LINKED;
 	}
 
+	@Override
 	public void score(State state) {
 
 		/**
@@ -28,6 +29,7 @@ public class NerlaObjectiveFunction implements IObjectiveFunction {
 		state.setObjectiveScore(state.score(evaluator, evaluationMode).getF1());
 	}
 
+	@Override
 	public void score(List<State> states) {
 		states.parallelStream().forEach(state -> score(state));
 	}

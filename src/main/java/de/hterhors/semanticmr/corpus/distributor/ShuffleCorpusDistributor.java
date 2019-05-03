@@ -142,6 +142,7 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 			return seed;
 		}
 
+		@Override
 		public ShuffleCorpusDistributor build() {
 			return new ShuffleCorpusDistributor(corpusSizeFraction, trainingProportion, developmentProportion,
 					testProportion, seed);

@@ -30,6 +30,7 @@ public class SingleFillerSlot extends AbstractSlot {
 		return slotFiller;
 	}
 
+	@Override
 	public boolean containsSlotFillerOfEntityType(EntityType entityType) {
 		return !containsSlotFiller() ? false : slotFiller.getEntityType() == entityType;
 	}
@@ -63,6 +64,7 @@ public class SingleFillerSlot extends AbstractSlot {
 				+ containsSlotFiller() + "]";
 	}
 
+	@Override
 	public SingleFillerSlot deepCopy() {
 		return new SingleFillerSlot(slotType, slotFiller == null ? null : slotFiller.deepCopy());
 	}

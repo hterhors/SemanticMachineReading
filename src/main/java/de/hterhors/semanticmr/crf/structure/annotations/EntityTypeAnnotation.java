@@ -4,11 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
-import de.hterhors.semanticmr.crf.structure.annotations.filter.IAnnotationFilter;
-import de.hterhors.semanticmr.crf.structure.annotations.filter.IBuilder;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
-import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 /**
  * Annotation object for literal based slots that are NOT linked to the
@@ -42,6 +38,7 @@ public class EntityTypeAnnotation<A extends EntityTypeAnnotation<A>> extends Abs
 		return entityTypeAnnotation;
 	}
 
+	@Override
 	public EntityTypeAnnotation deepCopy() {
 		return this;
 	}
@@ -92,6 +89,7 @@ public class EntityTypeAnnotation<A extends EntityTypeAnnotation<A>> extends Abs
 		return true;
 	}
 
+	@Override
 	public Score evaluate(AbstractEvaluator evaluator, EntityTypeAnnotation otherVal) {
 		if (otherVal == null) {
 			return Score.FN;

@@ -1,12 +1,8 @@
 package de.hterhors.semanticmr.crf.structure.annotations;
 
-import org.apache.jena.sparql.function.library.eval;
-
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
-import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 /**
  * Annotation object for literal based slots that are NOT linked to the
@@ -38,6 +34,7 @@ public class LiteralAnnotation<B extends LiteralAnnotation<B>> extends EntityTyp
 		return new LiteralAnnotation(entityType, textualContent.deepCopy());
 	}
 
+	@Override
 	public String toPrettyString(int depth) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(super.toPrettyString(depth));

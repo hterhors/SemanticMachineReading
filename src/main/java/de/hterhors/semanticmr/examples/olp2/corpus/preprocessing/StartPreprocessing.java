@@ -30,8 +30,6 @@ public class StartPreprocessing {
 			"src/main/resources/examples/olp2/de/specs/csv/slotSpecifications.csv");
 	private static final File de_entityStructureSpecifications = new File(
 			"src/main/resources/examples/olp2/de/specs/csv/entityStructureSpecifications.csv");
-	private static final File de_slotPairConstraitsSpecifications = new File(
-			"src/main/resources/examples/olp2/de/specs/csv/slotPairExcludingConstraints.csv");
 
 	private static final File en_entitySpecifications = new File(
 			"src/main/resources/examples/olp2/en/specs/csv/entitySpecifications.csv");
@@ -39,16 +37,14 @@ public class StartPreprocessing {
 			"src/main/resources/examples/olp2/en/specs/csv/slotSpecifications.csv");
 	private static final File en_entityStructureSpecifications = new File(
 			"src/main/resources/examples/olp2/en/specs/csv/entityStructureSpecifications.csv");
-	private static final File en_slotPairConstraitsSpecifications = new File(
-			"src/main/resources/examples/olp2/en/specs/csv/slotPairExcludingConstraints.csv");
 
 	public final static SpecificationsProvider de_specificationProvider = new SpecificationsProvider(
 			new CSVSpecifictationsReader(de_entitySpecifications, de_entityStructureSpecifications,
-					de_slotSpecifications, de_slotPairConstraitsSpecifications));
+					de_slotSpecifications));
 
 	public final static SpecificationsProvider en_specificationProvider = new SpecificationsProvider(
 			new CSVSpecifictationsReader(en_entitySpecifications, en_entityStructureSpecifications,
-					en_slotSpecifications, en_slotPairConstraitsSpecifications));
+					en_slotSpecifications));
 
 	public static void main(String[] args) throws Exception {
 		new StartPreprocessing("de");
@@ -64,7 +60,7 @@ public class StartPreprocessing {
 
 	public static void de() throws Exception {
 
-		SystemInitializer initializer = SystemInitializer.initialize(de_specificationProvider).apply();
+		SystemInitializer initializer = SystemInitializer.setSpecifications(de_specificationProvider).apply();
 
 		CrossRefReader crr = new CrossRefReader(new File("olp2/Crossref/"));
 		TextReader tr = new TextReader(new File("olp2/Text/"));
@@ -88,7 +84,7 @@ public class StartPreprocessing {
 	}
 
 	public static void en() throws Exception {
-		SystemInitializer initializer = SystemInitializer.initialize(en_specificationProvider).apply();
+		SystemInitializer initializer = SystemInitializer.setSpecifications(en_specificationProvider).apply();
 		CrossRefReader crr = new CrossRefReader(new File("olp2/Crossref/"));
 		TextReader tr = new TextReader(new File("olp2/Text/"));
 		XMLReader xml2json = new XMLReader(new File("olp2/SemiStructured/"));

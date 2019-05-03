@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
  *
  */
 public class TextReader {
-	
 
 	private final Pattern textPattern = Pattern.compile("<bodyelem id=\"(.+?)\">(.*?)</bodyelem>");
 	private final Pattern idPattern = Pattern.compile("<document name=\"(.*?)\">");
@@ -25,7 +24,6 @@ public class TextReader {
 	public final Map<String, String> en_textMap = new HashMap<>();
 
 	public TextReader(File crossRefDir) throws IOException {
-
 
 		for (File crossRefFile : crossRefDir.listFiles()) {
 

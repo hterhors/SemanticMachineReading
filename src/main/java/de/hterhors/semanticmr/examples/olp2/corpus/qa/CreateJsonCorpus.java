@@ -37,10 +37,10 @@ public class CreateJsonCorpus {
 	public CreateJsonCorpus(final String language) throws Exception {
 		SystemInitializer init = null;
 		if (language.equals("en"))
-			init = SystemInitializer.initialize(StartPreprocessing.en_specificationProvider).apply();
+			init = SystemInitializer.setSpecifications(StartPreprocessing.en_specificationProvider).apply();
 
 		if (language.equals("de"))
-			init = SystemInitializer.initialize(StartPreprocessing.de_specificationProvider).apply();
+			init = SystemInitializer.setSpecifications(StartPreprocessing.de_specificationProvider).apply();
 
 		this.reader = new XMLReader(new File("olp2/SemiStructured/"));
 

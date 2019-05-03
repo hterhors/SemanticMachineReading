@@ -22,7 +22,7 @@ public class RegexNerl {
 
 	public static void main(String[] args) throws Exception {
 
-		SystemInitializer initializer = SystemInitializer.initialize(Olp2ExtractionMain.de_specificationProvider)
+		SystemInitializer initializer = SystemInitializer.setSpecifications(Olp2ExtractionMain.de_specificationProvider)
 				.apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()

@@ -2,9 +2,7 @@ package de.hterhors.semanticmr.corpus.distributor;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import de.hterhors.semanticmr.corpus.InstanceProvider;
@@ -27,6 +25,7 @@ public class OriginalCorpusDistributor extends AbstractCorpusDistributor {
 
 	public static class Builder extends AbstractCorpusDistributorConfigBuilder<Builder> {
 
+		@Override
 		public OriginalCorpusDistributor build() {
 			return new OriginalCorpusDistributor(corpusSizeFraction);
 		}

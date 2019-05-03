@@ -2,8 +2,6 @@ package de.hterhors.semanticmr.crf.structure.annotations;
 
 import java.util.Objects;
 
-import org.apache.jena.sparql.function.library.e;
-
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;

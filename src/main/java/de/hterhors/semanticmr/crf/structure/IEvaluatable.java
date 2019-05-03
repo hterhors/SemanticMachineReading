@@ -1,7 +1,6 @@
 package de.hterhors.semanticmr.crf.structure;
 
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
-import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 public interface IEvaluatable<T> {
 

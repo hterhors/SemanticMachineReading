@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import de.hterhors.semanticmr.SlotFillingMain;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
-import de.hterhors.semanticmr.init.specifications.impl.CSVSlotFillingSpecs;
 import de.hterhors.semanticmr.santo.converter.Santo2JsonConverter;
 
 public class ScioSanto2Json {
@@ -19,7 +19,8 @@ public class ScioSanto2Json {
 		final String scioNameSpace = "http://psink.de/scio";
 		final String resourceNameSpace = "http://scio/data";
 
-		SystemInitializer initializer = SystemInitializer.initialize(new CSVSlotFillingSpecs().specificationProvider).apply();
+		SystemInitializer initializer = SystemInitializer.setSpecifications(SlotFillingMain.specificationProvider)
+				.apply();
 
 		final String dir = "rawData/export_" + exportDate + "/";
 		List<String> fileNames = Arrays.stream(new File(dir).listFiles()).filter(f -> f.getName().endsWith(".csv"))
@@ -39,8 +40,8 @@ public class ScioSanto2Json {
 			converter.addIgnoreProperty("<http://www.w3.org/2000/01/rdf-schema#comment>");
 			converter.addIgnoreProperty("<http://www.w3.org/2000/01/rdf-schema#label>");
 
-			converter.convert(new File("src/main/resources/corpus/data/instances/" + name + "_OrganismModel.json"), "OrganismModel", true,
-					false);
+			converter.convert(new File("src/main/resources/corpus/data/instances/" + name + "_OrganismModel.json"),
+					"OrganismModel", true, false);
 		}
 
 	}

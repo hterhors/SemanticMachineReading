@@ -12,7 +12,6 @@ import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnn
 import de.hterhors.semanticmr.crf.structure.slots.MultiFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
-import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 import de.hterhors.semanticmr.exce.UnkownMultiSlotException;
@@ -169,6 +168,7 @@ final public class EntityTemplate extends AbstractAnnotation<EntityTemplate> {
 		return multiFillerSlots;
 	}
 
+	@Override
 	public String toPrettyString(final int depth) {
 		final StringBuilder sb = new StringBuilder();
 		final int newDepth = depth + 1;

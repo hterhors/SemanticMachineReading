@@ -21,6 +21,7 @@ public class IdentityNormalization implements INormalizationFunction {
 		return instance;
 	}
 
+	@Override
 	public String normalize(String annotation) {
 		return annotation;
 	}

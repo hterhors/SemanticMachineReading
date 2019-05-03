@@ -6,16 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.hterhors.semanticmr.crf.exploration.constraints.AbstractHardConstraint;
-import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint;
-import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint.SlotEntityPair;
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.AbstractNormalizationFunction;
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.INormalizationFunction;
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.IRequiresInitialization;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
-import de.hterhors.semanticmr.init.specifications.StructureSpecification.ExcludeSlotTypePairNames;
 
 public class SystemInitializer {
 
@@ -34,7 +29,7 @@ public class SystemInitializer {
 		return specifications;
 	}
 
-	public static NormalizationFunctionHandler initialize(SpecificationsProvider specificationProvider) {
+	public static NormalizationFunctionHandler setSpecifications(SpecificationsProvider specificationProvider) {
 
 		SystemInitializer.specifications = specificationProvider;
 
@@ -88,68 +83,6 @@ public class SystemInitializer {
 			}
 
 			return this;
-		}
-
-		public HardConstraintsHandler apply() {
-			for (Entry<EntityType, INormalizationFunction> entry : normalizationFunctions.entrySet()) {
-				entry.getKey().setNormalizationFunction(entry.getValue());
-			}
-			return HardConstraintsHandler.getInstance();
-		}
-	}
-
-	public static class HardConstraintsHandler {
-
-		private static HardConstraintsHandler handlerInstance = null;
-
-		private HardConstraintsHandler() {
-		}
-
-		private static HardConstraintsHandler getInstance() {
-			if (handlerInstance == null) {
-				handlerInstance = new HardConstraintsHandler();
-			}
-
-			return handlerInstance;
-		}
-
-		final List<? extends AbstractHardConstraint> hardConstraints = new ArrayList<>();
-
-		public boolean violatesConstraints(EntityTemplate template) {
-			for (AbstractHardConstraint hardConstraint : hardConstraints) {
-				if (hardConstraint.violatesConstraint(template))
-					return true;
-			}
-			return false;
-		}
-
-		public NormalizationFunctionHandler registerNormalizationFunction(
-				AbstractNormalizationFunction normalizationFunction) {
-
-			normalizationFunctions.put(normalizationFunction.entityType, normalizationFunction);
-			for (EntityType subEntity : normalizationFunction.entityType.getSubEntityTypes()) {
-				normalizationFunctions.put(subEntity, normalizationFunction);
-			}
-
-			return this;
-		}
-
-		private List<? extends AbstractHardConstraint> getHardConstraints() {
-
-			List<ExcludePairConstraint> hardConstraints = new ArrayList<>();
-
-			for (ExcludeSlotTypePairNames constraint : initializer.getSpecificationProvider().getSpecifications()
-					.getExcludeSlotTypePairs()) {
-
-				hardConstraints.add(new ExcludePairConstraint(
-						constraint.onTemplateType.isEmpty() ? null : EntityType.get(constraint.onTemplateType),
-						new SlotEntityPair(SlotType.get(constraint.withSlotTypeName),
-								EntityType.get(constraint.withEntityTypeName)),
-						new SlotEntityPair(SlotType.get(constraint.excludeSlotTypeName),
-								EntityType.get(constraint.excludeEntityTypeName))));
-			}
-
-			return hardConstraints;
 		}
 
 		public SystemInitializer apply() {

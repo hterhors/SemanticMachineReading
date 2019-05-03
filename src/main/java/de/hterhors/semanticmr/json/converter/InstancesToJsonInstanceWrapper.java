@@ -158,7 +158,7 @@ public class InstancesToJsonInstanceWrapper {
 			rootAnnotationWrapper.setLiteralAnnotation(toLiteralAnnotationWrapper((LiteralAnnotation) wrapper));
 		} else if (wrapper instanceof EntityTypeAnnotation) {
 			rootAnnotationWrapper
-					.setEntityTypeAnnotation(toEntityTypeAnnotationWrapper((EntityTypeAnnotation) wrapper));
+					.setEntityTypeAnnotation(toEntityTypeAnnotationWrapper(wrapper));
 		}
 		return rootAnnotationWrapper;
 	}

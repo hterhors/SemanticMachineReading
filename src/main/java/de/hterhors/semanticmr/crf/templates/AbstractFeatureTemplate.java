@@ -1,7 +1,6 @@
 package de.hterhors.semanticmr.crf.templates;
 
 import java.util.List;
-import java.util.Map;
 
 import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.factor.Factor;

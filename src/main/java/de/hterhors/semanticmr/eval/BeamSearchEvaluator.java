@@ -17,6 +17,7 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 		this.beamSize = beamSize;
 	}
 
+	@Override
 	public Score scoreMax(Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> annotations,
 			Collection<AbstractAnnotation<? extends AbstractAnnotation<?>>> otherAnnotations) {
 

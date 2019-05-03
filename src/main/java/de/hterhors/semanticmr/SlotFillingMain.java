@@ -11,6 +11,7 @@ import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;
 import de.hterhors.semanticmr.crf.CRF;
 import de.hterhors.semanticmr.crf.exploration.EntityTemplateExplorer;
+import de.hterhors.semanticmr.crf.exploration.constraints.EHardConstraintType;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
@@ -23,7 +24,6 @@ import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
-import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -42,7 +42,6 @@ import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
 import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
 import de.hterhors.semanticmr.init.specifications.SystemInitializer;
-import de.hterhors.semanticmr.init.specifications.impl.CSVSlotFillingSpecs;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.nerla.NerlaCollector;
 
@@ -52,21 +51,23 @@ public class SlotFillingMain {
 		new SlotFillingMain();
 	}
 
-	private final File entitySpecifications = new File(
+	private static final File entitySpecifications = new File(
 			"src/main/resources/specifications/csv/entitySpecifications.csv");
-	private final File slotSpecifications = new File("src/main/resources/specifications/csv/slotSpecifications.csv");
-	private final File entityStructureSpecifications = new File(
+	private static final File slotSpecifications = new File(
+			"src/main/resources/specifications/csv/slotSpecifications.csv");
+	private static final File entityStructureSpecifications = new File(
 			"src/main/resources/specifications/csv/entityStructureSpecifications.csv");
 
 	private final File slotPairConstraitsSpecifications = new File(
 			"src/main/resources/specifications/csv/slotPairExcludingConstraints.csv");
 
-	public final SpecificationsProvider specificationProvider = new SpecificationsProvider(
+	public final static SpecificationsProvider specificationProvider = new SpecificationsProvider(
 			new CSVSpecifictationsReader(entitySpecifications, entityStructureSpecifications, slotSpecifications));
 
 	public SlotFillingMain() throws Exception {
-		SystemInitializer initializer = SystemInitializer.initialize(specificationProvider)
-				.registerNormalizationFunction(new WeightNormalization(EntityType.get("Weight"))).apply().apply();
+
+		SystemInitializer initializer = SystemInitializer.setSpecifications(specificationProvider)
+				.registerNormalizationFunction(new WeightNormalization()).apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
@@ -82,7 +83,9 @@ public class SlotFillingMain {
 
 //				candidateProvider.setEntityTypeCandidateProvider();
 
-		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider(initializer);
+		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider();
+		constraintsProvider.addHardConstraints(EHardConstraintType.SLOT_PAIR_EXCLUSION,
+				slotPairConstraitsSpecifications);
 
 		AbstractEvaluator evaluator = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
 

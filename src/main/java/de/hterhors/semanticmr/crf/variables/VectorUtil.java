@@ -22,7 +22,8 @@ public class VectorUtil {
 	 * @param state2
 	 * @return
 	 */
-	public static DoubleVector getFeatureDifferences(AbstractFeatureTemplate<?,?> template, State state1, State state2) {
+	public static DoubleVector getFeatureDifferences(AbstractFeatureTemplate<?, ?> template, State state1,
+			State state2) {
 		DoubleVector diff = new DoubleVector();
 
 		List<Factor<?>> factors1 = state1.getFactorGraph(template).getFactors();

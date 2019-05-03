@@ -1,7 +1,12 @@
 package de.hterhors.semanticmr.crf.exploration.constraints;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint;
 import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstraint.SlotEntityPair;
@@ -9,23 +14,10 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.init.specifications.StructureSpecification.ExcludeSlotTypePairNames;
-import de.hterhors.semanticmr.init.specifications.SystemInitializer;
 
 public class HardConstraintsProvider {
 
-	final List<? extends AbstractHardConstraint> hardConstraints;
-
-	private SystemInitializer initializer;
-
-	public HardConstraintsProvider(SystemInitializer initializer) {
-		this.initializer = initializer;
-		this.hardConstraints = getHardConstraints();
-	}
-
-	public HardConstraintsProvider(List<ExcludePairConstraint> hardConstraints) {
-
-		this.hardConstraints = hardConstraints;
-	}
+	final List<AbstractHardConstraint> hardConstraints = new ArrayList<>();
 
 	public boolean violatesConstraints(EntityTemplate template) {
 		for (AbstractHardConstraint hardConstraint : hardConstraints) {
@@ -35,12 +27,34 @@ public class HardConstraintsProvider {
 		return false;
 	}
 
-	private List<? extends AbstractHardConstraint> getHardConstraints() {
+	public HardConstraintsProvider addHardConstraints(EHardConstraintType type, File hardConstraintsFile) {
 
-		List<ExcludePairConstraint> hardConstraints = new ArrayList<>();
+		try {
+			switch (type) {
+			case SLOT_PAIR_EXCLUSION:
+				addSlotPairExclusionConstraint(hardConstraintsFile);
+				break;
 
-		for (ExcludeSlotTypePairNames constraint : initializer.getSpecificationProvider().getSpecifications()
-				.getExcludeSlotTypePairs()) {
+			default:
+				System.out.println("Unkown constraints type: " + type);
+				break;
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
+		}
+
+		return this;
+	}
+
+	private void addSlotPairExclusionConstraint(File hardConstraintsFile) throws IOException {
+		List<String[]> slotPairConstriants = Files.readAllLines(hardConstraintsFile.toPath()).stream()
+				.filter(l -> !l.startsWith("#")).filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t"))
+				.collect(Collectors.toList());
+
+		Set<ExcludeSlotTypePairNames> excludeSlotTypePairs = slotPairConstriants.stream()
+				.map(l -> new ExcludeSlotTypePairNames(l[0], l[1], l[2], l[3], l[4])).collect(Collectors.toSet());
+
+		for (ExcludeSlotTypePairNames constraint : excludeSlotTypePairs) {
 
 			hardConstraints.add(new ExcludePairConstraint(
 					constraint.onTemplateType.isEmpty() ? null : EntityType.get(constraint.onTemplateType),
@@ -49,7 +63,5 @@ public class HardConstraintsProvider {
 					new SlotEntityPair(SlotType.get(constraint.excludeSlotTypeName),
 							EntityType.get(constraint.excludeEntityTypeName))));
 		}
-
-		return hardConstraints;
 	}
 }

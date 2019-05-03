@@ -33,7 +33,7 @@ public class Token implements Serializable {
 	 */
 	final private int sentenceIndex;
 
-	public Token(int sentenceIndex, int index, int start, int stop, String text,int fromSen) {
+	public Token(int sentenceIndex, int index, int start, int stop, String text, int fromSen) {
 		this.documentIndex = index;
 		this.from = start;
 		this.to = stop;
@@ -53,9 +53,11 @@ public class Token implements Serializable {
 	public int getOffsetCharPosition() {
 		return to;
 	}
-public int getFromSen() {
-	return fromSen;
-}
+
+	public int getFromSen() {
+		return fromSen;
+	}
+
 	public String getText() {
 		return text;
 	}

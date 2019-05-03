@@ -5,8 +5,8 @@ import de.hterhors.semanticmr.crf.structure.annotations.normalization.AbstractNo
 
 public class WeightNormalization extends AbstractNormalizationFunction {
 
-	public WeightNormalization(EntityType entityType) {
-		super(entityType);
+	public WeightNormalization() {
+		super(EntityType.get("Weight"));
 	}
 
 	@Override

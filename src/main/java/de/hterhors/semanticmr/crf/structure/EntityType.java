@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.INormalizationFunction;
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.IRequiresInitialization;
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.IdentityNormalization;

@@ -11,6 +11,7 @@ public class JsonSpecifictationsReader implements ISpecificationsReader {
 	public JsonSpecifictationsReader(File specificationFile) {
 	}
 
+	@Override
 	public StructureSpecification read() throws InvalidSpecificationFileFormatException {
 
 //		this.specificationFile
