@@ -13,9 +13,77 @@ import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstr
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
-import de.hterhors.semanticmr.init.specifications.StructureSpecification.ExcludeSlotTypePairNames;
 
 public class HardConstraintsProvider {
+
+	public static class ExcludeSlotTypePairNames {
+
+		public final String onTemplateType;
+
+		public ExcludeSlotTypePairNames(String onTemplateType, String withSlotTypeName, String withEntityTypeName,
+				String excludeSlotTypeName, String excludeEntityTypeName) {
+			this.onTemplateType = onTemplateType;
+			this.withSlotTypeName = withSlotTypeName;
+			this.withEntityTypeName = withEntityTypeName;
+			this.excludeSlotTypeName = excludeSlotTypeName;
+			this.excludeEntityTypeName = excludeEntityTypeName;
+		}
+
+		public final String withSlotTypeName;
+		public final String withEntityTypeName;
+		public final String excludeSlotTypeName;
+		public final String excludeEntityTypeName;
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((excludeEntityTypeName == null) ? 0 : excludeEntityTypeName.hashCode());
+			result = prime * result + ((excludeSlotTypeName == null) ? 0 : excludeSlotTypeName.hashCode());
+			result = prime * result + ((onTemplateType == null) ? 0 : onTemplateType.hashCode());
+			result = prime * result + ((withEntityTypeName == null) ? 0 : withEntityTypeName.hashCode());
+			result = prime * result + ((withSlotTypeName == null) ? 0 : withSlotTypeName.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ExcludeSlotTypePairNames other = (ExcludeSlotTypePairNames) obj;
+			if (excludeEntityTypeName == null) {
+				if (other.excludeEntityTypeName != null)
+					return false;
+			} else if (!excludeEntityTypeName.equals(other.excludeEntityTypeName))
+				return false;
+			if (excludeSlotTypeName == null) {
+				if (other.excludeSlotTypeName != null)
+					return false;
+			} else if (!excludeSlotTypeName.equals(other.excludeSlotTypeName))
+				return false;
+			if (onTemplateType == null) {
+				if (other.onTemplateType != null)
+					return false;
+			} else if (!onTemplateType.equals(other.onTemplateType))
+				return false;
+			if (withEntityTypeName == null) {
+				if (other.withEntityTypeName != null)
+					return false;
+			} else if (!withEntityTypeName.equals(other.withEntityTypeName))
+				return false;
+			if (withSlotTypeName == null) {
+				if (other.withSlotTypeName != null)
+					return false;
+			} else if (!withSlotTypeName.equals(other.withSlotTypeName))
+				return false;
+			return true;
+		}
+
+	}
 
 	final List<AbstractHardConstraint> hardConstraints = new ArrayList<>();
 

@@ -21,7 +21,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
-import de.hterhors.semanticmr.init.specifications.CRFInitializer;
+import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
 import de.hterhors.semanticmr.santo.container.Triple;
 import de.hterhors.semanticmr.santo.helper.PatternCollection;
@@ -31,7 +31,7 @@ public class SantoRDFConverter {
 
 	public static final String RDF_TYPE_NAMESPACE = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>";
 
-	final private CRFInitializer initializer;
+	final private ScopeInitializer initializer;
 
 	private Map<String, Map<String, Set<String>>> rdfData;
 
@@ -46,7 +46,7 @@ public class SantoRDFConverter {
 	final private String ontologyNameSpace;
 	final private String dataNameSpace;
 
-	public SantoRDFConverter(CRFInitializer initializer, Map<Triple, RDFRelatedAnnotation> annotations,
+	public SantoRDFConverter(ScopeInitializer initializer, Map<Triple, RDFRelatedAnnotation> annotations,
 			File rdfAnnotationsFile, final String ontologyNameSpace, final String dataNameSpace) throws IOException {
 		this.initializer = initializer;
 		this.annotations = annotations;
@@ -119,7 +119,7 @@ public class SantoRDFConverter {
 			if (slotFillers.size() == 0)
 				continue;
 
-			if (slot.isSingleValueSlot) {
+			if (slot.isSingleValueSlot()) {
 				if (slotFillers.size() > 1) {
 					System.out.println("WARN! Multiple slot filler detected for single filler slot.");
 				}

@@ -16,12 +16,10 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
 	final public String slotTypeName;
 
-	final public boolean isSingleValueSlot;
-
 	/**
 	 * Maximum size as specified in the specifications.
 	 */
-	final public int multiFillerSlotMaxCapacity;
+	final public int slotMaxCapacity;
 
 	final private Set<String> slotFillerEntityTypeNames;
 
@@ -31,15 +29,13 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
 	private SlotType(String internalizedSlotTypeName, StructureSpecification specifications) {
 		this.slotTypeName = internalizedSlotTypeName;
-		this.isSingleValueSlot = specifications.isSingleValueSlot(internalizedSlotTypeName);
-		this.multiFillerSlotMaxCapacity = specifications.getMultiAnnotationSlotMaxSize(internalizedSlotTypeName);
+		this.slotMaxCapacity = specifications.getMultiAnnotationSlotMaxSize(internalizedSlotTypeName);
 		this.slotFillerEntityTypeNames = specifications.getSlotFillerEntityTypeNames(internalizedSlotTypeName);
 	}
 
 	private SlotType() {
 		this.slotTypeName = null;
-		this.multiFillerSlotMaxCapacity = 0;
-		this.isSingleValueSlot = false;
+		this.slotMaxCapacity = 0;
 		this.slotFillerEntityTypeNames = Collections.emptySet();
 	}
 
@@ -159,6 +155,10 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
 	public String toPrettyString(int depth) {
 		return slotTypeName;
+	}
+
+	public boolean isSingleValueSlot() {
+		return slotMaxCapacity == 1;
 	}
 
 }

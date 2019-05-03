@@ -21,7 +21,7 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.StartPreprocessing;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.XMLReader;
-import de.hterhors.semanticmr.init.specifications.CRFInitializer;
+import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 
@@ -35,12 +35,12 @@ public class CreateJsonCorpus {
 	}
 
 	public CreateJsonCorpus(final String language) throws Exception {
-		CRFInitializer init = null;
+		ScopeInitializer init = null;
 		if (language.equals("en"))
-			init = CRFInitializer.setSpecifications(StartPreprocessing.en_specificationProvider).apply();
+			init = ScopeInitializer.addScope(StartPreprocessing.en_specificationProvider).apply();
 
 		if (language.equals("de"))
-			init = CRFInitializer.setSpecifications(StartPreprocessing.de_specificationProvider).apply();
+			init = ScopeInitializer.addScope(StartPreprocessing.de_specificationProvider).apply();
 
 		this.reader = new XMLReader(new File("olp2/SemiStructured/"));
 

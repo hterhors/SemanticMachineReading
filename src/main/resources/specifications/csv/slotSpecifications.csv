@@ -1,6 +1,0 @@
-#Entity	Slot	SlotSuperEntityType	SlotCardinalityType MaxCardinality
-OrganismModel	hasAgeCategory	AgeCategory	Single	1
-OrganismModel	hasGender	Gender	Single	1
-OrganismModel	hasOrganismSpecies	OrganismSpecies	Single	1
-OrganismModel	hasAge	Age	Single	1
-OrganismModel	hasWeight	Weight	Single	1

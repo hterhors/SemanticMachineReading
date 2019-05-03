@@ -37,28 +37,20 @@ import de.hterhors.semanticmr.eval.BeamSearchEvaluator;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
+import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.StartPreprocessing;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
-import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
-import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
-import de.hterhors.semanticmr.init.specifications.CRFInitializer;
+import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
+import de.hterhors.semanticmr.init.specifications.SystemScope;
+import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.nerla.NerlaCollector;
 
 public class Olp2ExtractionMain {
-	private static final File de_entitySpecifications = new File(
-			"src/main/resources/examples/olp2/de/specs/csv/entitySpecifications.csv");
-	private static final File de_slotSpecifications = new File(
-			"src/main/resources/examples/olp2/de/specs/csv/slotSpecifications.csv");
-	private static final File de_entityStructureSpecifications = new File(
-			"src/main/resources/examples/olp2/de/specs/csv/entityStructureSpecifications.csv");
-
-	public final static SpecificationsProvider de_specificationProvider = new SpecificationsProvider(
-			new CSVSpecifictationsReader(de_entitySpecifications, de_entityStructureSpecifications,
-					de_slotSpecifications));
 
 	public static void main(String[] args) throws IOException, DocumentLinkedAnnotationMismatchException {
 
-		CRFInitializer crfInitializer = CRFInitializer.setSpecifications(de_specificationProvider).apply();
+		ScopeInitializer crfInitializer = ScopeInitializer.addScope(StartPreprocessing.de_specificationProvider)
+				.apply();
 
 		CartesianEvaluator cartesian = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
 		BeamSearchEvaluator beam = new BeamSearchEvaluator(EEvaluationDetail.ENTITY_TYPE, 2);

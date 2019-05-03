@@ -122,7 +122,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	public List<SlotType> getSingleFillerSlotTypes() {
 		if (singleAnnotationSlotTypes == null) {
 			this.singleAnnotationSlotTypes = Collections.unmodifiableList(
-					getSlotTypes().stream().filter(slot -> slot.isSingleValueSlot).collect(Collectors.toList()));
+					getSlotTypes().stream().filter(slot -> slot.isSingleValueSlot()).collect(Collectors.toList()));
 		}
 
 		return singleAnnotationSlotTypes;
@@ -131,7 +131,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	public List<SlotType> getMultiFillerSlotTypes() {
 		if (multiAnnotationSlotTypes == null) {
 			this.multiAnnotationSlotTypes = Collections.unmodifiableList(
-					getSlotTypes().stream().filter(slot -> !slot.isSingleValueSlot).collect(Collectors.toList()));
+					getSlotTypes().stream().filter(slot -> !slot.isSingleValueSlot()).collect(Collectors.toList()));
 		}
 		return multiAnnotationSlotTypes;
 	}

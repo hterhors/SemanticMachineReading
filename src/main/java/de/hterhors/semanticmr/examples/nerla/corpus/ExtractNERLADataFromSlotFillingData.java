@@ -19,7 +19,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnn
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.CRFInitializer;
+import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 
@@ -31,7 +31,7 @@ public class ExtractNERLADataFromSlotFillingData {
 
 	public ExtractNERLADataFromSlotFillingData() throws FileNotFoundException {
 
-		CRFInitializer initializer = CRFInitializer.setSpecifications(SlotFillingMain.specificationProvider)
+		ScopeInitializer initializer = ScopeInitializer.addScope(SlotFillingMain.systemsScope)
 				.apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()

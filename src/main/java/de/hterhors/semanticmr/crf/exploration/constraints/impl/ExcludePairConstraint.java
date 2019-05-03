@@ -84,7 +84,7 @@ public class ExcludePairConstraint extends AbstractHardConstraint {
 		if (onTemplateType != null && onTemplateType != entityTemplate.getEntityType())
 			return false;
 
-		final AbstractSlot withSlotFiller = with.slotType.isSingleValueSlot
+		final AbstractSlot withSlotFiller = with.slotType.isSingleValueSlot()
 				? entityTemplate.getSingleFillerSlot(with.slotType)
 				: entityTemplate.getMultiFillerSlot(with.slotType);
 
@@ -94,7 +94,7 @@ public class ExcludePairConstraint extends AbstractHardConstraint {
 		if (!withSlotFiller.containsSlotFillerOfEntityType(with.entityType))
 			return false;
 
-		final AbstractSlot excludeSlotFiller = exclude.slotType.isSingleValueSlot
+		final AbstractSlot excludeSlotFiller = exclude.slotType.isSingleValueSlot()
 				? entityTemplate.getSingleFillerSlot(exclude.slotType)
 				: entityTemplate.getMultiFillerSlot(exclude.slotType);
 

@@ -6,82 +6,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class StructureSpecification {
-
-	public static class ExcludeSlotTypePairNames {
-
-		public final String onTemplateType;
-
-		public ExcludeSlotTypePairNames(String onTemplateType, String withSlotTypeName, String withEntityTypeName,
-				String excludeSlotTypeName, String excludeEntityTypeName) {
-			this.onTemplateType = onTemplateType;
-			this.withSlotTypeName = withSlotTypeName;
-			this.withEntityTypeName = withEntityTypeName;
-			this.excludeSlotTypeName = excludeSlotTypeName;
-			this.excludeEntityTypeName = excludeEntityTypeName;
-		}
-
-		public final String withSlotTypeName;
-		public final String withEntityTypeName;
-		public final String excludeSlotTypeName;
-		public final String excludeEntityTypeName;
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((excludeEntityTypeName == null) ? 0 : excludeEntityTypeName.hashCode());
-			result = prime * result + ((excludeSlotTypeName == null) ? 0 : excludeSlotTypeName.hashCode());
-			result = prime * result + ((onTemplateType == null) ? 0 : onTemplateType.hashCode());
-			result = prime * result + ((withEntityTypeName == null) ? 0 : withEntityTypeName.hashCode());
-			result = prime * result + ((withSlotTypeName == null) ? 0 : withSlotTypeName.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			ExcludeSlotTypePairNames other = (ExcludeSlotTypePairNames) obj;
-			if (excludeEntityTypeName == null) {
-				if (other.excludeEntityTypeName != null)
-					return false;
-			} else if (!excludeEntityTypeName.equals(other.excludeEntityTypeName))
-				return false;
-			if (excludeSlotTypeName == null) {
-				if (other.excludeSlotTypeName != null)
-					return false;
-			} else if (!excludeSlotTypeName.equals(other.excludeSlotTypeName))
-				return false;
-			if (onTemplateType == null) {
-				if (other.onTemplateType != null)
-					return false;
-			} else if (!onTemplateType.equals(other.onTemplateType))
-				return false;
-			if (withEntityTypeName == null) {
-				if (other.withEntityTypeName != null)
-					return false;
-			} else if (!withEntityTypeName.equals(other.withEntityTypeName))
-				return false;
-			if (withSlotTypeName == null) {
-				if (other.withSlotTypeName != null)
-					return false;
-			} else if (!withSlotTypeName.equals(other.withSlotTypeName))
-				return false;
-			return true;
-		}
-
-	}
 
 	private final Set<String> entityTypeNames;
 	private final Set<String> slotTypeNames;
 
-	private final Map<String, Boolean> isSingleValueSlotTypes;
 	private final Map<String, Boolean> isLiteralValueSlotTypes;
 	/**
 	 * A map of slot names and a corresponding set of entity types that can be
@@ -96,20 +27,15 @@ public class StructureSpecification {
 	private final Map<String, Set<String>> subEntityTypes;
 
 	private final Map<String, Set<String>> slotsForEntity;
-	private final Map<String, Integer> multiAnnotationSlotMaxSizes;
-//	private final Set<ExcludeSlotTypePairNames> excludeSlotTypePairs;
+	private final Map<String, Integer> slotMaxSizes;
 
 	public StructureSpecification(Set<String> entityTypeNames, Set<String> slotTypeNames,
-			Map<String, Boolean> isSingleValueSlotTypes, Map<String, Boolean> isLiteralValueSlotTypes,
-			Map<String, Set<String>> slotFillerEntityTypes, Map<String, Set<String>> superEntityTypes,
-			Map<String, Set<String>> subEntityTypes, Map<String, Set<String>> slotsForEntities,
-			Map<String, Integer> multiAnnotationSlotMaxSizes
-//			, Set<ExcludeSlotTypePairNames> excludeSlotTypePairs
-	) {
+			Map<String, Boolean> isLiteralValueSlotTypes, Map<String, Set<String>> slotFillerEntityTypes,
+			Map<String, Set<String>> superEntityTypes, Map<String, Set<String>> subEntityTypes,
+			Map<String, Set<String>> slotsForEntities, Map<String, Integer> slotMaxSize) {
 
 		this.entityTypeNames = Collections.unmodifiableSet(new HashSet<>(entityTypeNames));
 		this.slotTypeNames = Collections.unmodifiableSet(new HashSet<>(slotTypeNames));
-		this.isSingleValueSlotTypes = Collections.unmodifiableMap(new HashMap<>(isSingleValueSlotTypes));
 
 		this.isLiteralValueSlotTypes = Collections.unmodifiableMap(new HashMap<>(isLiteralValueSlotTypes));
 
@@ -128,9 +54,8 @@ public class StructureSpecification {
 		this.slotsForEntity = new HashMap<>(slotsForEntities);
 		resolveSlotTransitivity(slotsForEntities);
 
-		this.multiAnnotationSlotMaxSizes = Collections.unmodifiableMap(multiAnnotationSlotMaxSizes);
-//		this.excludeSlotTypePairs = Collections.unmodifiableSet(excludeSlotTypePairs);
-
+		this.slotMaxSizes = Collections.unmodifiableMap(
+				slotMaxSize.entrySet().stream().collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue())));
 	}
 
 	private void resolveSuperClassTransitivity(Map<String, Set<String>> superEntityTypes, String baseEntityTypeName,
@@ -204,14 +129,6 @@ public class StructureSpecification {
 	public Set<String> getSlotTypeNames() {
 		return slotTypeNames;
 	}
-//
-//	public Set<ExcludeSlotTypePairNames> getExcludeSlotTypePairs() {
-//		return excludeSlotTypePairs;
-//	}
-
-	public boolean isSingleValueSlot(String slotTypeName) {
-		return isSingleValueSlotTypes.get(slotTypeName).booleanValue();
-	}
 
 	public boolean isLiteralEntityType(String internalizedEntityTypeName) {
 		return isLiteralValueSlotTypes.get(internalizedEntityTypeName).booleanValue();
@@ -229,9 +146,8 @@ public class StructureSpecification {
 		return subEntityTypes.getOrDefault(entityTypeName, Collections.emptySet());
 	}
 
-	@SuppressWarnings("boxing")
 	public int getMultiAnnotationSlotMaxSize(String internalizedSlotTypeName) {
-		return multiAnnotationSlotMaxSizes.getOrDefault(internalizedSlotTypeName, 0).intValue();
+		return slotMaxSizes.getOrDefault(internalizedSlotTypeName, 0).intValue();
 	}
 
 }

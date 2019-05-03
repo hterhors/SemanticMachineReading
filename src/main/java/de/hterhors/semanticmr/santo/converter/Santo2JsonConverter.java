@@ -15,7 +15,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.CRFInitializer;
+import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
@@ -32,7 +32,7 @@ public class Santo2JsonConverter {
 	final private static String textualAnnotationsFileNameEnding = ".annodb";
 	final private static String rdfAnnotationsFileNameEnding = ".n-triples";
 
-	final private CRFInitializer initializer;
+	final private ScopeInitializer initializer;
 
 	private Map<Triple, RDFRelatedAnnotation> annotations;
 
@@ -45,7 +45,7 @@ public class Santo2JsonConverter {
 
 	private final String documentID;
 
-	public Santo2JsonConverter(CRFInitializer initializer, final String documentID, File documentFile,
+	public Santo2JsonConverter(ScopeInitializer initializer, final String documentID, File documentFile,
 			File textualAnnotationsFile, File rdfAnnotationsFile, final String ontologyNameSpace,
 			final String resourceNameSpace) throws IOException {
 		this.initializer = initializer;

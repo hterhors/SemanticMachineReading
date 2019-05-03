@@ -17,7 +17,7 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.init.specifications.CRFInitializer;
+import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 
 public class CRF {
 
@@ -62,9 +62,9 @@ public class CRF {
 
 	private CRFStatistics testStatistics;
 	
-	private final CRFInitializer crfInitializer;
+	private final ScopeInitializer crfInitializer;
 
-	public CRF(CRFInitializer crfInitializer, Model model, IExplorationStrategy explorer, AbstractSampler sampler,
+	public CRF(ScopeInitializer crfInitializer, Model model, IExplorationStrategy explorer, AbstractSampler sampler,
 			IStateInitializer initializer, IObjectiveFunction objectiveFunction) {
 		this.crfInitializer = crfInitializer;
 		this.model = model;

@@ -15,40 +15,35 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.CrossRefReader.CrossRef;
-import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
-import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
-import de.hterhors.semanticmr.init.specifications.CRFInitializer;
+import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
+import de.hterhors.semanticmr.init.specifications.SystemScope;
+import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 import de.hterhors.semanticmr.tokenizer.StandardDocumentTokenizer;
 
 public class StartPreprocessing {
 
-	private static final File de_entitySpecifications = new File(
-			"src/main/resources/examples/olp2/de/specs/csv/entitySpecifications.csv");
-	private static final File de_slotSpecifications = new File(
-			"src/main/resources/examples/olp2/de/specs/csv/slotSpecifications.csv");
-	private static final File de_entityStructureSpecifications = new File(
-			"src/main/resources/examples/olp2/de/specs/csv/entityStructureSpecifications.csv");
+	private static final File de_entities = new File("src/main/resources/examples/olp2/de/specs/csv/entities.csv");
+	private static final File de_slots = new File("src/main/resources/examples/olp2/de/specs/csv/slots.csv");
+	private static final File de_hierarchies = new File(
+			"src/main/resources/examples/olp2/de/specs/csv/hierarchies.csv");
+	private static final File de_structure = new File("src/main/resources/examples/olp2/de/specs/csv/structures.csv");
 
-	private static final File en_entitySpecifications = new File(
-			"src/main/resources/examples/olp2/en/specs/csv/entitySpecifications.csv");
-	private static final File en_slotSpecifications = new File(
-			"src/main/resources/examples/olp2/en/specs/csv/slotSpecifications.csv");
-	private static final File en_entityStructureSpecifications = new File(
-			"src/main/resources/examples/olp2/en/specs/csv/entityStructureSpecifications.csv");
+	private static final File en_entities = new File("src/main/resources/examples/olp2/en/specs/csv/entities.csv");
+	private static final File en_slots = new File("src/main/resources/examples/olp2/en/specs/csv/slots.csv");
+	private static final File en_hierarchies = new File(
+			"src/main/resources/examples/olp2/en/specs/csv/hierarchies.csv");
+	private static final File en_structure = new File("src/main/resources/examples/olp2/en/specs/csv/structures.csv");
 
-	public final static SpecificationsProvider de_specificationProvider = new SpecificationsProvider(
-			new CSVSpecifictationsReader(de_entitySpecifications, de_entityStructureSpecifications,
-					de_slotSpecifications));
+	public final static SystemScope de_specificationProvider = new SystemScope(
+			new CSVScopeReader(de_entities, de_hierarchies, de_slots, de_structure));
 
-	public final static SpecificationsProvider en_specificationProvider = new SpecificationsProvider(
-			new CSVSpecifictationsReader(en_entitySpecifications, en_entityStructureSpecifications,
-					en_slotSpecifications));
+	public final static SystemScope en_specificationProvider = new SystemScope(
+			new CSVScopeReader(en_entities, en_hierarchies, en_slots, en_structure));
 
 	public static void main(String[] args) throws Exception {
 		new StartPreprocessing("de");
-
 	}
 
 	public StartPreprocessing(String language) throws Exception {
@@ -60,7 +55,7 @@ public class StartPreprocessing {
 
 	public static void de() throws Exception {
 
-		CRFInitializer initializer = CRFInitializer.setSpecifications(de_specificationProvider).apply();
+		ScopeInitializer initializer = ScopeInitializer.addScope(de_specificationProvider).apply();
 
 		CrossRefReader crr = new CrossRefReader(new File("olp2/Crossref/"));
 		TextReader tr = new TextReader(new File("olp2/Text/"));
@@ -84,7 +79,7 @@ public class StartPreprocessing {
 	}
 
 	public static void en() throws Exception {
-		CRFInitializer initializer = CRFInitializer.setSpecifications(en_specificationProvider).apply();
+		ScopeInitializer initializer = ScopeInitializer.addScope(en_specificationProvider).apply();
 		CrossRefReader crr = new CrossRefReader(new File("olp2/Crossref/"));
 		TextReader tr = new TextReader(new File("olp2/Text/"));
 		XMLReader xml2json = new XMLReader(new File("olp2/SemiStructured/"));

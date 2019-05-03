@@ -33,11 +33,11 @@ public class MultiFillerSlot extends AbstractSlot {
 	}
 
 	public int getMaxExplorationCapacity() {
-		return slotType.multiFillerSlotMaxCapacity;
+		return slotType.slotMaxCapacity;
 	}
 
 	public boolean containsMaximumFiller() {
-		return slotFiller.size() == slotType.multiFillerSlotMaxCapacity;
+		return slotFiller.size() == slotType.slotMaxCapacity;
 	}
 
 	public boolean containsSlotFiller(AbstractAnnotation slotFillerCandidate) {

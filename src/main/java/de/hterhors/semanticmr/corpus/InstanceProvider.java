@@ -30,8 +30,8 @@ import de.hterhors.semanticmr.json.JsonInstancesReader;
  */
 public class InstanceProvider {
 
-	public boolean removeEmptyInstances = false;
-	public boolean removeInstancesWithToManyAnnotations = false;
+	public static boolean removeEmptyInstances = false;
+	public static boolean removeInstancesWithToManyAnnotations = false;
 
 	final private File jsonInstancesDirectory;
 

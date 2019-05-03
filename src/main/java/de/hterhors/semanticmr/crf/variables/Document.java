@@ -69,6 +69,7 @@ public class Document {
 			throw new DuplicateDocumentException("Document ID was already used: " + documentID);
 
 		Document.documents.put(this.documentID, this);
+
 		this.tokenList = Collections.unmodifiableList(tokenList);
 
 		this.documentContent = builderDocumentContent(tokenList);

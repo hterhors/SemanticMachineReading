@@ -39,9 +39,9 @@ import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
-import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
-import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
-import de.hterhors.semanticmr.init.specifications.CRFInitializer;
+import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
+import de.hterhors.semanticmr.init.specifications.SystemScope;
+import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.nerla.NerlaCollector;
 
@@ -51,29 +51,33 @@ public class SlotFillingMain {
 		new SlotFillingMain();
 	}
 
-	private static final File entitySpecifications = new File(
-			"src/main/resources/specifications/csv/entitySpecifications.csv");
-	private static final File slotSpecifications = new File(
-			"src/main/resources/specifications/csv/slotSpecifications.csv");
-	private static final File entityStructureSpecifications = new File(
-			"src/main/resources/specifications/csv/entityStructureSpecifications.csv");
+	private static final File instancesFileDir = new File("src/main/resources/corpus/data/instances/");
+
+	private static final File entities = new File("src/main/resources/specifications/csv/OrganismModel/entities.csv");
+	private static final File slots = new File("src/main/resources/specifications/csv/OrganismModel/slots.csv");
+	private static final File structures = new File(
+			"src/main/resources/specifications/csv/OrganismModel/structures.csv");
+	private static final File hierarchies = new File(
+			"src/main/resources/specifications/csv/OrganismModel/hierarchies.csv");
 
 	private final File slotPairConstraitsSpecifications = new File(
-			"src/main/resources/specifications/csv/slotPairExcludingConstraints.csv");
+			"src/main/resources/specifications/slotPairExcludingConstraints.csv");
 
-	public final static SpecificationsProvider specificationProvider = new SpecificationsProvider(
-			new CSVSpecifictationsReader(entitySpecifications, entityStructureSpecifications, slotSpecifications));
+	public final static SystemScope systemsScope = new SystemScope(
+			new CSVScopeReader(entities, hierarchies, slots, structures));
 
 	public SlotFillingMain() throws Exception {
 
-		CRFInitializer crfInitializer = CRFInitializer.setSpecifications(specificationProvider)
+		ScopeInitializer scopeInitializer = ScopeInitializer.addScope(systemsScope)
 				.registerNormalizationFunction(new WeightNormalization()).apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
 
-		InstanceProvider instanceProvider = new InstanceProvider(new File("src/main/resources/corpus/data/instances/"),
-				shuffleCorpusDistributor);
+		InstanceProvider.removeEmptyInstances = false;
+		InstanceProvider.removeInstancesWithToManyAnnotations = true;
+
+		InstanceProvider instanceProvider = new InstanceProvider(instancesFileDir, shuffleCorpusDistributor);
 
 		NerlaCollector nerlaProvider = new NerlaCollector(instanceProvider.getInstances());
 		nerlaProvider
@@ -126,7 +130,7 @@ public class SlotFillingMain {
 //		}
 		model = new Model(featureTemplates);
 
-		CRF crf = new CRF(crfInitializer, model, explorer, sampler, stateInitializer, objectiveFunction);
+		CRF crf = new CRF(scopeInitializer, model, explorer, sampler, stateInitializer, objectiveFunction);
 
 		if (!model.wasLoaded()) {
 			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,

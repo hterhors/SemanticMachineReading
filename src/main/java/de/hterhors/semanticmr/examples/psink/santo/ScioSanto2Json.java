@@ -7,11 +7,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.hterhors.semanticmr.SlotFillingMain;
-import de.hterhors.semanticmr.init.specifications.CRFInitializer;
+import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
+import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
+import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.santo.converter.Santo2JsonConverter;
 
 public class ScioSanto2Json {
+
+	private static final File entities = new File("src/main/resources/specifications/csv/OrganismModel/entities.csv");
+	private static final File slots = new File("src/main/resources/specifications/csv/OrganismModel/slots.csv");
+	private static final File structures = new File(
+			"src/main/resources/specifications/csv/OrganismModel/structures.csv");
+	private static final File hierarchies = new File(
+			"src/main/resources/specifications/csv/OrganismModel/hierarchies.csv");
+
+	public final static SystemScope systemsScope = new SystemScope(
+			new CSVScopeReader(entities, hierarchies, slots, structures));
 
 	public static void main(String[] args) throws IOException {
 
@@ -19,8 +30,7 @@ public class ScioSanto2Json {
 		final String scioNameSpace = "http://psink.de/scio";
 		final String resourceNameSpace = "http://scio/data";
 
-		CRFInitializer initializer = CRFInitializer.setSpecifications(SlotFillingMain.specificationProvider)
-				.apply();
+		ScopeInitializer initializer = ScopeInitializer.addScope(systemsScope).apply();
 
 		final String dir = "rawData/export_" + exportDate + "/";
 		List<String> fileNames = Arrays.stream(new File(dir).listFiles()).filter(f -> f.getName().endsWith(".csv"))
@@ -40,6 +50,8 @@ public class ScioSanto2Json {
 			converter.addIgnoreProperty("<http://www.w3.org/2000/01/rdf-schema#comment>");
 			converter.addIgnoreProperty("<http://www.w3.org/2000/01/rdf-schema#label>");
 
+//			converter.convert(new File("src/main/resources/corpus/data/instances/" + name + "_Result.json"), "Result",
+//					true, false);
 			converter.convert(new File("src/main/resources/corpus/data/instances/" + name + "_OrganismModel.json"),
 					"OrganismModel", true, false);
 		}

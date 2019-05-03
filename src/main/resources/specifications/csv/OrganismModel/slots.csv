@@ -1,0 +1,6 @@
+#Slot	MaxCardinality
+hasAgeCategory	1
+hasGender	1
+hasOrganismSpecies	1
+hasAge	1
+hasWeight	1

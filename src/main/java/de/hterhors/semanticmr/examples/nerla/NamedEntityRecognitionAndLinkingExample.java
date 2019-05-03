@@ -34,25 +34,23 @@ import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
-import de.hterhors.semanticmr.init.reader.csv.CSVSpecifictationsReader;
-import de.hterhors.semanticmr.init.specifications.SpecificationsProvider;
-import de.hterhors.semanticmr.init.specifications.CRFInitializer;
+import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
+import de.hterhors.semanticmr.init.specifications.SystemScope;
+import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 
 public class NamedEntityRecognitionAndLinkingExample {
 
-	private static final File entitySpecifications = new File(
-			"src/main/resources/examples/nerla/specs/csv/entitySpecifications.csv");
-	private static final File slotSpecifications = new File(
-			"src/main/resources/examples/nerla/specs/csv/slotSpecifications.csv");
-	private static final File entityStructureSpecifications = new File(
-			"src/main/resources/examples/nerla/specs/csv/entityStructureSpecifications.csv");
+	private static final File entities = new File("src/main/resources/examples/nerla/specs/csv/entities.csv");
+	private static final File slots = new File("src/main/resources/examples/nerla/specs/csv/slots.csv");
+	private static final File structures = new File("src/main/resources/examples/nerla/specs/csv/structures.csv");
+	private static final File hierarchies = new File("src/main/resources/examples/nerla/specs/csv/hierarchies.csv");
 
-	public final static SpecificationsProvider specificationProvider = new SpecificationsProvider(
-			new CSVSpecifictationsReader(entitySpecifications, entityStructureSpecifications, slotSpecifications));
+	public final static SystemScope specificationProvider = new SystemScope(
+			new CSVScopeReader(entities, hierarchies, slots, structures));
 
 	public static void main(String[] args) throws IOException {
 
-		CRFInitializer crfInitializer = CRFInitializer.setSpecifications(specificationProvider).apply();
+		ScopeInitializer crfInitializer = ScopeInitializer.addScope(specificationProvider).apply();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
