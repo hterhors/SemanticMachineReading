@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.santo.converter.Santo2JsonConverter;
 
@@ -19,8 +18,7 @@ public class ScioSanto2Json {
 	private static final File structures = new File("src/main/resources/specifications/csv/Result/structures.csv");
 	private static final File hierarchies = new File("src/main/resources/specifications/csv/Result/hierarchies.csv");
 
-	public final static SystemScope systemsScope = new SystemScope(
-			new CSVScopeReader(entities, hierarchies, slots, structures));
+	public final static CSVScopeReader systemsScope = new CSVScopeReader(entities, hierarchies, slots, structures);
 
 	public static void main(String[] args) throws IOException {
 
@@ -28,7 +26,7 @@ public class ScioSanto2Json {
 		final String scioNameSpace = "http://psink.de/scio";
 		final String resourceNameSpace = "http://scio/data";
 
-		ScopeInitializer initializer = ScopeInitializer.addScope(systemsScope).apply();
+		SystemScope scope = SystemScope.Builder.getSpecsHandler().addScopeSpecification(systemsScope).build();
 
 		final String dir = "rawData/export_" + exportDate + "/";
 		List<String> fileNames = Arrays.stream(new File(dir).listFiles()).filter(f -> f.getName().endsWith(".csv"))
@@ -39,7 +37,7 @@ public class ScioSanto2Json {
 
 			System.out.println(name);
 
-			Santo2JsonConverter converter = new Santo2JsonConverter(initializer, name,
+			Santo2JsonConverter converter = new Santo2JsonConverter(scope, name,
 					new File("rawData/export_10012019/" + name + "_export.csv"),
 					new File("rawData/export_10012019/" + name + "_Jessica.annodb"),
 					new File("rawData/export_10012019/" + name + "_Jessica.n-triples"), scioNameSpace,

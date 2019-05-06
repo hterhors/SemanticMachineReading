@@ -14,7 +14,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.StartPreprocessing;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
+import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.nerla.JsonNerlaIO;
 import de.hterhors.semanticmr.json.nerla.wrapper.JsonEntityAnnotationWrapper;
 
@@ -22,7 +22,8 @@ public class RegexNerl {
 
 	public static void main(String[] args) throws Exception {
 
-		ScopeInitializer initializer = ScopeInitializer.addScope(StartPreprocessing.de_specificationProvider).apply();
+		SystemScope systemScope = SystemScope.Builder.getSpecsHandler()
+				.addScopeSpecification(StartPreprocessing.de_specificationProvider).build();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(0.2F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
@@ -35,8 +36,7 @@ public class RegexNerl {
 
 			System.out.println(instance.getName());
 
-			for (String entityTypeName : initializer.getSpecificationProvider().getSpecifications()
-					.getEntityTypeNames()) {
+			for (String entityTypeName : systemScope.getSpecifications().getEntityTypeNames()) {
 
 				Matcher fullM = Pattern.compile(entityTypeName, Pattern.CASE_INSENSITIVE)
 						.matcher(instance.getDocument().documentContent);

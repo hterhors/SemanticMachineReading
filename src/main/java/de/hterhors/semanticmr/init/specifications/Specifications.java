@@ -8,12 +8,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class StructureSpecification {
+public class Specifications {
 
 	private final Set<String> entityTypeNames;
 	private final Set<String> slotTypeNames;
 
 	private final Map<String, Boolean> isLiteralValueSlotTypes;
+
 	/**
 	 * A map of slot names and a corresponding set of entity types that can be
 	 * filled in that slot.
@@ -29,7 +30,7 @@ public class StructureSpecification {
 	private final Map<String, Set<String>> slotsForEntity;
 	private final Map<String, Integer> slotMaxSizes;
 
-	public StructureSpecification(Set<String> entityTypeNames, Set<String> slotTypeNames,
+	public Specifications(Set<String> entityTypeNames, Set<String> slotTypeNames,
 			Map<String, Boolean> isLiteralValueSlotTypes, Map<String, Set<String>> slotFillerEntityTypes,
 			Map<String, Set<String>> superEntityTypes, Map<String, Set<String>> subEntityTypes,
 			Map<String, Set<String>> slotsForEntities, Map<String, Integer> slotMaxSize) {

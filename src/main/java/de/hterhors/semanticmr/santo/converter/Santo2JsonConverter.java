@@ -15,7 +15,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
+import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
@@ -32,8 +32,6 @@ public class Santo2JsonConverter {
 	final private static String textualAnnotationsFileNameEnding = ".annodb";
 	final private static String rdfAnnotationsFileNameEnding = ".n-triples";
 
-	final private ScopeInitializer initializer;
-
 	private Map<Triple, RDFRelatedAnnotation> annotations;
 
 	private String ontologyNameSpace;
@@ -45,10 +43,9 @@ public class Santo2JsonConverter {
 
 	private final String documentID;
 
-	public Santo2JsonConverter(ScopeInitializer initializer, final String documentID, File documentFile,
+	public Santo2JsonConverter(SystemScope systemScope, final String documentID, File documentFile,
 			File textualAnnotationsFile, File rdfAnnotationsFile, final String ontologyNameSpace,
 			final String resourceNameSpace) throws IOException {
-		this.initializer = initializer;
 		this.documentFile = documentFile;
 		this.textualAnnotationsFile = textualAnnotationsFile;
 		this.rdfAnnotationsFile = rdfAnnotationsFile;
@@ -63,7 +60,7 @@ public class Santo2JsonConverter {
 
 		this.annotations = new TextualAnnotationsReader(this.document, textualAnnotationsFile).getAnnotations();
 
-		this.rdfConverter = new SantoRDFConverter(initializer, annotations, rdfAnnotationsFile, ontologyNameSpace,
+		this.rdfConverter = new SantoRDFConverter(systemScope, annotations, rdfAnnotationsFile, ontologyNameSpace,
 				resourceNameSpace);
 	}
 
@@ -87,7 +84,7 @@ public class Santo2JsonConverter {
 		InstancesToJsonInstanceWrapper conv = new InstancesToJsonInstanceWrapper(instances);
 
 		JsonInstanceIO writer = new JsonInstanceIO(jsonPrettyString);
-		String json = writer.writeInstances(conv.convertToWrapperInstances(initializer));
+		String json = writer.writeInstances(conv.convertToWrapperInstances());
 
 		final PrintStream ps = new PrintStream(writeToFile);
 		ps.println(json);

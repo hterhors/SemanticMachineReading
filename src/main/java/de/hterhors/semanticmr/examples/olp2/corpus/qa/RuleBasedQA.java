@@ -17,7 +17,7 @@ import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.XMLReader;
 
 public class RuleBasedQA {
 
-	public final static String[] question = new String[] { "Did the game ended in a draw?",
+	public final static String[] en_question = new String[] { "Did the game end in a draw?",
 			"What was the score at halftime?", "What was the score at the end of the game?",
 			"Which teams got at least one red card? ", "Which teams got at least one yellow card? ",
 			"Which team got the most yellow cards?", "Which team got the most red cards?",
@@ -31,24 +31,54 @@ public class RuleBasedQA {
 			"In which minute was the last red card?", "In which minute was the first equalizer scored?",
 			"In which minute was the last equalizer scored?", "How many equalizer were scored?",
 			"How many minutes of the regular time were played in a draw?",
-			"How many minutes of the regular time was Team A in the lead?",
-			"How many minutes of the regular time was Team B in the lead?",
-			"How many yellow cards were given in total?", "How many red cards were given in total?",
-			"In which minute did player X score a goal?", "How many goals did player X scored?",
-			"Did player X received a yellow card?", "Did player X received a red card?",
-			"How many yellow cards received Team A?", "How many red cards received Team A?",
-			"How many yellow cards received Team B?", "How many red cards received Team B?"
+			"How many minutes of the regular time was X in the lead?", "How many yellow cards were given in total?",
+			"How many red cards were given in total?", "In which minute did player X score a goal?",
+			"How many goals did player X score?", "Did player X receive a yellow card?",
+			"Did player X receive a red card?", "How many yellow cards received player X?",
+			"How many red cards received player X?"
+
+	};
+
+	public final static String[] de_question = new String[] { "Ist das Spiel unentschieden ausgegangen?",
+			"Wie war der Punktestand zur Halbzeit?", "Wie war der Punktestand am Ende des Spiels?",
+			"Welche Teams haben mindestens eine gelbe karte bekommen?",
+			"Welche Teams haben mindestens eine rote karte bekommen?",
+			"Welches Team hat die meisten gelben Karten bekommen?",
+			"Welches Team hat die meisten roten Karten bekommen?", "Welches Team hat die erste gelbe Karte bekommen?",
+			"Welches Team hat die erste rote Karte bekommen?", "Welches Team hat das Spiel gewonnen?",
+			"Welches Team hat das Spiel verloren?", "Welcher Spieler hat die erste gelbe Karte bekommen?",
+			"Welcher Spieler hat die erste rote Karte bekommen?",
+			"Welcher Spieler hat die letzte gelbe Karte bekommen?",
+			"Welcher Spieler hat die letzte rote Karte bekommen?", "Welcher Spieler hat das erste Tor geschossen?",
+			"Welcher Spieler hat das letzte Tor geschossen?", "In welcher Minute wurde das erste Tor geschossen?",
+			"In welcher Minute wurde das letzte Tor geschossen?", "In welcher Minute gab es die erste gelbe Karte?",
+			"In welcher Minute gab es die letzte gelbe Karte?", "In welcher Minute gab es die erste rote Karte?",
+			"In welcher Minute gab es die letzte rote Karte?",
+			"In welcher Minute wurde der erste Ausgleichstreffer geschossen?",
+			"In welcher Minute wurde der letzte Ausgleichstreffer geschossen?",
+			"Wie viele Ausgleichstreffer wurden geschossen?",
+			"Wie viele Spielminuten der regulären Spielzeit wurden unentschieden gespielt? ",
+			"Wie viele Spielminuten der regulären Spielzeit war X in der Führung?",
+			"Wie viele gelbe Karten wurden insgesammt vergeben?", "Wie viele rote Karten wurden insgesammt vergeben?",
+			"In welcher Minute hat X ein Tor geschossen?", "Wie viele Tore hat X geschossen?",
+			"Hat X eine gelbe Karte bekommen?", "Hat X eine rote Karte bekommen?",
+			"Wie viele gelbe Karten hat X bekommen?", "Wie viele rote Karten hat X bekommen?"
 
 	};
 
 	final public Map<Instance, List<QuestionAnswerPair>> questionsForInstances = new HashMap<>();
 
-	final private XMLReader reader;
 	public final static String DEFAULT_NOT_EXISTENT_ANSWER = "N/A";
 
-	public RuleBasedQA(XMLReader reader, final List<Instance> instances) {
+	public RuleBasedQA(String lang, XMLReader reader, final List<Instance> instances) {
+		String[] question = null;
+		if (lang.equals("en")) {
+			question = en_question;
+		}
+		if (lang.equals("de")) {
 
-		this.reader = reader;
+			question = de_question;
+		}
 
 		for (Instance instance : instances) {
 
@@ -299,8 +329,22 @@ public class RuleBasedQA {
 			}
 			questionIndex++;
 
-			if ((answer = answerQ28(instance.getGoldAnnotations().getAnnotations())) != null) {
-				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+			if ((answer = answerQ28_A(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team1")),
+								answer));
+
+			} else {
+//				questionsForInstances.get(instance)
+//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+			}
+
+			if ((answer = answerQ28_B(instance.getGoldAnnotations().getAnnotations())) != null) {
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team2")),
+								answer));
 
 			} else {
 //				questionsForInstances.get(instance)
@@ -326,18 +370,30 @@ public class RuleBasedQA {
 			}
 			questionIndex++;
 
-			if ((answer = answerQ31(instance.getGoldAnnotations().getAnnotations())) != null) {
-				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
-
-			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
-			}
-			questionIndex++;
-
 			String q = question[questionIndex];
-			int i = 0;
 
+			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team1")) {
+
+				if ((answer = answerQ31(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+				} else {
+//					questionsForInstances.get(instance)
+//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				}
+			}
+			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
+
+				if ((answer = answerQ31(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+				} else {
+//					questionsForInstances.get(instance)
+//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				}
+			}
+			questionIndex++;
+			q = question[questionIndex];
 			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team1")) {
 
 				if ((answer = answerQ32(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
@@ -347,7 +403,6 @@ public class RuleBasedQA {
 //					questionsForInstances.get(instance)
 //							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 				}
-				i++;
 			}
 			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
 
@@ -358,36 +413,33 @@ public class RuleBasedQA {
 //					questionsForInstances.get(instance)
 //							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 				}
-				i++;
 			}
 			questionIndex++;
 			q = question[questionIndex];
-			i = 0;
 			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team1")) {
 
 				if ((answer = answerQ33(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
 					questionsForInstances.get(instance)
 							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+
 				} else {
 //					questionsForInstances.get(instance)
 //							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 				}
-				i++;
 			}
 			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
 
 				if ((answer = answerQ33(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
 					questionsForInstances.get(instance)
 							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
+
 				} else {
 //					questionsForInstances.get(instance)
 //							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 				}
-				i++;
 			}
 			questionIndex++;
 			q = question[questionIndex];
-			i = 0;
 			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team1")) {
 
 				if ((answer = answerQ34(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
@@ -398,63 +450,40 @@ public class RuleBasedQA {
 //					questionsForInstances.get(instance)
 //							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 				}
-				i++;
 			}
 			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
 
 				if ((answer = answerQ34(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
 					questionsForInstances.get(instance)
 							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
-
 				} else {
 //					questionsForInstances.get(instance)
 //							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 				}
-				i++;
-			}
-			questionIndex++;
-			q = question[questionIndex];
-			i = 0;
-			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team1")) {
-
-				if ((answer = answerQ35(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
-					questionsForInstances.get(instance)
-							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
-
-				} else {
-//					questionsForInstances.get(instance)
-//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
-				}
-				i++;
-			}
-			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
-
-				if ((answer = answerQ35(instance.getGoldAnnotations().getAnnotations(), player)) != null) {
-					questionsForInstances.get(instance)
-							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
-				} else {
-//					questionsForInstances.get(instance)
-//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
-				}
-				i++;
 			}
 
 			questionIndex++;
 
-			if ((answer = answerQ36(instance.getGoldAnnotations().getAnnotations(),
+			if ((answer = answerQ35(instance.getGoldAnnotations().getAnnotations(),
 					reader.getTeam(instance.getName(), "Team1"))) != null) {
-				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team1")),
+								answer));
 
 			} else {
 //				questionsForInstances.get(instance)
 //						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 
-			questionIndex++;
+//			questionIndex++;
 
-			if ((answer = answerQ37(instance.getGoldAnnotations().getAnnotations(),
-					reader.getTeam(instance.getName(), "Team1"))) != null) {
-				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+			if ((answer = answerQ35(instance.getGoldAnnotations().getAnnotations(),
+					reader.getTeam(instance.getName(), "Team2"))) != null) {
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team2")),
+								answer));
 
 			} else {
 //				questionsForInstances.get(instance)
@@ -464,19 +493,23 @@ public class RuleBasedQA {
 			questionIndex++;
 
 			if ((answer = answerQ36(instance.getGoldAnnotations().getAnnotations(),
-					reader.getTeam(instance.getName(), "Team2"))) != null) {
-				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+					reader.getTeam(instance.getName(), "Team1"))) != null) {
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team1")),
+								answer));
 
 			} else {
 //				questionsForInstances.get(instance)
 //						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 
-			questionIndex++;
-
-			if ((answer = answerQ37(instance.getGoldAnnotations().getAnnotations(),
+			if ((answer = answerQ36(instance.getGoldAnnotations().getAnnotations(),
 					reader.getTeam(instance.getName(), "Team2"))) != null) {
-				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team2")),
+								answer));
 
 			} else {
 //				questionsForInstances.get(instance)
@@ -1422,7 +1455,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ28(List<AbstractAnnotation> annotations) {
+	public static String answerQ28_A(List<AbstractAnnotation> annotations) {
 
 		class P implements Comparable<P> {
 			int min;
@@ -1486,7 +1519,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ29(List<AbstractAnnotation> annotations) {
+	public static String answerQ28_B(List<AbstractAnnotation> annotations) {
 
 		class P implements Comparable<P> {
 			int min;
@@ -1550,7 +1583,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ30(List<AbstractAnnotation> annotations) {
+	public static String answerQ29(List<AbstractAnnotation> annotations) {
 
 		int count = 0;
 
@@ -1570,7 +1603,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ31(List<AbstractAnnotation> annotations) {
+	public static String answerQ30(List<AbstractAnnotation> annotations) {
 
 		int count = 0;
 
@@ -1591,7 +1624,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ32(List<AbstractAnnotation> annotations, String player) {
+	public static String answerQ31(List<AbstractAnnotation> annotations, String player) {
 
 		for (AbstractAnnotation abstractAnnotation : annotations) {
 
@@ -1619,7 +1652,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ33(List<AbstractAnnotation> annotations, String player) {
+	public static String answerQ32(List<AbstractAnnotation> annotations, String player) {
 
 		int count = 0;
 
@@ -1646,7 +1679,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ34(List<AbstractAnnotation> annotations, final String player) {
+	public static String answerQ33(List<AbstractAnnotation> annotations, final String player) {
 
 		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
@@ -1671,7 +1704,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ35(List<AbstractAnnotation> annotations, final String player) {
+	public static String answerQ34(List<AbstractAnnotation> annotations, final String player) {
 
 		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("RedCard"))
@@ -1696,7 +1729,7 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ36(List<AbstractAnnotation> annotations, String team) {
+	public static String answerQ35(List<AbstractAnnotation> annotations, String team) {
 
 		int count = 0;
 		for (AbstractAnnotation abstractAnnotation : annotations) {
@@ -1720,12 +1753,12 @@ public class RuleBasedQA {
 	 * @param annotations
 	 * @return
 	 */
-	public static String answerQ37(List<AbstractAnnotation> annotations, String team) {
+	public static String answerQ36(List<AbstractAnnotation> annotations, String team) {
 
 		int count = 0;
 
 		for (AbstractAnnotation abstractAnnotation : annotations) {
-			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("YellowCard"))
+			if (abstractAnnotation.asInstanceOfEntityTemplate().getEntityType() != EntityType.get("RedCard"))
 				continue;
 			if (!abstractAnnotation.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("cardForTeam"))
 					.getSlotFiller().getEntityType().entityName.equals(team))

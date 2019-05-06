@@ -10,7 +10,7 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.IRequiresInitialization;
 import de.hterhors.semanticmr.exce.UnkownEnityTypeException;
 import de.hterhors.semanticmr.exce.UnkownSlotTypeException;
-import de.hterhors.semanticmr.init.specifications.StructureSpecification;
+import de.hterhors.semanticmr.init.specifications.Specifications;
 
 public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
@@ -27,7 +27,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
 	private final HashMap<EntityType, Boolean> matchesCache = new HashMap<>();
 
-	private SlotType(String internalizedSlotTypeName, StructureSpecification specifications) {
+	private SlotType(String internalizedSlotTypeName, Specifications specifications) {
 		this.slotName = internalizedSlotTypeName;
 		this.slotMaxCapacity = specifications.getMultiAnnotationSlotMaxSize(internalizedSlotTypeName);
 		this.slotFillerEntityTypeNames = specifications.getSlotFillerEntityTypeNames(internalizedSlotTypeName);
@@ -77,7 +77,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 	}
 
 	@Override
-	public void system_init(StructureSpecification specifications) {
+	public void system_init(Specifications specifications) {
 
 		for (String slotTypeName : specifications.getSlotTypeNames()) {
 			final String internalized = slotTypeName.intern();

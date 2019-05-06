@@ -110,7 +110,7 @@ public class InstanceProvider {
 			for (Iterator<Instance> iterator = instances.iterator(); iterator.hasNext();) {
 				Instance instance = iterator.next();
 				if (instance.getGoldAnnotations().getAnnotations().isEmpty()) {
-					System.out.println("WARN: Instance with no annotations detected!");
+					System.out.println("WARN: Instance " + instance.getName() + " has no annotations!");
 					if (removeEmptyInstances) {
 						iterator.remove();
 						System.out.println("WARN: Remove instance!");
@@ -121,7 +121,7 @@ public class InstanceProvider {
 
 				if (instance.getGoldAnnotations().getAnnotations()
 						.size() >= CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE) {
-					System.out.println("WARN: Instance with to many annotations detected!");
+					System.out.println("WARN: Instance " + instance.getName() + " has to many annotations!");
 					if (removeInstancesWithToManyAnnotations) {
 						iterator.remove();
 						System.out.println("WARN: Remove instance!");

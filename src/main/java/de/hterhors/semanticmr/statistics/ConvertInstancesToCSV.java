@@ -19,8 +19,9 @@ import de.hterhors.semanticmr.crf.structure.slots.MultiFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
+import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.examples.psink.santo.ScioSanto2Json;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
+import de.hterhors.semanticmr.init.specifications.SystemScope;
 
 /**
  * This class converts the instances of Results into one big csv table for the
@@ -40,7 +41,8 @@ public class ConvertInstancesToCSV {
 	}
 
 	public ConvertInstancesToCSV(File instancesfiledir) throws IOException {
-		ScopeInitializer.addScope(ScioSanto2Json.systemsScope).apply();
+
+		SystemScope.Builder.getSpecsHandler().addScopeSpecification(ScioSanto2Json.systemsScope).build();
 
 		InstanceProvider.removeEmptyInstances = true;
 		InstanceProvider.removeInstancesWithToManyAnnotations = false;

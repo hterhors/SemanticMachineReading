@@ -22,7 +22,6 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.json.wrapper.JsonAnnotationsWrapper;
 import de.hterhors.semanticmr.json.wrapper.JsonDocumentLinkedAnnotationWrapper;
 import de.hterhors.semanticmr.json.wrapper.JsonDocumentPositionWrapper;
@@ -46,7 +45,7 @@ public class InstancesToJsonInstanceWrapper {
 		this.instances = instances;
 	}
 
-	public List<JsonInstanceWrapper> convertToWrapperInstances(ScopeInitializer initializer) {
+	public List<JsonInstanceWrapper> convertToWrapperInstances() {
 		return instances.stream().map(instance -> toInstanceWrapper(instance)).collect(Collectors.toList());
 	}
 

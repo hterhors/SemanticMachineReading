@@ -15,9 +15,9 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.CrossRefReader.CrossRef;
+import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 import de.hterhors.semanticmr.tokenizer.StandardDocumentTokenizer;
@@ -36,11 +36,11 @@ public class StartPreprocessing {
 			"src/main/resources/examples/olp2/en/specs/csv/hierarchies.csv");
 	private static final File en_structure = new File("src/main/resources/examples/olp2/en/specs/csv/structures.csv");
 
-	public final static SystemScope de_specificationProvider = new SystemScope(
-			new CSVScopeReader(de_entities, de_hierarchies, de_slots, de_structure));
+	public final static CSVScopeReader de_specificationProvider = new CSVScopeReader(de_entities, de_hierarchies,
+			de_slots, de_structure);
 
-	public final static SystemScope en_specificationProvider = new SystemScope(
-			new CSVScopeReader(en_entities, en_hierarchies, en_slots, en_structure));
+	public final static CSVScopeReader en_specificationProvider = new CSVScopeReader(en_entities, en_hierarchies,
+			en_slots, en_structure);
 
 	public static void main(String[] args) throws Exception {
 		new StartPreprocessing("de");
@@ -54,8 +54,7 @@ public class StartPreprocessing {
 	}
 
 	public static void de() throws Exception {
-
-		ScopeInitializer initializer = ScopeInitializer.addScope(de_specificationProvider).apply();
+		SystemScope.Builder.getSpecsHandler().addScopeSpecification(de_specificationProvider).build();
 
 		CrossRefReader crr = new CrossRefReader(new File("olp2/Crossref/"));
 		TextReader tr = new TextReader(new File("olp2/Text/"));
@@ -69,7 +68,7 @@ public class StartPreprocessing {
 
 			JsonInstanceIO io = new JsonInstanceIO(true);
 
-			final String ins = io.writeInstances(w.convertToWrapperInstances(initializer));
+			final String ins = io.writeInstances(w.convertToWrapperInstances());
 
 			PrintStream ps = new PrintStream(
 					new File("src/main/resources/examples/olp2/de/corpus/sf/" + crossRefEntry.getKey() + ".json"));
@@ -79,8 +78,11 @@ public class StartPreprocessing {
 	}
 
 	public static void en() throws Exception {
-		ScopeInitializer initializer = ScopeInitializer.addScope(en_specificationProvider).apply();
+		SystemScope.Builder.getSpecsHandler().addScopeSpecification(en_specificationProvider).apply()
+				.registerNormalizationFunction(new WeightNormalization()).apply().build();
+
 		CrossRefReader crr = new CrossRefReader(new File("olp2/Crossref/"));
+
 		TextReader tr = new TextReader(new File("olp2/Text/"));
 		XMLReader xml2json = new XMLReader(new File("olp2/SemiStructured/"));
 
@@ -92,7 +94,7 @@ public class StartPreprocessing {
 
 			JsonInstanceIO io = new JsonInstanceIO(true);
 
-			final String ins = io.writeInstances(w.convertToWrapperInstances(initializer));
+			final String ins = io.writeInstances(w.convertToWrapperInstances());
 
 			PrintStream ps = new PrintStream(
 					new File("src/main/resources/examples/olp2/en/corpus/sf/" + crossRefEntry.getKey() + ".json"));

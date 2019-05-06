@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.exce.InvalidSpecificationFileFormatException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
-import de.hterhors.semanticmr.init.specifications.StructureSpecification;
+import de.hterhors.semanticmr.init.specifications.Specifications;
 
 public class CSVScopeReader implements ISpecificationsReader {
 
@@ -29,7 +29,7 @@ public class CSVScopeReader implements ISpecificationsReader {
 	}
 
 	@Override
-	public StructureSpecification read() throws InvalidSpecificationFileFormatException {
+	public Specifications read() throws InvalidSpecificationFileFormatException {
 		try {
 			List<String[]> entities = Files.readAllLines(entitiesFile.toPath()).stream().filter(l -> !l.startsWith("#"))
 					.filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t")).collect(Collectors.toList());
@@ -93,7 +93,7 @@ public class CSVScopeReader implements ISpecificationsReader {
 				return max;
 			}));
 
-			return new StructureSpecification(entityTypeNames, slotTypeNames, isLiteralValueSlotTypes,
+			return new Specifications(entityTypeNames, slotTypeNames, isLiteralValueSlotTypes,
 					slotFillerEntityTypes, superEntityTypes, subEntityTypes, slotsForEntity, slotMaxSize);
 
 		} catch (Exception e) {

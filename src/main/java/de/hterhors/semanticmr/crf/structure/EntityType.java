@@ -13,7 +13,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.normalization.IRequiresI
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.IdentityNormalization;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.exce.UnkownEnityTypeException;
-import de.hterhors.semanticmr.init.specifications.StructureSpecification;
+import de.hterhors.semanticmr.init.specifications.Specifications;
 
 final public class EntityType implements Comparable<EntityType>, IRequiresInitialization {
 	/**
@@ -81,7 +81,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		this.isLiteral = false;
 	}
 
-	private EntityType(final String internalizedEntityTypeName, StructureSpecification specifications) {
+	private EntityType(final String internalizedEntityTypeName, Specifications specifications) {
 		this.entityName = internalizedEntityTypeName;
 		this.isLiteral = specifications.isLiteralEntityType(internalizedEntityTypeName);
 		this.slotNames = Collections.unmodifiableList(specifications.getSlotsForEntityType(this.entityName)
@@ -229,7 +229,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	}
 
 	@Override
-	public void system_init(StructureSpecification specifications) {
+	public void system_init(Specifications specifications) {
 		for (String entityTypeName : specifications.getEntityTypeNames()) {
 			final String internalized = entityTypeName.intern();
 

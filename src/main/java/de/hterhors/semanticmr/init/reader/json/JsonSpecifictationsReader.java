@@ -4,7 +4,7 @@ import java.io.File;
 
 import de.hterhors.semanticmr.exce.InvalidSpecificationFileFormatException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
-import de.hterhors.semanticmr.init.specifications.StructureSpecification;
+import de.hterhors.semanticmr.init.specifications.Specifications;
 
 public class JsonSpecifictationsReader implements ISpecificationsReader {
 
@@ -12,7 +12,7 @@ public class JsonSpecifictationsReader implements ISpecificationsReader {
 	}
 
 	@Override
-	public StructureSpecification read() throws InvalidSpecificationFileFormatException {
+	public Specifications read() throws InvalidSpecificationFileFormatException {
 
 //		this.specificationFile
 

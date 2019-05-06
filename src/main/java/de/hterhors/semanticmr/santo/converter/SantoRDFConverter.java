@@ -21,7 +21,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
+import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
 import de.hterhors.semanticmr.santo.container.Triple;
 import de.hterhors.semanticmr.santo.helper.PatternCollection;
@@ -31,7 +31,7 @@ public class SantoRDFConverter {
 
 	public static final String RDF_TYPE_NAMESPACE = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>";
 
-	final private ScopeInitializer initializer;
+	final private SystemScope systemScope;
 
 	private Map<String, Map<String, Set<String>>> rdfData;
 
@@ -46,9 +46,9 @@ public class SantoRDFConverter {
 	final private String ontologyNameSpace;
 	final private String dataNameSpace;
 
-	public SantoRDFConverter(ScopeInitializer initializer, Map<Triple, RDFRelatedAnnotation> annotations,
+	public SantoRDFConverter(SystemScope systemScope, Map<Triple, RDFRelatedAnnotation> annotations,
 			File rdfAnnotationsFile, final String ontologyNameSpace, final String dataNameSpace) throws IOException {
-		this.initializer = initializer;
+		this.systemScope = systemScope;
 		this.annotations = annotations;
 		this.rdfAnnotationsFile = rdfAnnotationsFile;
 		this.dataNameSpace = dataNameSpace;
@@ -251,8 +251,7 @@ public class SantoRDFConverter {
 		final Set<String> subEntities = new HashSet<>();
 
 		for (String rootEntityType : rootEntityTypes) {
-			subEntities.addAll(this.initializer.getSpecificationProvider().getSpecifications()
-					.getSubEntityTypeNames(rootEntityType));
+			subEntities.addAll(this.systemScope.getSpecifications().getSubEntityTypeNames(rootEntityType));
 		}
 
 		for (Entry<String, Map<String, Set<String>>> triple : rdfData.entrySet()) {

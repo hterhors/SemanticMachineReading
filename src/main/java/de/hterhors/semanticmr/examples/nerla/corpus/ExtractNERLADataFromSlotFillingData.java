@@ -19,7 +19,8 @@ import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnn
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
+import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
+import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 
@@ -31,8 +32,9 @@ public class ExtractNERLADataFromSlotFillingData {
 
 	public ExtractNERLADataFromSlotFillingData() throws FileNotFoundException {
 
-		ScopeInitializer initializer = ScopeInitializer.addScope(SlotFillingMain.systemsScope)
-				.apply();
+		SystemScope systemScope = SystemScope.Builder.getSpecsHandler()
+				.addScopeSpecification(SlotFillingMain.systemsScopeReader).apply()
+				.registerNormalizationFunction(new WeightNormalization()).apply().build();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
@@ -62,7 +64,7 @@ public class ExtractNERLADataFromSlotFillingData {
 
 			JsonInstanceIO io = new JsonInstanceIO(true);
 
-			String jsonString = io.writeInstances(conv.convertToWrapperInstances(initializer));
+			String jsonString = io.writeInstances(conv.convertToWrapperInstances());
 
 			PrintStream ps = new PrintStream(
 					new File("src/main/resources/examples/nerla/corpus/instances/" + instance.getName() + ".json"));

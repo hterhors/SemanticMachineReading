@@ -34,33 +34,90 @@ import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
+import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 
+/**
+ * Example of how to perform named entity recognition and linking.
+ * 
+ * @author hterhors
+ *
+ */
 public class NamedEntityRecognitionAndLinkingExample {
 
-	private static final File entities = new File("src/main/resources/examples/nerla/specs/csv/entities.csv");
-	private static final File slots = new File("src/main/resources/examples/nerla/specs/csv/slots.csv");
-	private static final File structures = new File("src/main/resources/examples/nerla/specs/csv/structures.csv");
-	private static final File hierarchies = new File("src/main/resources/examples/nerla/specs/csv/hierarchies.csv");
+	/**
+	 * Start the named entity recognition and linking procedure.
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
+	public static void main(String[] args) {
+		new NamedEntityRecognitionAndLinkingExample();
+	}
 
-	public final static SystemScope specificationProvider = new SystemScope(
-			new CSVScopeReader(entities, hierarchies, slots, structures));
+	/**
+	 * The file that contains specifications about the entities. This file is the
+	 * only specification file which is necessary for NERLA as it contains basically
+	 * a list of entities that need to be found.
+	 */
+	private final File entities = new File("src/main/resources/examples/nerla/specs/csv/entities.csv");
 
-	public static void main(String[] args) throws IOException {
+	/**
+	 * Specification file that contains information about slots. This file is
+	 * internally not used for NERLA as it is not necessary. However, additional
+	 * information can be exploited during feature generation.
+	 **/
+	private final File slots = new File("src/main/resources/examples/nerla/specs/csv/slots.csv");
 
-		ScopeInitializer crfInitializer = ScopeInitializer.addScope(specificationProvider).apply();
+	/**
+	 * Specification file that contains information about slots of entities. This
+	 * file is internally not used for NERLA as it is not necessary. However,
+	 * additional information can be exploited during feature generation.
+	 **/
+	private final File structures = new File("src/main/resources/examples/nerla/specs/csv/structures.csv");
+
+	/**
+	 * Specification file of entity hierarchies. This is not necessary for NERLA but
+	 * might be helpful for feature generation.
+	 */
+	private final File hierarchies = new File("src/main/resources/examples/nerla/specs/csv/hierarchies.csv");
+
+	/**
+	 * A dictionary file that is used for the in-memory dictionary based candidate
+	 * retrieval component. It is basically a list of terms and synonyms for
+	 * specific entities.
+	 * 
+	 * In a real world scenario dictionary lookups for candidate retrieval is mostly
+	 * not sufficient! Consider implementing your own candidate retrieval e.g. fuzzy
+	 * lookup, Lucene-based etc...
+	 */
+	private final File dictionaryFile = new File("src/main/resources/examples/nerla/dicts/organismModel.dict");
+
+	/**
+	 * The directory of the corpus instances. In this example each instance is
+	 * stored in its own json-file.
+	 */
+	private final File instanceDirectory = new File("src/main/resources/examples/nerla/corpus/instances/");
+
+	public NamedEntityRecognitionAndLinkingExample() {
+
+		/**
+		 * The systems scope. The scope represents the specifications of the 4 (in this
+		 * case only the entities-file is important) previously defined specification
+		 * files. The scope mainly defines the exploration.
+		 */
+		SystemScope.Builder.getSpecsHandler()
+				.addScopeSpecification(new CSVScopeReader(entities, hierarchies, slots, structures)).apply()
+				.registerNormalizationFunction(new WeightNormalization()).apply().build();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
 
-		InstanceProvider instanceProvider = new InstanceProvider(
-				new File("src/main/resources/examples/nerla/corpus/instances/"), shuffleCorpusDistributor);
+		InstanceProvider instanceProvider = new InstanceProvider(instanceDirectory, shuffleCorpusDistributor);
 
 		NerlaCandidateProviderCollection candidateProvider = new NerlaCandidateProviderCollection(
-				new InMEMDictionaryBasedCandidateProvider(
-						new File("src/main/resources/examples/nerla/dicts/organismModel.dict")));
+				new InMEMDictionaryBasedCandidateProvider(dictionaryFile));
 
 		IObjectiveFunction objectiveFunction = new NerlaObjectiveFunction(EEvaluationDetail.DOCUMENT_LINKED);
 
@@ -97,13 +154,17 @@ public class NamedEntityRecognitionAndLinkingExample {
 		}
 		model = new Model(featureTemplates);
 
-		CRF crf = new CRF(crfInitializer, model, explorer, sampler, stateInitializer, objectiveFunction);
+		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
 
 		if (!model.wasLoaded()) {
 			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,
 					noModelChangeCrit);
 
-			model.save(modelDir, modelName, true);
+			try {
+				model.save(modelDir, modelName, true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
@@ -114,4 +175,5 @@ public class NamedEntityRecognitionAndLinkingExample {
 		crf.printTrainingStatistics(System.out);
 		crf.printTestStatistics(System.out);
 	}
+
 }

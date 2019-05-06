@@ -43,23 +43,27 @@ public class InMEMDictionaryBasedCandidateProvider implements INerlaCandidatePro
 	 * @param dictionaryFile the dictionary file.
 	 * @throws IOException
 	 */
-	public InMEMDictionaryBasedCandidateProvider(final File dictionaryFile) throws IOException {
+	public InMEMDictionaryBasedCandidateProvider(final File dictionaryFile) {
 
 		/**
 		 * TODO: check file contents format.
 		 */
-		for (String dictLine : Files.readAllLines(dictionaryFile.toPath())) {
+		try {
+			for (String dictLine : Files.readAllLines(dictionaryFile.toPath())) {
 
-			final String data[] = dictLine.split("\t", 2);
+				final String data[] = dictLine.split("\t", 2);
 
-			for (String entry : data[1].split("\\|")) {
+				for (String entry : data[1].split("\\|")) {
 
-				dictionary.putIfAbsent(EntityType.get(data[0]), new HashSet<>());
-				dictionary.get(EntityType.get(data[0])).add(entry);
-				reverseDictionary.putIfAbsent(entry, new HashSet<>());
-				reverseDictionary.get(entry).add(EntityType.get(data[0]));
+					dictionary.putIfAbsent(EntityType.get(data[0]), new HashSet<>());
+					dictionary.get(EntityType.get(data[0])).add(entry);
+					reverseDictionary.putIfAbsent(entry, new HashSet<>());
+					reverseDictionary.get(entry).add(EntityType.get(data[0]));
+				}
+
 			}
-
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
 		}
 	}
 

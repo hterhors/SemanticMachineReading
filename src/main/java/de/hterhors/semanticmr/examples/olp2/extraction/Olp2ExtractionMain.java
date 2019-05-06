@@ -38,10 +38,9 @@ import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.StartPreprocessing;
+import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
-import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.nerla.NerlaCollector;
 
@@ -49,8 +48,9 @@ public class Olp2ExtractionMain {
 
 	public static void main(String[] args) throws IOException, DocumentLinkedAnnotationMismatchException {
 
-		ScopeInitializer crfInitializer = ScopeInitializer.addScope(StartPreprocessing.de_specificationProvider)
-				.apply();
+		SystemScope systemScope = SystemScope.Builder.getSpecsHandler()
+				.addScopeSpecification(StartPreprocessing.de_specificationProvider).apply()
+				.registerNormalizationFunction(new WeightNormalization()).apply().build();
 
 		CartesianEvaluator cartesian = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
 		BeamSearchEvaluator beam = new BeamSearchEvaluator(EEvaluationDetail.ENTITY_TYPE, 2);
@@ -107,7 +107,7 @@ public class Olp2ExtractionMain {
 		}
 		model = new Model(featureTemplates);
 
-		CRF crf = new CRF(crfInitializer, model, explorer, sampler, stateInitializer, objectiveFunction);
+		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
 
 		if (!model.wasLoaded()) {
 			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,

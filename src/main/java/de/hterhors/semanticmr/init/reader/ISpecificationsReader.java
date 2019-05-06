@@ -1,7 +1,7 @@
 package de.hterhors.semanticmr.init.reader;
 
 import de.hterhors.semanticmr.exce.InvalidSpecificationFileFormatException;
-import de.hterhors.semanticmr.init.specifications.StructureSpecification;
+import de.hterhors.semanticmr.init.specifications.Specifications;
 
 public interface ISpecificationsReader {
 
@@ -10,6 +10,6 @@ public interface ISpecificationsReader {
 	 * 
 	 * @throws InvalidSpecificationFileFormatException
 	 */
-	StructureSpecification read() throws InvalidSpecificationFileFormatException;
+	Specifications read() throws InvalidSpecificationFileFormatException;
 
 }

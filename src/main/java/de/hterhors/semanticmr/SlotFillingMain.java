@@ -41,7 +41,6 @@ import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.nerla.NerlaCollector;
 
@@ -63,13 +62,13 @@ public class SlotFillingMain {
 	private final File slotPairConstraitsSpecifications = new File(
 			"src/main/resources/specifications/slotPairExcludingConstraints.csv");
 
-	public final static SystemScope systemsScope = new SystemScope(
-			new CSVScopeReader(entities, hierarchies, slots, structures));
+	public final static CSVScopeReader systemsScopeReader = new CSVScopeReader(entities, hierarchies, slots,
+			structures);
 
 	public SlotFillingMain() throws Exception {
 
-		ScopeInitializer scopeInitializer = ScopeInitializer.addScope(systemsScope)
-				.registerNormalizationFunction(new WeightNormalization()).apply();
+		SystemScope systemScope = SystemScope.Builder.getSpecsHandler().addScopeSpecification(systemsScopeReader)
+				.apply().registerNormalizationFunction(new WeightNormalization()).apply().build();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
@@ -130,7 +129,7 @@ public class SlotFillingMain {
 //		}
 		model = new Model(featureTemplates);
 
-		CRF crf = new CRF(scopeInitializer, model, explorer, sampler, stateInitializer, objectiveFunction);
+		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
 
 		if (!model.wasLoaded()) {
 			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,

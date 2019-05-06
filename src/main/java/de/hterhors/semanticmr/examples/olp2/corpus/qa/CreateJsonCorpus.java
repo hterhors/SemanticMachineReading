@@ -21,7 +21,7 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.StartPreprocessing;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.XMLReader;
-import de.hterhors.semanticmr.init.specifications.ScopeInitializer;
+import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 
@@ -30,17 +30,20 @@ public class CreateJsonCorpus {
 	final private XMLReader reader;
 
 	public static void main(String[] args) throws Exception {
-		new CreateJsonCorpus("de");
+//		new CreateJsonCorpus("de");
+		new CreateJsonCorpus("en");
 
 	}
 
 	public CreateJsonCorpus(final String language) throws Exception {
-		ScopeInitializer init = null;
+
 		if (language.equals("en"))
-			init = ScopeInitializer.addScope(StartPreprocessing.en_specificationProvider).apply();
+			SystemScope.Builder.getSpecsHandler().addScopeSpecification(StartPreprocessing.en_specificationProvider)
+					.build();
 
 		if (language.equals("de"))
-			init = ScopeInitializer.addScope(StartPreprocessing.de_specificationProvider).apply();
+			SystemScope.Builder.getSpecsHandler().addScopeSpecification(StartPreprocessing.de_specificationProvider)
+					.build();
 
 		this.reader = new XMLReader(new File("olp2/SemiStructured/"));
 
@@ -50,7 +53,7 @@ public class CreateJsonCorpus {
 		InstanceProvider instanceProvider = new InstanceProvider(
 				new File("src/main/resources/examples/olp2/" + language + "/corpus/sf/"), shuffleCorpusDistributor);
 
-		RuleBasedQA qaData = new RuleBasedQA(this.reader, instanceProvider.getInstances());
+		RuleBasedQA qaData = new RuleBasedQA(language, this.reader, instanceProvider.getInstances());
 
 		List<Instance> instances = new ArrayList<>();
 
@@ -103,7 +106,7 @@ public class CreateJsonCorpus {
 
 			JsonInstanceIO io = new JsonInstanceIO(true);
 
-			final String ins = io.writeInstances(w.convertToWrapperInstances(init));
+			final String ins = io.writeInstances(w.convertToWrapperInstances());
 
 			PrintStream ps = new PrintStream(new File(
 					"src/main/resources/examples/olp2/" + language + "/corpus/qa/" + instance.getName() + ".json"));
