@@ -37,6 +37,7 @@ import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
+import de.hterhors.semanticmr.projects.AbstractSemReadProject;
 
 /**
  * Example of how to perform named entity recognition and linking.
@@ -44,7 +45,7 @@ import de.hterhors.semanticmr.init.specifications.SystemScope;
  * @author hterhors
  *
  */
-public class NamedEntityRecognitionAndLinkingExample {
+public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProject {
 
 	/**
 	 * Start the named entity recognition and linking procedure.
@@ -61,27 +62,27 @@ public class NamedEntityRecognitionAndLinkingExample {
 	 * only specification file which is necessary for NERLA as it contains basically
 	 * a list of entities that need to be found.
 	 */
-	private final File entities = new File("src/main/resources/examples/nerla/specs/csv/entities.csv");
+	private final static File entities = new File("src/main/resources/examples/nerla/specs/csv/entities.csv");
 
 	/**
 	 * Specification file that contains information about slots. This file is
 	 * internally not used for NERLA as it is not necessary. However, additional
 	 * information can be exploited during feature generation.
 	 **/
-	private final File slots = new File("src/main/resources/examples/nerla/specs/csv/slots.csv");
+	private final static File slots = new File("src/main/resources/examples/nerla/specs/csv/slots.csv");
 
 	/**
 	 * Specification file that contains information about slots of entities. This
 	 * file is internally not used for NERLA as it is not necessary. However,
 	 * additional information can be exploited during feature generation.
 	 **/
-	private final File structures = new File("src/main/resources/examples/nerla/specs/csv/structures.csv");
+	private final static File structures = new File("src/main/resources/examples/nerla/specs/csv/structures.csv");
 
 	/**
 	 * Specification file of entity hierarchies. This is not necessary for NERLA but
 	 * might be helpful for feature generation.
 	 */
-	private final File hierarchies = new File("src/main/resources/examples/nerla/specs/csv/hierarchies.csv");
+	private final static File hierarchies = new File("src/main/resources/examples/nerla/specs/csv/hierarchies.csv");
 
 	/**
 	 * A dictionary file that is used for the in-memory dictionary based candidate
@@ -103,14 +104,35 @@ public class NamedEntityRecognitionAndLinkingExample {
 	public NamedEntityRecognitionAndLinkingExample() {
 
 		/**
-		 * The systems scope. The scope represents the specifications of the 4 (in this
-		 * case only the entities-file is important) previously defined specification
-		 * files. The scope mainly defines the exploration.
+		 * The scope represents the specifications of the 4 (in this case only the
+		 * entities-file is important) previously defined specification files. The scope
+		 * mainly affects the exploration.
 		 */
-		SystemScope.Builder.getSpecsHandler()
-				.addScopeSpecification(new CSVScopeReader(entities, hierarchies, slots, structures)).apply()
-				.registerNormalizationFunction(new WeightNormalization()).apply().build();
+		super(SystemScope.Builder.getSpecsHandler()
+				/**
+				 * We add a scope reader that reads and interprets the 4 specification files.
+				 */
+				.addScopeSpecification(new CSVScopeReader(entities, hierarchies, slots, structures))
+				/**
+				 * We apply the scopes.
+				 */
+				.apply()
+				/**
+				 * Now normalization functions can be added. A normalization function is
+				 * especially used for literal annotations. In case a normalization function is
+				 * provided the normalized value is compared during evaluation instead of the
+				 * actual surface form. A normalization function e.g. can transform different
+				 * weights so that "500 g" == "0.5kg" == "500g" etc.
+				 */
+				.registerNormalizationFunction(new WeightNormalization())
+				/**
+				 * Finally, we build the systems scope.
+				 */
+				.build());
 
+		/**
+		 * 
+		 */
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
 

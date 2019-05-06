@@ -27,6 +27,7 @@ import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 
 public class CreateJsonCorpus {
 
+
 	final private XMLReader reader;
 
 	public static void main(String[] args) throws Exception {

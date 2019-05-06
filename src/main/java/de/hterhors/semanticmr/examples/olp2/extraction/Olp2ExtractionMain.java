@@ -50,7 +50,7 @@ public class Olp2ExtractionMain {
 
 		SystemScope systemScope = SystemScope.Builder.getSpecsHandler()
 				.addScopeSpecification(StartPreprocessing.de_specificationProvider).apply()
-				.registerNormalizationFunction(new WeightNormalization()).apply().build();
+				.registerNormalizationFunction(new WeightNormalization()).build();
 
 		CartesianEvaluator cartesian = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
 		BeamSearchEvaluator beam = new BeamSearchEvaluator(EEvaluationDetail.ENTITY_TYPE, 2);

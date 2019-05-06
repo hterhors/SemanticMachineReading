@@ -34,7 +34,7 @@ public class ExtractNERLADataFromSlotFillingData {
 
 		SystemScope systemScope = SystemScope.Builder.getSpecsHandler()
 				.addScopeSpecification(SlotFillingMain.systemsScopeReader).apply()
-				.registerNormalizationFunction(new WeightNormalization()).apply().build();
+				.registerNormalizationFunction(new WeightNormalization()).build();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();

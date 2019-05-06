@@ -79,7 +79,7 @@ public class StartPreprocessing {
 
 	public static void en() throws Exception {
 		SystemScope.Builder.getSpecsHandler().addScopeSpecification(en_specificationProvider).apply()
-				.registerNormalizationFunction(new WeightNormalization()).apply().build();
+				.registerNormalizationFunction(new WeightNormalization()).build();
 
 		CrossRefReader crr = new CrossRefReader(new File("olp2/Crossref/"));
 

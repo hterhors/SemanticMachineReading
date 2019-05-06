@@ -1,16 +1,12 @@
 package de.hterhors.semanticmr.init.specifications;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.NotImplementedException;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.AbstractNormalizationFunction;
-import de.hterhors.semanticmr.crf.structure.annotations.normalization.INormalizationFunction;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
 
@@ -105,7 +101,6 @@ public class SystemScope {
 	 */
 	public static class NormalizationFunctionHandler {
 
-		private final Map<EntityType, INormalizationFunction> normalizationFunctions = new HashMap<>();
 		private static NormalizationFunctionHandler handlerInstance = null;
 
 		private final Builder builder;
@@ -132,23 +127,16 @@ public class SystemScope {
 		public NormalizationFunctionHandler registerNormalizationFunction(
 				AbstractNormalizationFunction normalizationFunction) {
 
-			normalizationFunctions.put(normalizationFunction.entityType, normalizationFunction);
+			normalizationFunction.entityType.setNormalizationFunction(normalizationFunction);
 			for (EntityType subEntity : normalizationFunction.entityType.getSubEntityTypes()) {
-				normalizationFunctions.put(subEntity, normalizationFunction);
+				subEntity.setNormalizationFunction(normalizationFunction);
 			}
 
 			return this;
 		}
 
-		public Builder apply() {
-			for (Entry<EntityType, INormalizationFunction> entry : normalizationFunctions.entrySet()) {
-				entry.getKey().setNormalizationFunction(entry.getValue());
-			}
-			return builder;
-		}
-
 		public SystemScope build() {
-			return apply().build();
+			return builder.build();
 		}
 	}
 

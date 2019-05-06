@@ -16,6 +16,7 @@ import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.XMLReader;
 
 public class RuleBasedQA {
+	final static public String DEFAULT_NOT_EXISTENT_ANSWER = "IS_IMPOSSIBLE";
 
 	public final static String[] en_question = new String[] { "Did the game end in a draw?",
 			"What was the score at halftime?", "What was the score at the end of the game?",
@@ -68,8 +69,6 @@ public class RuleBasedQA {
 
 	final public Map<Instance, List<QuestionAnswerPair>> questionsForInstances = new HashMap<>();
 
-	public final static String DEFAULT_NOT_EXISTENT_ANSWER = "N/A";
-
 	public RuleBasedQA(String lang, XMLReader reader, final List<Instance> instances) {
 		String[] question = null;
 		if (lang.equals("en")) {
@@ -90,8 +89,8 @@ public class RuleBasedQA {
 			if ((answer = answerQ1(instance.getGoldAnnotations().getAnnotations())) != null) {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -99,8 +98,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -108,8 +107,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -117,8 +116,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -126,8 +125,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -135,8 +134,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -144,8 +143,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -153,8 +152,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -162,8 +161,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -171,8 +170,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -180,8 +179,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -189,8 +188,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -198,8 +197,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -207,8 +206,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -216,8 +215,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -225,8 +224,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -234,8 +233,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -243,8 +242,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -252,8 +251,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -261,8 +260,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -270,8 +269,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -279,8 +278,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -288,8 +287,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -297,8 +296,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -306,8 +305,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -315,8 +314,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -324,8 +323,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -336,8 +335,10 @@ public class RuleBasedQA {
 								answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team1")),
+								DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 
 			if ((answer = answerQ28_B(instance.getGoldAnnotations().getAnnotations())) != null) {
@@ -347,8 +348,10 @@ public class RuleBasedQA {
 								answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team2")),
+								DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -356,8 +359,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -365,8 +368,8 @@ public class RuleBasedQA {
 				questionsForInstances.get(instance).add(new QuestionAnswerPair(question[questionIndex], answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 			questionIndex++;
 
@@ -378,8 +381,8 @@ public class RuleBasedQA {
 					questionsForInstances.get(instance)
 							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
 				} else {
-//					questionsForInstances.get(instance)
-//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), DEFAULT_NOT_EXISTENT_ANSWER));
 				}
 			}
 			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
@@ -388,8 +391,8 @@ public class RuleBasedQA {
 					questionsForInstances.get(instance)
 							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
 				} else {
-//					questionsForInstances.get(instance)
-//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), DEFAULT_NOT_EXISTENT_ANSWER));
 				}
 			}
 			questionIndex++;
@@ -400,8 +403,8 @@ public class RuleBasedQA {
 					questionsForInstances.get(instance)
 							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
 				} else {
-//					questionsForInstances.get(instance)
-//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), DEFAULT_NOT_EXISTENT_ANSWER));
 				}
 			}
 			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
@@ -410,8 +413,8 @@ public class RuleBasedQA {
 					questionsForInstances.get(instance)
 							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
 				} else {
-//					questionsForInstances.get(instance)
-//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), DEFAULT_NOT_EXISTENT_ANSWER));
 				}
 			}
 			questionIndex++;
@@ -423,8 +426,8 @@ public class RuleBasedQA {
 							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
 
 				} else {
-//					questionsForInstances.get(instance)
-//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), DEFAULT_NOT_EXISTENT_ANSWER));
 				}
 			}
 			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
@@ -434,8 +437,8 @@ public class RuleBasedQA {
 							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
 
 				} else {
-//					questionsForInstances.get(instance)
-//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), DEFAULT_NOT_EXISTENT_ANSWER));
 				}
 			}
 			questionIndex++;
@@ -447,8 +450,8 @@ public class RuleBasedQA {
 							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
 
 				} else {
-//					questionsForInstances.get(instance)
-//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), DEFAULT_NOT_EXISTENT_ANSWER));
 				}
 			}
 			for (String player : reader.getPlayerAnnotations(instance.getName(), "Team2")) {
@@ -457,8 +460,8 @@ public class RuleBasedQA {
 					questionsForInstances.get(instance)
 							.add(new QuestionAnswerPair(q.replaceFirst("X", player), answer));
 				} else {
-//					questionsForInstances.get(instance)
-//							.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+					questionsForInstances.get(instance)
+							.add(new QuestionAnswerPair(q.replaceFirst("X", player), DEFAULT_NOT_EXISTENT_ANSWER));
 				}
 			}
 
@@ -472,8 +475,10 @@ public class RuleBasedQA {
 								answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team1")),
+								DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 
 //			questionIndex++;
@@ -486,8 +491,10 @@ public class RuleBasedQA {
 								answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team2")),
+								DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 
 			questionIndex++;
@@ -500,8 +507,10 @@ public class RuleBasedQA {
 								answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team1")),
+								DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 
 			if ((answer = answerQ36(instance.getGoldAnnotations().getAnnotations(),
@@ -512,8 +521,10 @@ public class RuleBasedQA {
 								answer));
 
 			} else {
-//				questionsForInstances.get(instance)
-//						.add(new QuestionAnswerPair(question[questionIndex], DEFAULT_NOT_EXISTENT_ANSWER));
+				questionsForInstances.get(instance)
+						.add(new QuestionAnswerPair(
+								question[questionIndex].replaceFirst("X", reader.getTeam(instance.getName(), "Team1")),
+								DEFAULT_NOT_EXISTENT_ANSWER));
 			}
 		}
 

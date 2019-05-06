@@ -68,7 +68,7 @@ public class SlotFillingMain {
 	public SlotFillingMain() throws Exception {
 
 		SystemScope systemScope = SystemScope.Builder.getSpecsHandler().addScopeSpecification(systemsScopeReader)
-				.apply().registerNormalizationFunction(new WeightNormalization()).apply().build();
+				.apply().registerNormalizationFunction(new WeightNormalization()).build();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()
 				.setCorpusSizeFraction(1F).setTrainingProportion(80).setTestProportion(20).setSeed(100L).build();
