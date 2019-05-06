@@ -10,7 +10,7 @@ import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateProviderCollection;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;
-import de.hterhors.semanticmr.crf.CRF;
+import de.hterhors.semanticmr.crf.SemanticParsingCRF;
 import de.hterhors.semanticmr.crf.exploration.EntityTemplateExplorer;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
@@ -22,7 +22,7 @@ import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
-import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.NoChangeCrit;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -93,7 +93,7 @@ public class Olp2ExtractionMain {
 //		AbstractSampler sampler = new EpochSwitchSampler(e -> new Random(e).nextBoolean());
 
 		IStoppingCriterion maxStepCrit = new MaxChainLengthCrit(10);
-		IStoppingCriterion noModelChangeCrit = new NoChangeCrit(3, s -> s.getModelScore());
+		IStoppingCriterion noModelChangeCrit = new ConverganceCrit(3, s -> s.getModelScore());
 
 		EntityTemplateExplorer explorer = new EntityTemplateExplorer(candidateProvider);
 
@@ -107,7 +107,7 @@ public class Olp2ExtractionMain {
 		}
 		model = new Model(featureTemplates);
 
-		CRF crf = new CRF(model, explorer, sampler, stateInitializer, objectiveFunction);
+		SemanticParsingCRF crf = new SemanticParsingCRF(model, explorer, sampler, stateInitializer, objectiveFunction);
 
 		if (!model.wasLoaded()) {
 			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,
@@ -118,7 +118,7 @@ public class Olp2ExtractionMain {
 		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
 				noModelChangeCrit);
 
-		EvaluationResultPrinter.evaluate(crf, testResults);
+		EvaluationResultPrinter.evaluate(testResults);
 
 		crf.printTrainingStatistics(System.out);
 		crf.printTestStatistics(System.out);

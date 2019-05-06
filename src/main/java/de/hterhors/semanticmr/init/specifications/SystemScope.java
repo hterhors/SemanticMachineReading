@@ -8,9 +8,20 @@ import org.apache.commons.lang3.NotImplementedException;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.AbstractNormalizationFunction;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
+import de.hterhors.semanticmr.exce.SystemNotInitializedException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
 
 public class SystemScope {
+
+	private static SystemScope instance = null;
+
+	public static SystemScope getInstance() {
+
+		if (instance == null)
+			throw new SystemNotInitializedException("System was not initialized!");
+
+		return instance;
+	}
 
 	public Specifications getSpecifications() {
 
@@ -30,7 +41,8 @@ public class SystemScope {
 		}
 
 		public SystemScope build() {
-			return new SystemScope();
+			instance = new SystemScope();
+			return instance;
 		}
 
 	}

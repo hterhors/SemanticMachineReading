@@ -3,7 +3,6 @@ package de.hterhors.semanticmr.eval;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.hterhors.semanticmr.crf.CRF;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -11,7 +10,7 @@ import de.hterhors.semanticmr.crf.variables.State;
 
 public class EvaluationResultPrinter {
 
-	public static void evaluate(CRF crf, Map<Instance, State> testResults) {
+	public static void evaluate(Map<Instance, State> testResults) {
 		Score mean = new Score();
 
 		for (Entry<Instance, State> res : testResults.entrySet()) {

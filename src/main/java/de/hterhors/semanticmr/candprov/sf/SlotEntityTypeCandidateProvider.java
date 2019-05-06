@@ -56,7 +56,7 @@ public class SlotEntityTypeCandidateProvider
 	public Set<EntityTypeAnnotation> getCandidates(EntityType templateType) {
 		if (!rootAnnotationsCache.containsKey(templateType)) {
 
-			for (EntityType slotEntityType : templateType.getRelatedEntityTypes()) {
+			for (EntityType slotEntityType : templateType.getHierarchicalEntityTypes()) {
 
 				if (slotEntityType.isLiteral) {
 					rootAnnotationsCache.putIfAbsent(templateType, Collections.emptySet());

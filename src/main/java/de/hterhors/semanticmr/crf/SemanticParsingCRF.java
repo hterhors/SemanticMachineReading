@@ -18,7 +18,7 @@ import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 
-public class CRF {
+public class SemanticParsingCRF {
 
 	private static class CRFStatistics {
 		private final String context;
@@ -61,7 +61,7 @@ public class CRF {
 
 	private CRFStatistics testStatistics;
 
-	public CRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler, IStateInitializer initializer,
+	public SemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler, IStateInitializer initializer,
 			IObjectiveFunction objectiveFunction) {
 		this.model = model;
 		this.explorer = explorer;

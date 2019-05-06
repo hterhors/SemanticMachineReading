@@ -12,8 +12,8 @@ public class NerlaObjectiveFunction implements IObjectiveFunction {
 
 	final private NerlaEvaluator evaluator = new NerlaEvaluator();
 
-	public NerlaObjectiveFunction(EEvaluationDetail evaluationMode) {
-		this.evaluationMode = evaluationMode;
+	public NerlaObjectiveFunction(EEvaluationDetail evaluationDetail) {
+		this.evaluationMode = evaluationDetail;
 	}
 
 	public NerlaObjectiveFunction() {

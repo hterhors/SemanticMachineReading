@@ -38,7 +38,7 @@ public class GeneralCandidateProvider
 
 		rootAnnotationsCache.putIfAbsent(slotFiller.getEntityType(), new HashSet<>());
 		rootAnnotationsCache.get(slotFiller.getEntityType()).add((EntityTypeAnnotation) slotFiller);
-		for (EntityType relatedEntitytype : slotFiller.getEntityType().getRelatedEntityTypes()) {
+		for (EntityType relatedEntitytype : slotFiller.getEntityType().getHierarchicalEntityTypes()) {
 			rootAnnotationsCache.putIfAbsent(relatedEntitytype, new HashSet<>());
 			rootAnnotationsCache.get(relatedEntitytype).add((EntityTypeAnnotation) slotFiller);
 		}

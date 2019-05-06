@@ -3,6 +3,7 @@ package de.hterhors.semanticmr.crf.exploration;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hterhors.semanticmr.candprov.nerla.ExhaustiveCandidateRetrieval;
 import de.hterhors.semanticmr.candprov.nerla.INerlaCandidateProvider;
 import de.hterhors.semanticmr.candprov.nerla.NerlaCandidateProviderCollection;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
@@ -34,14 +35,19 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 		this.hardConstraintsProvider = null;
 	}
 
+	public EntityRecLinkExplorer() {
+		this.candidateProvider = new NerlaCandidateProviderCollection(ExhaustiveCandidateRetrieval.getInstance());
+		this.hardConstraintsProvider = null;
+	}
+
 	/**
 	 * Average number of new explored proposal states. This variable is used as
 	 * initial size of the next new proposal state list.
 	 */
 	int averageNumberOfNewProposalStates = 16;
 
-	final int MAX_WINDOW_SIZE = 10;
-	final int MIN_WINDOW_SIZE = 1;
+	final public int MAX_WINDOW_SIZE = 10;
+	final public int MIN_WINDOW_SIZE = 1;
 
 	@Override
 	public List<State> explore(State currentState) {
@@ -110,9 +116,9 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 					for (EntityType entityType : cp.getEntityTypeCandidates(text)) {
 
 						try {
-							AbstractAnnotation newCurrentPrediction = AnnotationBuilder
-									.toAnnotation(currentState.getInstance().getDocument(), entityType.entityName,
-											text, fromToken.getDocCharOffset());
+							AbstractAnnotation newCurrentPrediction = AnnotationBuilder.toAnnotation(
+									currentState.getInstance().getDocument(), entityType.entityName, text,
+									fromToken.getDocCharOffset());
 							proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));
 						} catch (DocumentLinkedAnnotationMismatchException e) {
 							e.printStackTrace();

@@ -2,7 +2,6 @@ package de.hterhors.semanticmr.init.reader.csv;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +30,7 @@ public class CSVScopeReader implements ISpecificationsReader {
 	@Override
 	public Specifications read() throws InvalidSpecificationFileFormatException {
 		try {
+
 			List<String[]> entities = Files.readAllLines(entitiesFile.toPath()).stream().filter(l -> !l.startsWith("#"))
 					.filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t")).collect(Collectors.toList());
 			List<String[]> hierarchies = Files.readAllLines(hierarchiesFile.toPath()).stream()
@@ -93,8 +93,8 @@ public class CSVScopeReader implements ISpecificationsReader {
 				return max;
 			}));
 
-			return new Specifications(entityTypeNames, slotTypeNames, isLiteralValueSlotTypes,
-					slotFillerEntityTypes, superEntityTypes, subEntityTypes, slotsForEntity, slotMaxSize);
+			return new Specifications(entityTypeNames, slotTypeNames, isLiteralValueSlotTypes, slotFillerEntityTypes,
+					superEntityTypes, subEntityTypes, slotsForEntity, slotMaxSize);
 
 		} catch (Exception e) {
 			throw new InvalidSpecificationFileFormatException(e);

@@ -6,18 +6,18 @@ import java.util.function.Function;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.variables.State;
 
-public class NoChangeCrit implements IStoppingCriterion {
+public class ConverganceCrit implements IStoppingCriterion {
 
 	final private double threshold;
 
 	final private int maxTimesNoChange;
 	final private Function<State, Double> f;
 
-	public NoChangeCrit(final int maxTimesNoChange, Function<State, Double> f) {
+	public ConverganceCrit(final int maxTimesNoChange, Function<State, Double> f) {
 		this(maxTimesNoChange, f, 0.001);
 	}
 
-	public NoChangeCrit(final int maxTimesNoChange, Function<State, Double> f, final double threshold) {
+	public ConverganceCrit(final int maxTimesNoChange, Function<State, Double> f, final double threshold) {
 		if (maxTimesNoChange < 1)
 			throw new IllegalArgumentException(
 					"The parameter maxTimesNoChange must be larger than 1, iven value: " + maxTimesNoChange);

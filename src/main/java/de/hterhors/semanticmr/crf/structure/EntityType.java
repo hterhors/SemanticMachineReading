@@ -2,6 +2,7 @@ package de.hterhors.semanticmr.crf.structure;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,12 @@ import de.hterhors.semanticmr.exce.UnkownEnityTypeException;
 import de.hterhors.semanticmr.init.specifications.Specifications;
 
 final public class EntityType implements Comparable<EntityType>, IRequiresInitialization {
+
+	/**
+	 * Set of entity types that were registered.
+	 */
+	private static Set<EntityType> entityTypes = null;
+
 	/**
 	 * The name of this entity type.
 	 */
@@ -84,12 +91,12 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	private EntityType(final String internalizedEntityTypeName, Specifications specifications) {
 		this.entityName = internalizedEntityTypeName;
 		this.isLiteral = specifications.isLiteralEntityType(internalizedEntityTypeName);
-		this.slotNames = Collections.unmodifiableList(specifications.getSlotsForEntityType(this.entityName)
-				.stream().sorted().collect(Collectors.toList()));
-		this.superEntityTypeNames = Collections.unmodifiableSet(specifications
-				.getSuperEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
-		this.subEntityTypeNames = Collections.unmodifiableSet(specifications.getSubEntityTypeNames(this.entityName)
-				.stream().sorted().collect(Collectors.toSet()));
+		this.slotNames = Collections.unmodifiableList(
+				specifications.getSlotsForEntityType(this.entityName).stream().sorted().collect(Collectors.toList()));
+		this.superEntityTypeNames = Collections.unmodifiableSet(
+				specifications.getSuperEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
+		this.subEntityTypeNames = Collections.unmodifiableSet(
+				specifications.getSubEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
 
 		this.slotFillerOfSlotTypeNames = specifications
 				.getSlotTypeNames().stream().filter(slotType -> specifications
@@ -99,8 +106,8 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 
 	public Set<SlotType> getSlots() {
 		if (slots == null) {
-			slots = Collections.unmodifiableSet(this.slotNames.stream()
-					.map(slotTypeName -> SlotType.get(slotTypeName)).sorted().collect(Collectors.toSet()));
+			slots = Collections.unmodifiableSet(this.slotNames.stream().map(slotTypeName -> SlotType.get(slotTypeName))
+					.sorted().collect(Collectors.toSet()));
 		}
 
 		return slots;
@@ -152,7 +159,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		return subEntityTypes;
 	}
 
-	public Set<EntityType> getRelatedEntityTypes() {
+	public Set<EntityType> getHierarchicalEntityTypes() {
 		if (relatedEntityTypes == null) {
 			relatedEntityTypes = Collections
 					.unmodifiableSet(Stream.concat(this.subEntityTypeNames.stream(), this.superEntityTypeNames.stream())
@@ -244,7 +251,11 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 			}
 
 		}
+		entityTypes = Collections.unmodifiableSet(new HashSet<>(entityTypeFactory.values()));
+	}
 
+	public static Set<EntityType> getEntityTypes() {
+		return entityTypes;
 	}
 
 	@Override

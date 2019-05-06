@@ -21,6 +21,7 @@ import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.exce.ModelLoadException;
+import de.hterhors.semanticmr.exce.ModelSaveException;
 
 public class Model {
 
@@ -61,8 +62,17 @@ public class Model {
 
 	final private List<AbstractFeatureTemplate<?, ?>> factorTemplates;
 
+	private File modelBaseDir;
+	private String modelName;
+
 	public Model(List<AbstractFeatureTemplate<?, ?>> factorTemplates) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
+	}
+
+	public Model(List<AbstractFeatureTemplate<?, ?>> factorTemplates, File modelDir, String modelName) {
+		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
+		this.modelBaseDir = modelDir;
+		this.modelName = modelName;
 	}
 
 	public void score(State state) {
@@ -181,76 +191,95 @@ public class Model {
 		return "";
 	}
 
-	public void print(File modelDir, String modelName) throws IOException {
-		for (AbstractFeatureTemplate<?, ?> template : this.factorTemplates) {
-			File parentDir = new File(modelDir, modelName + "/" + DEFAULT_READABLE_DIR);
-			parentDir.mkdirs();
-
-			PrintStream ps = new PrintStream(new File(parentDir, template.getClass().getSimpleName()));
-
-			List<Entry<Integer, Double>> sortedWeights = new ArrayList<>(
-					template.getWeights().getFeatures().entrySet());
-			Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
-			for (Entry<Integer, Double> feature : sortedWeights) {
-				ps.println(indexFeatureName.get(feature.getKey()) + "\t" + feature.getValue());
-			}
-			ps.close();
-
-		}
-
+	public void printReadable() {
+		printReadable(this.modelBaseDir, this.modelName);
 	}
 
-	public void save(final File modelDir, final String modelName, boolean printAsReadable) throws IOException {
-
-		if (!modelDir.exists())
-			modelDir.mkdirs();
-
-		if (!modelDir.isDirectory())
-			throw new IllegalArgumentException("Model directory s not a directory: " + modelDir);
-
-		final File modelFile;
-
-		if ((modelFile = new File(modelDir, modelName + MODEL_SUFFIX)).exists())
-			System.out.println("Warn: model already exists override model!");
-
-		if (printAsReadable)
-			print(modelDir, modelName);
-		// Serialization
+	public void printReadable(File modelDir, String modelName) {
 		try {
-			// Saving of object in a file
-			FileOutputStream file = new FileOutputStream(modelFile);
-			ObjectOutputStream out = new ObjectOutputStream(file);
+			for (AbstractFeatureTemplate<?, ?> template : this.factorTemplates) {
+				File parentDir = new File(modelDir, modelName + "/" + DEFAULT_READABLE_DIR);
+				parentDir.mkdirs();
 
-			// Method for serialization of object
+				PrintStream ps = new PrintStream(new File(parentDir, template.getClass().getSimpleName()));
+
+				List<Entry<Integer, Double>> sortedWeights = new ArrayList<>(
+						template.getWeights().getFeatures().entrySet());
+				Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
+				for (Entry<Integer, Double> feature : sortedWeights) {
+					ps.println(indexFeatureName.get(feature.getKey()) + "\t" + feature.getValue());
+				}
+				ps.close();
+
+			}
+		} catch (IOException ex) {
+			throw new RuntimeException("The model could not be printed. Failed with error: " + ex.getMessage());
+		}
+	}
+
+	public void save() {
+		save(false);
+	}
+
+	public void save(boolean overrideOnExistence) {
+		save(this.modelBaseDir, this.modelName, overrideOnExistence);
+	}
+
+	public void save(final File modelBaseDir, final String modelName, boolean overrideOnExistence) {
+
+		try {
+
+			if (!modelBaseDir.exists())
+				throw new IllegalArgumentException("Model base directory does not exist: " + modelBaseDir);
+
+			if (!modelBaseDir.isDirectory())
+				throw new IllegalArgumentException("Model base directory is not a directory: " + modelBaseDir);
+
+			final boolean modelExists = exists(modelBaseDir, modelName);
+
+			if (!overrideOnExistence && modelExists) {
+				System.out.println("Warn: Model already exists but can not override model! MODEL NOT SAVED!");
+				return;
+			} else if (overrideOnExistence && modelExists) {
+				System.out.println("Warn: Model already exists override model!");
+			}
+
+			final File modelDir = getModelDir(modelBaseDir, modelName);
+
+			if (!modelDir.exists())
+				modelDir.mkdirs();
+
+			ObjectOutputStream out = new ObjectOutputStream(
+					new FileOutputStream(getAbsoluteModelFile(modelBaseDir, modelName)));
+
 			out.writeObject(new SerializableModelWrapper(this.factorTemplates));
 
 			out.close();
-			file.close();
-
-			System.out.println("Object has been serialized");
 
 		}
 
 		catch (IOException ex) {
-			ex.printStackTrace();
-
+			throw new ModelSaveException("The model could not be saved. Failed with error: " + ex.getMessage());
 		}
 
 	}
 
-	public static Model load(final File modelDir, final String modelName) throws IOException, ClassNotFoundException {
+	public static Model load(final File modelBaseDir, final String modelName) {
 
-		SerializableModelWrapper modelWrapper = null;
+		try {
+			SerializableModelWrapper modelWrapper = null;
 
-		FileInputStream file = new FileInputStream(new File(modelDir, modelName + MODEL_SUFFIX));
-		ObjectInputStream in = new ObjectInputStream(file);
+			ObjectInputStream in = new ObjectInputStream(
+					new FileInputStream(getAbsoluteModelFile(modelBaseDir, modelName)));
 
-		modelWrapper = (SerializableModelWrapper) in.readObject();
+			modelWrapper = (SerializableModelWrapper) in.readObject();
 
-		in.close();
-		file.close();
-		System.out.println("Object has been deserialized ");
-		return toModel(modelWrapper);
+			in.close();
+			return toModel(modelWrapper);
+		} catch (Exception e) {
+			throw new ModelLoadException("The model could not be loaded. Failed with error: " + e.getMessage());
+
+		}
 
 	}
 
@@ -283,6 +312,26 @@ public class Model {
 
 	public boolean wasLoaded() {
 		return wasLoaded;
+	}
+
+	private static File getModelDir(File modelBaseDir, String modelName) {
+		return new File(modelBaseDir, modelName);
+	}
+
+	public static boolean exists(File modelBaseDir, String modelName) {
+		return getAbsoluteModelFile(modelBaseDir, modelName).exists();
+	}
+
+	public static File getAbsoluteModelFile(File modelBaseDir, String modelName) {
+		return new File(getModelDir(modelBaseDir, modelName), modelName + MODEL_SUFFIX);
+	}
+
+	public void changeModelBaseDir(final File newBaseDir) {
+		this.modelBaseDir = newBaseDir;
+	}
+
+	public void changeModelName(final String newName) {
+		this.modelName = newName;
 	}
 
 }
