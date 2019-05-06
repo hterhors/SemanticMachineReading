@@ -72,20 +72,21 @@ public class SlotFillingExample extends AbstractSemReadProject {
 	 * Slot B must not be filled with value Y.
 	 */
 	private final File slotPairConstraitsSpecifications = new File(
-			"src/main/resources/specifications/slotPairExclusionConstraints.csv");
+			"src/main/resources/examples/slotfilling/constraints/slotPairExclusionConstraints.csv");
 
 	/**
 	 * The directory of the corpus instances. In this example each instance is
 	 * stored in its own json-file.
 	 */
-	private final File instanceDirectory = new File("src/main/resources/corpus/data/instances/");
+	private final File instanceDirectory = new File("src/main/resources/examples/slotfilling/corpus/instances/");
 
 	/**
 	 * A file that contains named entity recognition and linking annotations for
 	 * each instance. These annotations are used as candidate retrieval during the
 	 * search space exploration.
 	 */
-	private final File externalNerlaAnnotations = new File("src/main/resources/corpus/data/nerla/nerla.json");
+	private final File externalNerlaAnnotations = new File(
+			"src/main/resources/examples/slotfilling/corpus/nerla/nerla.json");
 
 	public SlotFillingExample() {
 
