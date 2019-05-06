@@ -1,0 +1,6 @@
+#Entity	Slot	SlotSuperEntityType	 
+OrganismModel	hasAgeCategory	AgeCategory
+OrganismModel	hasGender	Gender
+OrganismModel	hasOrganismSpecies	OrganismSpecies
+OrganismModel	hasAge	Age
+OrganismModel	hasWeight	Weight

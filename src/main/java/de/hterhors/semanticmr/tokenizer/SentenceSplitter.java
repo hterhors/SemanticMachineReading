@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class SentenceSplitter {
+	
 	public static List<String> extractSentences(String document) {
 
 		document = document.replaceAll("\n", " ");

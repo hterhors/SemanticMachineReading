@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
+import de.hterhors.semanticmr.tokenizer.Tokenization.Token;
 
 public class StandardDocumentTokenizer {
 

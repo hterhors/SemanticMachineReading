@@ -6,7 +6,7 @@ import de.hterhors.semanticmr.init.specifications.Specifications;
 public interface ISpecificationsReader {
 
 	/**
-	 * Validates the file format.
+	 * Reads the specification file(s) and returns them.
 	 * 
 	 * @throws InvalidSpecificationFileFormatException
 	 */

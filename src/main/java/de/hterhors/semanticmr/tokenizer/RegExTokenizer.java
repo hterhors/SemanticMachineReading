@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.hterhors.semanticmr.tokenizer.Tokenization.Token;
+
 public class RegExTokenizer {
 
 //	private static Pattern pattern = Pattern.compile("[\\S]+");
