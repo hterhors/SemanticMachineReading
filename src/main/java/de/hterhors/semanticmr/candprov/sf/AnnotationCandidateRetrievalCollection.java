@@ -22,7 +22,7 @@ import de.hterhors.semanticmr.crf.variables.Instance;
  * @author hterhors
  *
  */
-public class AnnotationCandidateProviderCollection {
+public class AnnotationCandidateRetrievalCollection {
 
 	/**
 	 * The list of corresponding slot type provider.
@@ -44,7 +44,7 @@ public class AnnotationCandidateProviderCollection {
 	 * 
 	 * @param instances
 	 */
-	public AnnotationCandidateProviderCollection(List<Instance> instances) {
+	public AnnotationCandidateRetrievalCollection(List<Instance> instances) {
 		this.instances = instances;
 		for (Instance instance : instances) {
 			slotTypeCandidateProvider.putIfAbsent(instance, new ArrayList<>());
@@ -52,7 +52,7 @@ public class AnnotationCandidateProviderCollection {
 		}
 	}
 
-	public AnnotationCandidateProviderCollection registerCandidateProvider(ICandidateProvider candidateProvider) {
+	public AnnotationCandidateRetrievalCollection registerCandidateProvider(ICandidateProvider candidateProvider) {
 		if (candidateProvider instanceof ISlotTypeAnnotationCandidateProvider) {
 			if (!slotTypeCandidateProvider.containsKey(candidateProvider.getRelatedInstance()))
 				throw new IllegalArgumentException(
@@ -77,7 +77,7 @@ public class AnnotationCandidateProviderCollection {
 	 * 
 	 * @return this collection.
 	 */
-	public AnnotationCandidateProviderCollection setSlotEntityTypeCandidateProvider() {
+	public AnnotationCandidateRetrievalCollection setSlotEntityTypeCandidateProvider() {
 		for (Instance instance : instances) {
 			slotTypeCandidateProvider.putIfAbsent(instance, new ArrayList<>());
 			slotTypeCandidateProvider.get(instance).add(SlotEntityTypeCandidateProvider.getInstance());

@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateProviderCollection;
+import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;
 import de.hterhors.semanticmr.crf.SemanticParsingCRF;
-import de.hterhors.semanticmr.crf.exploration.EntityTemplateExplorer;
+import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.learner.optimizer.SGD;
@@ -65,7 +65,7 @@ public class Olp2ExtractionMain {
 		nerlaProvider.addNerlaProvider(
 				new JsonNerlaProvider(new File("src/main/resources/examples/olp2/de/nerla/nerla.json")));
 
-		AnnotationCandidateProviderCollection candidateProvider = nerlaProvider.collect();
+		AnnotationCandidateRetrievalCollection candidateProvider = nerlaProvider.collect();
 
 //		AnnotationCandidateProviderCollection candidateProvider = new AnnotationCandidateProviderCollection(
 //				instanceProvider.getInstances());
@@ -95,7 +95,7 @@ public class Olp2ExtractionMain {
 		IStoppingCriterion maxStepCrit = new MaxChainLengthCrit(10);
 		IStoppingCriterion noModelChangeCrit = new ConverganceCrit(3, s -> s.getModelScore());
 
-		EntityTemplateExplorer explorer = new EntityTemplateExplorer(candidateProvider);
+		SlotFillingExplorer explorer = new SlotFillingExplorer(candidateProvider);
 
 		final File modelDir = new File("models/olp2/test1/");
 		final String modelName = "Model3";
