@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.olp2.corpus.qa;
+package de.hterhors.semanticmr.projects.olp2.corpus.qa;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -19,11 +19,11 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.StartPreprocessing;
-import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.XMLReader;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
+import de.hterhors.semanticmr.projects.olp2.corpus.preprocessing.StartPreprocessing;
+import de.hterhors.semanticmr.projects.olp2.corpus.preprocessing.XMLReader;
 
 public class CreateJsonCorpus {
 

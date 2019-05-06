@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.psink.santo;
+package de.hterhors.semanticmr.projects.psink.santo;
 
 import java.io.File;
 import java.io.IOException;

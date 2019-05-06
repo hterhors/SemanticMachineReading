@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.psink.normalization;
+package de.hterhors.semanticmr.projects.psink.normalization;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.AbstractNormalizationFunction;

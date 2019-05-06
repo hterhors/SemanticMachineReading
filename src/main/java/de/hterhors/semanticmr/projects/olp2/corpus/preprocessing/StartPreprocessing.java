@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.olp2.corpus.preprocessing;
+package de.hterhors.semanticmr.projects.olp2.corpus.preprocessing;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -14,12 +14,12 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.CrossRefReader.CrossRef;
-import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
+import de.hterhors.semanticmr.projects.olp2.corpus.preprocessing.CrossRefReader.CrossRef;
+import de.hterhors.semanticmr.projects.psink.normalization.WeightNormalization;
 import de.hterhors.semanticmr.tokenizer.StandardDocumentTokenizer;
 
 public class StartPreprocessing {

@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.olp2.corpus.qa;
+package de.hterhors.semanticmr.projects.olp2.corpus.qa;
 
 public class QuestionAnswerPair {
 

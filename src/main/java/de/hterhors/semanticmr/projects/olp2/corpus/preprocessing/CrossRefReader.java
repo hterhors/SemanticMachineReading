@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.olp2.corpus.preprocessing;
+package de.hterhors.semanticmr.projects.olp2.corpus.preprocessing;
 
 import java.io.File;
 import java.io.IOException;

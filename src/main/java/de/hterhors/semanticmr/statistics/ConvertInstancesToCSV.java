@@ -19,9 +19,9 @@ import de.hterhors.semanticmr.crf.structure.slots.MultiFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
-import de.hterhors.semanticmr.examples.psink.santo.ScioSanto2Json;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
+import de.hterhors.semanticmr.projects.psink.normalization.WeightNormalization;
+import de.hterhors.semanticmr.projects.psink.santo.ScioSanto2Json;
 
 /**
  * This class converts the instances of Results into one big csv table for the

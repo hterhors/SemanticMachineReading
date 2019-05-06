@@ -22,8 +22,8 @@ import de.hterhors.semanticmr.crf.of.NerlaObjectiveFunction;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
-import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.nerla.IntraTokenNerlaTemplate;
 import de.hterhors.semanticmr.crf.templates.nerla.MorphologicalNerlaTemplate;
@@ -34,10 +34,11 @@ import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
-import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
+import de.hterhors.semanticmr.examples.nerla.specs.NERLASpecs;
 import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.projects.AbstractSemReadProject;
+import de.hterhors.semanticmr.projects.psink.normalization.WeightNormalization;
 
 /**
  * Example of how to perform named entity recognition and linking.
@@ -56,33 +57,6 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 	public static void main(String[] args) {
 		new NamedEntityRecognitionAndLinkingExample();
 	}
-
-	/**
-	 * The file that contains specifications about the entities. This file is the
-	 * only specification file which is necessary for NERLA as it contains basically
-	 * a list of entities that need to be found.
-	 */
-	private final static File entities = new File("src/main/resources/examples/nerla/specs/csv/entities.csv");
-
-	/**
-	 * Specification file that contains information about slots. This file is
-	 * internally not used for NERLA as it is not necessary. However, additional
-	 * information can be exploited during feature generation.
-	 **/
-	private final static File slots = new File("src/main/resources/examples/nerla/specs/csv/slots.csv");
-
-	/**
-	 * Specification file that contains information about slots of entities. This
-	 * file is internally not used for NERLA as it is not necessary. However,
-	 * additional information can be exploited during feature generation.
-	 **/
-	private final static File structures = new File("src/main/resources/examples/nerla/specs/csv/structures.csv");
-
-	/**
-	 * Specification file of entity hierarchies. This is not necessary for NERLA but
-	 * might be helpful for feature generation.
-	 */
-	private final static File hierarchies = new File("src/main/resources/examples/nerla/specs/csv/hierarchies.csv");
 
 	/**
 	 * A dictionary file that is used for the in-memory dictionary based candidate
@@ -114,7 +88,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 				/**
 				 * We add a scope reader that reads and interprets the 4 specification files.
 				 */
-				.addScopeSpecification(new CSVScopeReader(entities, hierarchies, slots, structures))
+				.addScopeSpecification(NERLASpecs.csvSpecsReader)
 				/**
 				 * We apply the scopes.
 				 */

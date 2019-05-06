@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.nerla.corpus;
+package de.hterhors.semanticmr.projects.psink.nerla.corpus;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import de.hterhors.semanticmr.SlotFillingMain;
 import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
@@ -19,10 +18,11 @@ import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnn
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.examples.psink.normalization.WeightNormalization;
+import de.hterhors.semanticmr.examples.slotfilling.specs.SFSpecs;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
+import de.hterhors.semanticmr.projects.psink.normalization.WeightNormalization;
 
 public class ExtractNERLADataFromSlotFillingData {
 
@@ -33,7 +33,7 @@ public class ExtractNERLADataFromSlotFillingData {
 	public ExtractNERLADataFromSlotFillingData() throws FileNotFoundException {
 
 		SystemScope systemScope = SystemScope.Builder.getSpecsHandler()
-				.addScopeSpecification(SlotFillingMain.systemsScopeReader).apply()
+				.addScopeSpecification(SFSpecs.systemsScopeReader).apply()
 				.registerNormalizationFunction(new WeightNormalization()).build();
 
 		AbstractCorpusDistributor shuffleCorpusDistributor = new ShuffleCorpusDistributor.Builder()

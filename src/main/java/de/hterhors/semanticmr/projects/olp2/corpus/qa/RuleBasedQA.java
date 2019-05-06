@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.olp2.corpus.qa;
+package de.hterhors.semanticmr.projects.olp2.corpus.qa;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +13,7 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.examples.olp2.corpus.preprocessing.XMLReader;
+import de.hterhors.semanticmr.projects.olp2.corpus.preprocessing.XMLReader;
 
 public class RuleBasedQA {
 	final static public String DEFAULT_NOT_EXISTENT_ANSWER = "IS_IMPOSSIBLE";
