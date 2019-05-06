@@ -3,7 +3,7 @@ package de.hterhors.semanticmr.crf.exploration;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateProviderCollection;
+import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection;
 import de.hterhors.semanticmr.candprov.sf.IEntityTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.candprov.sf.ISlotTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
@@ -17,19 +17,19 @@ import de.hterhors.semanticmr.crf.variables.State;
  * @author hterhors
  *
  */
-public class EntityTemplateExplorer implements IExplorationStrategy {
+public class SlotFillingExplorer implements IExplorationStrategy {
 
-	final private AnnotationCandidateProviderCollection candidateProvider;
+	final private AnnotationCandidateRetrievalCollection candidateProvider;
 
 	final private HardConstraintsProvider hardConstraintsProvider;
 
-	public EntityTemplateExplorer(AnnotationCandidateProviderCollection candidateProvider,
+	public SlotFillingExplorer(AnnotationCandidateRetrievalCollection candidateProvider,
 			HardConstraintsProvider hardConstraintsProvder) {
 		this.candidateProvider = candidateProvider;
 		this.hardConstraintsProvider = hardConstraintsProvder;
 	}
 
-	public EntityTemplateExplorer(AnnotationCandidateProviderCollection candidateProvider) {
+	public SlotFillingExplorer(AnnotationCandidateRetrievalCollection candidateProvider) {
 		this.candidateProvider = candidateProvider;
 		this.hardConstraintsProvider = null;
 	}

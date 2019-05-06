@@ -81,8 +81,8 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * 1. STEP initialize the system.
 		 * 
 		 * The scope represents the specifications of the 4 (in this case only the
-		 * entities-file is important) previously defined specification files. The scope
-		 * mainly affects the exploration.
+		 * entities-file is important) defined specification files. The scope mainly
+		 * affects the exploration.
 		 */
 		super(SystemScope.Builder.getSpecsHandler()
 				/**
@@ -90,15 +90,17 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 				 */
 				.addScopeSpecification(NERLASpecs.csvSpecsReader)
 				/**
-				 * We apply the scopes.
+				 * We apply the scope(s).
 				 */
 				.apply()
 				/**
 				 * Now normalization functions can be added. A normalization function is
-				 * especially used for literal annotations. In case a normalization function is
-				 * provided the normalized value is compared during evaluation instead of the
-				 * actual surface form. A normalization function e.g. can transform different
-				 * weights so that "500 g" == "0.5kg" == "500g" etc.
+				 * especially used for literal-based annotations. In case a normalization
+				 * function is provided for a specific entity type, the normalized value is
+				 * compared during evaluation instead of the actual surface form. A
+				 * normalization function normalizes different surface forms so that e.g. the
+				 * weights "500 g", "0.5kg", "500g" are all equal. Each normalization function
+				 * is bound to exactly one entity type.
 				 */
 				.registerNormalizationFunction(new WeightNormalization())
 				/**
@@ -161,7 +163,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * As objective function we select the NERLA-specific objective function which
 		 * basically checks overlapping annotation in gold and predicted set.
 		 *
-		 * Each objective function is parameterized with a EvaluationDetail-parameter.
+		 * Each objective function is parameterized with an EvaluationDetail-parameter.
 		 * The most strict is the DOCUMENT_LINKED-evaluation. Here, the position in the
 		 * text, the annotation text and the assigned entity is compared and needs to be
 		 * correct to count as true positive.
@@ -262,7 +264,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * NOTE: Make sure that the base model directory exists!
 		 */
 		final File modelBaseDir = new File("models/nerla/test1/");
-		final String modelName = "ModelName1234";
+		final String modelName = "NERLA1234";
 
 		Model model;
 
