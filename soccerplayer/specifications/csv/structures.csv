@@ -1,0 +1,5 @@
+#Entity	Slot	SlotSuperEntityType
+SoccerPlayer	hasPosition	Position
+SoccerPlayer	hasBirthPlace	BirthPlace
+SoccerPlayer	hasBirthYear	BirthYear
+SoccerPlayer	hasTeam	Team
