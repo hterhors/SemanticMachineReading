@@ -197,9 +197,11 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 						continue;
 
 					if (docLinkedAnnoation) {
-
-						final DocumentLinkedAnnotation slotFiller = slot.getSlotFiller()
-								.asInstanceOfDocumentLinkedAnnotation();
+						DocumentLinkedAnnotation slotFiller = null;
+						try {
+							slotFiller = slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation();
+						} catch (ClassCastException e) {
+						}
 
 						if (slotFiller == null)
 							continue;

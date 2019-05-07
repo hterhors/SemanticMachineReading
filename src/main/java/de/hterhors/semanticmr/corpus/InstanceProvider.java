@@ -122,7 +122,7 @@ public class InstanceProvider {
 						iterator.remove();
 						log.warn("Remove instance!");
 					} else {
-						log.warn("Ignore!");
+						log.warn("Keep instance!");
 					}
 				}
 
@@ -133,7 +133,7 @@ public class InstanceProvider {
 						iterator.remove();
 						log.warn("Remove instance!");
 					} else {
-						log.warn("Ignore!");
+						log.warn("Keep instance!");
 					}
 				}
 

@@ -64,6 +64,7 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 		return "DocumentLinkedSlotFiller [documentPosition=" + documentPosition + "]";
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public DocumentLinkedAnnotation deepCopy() {
 		try {
