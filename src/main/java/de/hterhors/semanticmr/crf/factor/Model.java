@@ -16,6 +16,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
@@ -24,6 +28,9 @@ import de.hterhors.semanticmr.exce.ModelLoadException;
 import de.hterhors.semanticmr.exce.ModelSaveException;
 
 public class Model {
+	private static Logger log = LogManager.getFormatterLogger(Model.class);
+
+	public static boolean alwaysTrainModel = false;
 
 	final private static FactorPool FACTOR_POOL_INSTANCE = FactorPool.getInstance();
 
@@ -32,7 +39,7 @@ public class Model {
 	 */
 	private final static Map<String, Integer> featureNameIndex = new ConcurrentHashMap<>();
 
-	private boolean wasLoaded = false;
+	private boolean isTrained = false;
 	/**
 	 * Converts an index to its feature name.
 	 */
@@ -40,7 +47,10 @@ public class Model {
 
 	private static final String DEFAULT_READABLE_DIR = "/readable/";
 
-	private static final String MODEL_SUFFIX = ".crf";
+	private static final String MODEL_SUFFIX = ".smcrf";
+
+	private File modelBaseDir;
+	private String modelName;
 
 	public static Integer getIndexForFeatureName(String feature) {
 		Integer index;
@@ -61,9 +71,6 @@ public class Model {
 	}
 
 	final private List<AbstractFeatureTemplate<?, ?>> factorTemplates;
-
-	private File modelBaseDir;
-	private String modelName;
 
 	public Model(List<AbstractFeatureTemplate<?, ?>> factorTemplates) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
@@ -196,15 +203,21 @@ public class Model {
 	}
 
 	public void printReadable(File modelDir, String modelName) {
+		log.info("Print model in readable format...");
 		try {
 			for (AbstractFeatureTemplate<?, ?> template : this.factorTemplates) {
-				File parentDir = new File(modelDir, modelName + "/" + DEFAULT_READABLE_DIR);
+				File parentDir = new File(modelDir, modelName + DEFAULT_READABLE_DIR);
 				parentDir.mkdirs();
 
-				PrintStream ps = new PrintStream(new File(parentDir, template.getClass().getSimpleName()));
+				final File f = new File(parentDir, template.getClass().getSimpleName());
 
+				PrintStream ps = new PrintStream(f);
+				log.info("Print template to " + f.getAbsolutePath());
 				List<Entry<Integer, Double>> sortedWeights = new ArrayList<>(
 						template.getWeights().getFeatures().entrySet());
+
+				if (sortedWeights.size() == 0)
+					log.warn("No features found for template: " + template.getClass().getSimpleName());
 				Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
 				for (Entry<Integer, Double> feature : sortedWeights) {
 					ps.println(indexFeatureName.get(feature.getKey()) + "\t" + feature.getValue());
@@ -226,6 +239,7 @@ public class Model {
 	}
 
 	public void save(final File modelBaseDir, final String modelName, boolean overrideOnExistence) {
+		log.info("Save model binaries to filesystem...");
 
 		try {
 
@@ -238,10 +252,10 @@ public class Model {
 			final boolean modelExists = exists(modelBaseDir, modelName);
 
 			if (!overrideOnExistence && modelExists) {
-				System.out.println("Warn: Model already exists but can not override model! MODEL NOT SAVED!");
+				log.warn("Model already exists but can not override model! MODEL NOT SAVED!");
 				return;
 			} else if (overrideOnExistence && modelExists) {
-				System.out.println("Warn: Model already exists override model!");
+				log.warn("Model already exists override model!");
 			}
 
 			final File modelDir = getModelDir(modelBaseDir, modelName);
@@ -249,12 +263,15 @@ public class Model {
 			if (!modelDir.exists())
 				modelDir.mkdirs();
 
-			ObjectOutputStream out = new ObjectOutputStream(
-					new FileOutputStream(getAbsoluteModelFile(modelBaseDir, modelName)));
+			File modelFile = getAbsoluteModelFile(modelBaseDir, modelName);
+
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
 
 			out.writeObject(new SerializableModelWrapper(this.factorTemplates));
 
 			out.close();
+
+			log.info("Model saved under " + modelFile.getAbsolutePath());
 
 		}
 
@@ -265,17 +282,20 @@ public class Model {
 	}
 
 	public static Model load(final File modelBaseDir, final String modelName) {
+		log.info("Load model binaries from filesystem...");
 
 		try {
 			SerializableModelWrapper modelWrapper = null;
 
-			ObjectInputStream in = new ObjectInputStream(
-					new FileInputStream(getAbsoluteModelFile(modelBaseDir, modelName)));
+			final File modelFile = getAbsoluteModelFile(modelBaseDir, modelName);
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(modelFile));
 
 			modelWrapper = (SerializableModelWrapper) in.readObject();
 
 			in.close();
-			return toModel(modelWrapper);
+			final Model m = toModel(modelWrapper);
+			log.info("Model successfully loaded from: " + modelFile);
+			return m;
 		} catch (Exception e) {
 			throw new ModelLoadException("The model could not be loaded. Failed with error: " + e.getMessage());
 
@@ -286,7 +306,7 @@ public class Model {
 	private static Model toModel(SerializableModelWrapper modelWrapper) {
 		Model model = new Model(
 				modelWrapper.templates.stream().map(t -> toAbstractFeaturetemplate(t)).collect(Collectors.toList()));
-		model.wasLoaded = true;
+		model.isTrained = true;
 		return model;
 	}
 
@@ -310,8 +330,8 @@ public class Model {
 		}
 	}
 
-	public boolean wasLoaded() {
-		return wasLoaded;
+	public boolean isTrained() {
+		return isTrained;
 	}
 
 	private static File getModelDir(File modelBaseDir, String modelName) {

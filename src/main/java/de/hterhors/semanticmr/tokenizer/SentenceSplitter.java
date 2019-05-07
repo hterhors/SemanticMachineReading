@@ -5,8 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import de.hterhors.semanticmr.json.nerla.JsonNerlaIO;
+
 public class SentenceSplitter {
-	
+
 	public static List<String> extractSentences(String document) {
 
 		document = document.replaceAll("\n", " ");

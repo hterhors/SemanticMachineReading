@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.candprov.nerla.InMEMDictionaryBasedCandidateProvider;
 import de.hterhors.semanticmr.candprov.nerla.NerlaCandidateProviderCollection;
@@ -35,7 +39,6 @@ import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.examples.nerla.specs.NERLASpecs;
-import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.projects.AbstractSemReadProject;
 import de.hterhors.semanticmr.projects.psink.normalization.WeightNormalization;
@@ -47,6 +50,7 @@ import de.hterhors.semanticmr.projects.psink.normalization.WeightNormalization;
  *
  */
 public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProject {
+	private static Logger log = LogManager.getFormatterLogger(NamedEntityRecognitionAndLinkingExample.class);
 
 	/**
 	 * Start the named entity recognition and linking procedure.
@@ -172,7 +176,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * if not necessary.
 		 *
 		 */
-		IObjectiveFunction objectiveFunction = new NerlaObjectiveFunction(EEvaluationDetail.ENTITY_TYPE);
+		IObjectiveFunction objectiveFunction = new NerlaObjectiveFunction(EEvaluationDetail.DOCUMENT_LINKED);
 
 		/**
 		 * The learner defines the update strategy of learned weights. parameters are
@@ -264,7 +268,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * NOTE: Make sure that the base model directory exists!
 		 */
 		final File modelBaseDir = new File("models/nerla/test1/");
-		final String modelName = "NERLA1234";
+		final String modelName = "NERLA1234" + new Random().nextInt(10000);
 
 		Model model;
 
@@ -288,7 +292,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		/**
 		 * If the model was loaded from the file system, we do not need to train it.
 		 */
-		if (!model.wasLoaded()) {
+		if (!model.isTrained()) {
 			/**
 			 * Train the CRF.
 			 */
@@ -319,10 +323,10 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		/**
 		 * Finally, we evaluate the produced states and print some statistics.
 		 */
-		EvaluationResultPrinter.evaluate(testResults);
+		evaluate(log, testResults);
 
-		crf.printTrainingStatistics(System.out);
-		crf.printTestStatistics(System.out);
+		log.info(crf.getTrainingStatistics());
+		log.info(crf.getTestStatistics());
 
 		/**
 		 * TODO: Compare results with results when changing some parameter. Implement

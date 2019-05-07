@@ -17,7 +17,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		super(evaluationMode);
 	}
 
-	public static final int MAXIMUM_PERMUTATION_SIZE = 8;
+	public static int MAXIMUM_PERMUTATION_SIZE = 8;
 
 	@SuppressWarnings("unchecked")
 	private static final Collection<List<Integer>>[] permutationCache = new Collection[1 + MAXIMUM_PERMUTATION_SIZE];
@@ -31,8 +31,8 @@ public class CartesianEvaluator extends AbstractEvaluator {
 	private static Stream<List<Integer>> getPermutationStream(final int size) {
 
 		if (permutationCache.length < size)
-			throw new IllegalArgumentException("Request for permutation of size " + size + " exceeds maximum size of: "
-					+ MAXIMUM_PERMUTATION_SIZE);
+			throw new IllegalArgumentException(
+					"Requested permutation size " + size + " exceeds maximum size of: " + MAXIMUM_PERMUTATION_SIZE);
 
 		return permutationCache[size].stream();
 	}

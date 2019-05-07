@@ -3,6 +3,9 @@ package de.hterhors.semanticmr.crf.exploration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.hterhors.semanticmr.candprov.nerla.ExhaustiveCandidateRetrieval;
 import de.hterhors.semanticmr.candprov.nerla.INerlaCandidateProvider;
 import de.hterhors.semanticmr.candprov.nerla.NerlaCandidateProviderCollection;
@@ -12,6 +15,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.State;
+import de.hterhors.semanticmr.examples.slotfilling.SlotFillingExample;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 
 /**
@@ -19,6 +23,7 @@ import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
  *
  */
 public class EntityRecLinkExplorer implements IExplorationStrategy {
+	private static Logger log = LogManager.getFormatterLogger(EntityRecLinkExplorer.class);
 
 	final private NerlaCandidateProviderCollection candidateProvider;
 

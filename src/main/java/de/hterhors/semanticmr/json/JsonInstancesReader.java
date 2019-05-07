@@ -9,11 +9,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.json.converter.JsonInstanceWrapperToInstance;
 import de.hterhors.semanticmr.json.wrapper.JsonInstanceWrapper;
 
 public class JsonInstancesReader {
+	private static Logger log = LogManager.getFormatterLogger(JsonInstancesReader.class);
 
 	private final File corpusDirectory;
 
@@ -22,9 +26,11 @@ public class JsonInstancesReader {
 	}
 
 	public List<Instance> readInstances(final int numToRead) throws IOException {
-		System.out.println("#######################LOAD INSTANCES#######################");
+		log.info("Read corpus instances from the file system...");
 
-		System.out.print("Read instances");
+		if (numToRead != Integer.MAX_VALUE) {
+			log.info("Limit instances to: " + numToRead);
+		}
 
 		List<File> jsonFiles = Arrays.stream(corpusDirectory.listFiles()).filter(f -> f.getName().endsWith(".json"))
 				.collect(Collectors.toList());
@@ -40,19 +46,15 @@ public class JsonInstancesReader {
 				break;
 
 			count++;
-			if (count % 10 == 0)
-				System.out.print(".");
 			if (count % 100 == 0) {
-				System.out.print(" - " + count + " - ");
+				log.debug(" - " + count + " - ");
 			}
 			List<JsonInstanceWrapper> jsonInstances = new JsonInstanceIO(true)
 					.readInstances(new String(Files.readAllBytes(jsonFile.toPath())));
 
 			trainingInstances.addAll(new JsonInstanceWrapperToInstance(jsonInstances).convertToInstances());
 		}
-		System.out.println("... done");
-		System.out.println("Total number of instances loaded: " + count);
-
+		log.info("Read instances... done");
 		return trainingInstances;
 
 	}

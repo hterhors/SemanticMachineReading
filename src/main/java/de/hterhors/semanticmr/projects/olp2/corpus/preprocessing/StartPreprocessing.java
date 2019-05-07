@@ -24,17 +24,17 @@ import de.hterhors.semanticmr.tokenizer.StandardDocumentTokenizer;
 
 public class StartPreprocessing {
 
-	private static final File de_entities = new File("src/main/resources/examples/olp2/de/specs/csv/entities.csv");
-	private static final File de_slots = new File("src/main/resources/examples/olp2/de/specs/csv/slots.csv");
+	private static final File de_entities = new File("projects/olp2/de/specs/csv/entities.csv");
+	private static final File de_slots = new File("projects/olp2/de/specs/csv/slots.csv");
 	private static final File de_hierarchies = new File(
-			"src/main/resources/examples/olp2/de/specs/csv/hierarchies.csv");
-	private static final File de_structure = new File("src/main/resources/examples/olp2/de/specs/csv/structures.csv");
+			"projects/olp2/de/specs/csv/hierarchies.csv");
+	private static final File de_structure = new File("projects/olp2/de/specs/csv/structures.csv");
 
-	private static final File en_entities = new File("src/main/resources/examples/olp2/en/specs/csv/entities.csv");
-	private static final File en_slots = new File("src/main/resources/examples/olp2/en/specs/csv/slots.csv");
+	private static final File en_entities = new File("projects/olp2/en/specs/csv/entities.csv");
+	private static final File en_slots = new File("projects/olp2/en/specs/csv/slots.csv");
 	private static final File en_hierarchies = new File(
-			"src/main/resources/examples/olp2/en/specs/csv/hierarchies.csv");
-	private static final File en_structure = new File("src/main/resources/examples/olp2/en/specs/csv/structures.csv");
+			"projects/olp2/en/specs/csv/hierarchies.csv");
+	private static final File en_structure = new File("projects/olp2/en/specs/csv/structures.csv");
 
 	public final static CSVScopeReader de_specificationProvider = new CSVScopeReader(de_entities, de_hierarchies,
 			de_slots, de_structure);
@@ -71,7 +71,7 @@ public class StartPreprocessing {
 			final String ins = io.writeInstances(w.convertToWrapperInstances());
 
 			PrintStream ps = new PrintStream(
-					new File("src/main/resources/examples/olp2/de/corpus/sf/" + crossRefEntry.getKey() + ".json"));
+					new File("projects/olp2/de/corpus/sf/" + crossRefEntry.getKey() + ".json"));
 			ps.println(ins);
 			ps.close();
 		}
@@ -97,7 +97,7 @@ public class StartPreprocessing {
 			final String ins = io.writeInstances(w.convertToWrapperInstances());
 
 			PrintStream ps = new PrintStream(
-					new File("src/main/resources/examples/olp2/en/corpus/sf/" + crossRefEntry.getKey() + ".json"));
+					new File("projects/olp2/en/corpus/sf/" + crossRefEntry.getKey() + ".json"));
 			ps.println(ins);
 			ps.close();
 

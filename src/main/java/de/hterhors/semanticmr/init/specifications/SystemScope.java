@@ -4,16 +4,31 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.normalization.AbstractNormalizationFunction;
+import de.hterhors.semanticmr.crf.structure.annotations.normalization.IdentityNormalization;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.exce.SystemNotInitializedException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
 
 public class SystemScope {
 
+	private static Logger log = LogManager.getFormatterLogger(SystemScope.class);
+
 	private static SystemScope instance = null;
+
+	private SystemScope() {
+		EntityType.getEntityTypes().stream().forEach(et -> {
+			if (et.isLiteral && et.getNormalizationFunction() == IdentityNormalization.getInstance()) {
+				log.warn("No normalization function for literal entity type \"" + et.entityName
+						+ "\" was specified. Set default to \"" + IdentityNormalization.class.getSimpleName()+"\"");
+			}
+		});
+		log.info("System successfully initialized!");
+	}
 
 	public static SystemScope getInstance() {
 
@@ -24,13 +39,16 @@ public class SystemScope {
 	}
 
 	public Specifications getSpecifications() {
-
 		throw new NotImplementedException("NOT IMPL");
 	}
 
 	static public class Builder {
 
 		private static Builder builder = null;
+
+		private Builder() {
+			log.info("Initialize system...");
+		}
 
 		public static SpecificationScopeHandler getSpecsHandler() {
 
@@ -87,6 +105,11 @@ public class SystemScope {
 		}
 
 		public NormalizationFunctionHandler apply() {
+			if (specsReaderSet.isEmpty()) {
+				log.error("No specifications were added. System might not run properly! Call System.exit()");
+				System.exit(-1);
+			}
+
 			for (ISpecificationsReader iSpecificationsReader : specsReaderSet) {
 
 				Specifications specification = iSpecificationsReader.read();
@@ -138,7 +161,8 @@ public class SystemScope {
 		 */
 		public NormalizationFunctionHandler registerNormalizationFunction(
 				AbstractNormalizationFunction normalizationFunction) {
-
+			log.info("Register normalization function  \"" + normalizationFunction.getClass().getSimpleName()
+					+ "\" for entity type \"" + normalizationFunction.entityType.entityName + "\"");
 			normalizationFunction.entityType.setNormalizationFunction(normalizationFunction);
 			for (EntityType subEntity : normalizationFunction.entityType.getSubEntityTypes()) {
 				subEntity.setNormalizationFunction(normalizationFunction);

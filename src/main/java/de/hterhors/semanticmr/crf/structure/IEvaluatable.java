@@ -1,11 +1,14 @@
 package de.hterhors.semanticmr.crf.structure;
 
+import java.text.DecimalFormat;
+
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 
 public interface IEvaluatable {
 
 	public static class Score {
+		public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.000");
 
 		final public static Score ZERO = new Score().unmod();
 
@@ -55,7 +58,8 @@ public interface IEvaluatable {
 
 		@Override
 		public String toString() {
-			return "Score [getF1()=" + getF1() + ", getPrecision()=" + getPrecision() + ", getRecall()=" + getRecall()
+			return "Score [getF1()=" + SCORE_FORMAT.format(getF1()) + ", getPrecision()="
+					+ SCORE_FORMAT.format(getPrecision()) + ", getRecall()=" + SCORE_FORMAT.format(getRecall())
 					+ ", tp=" + tp + ", fp=" + fp + ", fn=" + fn + ", tn=" + tn + "]";
 		}
 

@@ -1,11 +1,14 @@
 package de.hterhors.semanticmr.crf;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import de.hterhors.semanticmr.corpus.log.LogUtils;
 import de.hterhors.semanticmr.crf.exploration.IExplorationStrategy;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
@@ -14,11 +17,14 @@ import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 
 public class SemanticParsingCRF {
+
+	private static Logger log = LogManager.getFormatterLogger(SemanticParsingCRF.class);
 
 	private static class CRFStatistics {
 		private final String context;
@@ -47,6 +53,9 @@ public class SemanticParsingCRF {
 	 */
 	final static public int MAX_SAMPLING = 100;
 
+	private static final String TEST_CONTEXT = "Test";
+	private static final String TRAIN_CONTEXT = "Train";
+
 	final IExplorationStrategy explorer;
 
 	final Model model;
@@ -61,8 +70,8 @@ public class SemanticParsingCRF {
 
 	private CRFStatistics testStatistics;
 
-	public SemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler, IStateInitializer initializer,
-			IObjectiveFunction objectiveFunction) {
+	public SemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
+			IStateInitializer initializer, IObjectiveFunction objectiveFunction) {
 		this.model = model;
 		this.explorer = explorer;
 		this.objectiveFunction = objectiveFunction;
@@ -74,33 +83,32 @@ public class SemanticParsingCRF {
 
 	public Map<Instance, State> train(final AdvancedLearner learner, final List<Instance> trainingInstances,
 			final int numberOfEpochs, final IStoppingCriterion... stoppingCriterion) {
+
+		log.info("Start training procedure...");
+
 		this.trainingStatistics.startTrainingTime = System.currentTimeMillis();
 
 		final Map<Instance, State> finalStates = new LinkedHashMap<>();
 
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
 
-			System.out.print("Epoch: " + epoch + "... ");
+			log.info("############");
+			log.info("# Epoch: " + epoch + " #");
+			log.info("############");
 
 			final boolean sampleBasedOnObjectiveFunction = sampler.sampleBasedOnObjectiveScore(epoch);
 
-			for (Instance instance : trainingInstances) {
-				System.out.print(".");
-//				System.out.println(instance.getName());
-//				System.out.println(instance.getGoldAnnotations().getAnnotations().get(0).toPrettyString());
-//				System.out.println();
+			int instanceIndex = 0;
 
+			for (Instance instance : trainingInstances) {
 				final List<State> producedStateChain = new ArrayList<>();
 
 				State currentState = initializer.getInitState(instance);
 				objectiveFunction.score(currentState);
 				finalStates.put(instance, currentState);
 				producedStateChain.add(currentState);
-
-				for (int samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
-//					System.out.println();
-//					System.out.println(currentState.getCurrentPredictions().getAnnotations().get(0).toPrettyString());
-//					System.out.println();
+				int samplingStep;
+				for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
 
 					final List<State> proposalStates = explorer.explore(currentState);
 
@@ -109,20 +117,12 @@ public class SemanticParsingCRF {
 
 					if (sampleBasedOnObjectiveFunction) {
 						objectiveFunction.score(proposalStates);
-//						System.out.println("#############################################");
-//						for (State state : proposalStates) {
-//							System.out.println(state.getObjectiveScore() + ":"
-//									+ state.getCurrentPredictions().getAnnotations().get(0).toPrettyString());
-//						}
-//						System.out.println("#############################################");
 					} else {
 						model.score(proposalStates);
 					}
 
 					final State candidateState = sampler.sampleCandidate(proposalStates);
 
-//					System.out.println(candidateState.getCurrentPredictions().getAnnotations().get(0).toPrettyString());
-//					System.out.println();
 					scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
 
 					boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState, currentState);
@@ -140,8 +140,11 @@ public class SemanticParsingCRF {
 						break;
 
 				}
+				LogUtils.logState(log,
+						TRAIN_CONTEXT + " [" + ++instanceIndex + "/" + trainingInstances.size() + "]" + "["
+								+ (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + (samplingStep + 1) + "]",
+						instance, currentState);
 			}
-			System.out.println();
 		}
 		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 		return finalStates;
@@ -166,12 +169,12 @@ public class SemanticParsingCRF {
 		}
 	}
 
-	public void printTrainingStatistics(final PrintStream ps) {
-		ps.println(this.trainingStatistics);
+	public CRFStatistics getTrainingStatistics() {
+		return this.trainingStatistics;
 	}
 
-	public void printTestStatistics(final PrintStream ps) {
-		ps.println(this.testStatistics);
+	public CRFStatistics getTestStatistics() {
+		return this.testStatistics;
 	}
 
 	public Map<Instance, State> test(List<Instance> testInstances, IStoppingCriterion... stoppingCriterion) {
@@ -179,10 +182,8 @@ public class SemanticParsingCRF {
 
 		final Map<Instance, State> finalStates = new LinkedHashMap<>();
 
+		int instanceIndex = 0;
 		for (Instance instance : testInstances) {
-//				System.out.println(instance.getName());
-//				System.out.println(instance.getGoldAnnotations().getAnnotations().get(0).toPrettyString());
-//				System.out.println();
 
 			final List<State> producedStateChain = new ArrayList<>();
 
@@ -190,11 +191,8 @@ public class SemanticParsingCRF {
 			objectiveFunction.score(currentState);
 			finalStates.put(instance, currentState);
 			producedStateChain.add(currentState);
-
-			for (int samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
-//					System.out.println();
-//					System.out.println(currentState.getCurrentPredictions().getAnnotations().get(0).toPrettyString());
-//					System.out.println();
+			int samplingStep;
+			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
 
 				final List<State> proposalStates = explorer.explore(currentState);
 
@@ -220,8 +218,12 @@ public class SemanticParsingCRF {
 					break;
 
 			}
+			LogUtils.logState(log,
+					TEST_CONTEXT + "[" + ++instanceIndex + "/" + testInstances.size() + "] [" + samplingStep + "]",
+					instance, currentState);
 		}
 		this.testStatistics.endTrainingTime = System.currentTimeMillis();
 		return finalStates;
 	}
+
 }

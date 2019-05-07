@@ -3,6 +3,9 @@ package de.hterhors.semanticmr.eval;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
@@ -11,11 +14,12 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 
 public abstract class AbstractEvaluator {
+	protected static Logger log = LogManager.getFormatterLogger(AbstractEvaluator.class);
 
-	final public EEvaluationDetail evaluationMode;
+	final public EEvaluationDetail evaluationDetail;
 
-	public AbstractEvaluator(EEvaluationDetail evaluationMode) {
-		this.evaluationMode = evaluationMode;
+	public AbstractEvaluator(EEvaluationDetail evaluationDetail) {
+		this.evaluationDetail = evaluationDetail;
 	}
 
 	protected Score[][] computeScores(final Collection<AbstractAnnotation> slotFiller,

@@ -52,7 +52,7 @@ public class RegexNerl {
 		}
 
 		JsonNerlaIO io = new JsonNerlaIO(true);
-		String jsonFile = io.writeInstances(wrapper);
+		String jsonFile = io.toJsonString(wrapper);
 
 		PrintStream ps = new PrintStream(new File("src/main/resources/examples/olp2/de/nerla/nerla.json"));
 		ps.println(jsonFile);

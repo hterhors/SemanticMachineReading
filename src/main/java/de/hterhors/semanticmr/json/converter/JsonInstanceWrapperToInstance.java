@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
@@ -35,6 +38,7 @@ import de.hterhors.semanticmr.json.wrapper.JsonSlotTypeWrapper;
 import de.hterhors.semanticmr.json.wrapper.JsonTextualContentWrapper;
 
 public class JsonInstanceWrapperToInstance {
+	private static Logger log = LogManager.getFormatterLogger(JsonInstanceWrapperToInstance.class);
 
 	private List<JsonInstanceWrapper> jsonInstances;
 
@@ -81,7 +85,8 @@ public class JsonInstanceWrapperToInstance {
 				try {
 					annotations.add(toDocumentLinkedAnnotation(document, wrapper));
 				} catch (Exception e) {
-					System.out.println("Can not map annotation to document: " + e.getMessage());
+					log.warn("Can not map annotation to document: " + e.getMessage());
+					log.warn("Discard annotation: " + wrapper);
 				}
 			}
 		if (literalAnnotations != null)
@@ -159,7 +164,8 @@ public class JsonInstanceWrapperToInstance {
 			try {
 				return toDocumentLinkedAnnotation(document, wrapper.getDocLinkedAnnotation());
 			} catch (Exception e) {
-				System.out.println("Can not map annotation to document: " + e.getMessage());
+				log.warn("Can not map annotation to document: " + e.getMessage());
+				log.warn("Discard annotation: " + wrapper);
 			}
 		} else if (wrapper.getEntityTypeAnnotation() != null) {
 			return toEntityTypeAnnotation(wrapper.getEntityTypeAnnotation());
@@ -174,7 +180,8 @@ public class JsonInstanceWrapperToInstance {
 			try {
 				return toDocumentLinkedAnnotation(document, wrapper.getDocLinkedAnnotation());
 			} catch (Exception e) {
-				System.out.println("Can not map annotation to document: " + e.getMessage());
+				log.warn("Can not map annotation to document: " + e.getMessage());
+				log.warn("Discard annotation: " + wrapper);
 			}
 		} else if (wrapper.getEntityTemplateAnnotation() != null) {
 			return toEntityTemplate(document, wrapper.getEntityTemplateAnnotation());

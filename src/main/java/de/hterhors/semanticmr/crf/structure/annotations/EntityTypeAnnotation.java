@@ -95,7 +95,7 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 		if (otherVal == null) {
 			return Score.FN;
 		} else {
-			switch (evaluator.evaluationMode) {
+			switch (evaluator.evaluationDetail) {
 			case DOCUMENT_LINKED:
 			case LITERAL:
 				if (equals(otherVal))
@@ -118,7 +118,7 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 				return Score.FN_FP;
 			}
 		}
-		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationMode);
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationDetail);
 
 	}
 

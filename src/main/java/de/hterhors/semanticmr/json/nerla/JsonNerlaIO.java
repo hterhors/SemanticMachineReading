@@ -32,11 +32,11 @@ public class JsonNerlaIO {
 
 	}
 
-	public List<JsonEntityAnnotationWrapper> readInstances(String json) {
+	public List<JsonEntityAnnotationWrapper> fromJsonString(String json) {
 		return gson.fromJson(json, type);
 	}
 
-	public String writeInstances(List<JsonEntityAnnotationWrapper> instances) {
+	public String toJsonString(List<JsonEntityAnnotationWrapper> instances) {
 		return gson.toJson(instances, type);
 	}
 }

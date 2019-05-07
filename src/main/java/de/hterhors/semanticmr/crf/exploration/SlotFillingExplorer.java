@@ -3,6 +3,9 @@ package de.hterhors.semanticmr.crf.exploration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection;
 import de.hterhors.semanticmr.candprov.sf.IEntityTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.candprov.sf.ISlotTypeAnnotationCandidateProvider;
@@ -18,6 +21,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  *
  */
 public class SlotFillingExplorer implements IExplorationStrategy {
+	private static Logger log = LogManager.getFormatterLogger(SlotFillingExplorer.class);
 
 	final private AnnotationCandidateRetrievalCollection candidateProvider;
 
@@ -81,7 +85,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 		}
 
 		if (proposalStates.isEmpty()) {
-			System.out.println("WARN no states generated for instance: " + currentState.getInstance().getDocument());
+			log.warn("No states were generated for instance: " + currentState.getInstance().getName());
 		}
 
 		updateAverage(proposalStates);

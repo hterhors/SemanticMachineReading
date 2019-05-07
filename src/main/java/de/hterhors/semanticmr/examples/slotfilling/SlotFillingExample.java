@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
@@ -35,11 +39,8 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.eval.AbstractEvaluator;
-import de.hterhors.semanticmr.eval.BeamSearchEvaluator;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
-import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
 import de.hterhors.semanticmr.examples.slotfilling.specs.SFSpecs;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
@@ -64,6 +65,8 @@ public class SlotFillingExample extends AbstractSemReadProject {
 	public static void main(String[] args) {
 		new SlotFillingExample();
 	}
+
+	private static Logger log = LogManager.getFormatterLogger(SlotFillingExample.class);
 
 	/**
 	 * File of additional hard constraints during exploration. There are different
@@ -102,7 +105,8 @@ public class SlotFillingExample extends AbstractSemReadProject {
 				 */
 				.addScopeSpecification(SFSpecs.systemsScopeReader)
 				/**
-				 * We apply the scope(s).
+				 * We apply the scope, so that we can add normalization functions for various
+				 * literal entity types, if necessary.
 				 */
 				.apply()
 				/**
@@ -331,7 +335,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * NOTE: Make sure that the base model directory exists!
 		 */
 		final File modelBaseDir = new File("models/slotfill/test1/");
-		final String modelName = "SlotFillingModel1234";
+		final String modelName = "SlotFillingModel1234" + new Random().nextInt(1000000);
 
 		Model model;
 
@@ -355,7 +359,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		/**
 		 * If the model was loaded from the file system, we do not need to train it.
 		 */
-		if (!model.wasLoaded()) {
+		if (!model.isTrained()) {
 			/**
 			 * Train the CRF.
 			 */
@@ -386,10 +390,10 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		/**
 		 * Finally, we evaluate the produced states and print some statistics.
 		 */
-		EvaluationResultPrinter.evaluate(testResults);
+		evaluate(log, testResults);
 
-		crf.printTrainingStatistics(System.out);
-		crf.printTestStatistics(System.out);
+		log.info(crf.getTrainingStatistics());
+		log.info(crf.getTestStatistics());
 
 		/**
 		 * TODO: Compare results with results when changing some parameter. Implement

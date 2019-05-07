@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
@@ -20,6 +23,7 @@ import de.hterhors.semanticmr.json.nerla.wrapper.JsonEntityAnnotationWrapper;
 import de.hterhors.semanticmr.nerla.INerlaProvider;
 
 public class JsonNerlaProvider implements INerlaProvider {
+	private static Logger log = LogManager.getFormatterLogger(JsonNerlaProvider.class);
 
 	private final File nerlaFile;
 
@@ -31,9 +35,10 @@ public class JsonNerlaProvider implements INerlaProvider {
 
 	@Override
 	public Map<Instance, List<DocumentLinkedAnnotation>> getForInstances(List<Instance> instances) throws IOException {
+		log.info("Read named entity recognition and linking annotations...");
 
 		final List<JsonEntityAnnotationWrapper> jsonNerla = new JsonNerlaIO(true)
-				.readInstances(new String(Files.readAllBytes(nerlaFile.toPath())));
+				.fromJsonString(new String(Files.readAllBytes(nerlaFile.toPath())));
 
 		final Map<String, Instance> map = new HashMap<>();
 
@@ -43,18 +48,12 @@ public class JsonNerlaProvider implements INerlaProvider {
 
 		final Map<Instance, List<DocumentLinkedAnnotation>> nerla = new HashMap<>();
 
-		System.out.println("#######################LOAD NERLA#######################");
-		System.out.print("Read nerla");
 		int count = 0;
-
 		List<String> exceptions = new ArrayList<>();
 
 		for (JsonEntityAnnotationWrapper jsonEntityAnnotationWrapper : jsonNerla) {
-			count++;
-			if (count % 500 == 0)
-				System.out.print(".");
-			if (count % 5000 == 0)
-				System.out.print(" - " + count + " - ");
+			if (count++ % 5000 == 0)
+				log.debug(" - " + count + " - ");
 
 			Instance instance = map.get(jsonEntityAnnotationWrapper.getDocumentID());
 
@@ -70,15 +69,13 @@ public class JsonNerlaProvider implements INerlaProvider {
 				exceptions.add(e.getMessage());
 			}
 		}
-		System.out.println("... done");
 		if (!exceptions.isEmpty()) {
-			System.out.println("WARN: Could not load all annotations. " + exceptions.size()
-					+ " exceptions were thrown during loading: ");
-			exceptions.stream().limit(10).forEach(System.out::println);
-			System.out.println("...");
+			log.warn("Could not load all annotations. " + exceptions.size() + " exceptions were thrown:");
+			exceptions.stream().limit(10).forEach(log::warn);
+			log.warn("...");
 		}
-		System.out.println("Total number of nerla loaded: " + (count - exceptions.size()) + " / " + count);
-		System.out.println("########################################################");
+		log.info("Read annotations... done");
+		log.info("Total number of annotations loaded: " + (count - exceptions.size()) + " / " + count);
 		return nerla;
 	}
 
@@ -93,7 +90,7 @@ public class JsonNerlaProvider implements INerlaProvider {
 			throw new IllegalArgumentException("File does not exist: " + nerlaFile.getAbsolutePath());
 
 		if (!nerlaFile.getName().endsWith(".json"))
-			System.out.println("Warn! Unexpected file format: " + nerlaFile.getName());
+			log.warn("Unexpected file format: " + nerlaFile.getName());
 
 	}
 

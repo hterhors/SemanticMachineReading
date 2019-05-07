@@ -8,11 +8,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
+import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.JsonInstancesReader;
 
 /**
@@ -29,6 +33,7 @@ import de.hterhors.semanticmr.json.JsonInstancesReader;
  *
  */
 public class InstanceProvider {
+	private static Logger log = LogManager.getFormatterLogger(InstanceProvider.class);
 
 	public static boolean removeEmptyInstances = false;
 	public static boolean removeInstancesWithToManyAnnotations = false;
@@ -55,12 +60,12 @@ public class InstanceProvider {
 	 */
 	public void redistribute(final IInstanceDistributor distributor) {
 		this.distributor = distributor;
+		log.info("Redistribute instances based on: " + distributor.getDistributorID() + "...");
 		this.distributor.distributeInstances(this).distributeTrainingInstances(redistTrainInstances)
 				.distributeDevelopmentInstances(redistDevInstances).distributeTestInstances(redistTestInstances);
-		System.out.println("Number of trainings instances: " + redistTrainInstances.size());
-		System.out.println("Number of develop instances: " + redistDevInstances.size());
-		System.out.println("Number of test instances: " + redistTestInstances.size());
-
+		log.info("Number of trainings instances: " + redistTrainInstances.size());
+		log.info("Number of develop instances: " + redistDevInstances.size());
+		log.info("Number of test instances: " + redistTestInstances.size());
 	}
 
 	/**
@@ -107,26 +112,28 @@ public class InstanceProvider {
 
 			this.instances = new JsonInstancesReader(jsonInstancesDirectory).readInstances(numToRead);
 
+			log.info("Total number of instances loaded: " + getInstances().size());
+
 			for (Iterator<Instance> iterator = instances.iterator(); iterator.hasNext();) {
 				Instance instance = iterator.next();
 				if (instance.getGoldAnnotations().getAnnotations().isEmpty()) {
-					System.out.println("WARN: Instance " + instance.getName() + " has no annotations!");
+					log.warn("Instance " + instance.getName() + " has no annotations!");
 					if (removeEmptyInstances) {
 						iterator.remove();
-						System.out.println("WARN: Remove instance!");
+						log.warn("Remove instance!");
 					} else {
-						System.out.println("WARN: Ignore!");
+						log.warn("Ignore!");
 					}
 				}
 
 				if (instance.getGoldAnnotations().getAnnotations()
 						.size() >= CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE) {
-					System.out.println("WARN: Instance " + instance.getName() + " has to many annotations!");
+					log.warn("WARN: Instance " + instance.getName() + " has to many annotations!");
 					if (removeInstancesWithToManyAnnotations) {
 						iterator.remove();
-						System.out.println("WARN: Remove instance!");
+						log.warn("Remove instance!");
 					} else {
-						System.out.println("WARN: Ignore!");
+						log.warn("Ignore!");
 					}
 				}
 
@@ -146,7 +153,7 @@ public class InstanceProvider {
 			throw new IllegalArgumentException("File does not exist: " + jsonInstancesDirectory.getAbsolutePath());
 
 		if (!jsonInstancesDirectory.isDirectory())
-			System.out.println("Warn! Expect a directory: " + jsonInstancesDirectory.getName());
+			log.warn("Expect a directory: " + jsonInstancesDirectory.getName());
 
 	}
 

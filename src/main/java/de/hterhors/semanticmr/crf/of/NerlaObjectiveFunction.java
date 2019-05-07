@@ -8,25 +8,19 @@ import de.hterhors.semanticmr.eval.NerlaEvaluator;
 
 public class NerlaObjectiveFunction implements IObjectiveFunction {
 
-	final private EEvaluationDetail evaluationMode;
-
-	final private NerlaEvaluator evaluator = new NerlaEvaluator();
+	final private NerlaEvaluator evaluator;
 
 	public NerlaObjectiveFunction(EEvaluationDetail evaluationDetail) {
-		this.evaluationMode = evaluationDetail;
+		this.evaluator = new NerlaEvaluator(evaluationDetail);
 	}
 
 	public NerlaObjectiveFunction() {
-		this.evaluationMode = EEvaluationDetail.DOCUMENT_LINKED;
+		this(EEvaluationDetail.DOCUMENT_LINKED);
 	}
 
 	@Override
 	public void score(State state) {
-
-		/**
-		 * Implement details.
-		 */
-		state.setObjectiveScore(state.score(evaluator, evaluationMode).getF1());
+		state.setObjectiveScore(state.score(evaluator).getF1());
 	}
 
 	@Override

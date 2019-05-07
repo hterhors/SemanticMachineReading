@@ -9,11 +9,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import de.hterhors.semanticmr.examples.slotfilling.SlotFillingExample;
 import de.hterhors.semanticmr.exce.InvalidSpecificationFileFormatException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
 import de.hterhors.semanticmr.init.specifications.Specifications;
 
 public class CSVScopeReader implements ISpecificationsReader {
+	private static Logger log = LogManager.getFormatterLogger(CSVScopeReader.class);
 
 	private final File entitiesFile;
 	private final File hierarchiesFile;

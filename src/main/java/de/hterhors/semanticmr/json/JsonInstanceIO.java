@@ -4,10 +4,13 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import org.apache.jena.ext.com.google.common.reflect.TypeToken;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.wrapper.JsonInstanceWrapper;
 
 public class JsonInstanceIO {

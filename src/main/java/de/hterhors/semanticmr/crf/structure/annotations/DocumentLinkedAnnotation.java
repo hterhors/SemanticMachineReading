@@ -119,7 +119,7 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 		if (otherVal == null) {
 			return Score.FN;
 		} else {
-			switch (evaluator.evaluationMode) {
+			switch (evaluator.evaluationDetail) {
 			case DOCUMENT_LINKED:
 				if (equals(otherVal)) {
 					return Score.TP;
@@ -131,7 +131,7 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 				return super.evaluate(evaluator, otherVal);
 			}
 		}
-		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationMode);
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationDetail);
 	}
 
 }

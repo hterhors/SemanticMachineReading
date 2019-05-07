@@ -1,10 +1,12 @@
 package de.hterhors.semanticmr.projects.olp2.extraction;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
@@ -21,8 +23,8 @@ import de.hterhors.semanticmr.crf.of.SlotFillingObjectiveFunction;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
-import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -36,21 +38,19 @@ import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.BeamSearchEvaluator;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
-import de.hterhors.semanticmr.eval.EvaluationResultPrinter;
-import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
+import de.hterhors.semanticmr.examples.slotfilling.SlotFillingExample;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.nerla.NerlaCollector;
+import de.hterhors.semanticmr.projects.AbstractSemReadProject;
 import de.hterhors.semanticmr.projects.olp2.corpus.preprocessing.StartPreprocessing;
 import de.hterhors.semanticmr.projects.psink.normalization.WeightNormalization;
 
-public class Olp2ExtractionMain {
+public class Olp2ExtractionMain extends AbstractSemReadProject {
 
-	public static void main(String[] args) throws IOException, DocumentLinkedAnnotationMismatchException {
-
-		SystemScope systemScope = SystemScope.Builder.getSpecsHandler()
-				.addScopeSpecification(StartPreprocessing.de_specificationProvider).apply()
-				.registerNormalizationFunction(new WeightNormalization()).build();
+	public Olp2ExtractionMain() {
+		super(SystemScope.Builder.getSpecsHandler().addScopeSpecification(StartPreprocessing.de_specificationProvider)
+				.apply().registerNormalizationFunction(new WeightNormalization()).build());
 
 		CartesianEvaluator cartesian = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
 		BeamSearchEvaluator beam = new BeamSearchEvaluator(EEvaluationDetail.ENTITY_TYPE, 2);
@@ -109,7 +109,7 @@ public class Olp2ExtractionMain {
 
 		SemanticParsingCRF crf = new SemanticParsingCRF(model, explorer, sampler, stateInitializer, objectiveFunction);
 
-		if (!model.wasLoaded()) {
+		if (!model.isTrained()) {
 			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,
 					noModelChangeCrit);
 			model.save(modelDir, modelName, true);
@@ -118,10 +118,17 @@ public class Olp2ExtractionMain {
 		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
 				noModelChangeCrit);
 
-		EvaluationResultPrinter.evaluate(testResults);
+		evaluate(log, testResults);
 
-		crf.printTrainingStatistics(System.out);
-		crf.printTestStatistics(System.out);
+		log.info(crf.getTrainingStatistics());
+		log.info(crf.getTestStatistics());
+	}
+
+	private static Logger log = LogManager.getFormatterLogger(SlotFillingExample.class);
+
+	public static void main(String[] args) {
+		new Olp2ExtractionMain();
+
 	}
 
 }

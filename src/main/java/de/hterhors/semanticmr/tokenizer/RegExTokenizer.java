@@ -5,14 +5,23 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.hterhors.semanticmr.tokenizer.Tokenization.Token;
 
 public class RegExTokenizer {
+	private static Logger log = LogManager.getFormatterLogger(RegExTokenizer.class);
 
 //	private static Pattern pattern = Pattern.compile("[\\S]+");
 	private static Pattern pattern = Pattern.compile("[a-zA-Z]+|\\d+|[^\\w\\s]");
 
+	static {
+		log.debug("Tokenization pattern = \"[a-zA-Z]+|\\d+|[^\\w\\s]\"");
+	}
+
 	public static List<Tokenization> tokenize(List<String> sentences) {
+		log.debug("Tokenize number of sentences: " + sentences.size());
 		List<Tokenization> tokenizations = new ArrayList<>();
 		int accumulatedSentenceLength = 0;
 		int sentenceIndex = 0;
