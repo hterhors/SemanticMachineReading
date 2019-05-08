@@ -20,7 +20,7 @@ import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 import de.hterhors.semanticmr.projects.olp2.corpus.preprocessing.CrossRefReader.CrossRef;
 import de.hterhors.semanticmr.projects.psink.normalization.WeightNormalization;
-import de.hterhors.semanticmr.tokenizer.StandardDocumentTokenizer;
+import de.hterhors.semanticmr.tokenizer.DefaultDocumentTokenizer;
 
 public class StartPreprocessing {
 
@@ -122,7 +122,7 @@ public class StartPreprocessing {
 			annotations.add(et);
 		}
 		return new Instance(EInstanceContext.UNSPECIFIED,
-				new Document(structureID, StandardDocumentTokenizer.tokenizeDocumentsContent(docContent)),
+				new Document(structureID, DefaultDocumentTokenizer.tokenizeDocumentsContent(docContent)),
 				new Annotations(annotations));
 	}
 

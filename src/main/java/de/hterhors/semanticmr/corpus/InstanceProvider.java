@@ -16,7 +16,6 @@ import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
-import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.JsonInstancesReader;
 
 /**
