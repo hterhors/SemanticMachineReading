@@ -12,7 +12,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.crf.templates.et.ContextBetweenSlotFillerTemplate.InBetweenContextScope;
+import de.hterhors.semanticmr.crf.templates.et.ContextBetweenSlotFillerTemplate.ContextBetweenScope;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
@@ -29,7 +29,7 @@ import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
  *
  * @date Jan 15, 2018
  */
-public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<InBetweenContextScope> {
+public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<ContextBetweenScope> {
 
 	private static final String LEFT = "<";
 
@@ -66,7 +66,7 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<In
 
 	}
 
-	class InBetweenContextScope extends AbstractFactorScope<InBetweenContextScope> {
+	class ContextBetweenScope extends AbstractFactorScope<ContextBetweenScope> {
 
 		public final Instance instance;
 		public final EntityType fromEntity;
@@ -74,7 +74,7 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<In
 		public final EntityType toEntity;
 		public final Integer toEntityCharacterOnset;
 
-		public InBetweenContextScope(AbstractFeatureTemplate<InBetweenContextScope> template, Instance instance,
+		public ContextBetweenScope(AbstractFeatureTemplate<ContextBetweenScope> template, Instance instance,
 				EntityType fromEntity, Integer fromEntityCharacterOnset, EntityType toEntity,
 				Integer toEntityCharacterOnset) {
 			super(template);
@@ -106,7 +106,7 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<In
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			InBetweenContextScope other = (InBetweenContextScope) obj;
+			ContextBetweenScope other = (ContextBetweenScope) obj;
 			if (!getOuterType().equals(other.getOuterType()))
 				return false;
 			if (fromEntity == null) {
@@ -154,9 +154,9 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<In
 	}
 
 	@Override
-	public List<InBetweenContextScope> generateFactorScopes(State state) {
+	public List<ContextBetweenScope> generateFactorScopes(State state) {
 
-		final List<InBetweenContextScope> factors = new ArrayList<>();
+		final List<ContextBetweenScope> factors = new ArrayList<>();
 
 		for (EntityTemplate annotation : super.<EntityTemplate>getPredictedAnnotations(state)) {
 
@@ -167,10 +167,10 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<In
 					.flatMap(s -> s.stream()).collect(Collectors.toList());
 
 			for (int i = 0; i < slotFillers.size(); i++) {
-				AbstractAnnotation fromSlotFiller = slotFillers.get(i);
+				final AbstractAnnotation fromSlotFiller = slotFillers.get(i);
 
 				for (int j = i + 1; j < slotFillers.size(); j++) {
-					AbstractAnnotation toSlotFiller = slotFillers.get(j);
+					final AbstractAnnotation toSlotFiller = slotFillers.get(j);
 
 					final Integer fromOffset = fromSlotFiller.asInstanceOfDocumentLinkedAnnotation()
 							.getStartDocCharOffset();
@@ -178,10 +178,10 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<In
 							.getStartDocCharOffset();
 
 					if (fromOffset.intValue() > toOffset.intValue()) {
-						factors.add(new InBetweenContextScope(this, state.getInstance(), toSlotFiller.getEntityType(),
+						factors.add(new ContextBetweenScope(this, state.getInstance(), toSlotFiller.getEntityType(),
 								toOffset, fromSlotFiller.getEntityType(), fromOffset));
 					} else if (fromOffset.intValue() < toOffset.intValue()) {
-						factors.add(new InBetweenContextScope(this, state.getInstance(), fromSlotFiller.getEntityType(),
+						factors.add(new ContextBetweenScope(this, state.getInstance(), fromSlotFiller.getEntityType(),
 								fromOffset, toSlotFiller.getEntityType(), toOffset));
 					}
 
@@ -194,7 +194,7 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<In
 	}
 
 	@Override
-	public void generateFeatureVector(Factor<InBetweenContextScope> factor) {
+	public void generateFeatureVector(Factor<ContextBetweenScope> factor) {
 		try {
 
 			DoubleVector featureVector = factor.getFeatureVector();

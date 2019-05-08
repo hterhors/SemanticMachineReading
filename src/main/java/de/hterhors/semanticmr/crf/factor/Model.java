@@ -243,8 +243,10 @@ public class Model {
 
 		try {
 
-			if (!modelBaseDir.exists())
-				throw new IllegalArgumentException("Model base directory does not exist: " + modelBaseDir);
+			final File modelDir = getModelDir(modelBaseDir, modelName);
+
+			if (!modelDir.exists())
+				modelDir.mkdirs();
 
 			if (!modelBaseDir.isDirectory())
 				throw new IllegalArgumentException("Model base directory is not a directory: " + modelBaseDir);
@@ -257,11 +259,6 @@ public class Model {
 			} else if (overrideOnExistence && modelExists) {
 				log.warn("Model already exists override model!");
 			}
-
-			final File modelDir = getModelDir(modelBaseDir, modelName);
-
-			if (!modelDir.exists())
-				modelDir.mkdirs();
 
 			File modelFile = getAbsoluteModelFile(modelBaseDir, modelName);
 

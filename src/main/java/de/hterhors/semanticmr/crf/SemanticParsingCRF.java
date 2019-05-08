@@ -141,8 +141,8 @@ public class SemanticParsingCRF {
 
 				}
 				LogUtils.logState(log,
-						TRAIN_CONTEXT + " [" + ++instanceIndex + "/" + trainingInstances.size() + "]" + "["
-								+ (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + (samplingStep + 1) + "]",
+						TRAIN_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + ++instanceIndex + "/"
+								+ trainingInstances.size() + "]" + "[" + (samplingStep + 1) + "]",
 						instance, currentState);
 			}
 		}
