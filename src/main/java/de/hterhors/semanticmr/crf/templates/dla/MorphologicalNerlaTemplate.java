@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.templates.nerla;
+package de.hterhors.semanticmr.crf.templates.dla;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ import de.hterhors.semanticmr.crf.factor.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.crf.templates.nerla.MorphologicalNerlaTemplate.MorphologicalNerlaScope;
+import de.hterhors.semanticmr.crf.templates.dla.MorphologicalNerlaTemplate.MorphologicalNerlaScope;
 import de.hterhors.semanticmr.crf.variables.State;
 
 /**
@@ -16,17 +16,14 @@ import de.hterhors.semanticmr.crf.variables.State;
  *
  * @date Nov 15, 2017
  */
-public class MorphologicalNerlaTemplate
-		extends AbstractFeatureTemplate<MorphologicalNerlaScope, DocumentLinkedAnnotation> {
+public class MorphologicalNerlaTemplate extends AbstractFeatureTemplate<MorphologicalNerlaScope> {
 
-	static class MorphologicalNerlaScope
-			extends AbstractFactorScope<MorphologicalNerlaScope, DocumentLinkedAnnotation> {
+	static class MorphologicalNerlaScope extends AbstractFactorScope<MorphologicalNerlaScope> {
 
 		final public EntityType type;
 		final public String surfaceForm;
 
-		public MorphologicalNerlaScope(
-				AbstractFeatureTemplate<MorphologicalNerlaScope, DocumentLinkedAnnotation> template, EntityType type,
+		public MorphologicalNerlaScope(AbstractFeatureTemplate<MorphologicalNerlaScope> template, EntityType type,
 				String surfaceForm) {
 			super(template);
 			this.type = type;
@@ -80,7 +77,7 @@ public class MorphologicalNerlaTemplate
 	public List<MorphologicalNerlaScope> generateFactorScopes(State state) {
 		List<MorphologicalNerlaScope> factors = new ArrayList<>();
 
-		for (DocumentLinkedAnnotation annotation : getPredictedAnnotations(state)) {
+		for (DocumentLinkedAnnotation annotation : super.<DocumentLinkedAnnotation>getPredictedAnnotations(state)) {
 
 			String surfaceForm = annotation.getSurfaceForm();
 			EntityType type = annotation.getEntityType();

@@ -28,9 +28,9 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.crf.templates.slotfilling.InBetweenContextTemplate;
-import de.hterhors.semanticmr.crf.templates.slotfilling.IntraTokenTemplate;
-import de.hterhors.semanticmr.crf.templates.slotfilling.TokenContextTemplate;
+import de.hterhors.semanticmr.crf.templates.et.ContextBetweenSlotFillerTemplate;
+import de.hterhors.semanticmr.crf.templates.shared.IntraTokenTemplate;
+import de.hterhors.semanticmr.crf.templates.shared.TokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -75,11 +75,11 @@ public class Olp2ExtractionMain extends AbstractSemReadProject {
 
 		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
 
-		List<AbstractFeatureTemplate<?, ?>> featureTemplates = new ArrayList<>();
+		List<AbstractFeatureTemplate<?>> featureTemplates = new ArrayList<>();
 
 		featureTemplates.add(new IntraTokenTemplate());
 		featureTemplates.add(new TokenContextTemplate());
-		featureTemplates.add(new InBetweenContextTemplate());
+		featureTemplates.add(new ContextBetweenSlotFillerTemplate());
 
 		IStateInitializer stateInitializer = (instance) -> new State(instance,
 				new Annotations(new EntityTemplate(AnnotationBuilder.toAnnotation("Goal"))));

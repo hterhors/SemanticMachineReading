@@ -14,15 +14,23 @@ public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable 
 
 	public abstract EntityType getEntityType();
 
+	private DocumentLinkedAnnotation asInstanceOfDocumentLinkedAnnotation = null;
+	private LiteralAnnotation asInstanceOfLiteralAnnotation = null;
+	private EntityTypeAnnotation asInstanceOfEntityTypeAnnotation = null;
+	private EntityTemplate asInstanceOfEntityTemplate = null;
+
 	/**
 	 * Returns this annotation as DocumentLinkedAnnotation iff this annotation is
 	 * instanceof DocumentLinkedAnnotation, else null;
 	 * 
 	 * @return this annotation as DocumentLinkedAnnotation or null
 	 */
-	public DocumentLinkedAnnotation asInstanceOfDocumentLinkedAnnotation() {
+	final public DocumentLinkedAnnotation asInstanceOfDocumentLinkedAnnotation() {
+		if (asInstanceOfDocumentLinkedAnnotation != null)
+			return asInstanceOfDocumentLinkedAnnotation;
+
 		if (this instanceof DocumentLinkedAnnotation) {
-			return (DocumentLinkedAnnotation) this;
+			return asInstanceOfDocumentLinkedAnnotation = (DocumentLinkedAnnotation) this;
 		}
 		throw new ClassCastException(
 				"Annotation is not an instance of " + DocumentLinkedAnnotation.class.getSimpleName());
@@ -34,9 +42,12 @@ public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable 
 	 * 
 	 * @return this annotation as LiteralAnnotation or null
 	 */
-	public LiteralAnnotation asInstanceOfLiteralAnnotation() {
+	final public LiteralAnnotation asInstanceOfLiteralAnnotation() {
+		if (asInstanceOfLiteralAnnotation != null)
+			return asInstanceOfLiteralAnnotation;
+
 		if (this instanceof LiteralAnnotation) {
-			return (LiteralAnnotation) this;
+			return asInstanceOfLiteralAnnotation = (LiteralAnnotation) this;
 		}
 		throw new ClassCastException("Annotation is not an instance of " + LiteralAnnotation.class.getSimpleName());
 	}
@@ -47,9 +58,12 @@ public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable 
 	 * 
 	 * @return this annotation as EntityTypeAnnotation or null
 	 */
-	public EntityTypeAnnotation asInstanceOfEntityTypeAnnotation() {
-		if (this instanceof EntityTypeAnnotation) {
-			return (EntityTypeAnnotation) this;
+	final public EntityTypeAnnotation asInstanceOfEntityTypeAnnotation() {
+		if (asInstanceOfEntityTypeAnnotation != null)
+			return asInstanceOfEntityTypeAnnotation;
+
+		if (this instanceof DocumentLinkedAnnotation) {
+			return asInstanceOfEntityTypeAnnotation = (EntityTypeAnnotation) this;
 		}
 		throw new ClassCastException("Annotation is not an instance of " + EntityTypeAnnotation.class.getSimpleName());
 	}
@@ -60,11 +74,31 @@ public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable 
 	 * 
 	 * @return this annotation as EntityTemplate or null
 	 */
-	public EntityTemplate asInstanceOfEntityTemplate() {
+	final public EntityTemplate asInstanceOfEntityTemplate() {
+		if (asInstanceOfEntityTemplate != null)
+			return asInstanceOfEntityTemplate;
+
 		if (this instanceof EntityTemplate) {
-			return (EntityTemplate) this;
+			return asInstanceOfEntityTemplate = (EntityTemplate) this;
 		}
 		throw new ClassCastException("Annotation is not an instance of " + EntityTemplate.class.getSimpleName());
+	}
+
+	final public boolean isInstanceOfDocumentLinkedAnnotation() {
+		return this instanceof DocumentLinkedAnnotation;
+	}
+
+	final public boolean isInstanceOfLiteralAnnotation() {
+		return this instanceof DocumentLinkedAnnotation;
+	}
+
+	final public boolean isInstanceOfEntityTypeAnnotation() {
+		return this instanceof EntityTypeAnnotation;
+	}
+
+	final public boolean isInstanceOfEntityTemplate() {
+		return this instanceof EntityTemplate;
+
 	}
 
 }

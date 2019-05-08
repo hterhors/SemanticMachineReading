@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.templates.slotfilling;
+package de.hterhors.semanticmr.crf.templates.et;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.crf.templates.slotfilling.InBetweenContextTemplate.InBetweenContextScope;
+import de.hterhors.semanticmr.crf.templates.et.ContextBetweenSlotFillerTemplate.InBetweenContextScope;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
@@ -29,7 +29,7 @@ import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
  *
  * @date Jan 15, 2018
  */
-public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenContextScope, EntityTemplate> {
+public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<InBetweenContextScope> {
 
 	private static final String LEFT = "<";
 
@@ -45,7 +45,7 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 
 	private static final int MIN_TOKEN_DIST = 2;
 
-	public InBetweenContextTemplate() {
+	public ContextBetweenSlotFillerTemplate() {
 	}
 
 	static class PositionPairContainer {
@@ -66,7 +66,7 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 
 	}
 
-	class InBetweenContextScope extends AbstractFactorScope<InBetweenContextScope, EntityTemplate> {
+	class InBetweenContextScope extends AbstractFactorScope<InBetweenContextScope> {
 
 		public final Instance instance;
 		public final EntityType fromEntity;
@@ -74,8 +74,8 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 		public final EntityType toEntity;
 		public final Integer toEntityCharacterOnset;
 
-		public InBetweenContextScope(AbstractFeatureTemplate<InBetweenContextScope, EntityTemplate> template,
-				Instance instance, EntityType fromEntity, Integer fromEntityCharacterOnset, EntityType toEntity,
+		public InBetweenContextScope(AbstractFeatureTemplate<InBetweenContextScope> template, Instance instance,
+				EntityType fromEntity, Integer fromEntityCharacterOnset, EntityType toEntity,
 				Integer toEntityCharacterOnset) {
 			super(template);
 			this.instance = instance;
@@ -137,8 +137,8 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 			return true;
 		}
 
-		private InBetweenContextTemplate getOuterType() {
-			return InBetweenContextTemplate.this;
+		private ContextBetweenSlotFillerTemplate getOuterType() {
+			return ContextBetweenSlotFillerTemplate.this;
 		}
 
 		@Override
@@ -158,7 +158,7 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 
 		final List<InBetweenContextScope> factors = new ArrayList<>();
 
-		for (EntityTemplate annotation : getPredictedAnnotations(state)) {
+		for (EntityTemplate annotation : super.<EntityTemplate>getPredictedAnnotations(state)) {
 
 			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
 					.nonEmpty().literalAnnoation().build();
@@ -172,8 +172,10 @@ public class InBetweenContextTemplate extends AbstractFeatureTemplate<InBetweenC
 				for (int j = i + 1; j < slotFillers.size(); j++) {
 					AbstractAnnotation toSlotFiller = slotFillers.get(j);
 
-					final Integer fromOffset = ((DocumentLinkedAnnotation) fromSlotFiller).getStartDocCharOffset();
-					final Integer toOffset = ((DocumentLinkedAnnotation) toSlotFiller).getStartDocCharOffset();
+					final Integer fromOffset = fromSlotFiller.asInstanceOfDocumentLinkedAnnotation()
+							.getStartDocCharOffset();
+					final Integer toOffset = toSlotFiller.asInstanceOfDocumentLinkedAnnotation()
+							.getStartDocCharOffset();
 
 					if (fromOffset.intValue() > toOffset.intValue()) {
 						factors.add(new InBetweenContextScope(this, state.getInstance(), toSlotFiller.getEntityType(),

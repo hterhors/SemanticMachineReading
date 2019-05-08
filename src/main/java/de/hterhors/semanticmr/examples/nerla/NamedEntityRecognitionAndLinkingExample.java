@@ -29,9 +29,9 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.crf.templates.nerla.IntraTokenNerlaTemplate;
-import de.hterhors.semanticmr.crf.templates.nerla.MorphologicalNerlaTemplate;
-import de.hterhors.semanticmr.crf.templates.nerla.NerlaTokenContextTemplate;
+import de.hterhors.semanticmr.crf.templates.dla.MorphologicalNerlaTemplate;
+import de.hterhors.semanticmr.crf.templates.shared.IntraTokenTemplate;
+import de.hterhors.semanticmr.crf.templates.shared.TokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -194,11 +194,11 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * TODO: Implement further templates / features to solve your problem.
 		 * 
 		 */
-		List<AbstractFeatureTemplate<?, ?>> featureTemplates = new ArrayList<>();
+		List<AbstractFeatureTemplate<?>> featureTemplates = new ArrayList<>();
 
 		featureTemplates.add(new MorphologicalNerlaTemplate());
-		featureTemplates.add(new NerlaTokenContextTemplate());
-		featureTemplates.add(new IntraTokenNerlaTemplate());
+		featureTemplates.add(new TokenContextTemplate());
+		featureTemplates.add(new IntraTokenTemplate());
 
 		/**
 		 * During exploration we initialize each state with no annotations. In NERLA

@@ -26,7 +26,7 @@ public class State {
 		return currentPredictions;
 	}
 
-	final private Map<AbstractFeatureTemplate<?, ?>, FactorGraph> factorGraphs;
+	final private Map<AbstractFeatureTemplate<?>, FactorGraph> factorGraphs;
 
 	private double modelScore;
 
@@ -62,7 +62,7 @@ public class State {
 		return new State(this.instance, currentPredictions.deepRemoveCopy(annotationIndex));
 	}
 
-	public FactorGraph getFactorGraph(final AbstractFeatureTemplate<?, ?> template) {
+	public FactorGraph getFactorGraph(final AbstractFeatureTemplate<?> template) {
 		FactorGraph fg;
 		if ((fg = factorGraphs.get(template)) == null) {
 			fg = new FactorGraph();

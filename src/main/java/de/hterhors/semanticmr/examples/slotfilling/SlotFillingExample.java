@@ -32,9 +32,9 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.crf.templates.slotfilling.InBetweenContextTemplate;
-import de.hterhors.semanticmr.crf.templates.slotfilling.IntraTokenTemplate;
-import de.hterhors.semanticmr.crf.templates.slotfilling.TokenContextTemplate;
+import de.hterhors.semanticmr.crf.templates.et.ContextBetweenSlotFillerTemplate;
+import de.hterhors.semanticmr.crf.templates.shared.IntraTokenTemplate;
+import de.hterhors.semanticmr.crf.templates.shared.TokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -265,11 +265,11 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * TODO: Implement further templates / features to solve your problem.
 		 * 
 		 */
-		List<AbstractFeatureTemplate<?, ?>> featureTemplates = new ArrayList<>();
+		List<AbstractFeatureTemplate<?>> featureTemplates = new ArrayList<>();
 
 		featureTemplates.add(new IntraTokenTemplate());
 		featureTemplates.add(new TokenContextTemplate());
-		featureTemplates.add(new InBetweenContextTemplate());
+		featureTemplates.add(new ContextBetweenSlotFillerTemplate());
 
 		/**
 		 * During exploration we initialize each state with an empty

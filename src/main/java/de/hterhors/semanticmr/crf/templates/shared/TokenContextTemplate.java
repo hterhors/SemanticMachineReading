@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.templates.slotfilling;
+package de.hterhors.semanticmr.crf.templates.shared;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,13 +14,18 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.crf.templates.slotfilling.TokenContextTemplate.TokenContextScope;
+import de.hterhors.semanticmr.crf.templates.shared.TokenContextTemplate.TokenContextScope;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 
-public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextScope, EntityTemplate> {
+public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextScope> {
+
+	private static final int DEFAULT_MAX_TOKEN_CONTEXT_LEFT = 3;
+	private static final int DEFAULT_MAX_TOKEN_CONTEXT_RIGHT = 3;
+	private static final int MAX_TOKEN_CONTEXT_LEFT = DEFAULT_MAX_TOKEN_CONTEXT_LEFT;
+	private static final int MAX_TOKEN_CONTEXT_RIGHT = DEFAULT_MAX_TOKEN_CONTEXT_RIGHT;
 
 	private static final char SPLITTER = ' ';
 	private static final char RIGHT = '>';
@@ -28,7 +33,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 	private static final String BOF = "BOF";
 	private static final String EOF = "EOF";
 
-	class TokenContextScope extends AbstractFactorScope<TokenContextScope, EntityTemplate> {
+	class TokenContextScope extends AbstractFactorScope<TokenContextScope> {
 
 		public final Instance instance;
 
@@ -38,7 +43,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 
 		public final int endOffset;
 
-		public TokenContextScope(AbstractFeatureTemplate<TokenContextScope, EntityTemplate> template, Instance instance,
+		public TokenContextScope(AbstractFeatureTemplate<TokenContextScope> template, Instance instance,
 				EntityType entityType, int startOffset, int endOffset) {
 			super(template);
 			this.instance = instance;
@@ -107,20 +112,30 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 	public List<TokenContextScope> generateFactorScopes(State state) {
 		List<TokenContextScope> factors = new ArrayList<>();
 
-		for (EntityTemplate annotation : getPredictedAnnotations(state)) {
+		for (AbstractAnnotation annotation : getPredictedAnnotations(state)) {
 
-			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
-					.nonEmpty().docLinkedAnnoation().build();
+			if (annotation.isInstanceOfDocumentLinkedAnnotation()) {
 
-			for (Entry<SlotType, Set<AbstractAnnotation>> slot : filter.getMergedAnnotations().entrySet()) {
+				factors.add(new TokenContextScope(this, state.getInstance(), annotation.getEntityType(),
+						annotation.asInstanceOfDocumentLinkedAnnotation().getStartDocCharOffset(),
+						annotation.asInstanceOfDocumentLinkedAnnotation().getEndDocCharOffset()));
 
-				for (AbstractAnnotation slotFiller : slot.getValue()) {
+			} else if (annotation.isInstanceOfEntityTemplate()) {
 
-					final DocumentLinkedAnnotation docLinkedAnnotation = slotFiller
-							.asInstanceOfDocumentLinkedAnnotation();
+				final EntityTemplateAnnotationFilter filter = ((EntityTemplate) annotation).filter().singleSlots()
+						.multiSlots().merge().nonEmpty().docLinkedAnnoation().build();
 
-					factors.add(new TokenContextScope(this, state.getInstance(), docLinkedAnnotation.getEntityType(),
-							docLinkedAnnotation.getStartDocCharOffset(), docLinkedAnnotation.getEndDocCharOffset()));
+				for (Entry<SlotType, Set<AbstractAnnotation>> slot : filter.getMergedAnnotations().entrySet()) {
+
+					for (AbstractAnnotation slotFiller : slot.getValue()) {
+
+						final DocumentLinkedAnnotation docLinkedAnnotation = slotFiller
+								.asInstanceOfDocumentLinkedAnnotation();
+
+						factors.add(new TokenContextScope(this, state.getInstance(),
+								docLinkedAnnotation.getEntityType(), docLinkedAnnotation.getStartDocCharOffset(),
+								docLinkedAnnotation.getEndDocCharOffset()));
+					}
 				}
 			}
 
@@ -159,9 +174,9 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 	}
 
 	private String[] extractLeftContext(List<DocumentToken> tokens, int beginTokenIndex) {
-		final String[] leftContext = new String[3];
+		final String[] leftContext = new String[MAX_TOKEN_CONTEXT_LEFT];
 
-		for (int i = 1; i < 4; i++) {
+		for (int i = 1; i < 1 + MAX_TOKEN_CONTEXT_LEFT; i++) {
 			if (beginTokenIndex - i >= 0) {
 				leftContext[i - 1] = tokens.get(beginTokenIndex - i).getText();
 			} else {
@@ -172,9 +187,9 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 	}
 
 	private String[] extractRightContext(List<DocumentToken> tokens, int endTokenIndex) {
-		final String[] rightContext = new String[3];
+		final String[] rightContext = new String[MAX_TOKEN_CONTEXT_RIGHT];
 
-		for (int i = 1; i < 4; i++) {
+		for (int i = 1; i < 1 + MAX_TOKEN_CONTEXT_RIGHT; i++) {
 			if (endTokenIndex + i < tokens.size()) {
 				rightContext[i - 1] = tokens.get(endTokenIndex + i).getText();
 			} else {

@@ -70,13 +70,13 @@ public class Model {
 		return indexFeatureName.get(feature);
 	}
 
-	final private List<AbstractFeatureTemplate<?, ?>> factorTemplates;
+	final private List<AbstractFeatureTemplate<?>> factorTemplates;
 
-	public Model(List<AbstractFeatureTemplate<?, ?>> factorTemplates) {
+	public Model(List<AbstractFeatureTemplate<?>> factorTemplates) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
 	}
 
-	public Model(List<AbstractFeatureTemplate<?, ?>> factorTemplates, File modelDir, String modelName) {
+	public Model(List<AbstractFeatureTemplate<?>> factorTemplates, File modelDir, String modelName) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
 		this.modelBaseDir = modelDir;
 		this.modelName = modelName;
@@ -87,7 +87,7 @@ public class Model {
 		/**
 		 * TODO: measure efficiency of streams
 		 */
-		for (AbstractFeatureTemplate<?, ?> template : this.factorTemplates) {
+		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
 
 			/*
 			 * Collect all factor scopes of all states to that this template can be applied
@@ -114,7 +114,7 @@ public class Model {
 		/**
 		 * TODO: measure efficiency of streams
 		 */
-		for (AbstractFeatureTemplate<?, ?> template : this.factorTemplates) {
+		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
 
 			/*
 			 * Collect all factor scopes of all states to that this template can be applied
@@ -140,7 +140,7 @@ public class Model {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void computeRemainingFactors(AbstractFeatureTemplate<?, ?> template,
+	private void computeRemainingFactors(AbstractFeatureTemplate<?> template,
 			@SuppressWarnings("rawtypes") Stream<AbstractFactorScope> stream) {
 
 		Stream<Factor<?>> s = stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs))
@@ -154,7 +154,7 @@ public class Model {
 		s.sequential().forEach(factor -> FACTOR_POOL_INSTANCE.addFactor(factor));
 	}
 
-	private void collectFactorScopesForState(AbstractFeatureTemplate<?, ?> template, State state) {
+	private void collectFactorScopesForState(AbstractFeatureTemplate<?> template, State state) {
 		state.getFactorGraph(template).addFactorScopes(template.generateFactorScopes(state));
 	}
 
@@ -205,7 +205,7 @@ public class Model {
 	public void printReadable(File modelDir, String modelName) {
 		log.info("Print model in readable format...");
 		try {
-			for (AbstractFeatureTemplate<?, ?> template : this.factorTemplates) {
+			for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
 				File parentDir = new File(modelDir, modelName + DEFAULT_READABLE_DIR);
 				parentDir.mkdirs();
 
@@ -310,9 +310,9 @@ public class Model {
 		return model;
 	}
 
-	private static AbstractFeatureTemplate<?, ?> toAbstractFeaturetemplate(final GenericTemplate t) {
+	private static AbstractFeatureTemplate<?> toAbstractFeaturetemplate(final GenericTemplate t) {
 		try {
-			final AbstractFeatureTemplate<?, ?> template = (AbstractFeatureTemplate<?, ?>) Class
+			final AbstractFeatureTemplate<?> template = (AbstractFeatureTemplate<?>) Class
 					.forName(t.packageName + "." + t.templateName).newInstance();
 
 			final DoubleVector v = new DoubleVector();

@@ -15,7 +15,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  *
  * @param <S>
  */
-public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S, A>, A extends AbstractAnnotation> {
+public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S>> {
 
 	/**
 	 * Weights for the computation of factor scores. These weights are shared across
@@ -53,8 +53,8 @@ public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S, A
 		this.weights = weights;
 	}
 
-	protected List<A> getPredictedAnnotations(State state) {
-		return state.getCurrentPredictions().<A>getAnnotations();
+	protected <A extends AbstractAnnotation> List<A> getPredictedAnnotations(State state) {
+		return state.getCurrentPredictions().getAnnotations();
 
 	}
 }
