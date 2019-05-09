@@ -123,15 +123,19 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationDetail);
 	}
 
-	public String getCleanedSurfaceForm() {
+	final public String getCleanedSurfaceForm() {
 		return textualContent.cleanedSurfaceForm;
 	}
 
-	public String getSurfaceForm() {
+	final public String getSurfaceForm() {
 		return textualContent.surfaceForm;
 	}
 
-	public String getNormalizedSurfaceForm() {
+	final public String getNormalizedSurfaceForm() {
 		return textualContent.normalizedSurfaceForm;
+	}
+
+	final public int getSurfaceFormAsInt() {
+		return Integer.parseInt(textualContent.surfaceForm);
 	}
 }

@@ -34,6 +34,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.et.ContextBetweenSlotFillerTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.IntraTokenTemplate;
+import de.hterhors.semanticmr.crf.templates.shared.LevenshteinTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.TokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
@@ -255,7 +256,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * 
 		 * TODO: find best alpha value in combination with L2-regularization.
 		 */
-		AdvancedLearner learner = new AdvancedLearner(new SGD(0.1, 0), new L2(0.01));
+		AdvancedLearner learner = new AdvancedLearner(new SGD(0.05, 0), new L2(0.00));
 
 		/**
 		 * Next, we need to specify the actual feature templates. In this example we
@@ -267,6 +268,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 */
 		List<AbstractFeatureTemplate<?>> featureTemplates = new ArrayList<>();
 
+		featureTemplates.add(new LevenshteinTemplate());
 		featureTemplates.add(new IntraTokenTemplate());
 		featureTemplates.add(new TokenContextTemplate());
 		featureTemplates.add(new ContextBetweenSlotFillerTemplate());

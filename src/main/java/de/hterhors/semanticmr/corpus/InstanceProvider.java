@@ -36,6 +36,7 @@ public class InstanceProvider {
 
 	public static boolean removeEmptyInstances = false;
 	public static boolean removeInstancesWithToManyAnnotations = false;
+	public static int maxNumberOfAnnotations = CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE;
 
 	final private File jsonInstancesDirectory;
 
@@ -125,8 +126,7 @@ public class InstanceProvider {
 					}
 				}
 
-				if (instance.getGoldAnnotations().getAnnotations()
-						.size() >= CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE) {
+				if (instance.getGoldAnnotations().getAnnotations().size() >= maxNumberOfAnnotations) {
 					log.warn("WARN: Instance " + instance.getName() + " has to many annotations!");
 					if (removeInstancesWithToManyAnnotations) {
 						iterator.remove();

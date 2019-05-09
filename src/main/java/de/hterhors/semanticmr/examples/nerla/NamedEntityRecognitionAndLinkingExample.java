@@ -30,8 +30,8 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.dla.ContextBetweenAnnotationsTemplate;
-import de.hterhors.semanticmr.crf.templates.dla.MorphologicalNerlaTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.IntraTokenTemplate;
+import de.hterhors.semanticmr.crf.templates.shared.LevenshteinTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.TokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
@@ -176,7 +176,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * if not necessary.
 		 *
 		 */
-		IObjectiveFunction objectiveFunction = new NerlaObjectiveFunction(EEvaluationDetail.DOCUMENT_LINKED);
+		IObjectiveFunction objectiveFunction = new NerlaObjectiveFunction(EEvaluationDetail.ENTITY_TYPE);
 
 		/**
 		 * The learner defines the update strategy of learned weights. parameters are
@@ -201,6 +201,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 //		featureTemplates.add(new MorphologicalNerlaTemplate());
 		featureTemplates.add(new TokenContextTemplate());
 		featureTemplates.add(new IntraTokenTemplate());
+//		featureTemplates.add(new LevenshteinTemplate());
 
 		/**
 		 * During exploration we initialize each state with no annotations. In NERLA

@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.projects.soccerplayer.templates;
+package de.hterhors.semanticmr.crf.templates.et;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,15 +14,15 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
+import de.hterhors.semanticmr.crf.templates.et.SlotPriorTemplate.Scope;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.projects.soccerplayer.templates.PriorTemplate.Scope;
 
 /**
  * @author hterhors
  *
  * @date Nov 15, 2017
  */
-public class PriorTemplate extends AbstractFeatureTemplate<Scope> {
+public class SlotPriorTemplate extends AbstractFeatureTemplate<Scope> {
 
 	static class Scope extends AbstractFactorScope<Scope> {
 
@@ -85,10 +85,10 @@ public class PriorTemplate extends AbstractFeatureTemplate<Scope> {
 	public List<Scope> generateFactorScopes(State state) {
 		List<Scope> factors = new ArrayList<>();
 
-		for (EntityTemplate entityTemplateAnnotation : super.<EntityTemplate>getPredictedAnnotations(state)) {
+		for (EntityTemplate soccerPlayer : super.<EntityTemplate>getPredictedAnnotations(state)) {
 
-			EntityTemplateAnnotationFilter singleFilter = entityTemplateAnnotation.filter().singleSlots()
-					.docLinkedAnnoation().build();
+			EntityTemplateAnnotationFilter singleFilter = soccerPlayer.filter().singleSlots().docLinkedAnnoation()
+					.build();
 
 			for (Entry<SlotType, AbstractAnnotation> annotation : singleFilter.getSingleAnnotations().entrySet()) {
 				Set<String> values = new HashSet<>();
@@ -96,8 +96,8 @@ public class PriorTemplate extends AbstractFeatureTemplate<Scope> {
 				factors.add(new Scope(this, annotation.getKey(), values));
 			}
 
-			EntityTemplateAnnotationFilter multiFilter = entityTemplateAnnotation.filter().multiSlots()
-					.docLinkedAnnoation().build();
+			EntityTemplateAnnotationFilter multiFilter = soccerPlayer.filter().multiSlots().docLinkedAnnoation()
+					.build();
 
 			for (Entry<SlotType, Set<AbstractAnnotation>> annotation : multiFilter.getMultiAnnotations().entrySet()) {
 
@@ -126,11 +126,21 @@ public class PriorTemplate extends AbstractFeatureTemplate<Scope> {
 	@Override
 	public void generateFeatureVector(Factor<Scope> factor) {
 
+		/*
+		 * If the property had multiple values, as in one-to-many relations (such as
+		 * hasTeams) we create a feature that takes both values into account. This might
+		 * be very sparse.
+		 */
 		if (factor.getFactorScope().values.size() > 1)
 			factor.getFeatureVector().set("Prior towards: " + factor.getFactorScope().slotType.slotName + "->"
 					+ factor.getFactorScope().values, true);
 
 		for (String assignedClassesNamesOrValue : factor.getFactorScope().values) {
+
+			/*
+			 * For each property and for each value for that property create a single
+			 * feature.
+			 */
 			factor.getFeatureVector().set(
 					"Prior: " + factor.getFactorScope().slotType.slotName + "->" + assignedClassesNamesOrValue, true);
 		}

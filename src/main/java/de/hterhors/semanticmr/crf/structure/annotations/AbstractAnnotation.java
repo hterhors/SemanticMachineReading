@@ -98,7 +98,9 @@ public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable 
 
 	final public boolean isInstanceOfEntityTemplate() {
 		return this instanceof EntityTemplate;
-
 	}
+	
+	
+	
 
 }
