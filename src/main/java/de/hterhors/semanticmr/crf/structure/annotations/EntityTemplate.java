@@ -129,7 +129,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 		if (getMultiFillerSlot(slotType).containsSlotFiller(slotFillerCandidate)) {
 			System.out.println("WARN: can not add same object twice: " + slotFiller.toPrettyString());
-			throw new IllegalSlotFillerException("Can not update slot .\"" + slotType.toPrettyString()
+			throw new IllegalSlotFillerException("Can not update slot \"" + slotType.toPrettyString()
 					+ "\" with slot filler: \"" + slotFiller.toPrettyString() + "\"");
 		}
 
@@ -143,7 +143,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 		if (getMultiFillerSlot(slotType).containsSlotFiller(slotFiller)) {
 			System.out.println("WARN: can not add same object twice: " + slotFiller.toPrettyString());
-			throw new IllegalSlotFillerException("Can not update slot .\"" + slotType.toPrettyString()
+			throw new IllegalSlotFillerException("Can not add same object twice: \"" + slotType.toPrettyString()
 					+ "\" with slot filler: \"" + slotFiller.toPrettyString() + "\"");
 		}
 

@@ -3,10 +3,10 @@ package de.hterhors.semanticmr.crf.sampling.stopcrit.impl;
 import java.util.List;
 import java.util.function.Function;
 
-import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.variables.State;
 
-public class ConverganceCrit implements IStoppingCriterion {
+public class ConverganceCrit implements ISamplingStoppingCriterion {
 
 	final private double threshold;
 

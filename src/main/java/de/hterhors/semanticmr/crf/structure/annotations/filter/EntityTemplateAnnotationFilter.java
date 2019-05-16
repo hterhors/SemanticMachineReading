@@ -47,6 +47,7 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 		private boolean multiSlots;
 		private boolean singleSlots;
 		private boolean nonEmpty;
+		private boolean rootAnnotation;
 		private boolean docLinkedAnnoation;
 		private boolean literalAnnoation;
 		private boolean entityTypeAnnoation;
@@ -59,6 +60,11 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 
 		public Builder(EntityTemplate entityTemplate) {
 			this.entityTemplate = entityTemplate;
+		}
+
+		public Builder rootAnnotation() {
+			this.rootAnnotation = true;
+			return this;
 		}
 
 		public Builder singleSlots() {
@@ -121,7 +127,7 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 
 					for (AbstractAnnotation slotFiller : slot.getSlotFiller()) {
 
-						if (docLinkedAnnoation) {
+						if (docLinkedAnnoation && slotFiller.isInstanceOfDocumentLinkedAnnotation()) {
 
 							final DocumentLinkedAnnotation dla = slotFiller.asInstanceOfDocumentLinkedAnnotation();
 
@@ -136,7 +142,7 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 							multiAnnotations.get(slotType).add(dla);
 						}
 
-						if (literalAnnoation) {
+						if (literalAnnoation && slotFiller.isInstanceOfLiteralAnnotation()) {
 
 							final LiteralAnnotation la = slotFiller.asInstanceOfLiteralAnnotation();
 
@@ -151,7 +157,7 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 							multiAnnotations.putIfAbsent(slotType, new LinkedHashSet<>());
 							multiAnnotations.get(slotType).add(la);
 						}
-						if (entityTypeAnnoation) {
+						if (entityTypeAnnoation && slotFiller.isInstanceOfEntityTypeAnnotation()) {
 
 							final EntityTypeAnnotation eta = slotFiller.asInstanceOfEntityTypeAnnotation();
 
@@ -166,7 +172,7 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 							multiAnnotations.putIfAbsent(slotType, new LinkedHashSet<>());
 							multiAnnotations.get(slotType).add(eta);
 						}
-						if (entityTemplateAnnoation) {
+						if (entityTemplateAnnoation && slotFiller.isInstanceOfEntityTemplate()) {
 
 							final EntityTemplate et = slotFiller.asInstanceOfEntityTemplate();
 
@@ -196,12 +202,10 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 					if (nonEmpty && !slot.containsSlotFiller())
 						continue;
 
-					if (docLinkedAnnoation) {
-						DocumentLinkedAnnotation slotFiller = null;
-						try {
-							slotFiller = slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation();
-						} catch (ClassCastException e) {
-						}
+					if (docLinkedAnnoation && slot.getSlotFiller().isInstanceOfDocumentLinkedAnnotation()) {
+
+						DocumentLinkedAnnotation slotFiller = slot.getSlotFiller()
+								.asInstanceOfDocumentLinkedAnnotation();
 
 						if (slotFiller == null)
 							continue;
@@ -212,7 +216,7 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 						}
 						singleAnnotations.put(slotType, slotFiller);
 					}
-					if (literalAnnoation) {
+					if (literalAnnoation && slot.getSlotFiller().isInstanceOfLiteralAnnotation()) {
 
 						final LiteralAnnotation slotFiller = slot.getSlotFiller().asInstanceOfLiteralAnnotation();
 
@@ -225,7 +229,7 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 						}
 						singleAnnotations.put(slotType, slotFiller);
 					}
-					if (entityTypeAnnoation) {
+					if (entityTypeAnnoation && slot.getSlotFiller().isInstanceOfEntityTypeAnnotation()) {
 
 						final EntityTypeAnnotation slotFiller = slot.getSlotFiller().asInstanceOfEntityTypeAnnotation();
 
@@ -238,7 +242,7 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 						}
 						singleAnnotations.put(slotType, slotFiller);
 					}
-					if (entityTemplateAnnoation) {
+					if (entityTemplateAnnoation && slot.getSlotFiller().isInstanceOfEntityTemplate()) {
 
 						final EntityTemplate slotFiller = slot.getSlotFiller().asInstanceOfEntityTemplate();
 

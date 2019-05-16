@@ -2,7 +2,7 @@ package de.hterhors.semanticmr.crf.sampling.stopcrit.impl;
 
 import java.util.List;
 
-import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.variables.State;
 
 /**
@@ -12,7 +12,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  * @author hterhors
  *
  */
-public class MaxChainLengthCrit implements IStoppingCriterion {
+public class MaxChainLengthCrit implements ISamplingStoppingCriterion {
 
 	/**
 	 * Maximum number of sampling steps / chain length.

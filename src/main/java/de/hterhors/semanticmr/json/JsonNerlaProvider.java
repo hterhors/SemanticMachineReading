@@ -25,10 +25,10 @@ import de.hterhors.semanticmr.nerla.INerlaProvider;
 public class JsonNerlaProvider implements INerlaProvider {
 	private static Logger log = LogManager.getFormatterLogger(JsonNerlaProvider.class);
 
-	private final File nerlaFile;
+	private final File nerlaFileOrDir;
 
-	public JsonNerlaProvider(final File nerlaFile) {
-		this.nerlaFile = nerlaFile;
+	public JsonNerlaProvider(final File nerlaFileOrDir) {
+		this.nerlaFileOrDir = nerlaFileOrDir;
 
 		this.validateFiles();
 	}
@@ -37,8 +37,17 @@ public class JsonNerlaProvider implements INerlaProvider {
 	public Map<Instance, List<DocumentLinkedAnnotation>> getForInstances(List<Instance> instances) throws IOException {
 		log.info("Read named entity recognition and linking annotations...");
 
-		final List<JsonEntityAnnotationWrapper> jsonNerla = new JsonNerlaIO(true)
-				.fromJsonString(new String(Files.readAllBytes(nerlaFile.toPath())));
+		final List<JsonEntityAnnotationWrapper> jsonNerla;
+
+		if (nerlaFileOrDir.isDirectory()) {
+			jsonNerla = new ArrayList<>();
+			for (File nerlaJsonFile : nerlaFileOrDir.listFiles()) {
+				jsonNerla.addAll(
+						new JsonNerlaIO(true).fromJsonString(new String(Files.readAllBytes(nerlaJsonFile.toPath()))));
+			}
+		} else {
+			jsonNerla = new JsonNerlaIO(true).fromJsonString(new String(Files.readAllBytes(nerlaFileOrDir.toPath())));
+		}
 
 		final Map<String, Instance> map = new HashMap<>();
 
@@ -86,11 +95,12 @@ public class JsonNerlaProvider implements INerlaProvider {
 	}
 
 	private void validateFiles() {
-		if (!nerlaFile.exists())
-			throw new IllegalArgumentException("File does not exist: " + nerlaFile.getAbsolutePath());
+		if (!nerlaFileOrDir.exists())
+			throw new IllegalArgumentException("File does not exist: " + nerlaFileOrDir.getAbsolutePath());
 
-		if (!nerlaFile.getName().endsWith(".json"))
-			log.warn("Unexpected file format: " + nerlaFile.getName());
+		if (nerlaFileOrDir.isDirectory()) {
+		} else if (!nerlaFileOrDir.getName().endsWith(".json"))
+			log.warn("Unexpected file format: " + nerlaFileOrDir.getName());
 
 	}
 

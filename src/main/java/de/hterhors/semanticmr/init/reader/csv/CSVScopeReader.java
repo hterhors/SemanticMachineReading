@@ -84,6 +84,14 @@ public class CSVScopeReader implements ISpecificationsReader {
 				slotFillerEntityTypes.get(line[1]).add(line[2]);
 			}
 
+			Set<String> sa = new HashSet<>();
+			for (String[] string : entities) {
+				if (sa.contains(string[0]))
+					System.out.println("WARN: " + string[0]);
+				sa.add(string[0]);
+
+			}
+
 			Map<String, Boolean> isLiteralValueSlotTypes = entities.stream()
 					.collect(Collectors.toMap(s -> s[0], s -> new Boolean(s[1].equals("true"))));
 

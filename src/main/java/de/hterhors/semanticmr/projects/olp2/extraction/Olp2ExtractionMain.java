@@ -22,7 +22,7 @@ import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.of.SlotFillingObjectiveFunction;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
-import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
@@ -92,9 +92,10 @@ public class Olp2ExtractionMain extends AbstractSemReadProject {
 //		AbstractSampler sampler = new EpochSwitchSampler(new RandomSwitchSamplingStrategy());
 //		AbstractSampler sampler = new EpochSwitchSampler(e -> new Random(e).nextBoolean());
 
-		IStoppingCriterion maxStepCrit = new MaxChainLengthCrit(10);
-		IStoppingCriterion noModelChangeCrit = new ConverganceCrit(3, s -> s.getModelScore());
-
+		ISamplingStoppingCriterion maxStepCrit = new MaxChainLengthCrit(10);
+		ISamplingStoppingCriterion noModelChangeCrit = new ConverganceCrit(3, s -> s.getModelScore());
+		ISamplingStoppingCriterion[] sampleStoppingCrits = new ISamplingStoppingCriterion[] { maxStepCrit,
+				noModelChangeCrit };
 		SlotFillingExplorer explorer = new SlotFillingExplorer(candidateProvider);
 
 		final File modelDir = new File("models/olp2/test1/");
@@ -110,13 +111,13 @@ public class Olp2ExtractionMain extends AbstractSemReadProject {
 		SemanticParsingCRF crf = new SemanticParsingCRF(model, explorer, sampler, stateInitializer, objectiveFunction);
 
 		if (!model.isTrained()) {
-			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,
-					noModelChangeCrit);
+			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs,
+					sampleStoppingCrits);
 			model.save(modelDir, modelName, true);
 		}
 
-		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
-				noModelChangeCrit);
+		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(),
+				sampleStoppingCrits);
 
 		evaluate(log, testResults);
 

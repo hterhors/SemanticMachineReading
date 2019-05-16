@@ -18,7 +18,6 @@ public class AbstractSemReadProject {
 
 	public void evaluate(Logger log, Map<Instance, State> testResults) {
 		Score mean = new Score();
-
 		for (Entry<Instance, State> res : testResults.entrySet()) {
 			mean.add(res.getValue().getScore());
 			LogUtils.logState(log, "Final Evaluation", res.getKey(), res.getValue());

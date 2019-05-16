@@ -4,6 +4,7 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 /**
  * Annotation object for literal based slots that are NOT linked to the
@@ -87,39 +88,39 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 
 	@Override
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal) {
-		if (otherVal == null) {
+		if (otherVal == null)
 			return Score.FN;
-		} else {
-			switch (evaluator.evaluationDetail) {
-			case DOCUMENT_LINKED:
-				if (equals(otherVal))
-					return Score.TP;
-				return Score.FN_FP;
-			case LITERAL:
-				if (getClass() == otherVal.getClass()) {
-					if (getClass() != LiteralAnnotation.class)
-						return equalsEvalLA(otherVal) ? Score.TP : Score.FN_FP;
+
+//		if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED) {
+//			if (equals(otherVal))
+//				return Score.TP;
+//			return Score.FN_FP;
+//		} else 
+		if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED
+				|| evaluator.evaluationDetail == EEvaluationDetail.LITERAL) {
+			if (getClass() == otherVal.getClass()) {
+				if (getClass() != LiteralAnnotation.class)
+					return equalsEvalLA(otherVal) ? Score.TP : Score.FN_FP;
+				else
+					return equals(otherVal) ? Score.TP : Score.FN_FP;
+			} else {
+				if ((this.getClass() == DocumentLinkedAnnotation.class))
+					if (otherVal.getClass() == LiteralAnnotation.class)
+						return ((LiteralAnnotation) otherVal).equalsEvalLA(this) ? Score.TP : Score.FN_FP;
 					else
-						return equals(otherVal) ? Score.TP : Score.FN_FP;
-				} else {
-					if ((this.getClass() == DocumentLinkedAnnotation.class))
-						if (otherVal.getClass() == LiteralAnnotation.class)
-							return ((LiteralAnnotation) otherVal).equalsEvalLA(this) ? Score.TP : Score.FN_FP;
-						else
-							return Score.FN_FP;
+						return Score.FN_FP;
 
-					else if ((otherVal.getClass() == DocumentLinkedAnnotation.class))
-						if (getClass() == LiteralAnnotation.class)
-							return ((LiteralAnnotation) this).equalsEvalLA(otherVal) ? Score.TP : Score.FN_FP;
-						else
-							return Score.FN_FP;
-				}
-				return Score.FN_FP;
-
-			case ENTITY_TYPE:
-				return super.evaluate(evaluator, otherVal);
+				else if ((otherVal.getClass() == DocumentLinkedAnnotation.class))
+					if (getClass() == LiteralAnnotation.class)
+						return ((LiteralAnnotation) this).equalsEvalLA(otherVal) ? Score.TP : Score.FN_FP;
+					else
+						return Score.FN_FP;
 			}
+			return Score.FN_FP;
+		} else if (evaluator.evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
+			return super.evaluate(evaluator, otherVal);
 		}
+
 		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationDetail);
 	}
 

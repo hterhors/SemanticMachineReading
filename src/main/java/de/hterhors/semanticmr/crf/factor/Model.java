@@ -351,4 +351,12 @@ public class Model {
 		this.modelName = newName;
 	}
 
+	public String getName() {
+		return modelName;
+	}
+
+	public List<AbstractFeatureTemplate<?>> getFactorTemplates() {
+		return Collections.unmodifiableList(factorTemplates);
+	}
+
 }

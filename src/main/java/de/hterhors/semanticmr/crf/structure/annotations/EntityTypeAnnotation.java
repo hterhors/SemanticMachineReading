@@ -6,6 +6,7 @@ import java.util.Map;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 /**
  * Annotation object for literal based slots that are NOT linked to the
@@ -92,32 +93,38 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 
 	@Override
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal) {
-		if (otherVal == null) {
-			return Score.FN;
-		} else {
-			switch (evaluator.evaluationDetail) {
-			case DOCUMENT_LINKED:
-			case LITERAL:
-				if (equals(otherVal))
-					return Score.TP;
-				return Score.FN_FP;
-			case ENTITY_TYPE:
 
-				if (getClass() == otherVal.getClass()) {
-					if (getClass() != EntityTypeAnnotation.class)
-						return equalsEvalETA(otherVal) ? Score.TP : Score.FN_FP;
-					else
-						return equals(otherVal) ? Score.TP : Score.FN_FP;
-				} else {
-					if (this.getClass().isAssignableFrom(otherVal.getClass())) {
-						return this.equalsEvalETA(otherVal) ? Score.TP : Score.FN_FP;
-					} else if (otherVal.getClass().isAssignableFrom(this.getClass())) {
-						return ((EntityTypeAnnotation) otherVal).equalsEvalETA(this) ? Score.TP : Score.FN_FP;
-					}
+		if (otherVal == null)
+			return Score.FN;
+
+//		if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED) {
+//			if (equals(otherVal))
+//				return Score.TP;
+//			return Score.FN_FP;
+//		} else if (evaluator.evaluationDetail == EEvaluationDetail.LITERAL) {
+//			if (equals(otherVal))
+//				return Score.TP;
+//			return Score.FN_FP;
+//		} else 
+		if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED
+				|| evaluator.evaluationDetail == EEvaluationDetail.LITERAL
+				|| evaluator.evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
+
+			if (getClass() == otherVal.getClass()) {
+				if (getClass() != EntityTypeAnnotation.class)
+					return equalsEvalETA(otherVal) ? Score.TP : Score.FN_FP;
+				else
+					return equals(otherVal) ? Score.TP : Score.FN_FP;
+			} else {
+				if (this.getClass().isAssignableFrom(otherVal.getClass())) {
+					return this.equalsEvalETA(otherVal) ? Score.TP : Score.FN_FP;
+				} else if (otherVal.getClass().isAssignableFrom(this.getClass())) {
+					return ((EntityTypeAnnotation) otherVal).equalsEvalETA(this) ? Score.TP : Score.FN_FP;
 				}
-				return Score.FN_FP;
 			}
+			return Score.FN_FP;
 		}
+
 		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationDetail);
 
 	}

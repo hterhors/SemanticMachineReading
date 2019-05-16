@@ -4,11 +4,13 @@ import java.util.List;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.container.DocumentPosition;
 import de.hterhors.semanticmr.crf.structure.annotations.container.TextualContent;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 
 /**
@@ -117,24 +119,21 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	@Override
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal) {
-		if (otherVal == null) {
+		if (otherVal == null)
 			return Score.FN;
-		} else {
-			switch (evaluator.evaluationDetail) {
-			case DOCUMENT_LINKED:
-				if (equals(otherVal)) {
-					return Score.TP;
-				} else {
-					return Score.FN_FP;
-				}
-			case LITERAL:
-			case ENTITY_TYPE:
-				return super.evaluate(evaluator, otherVal);
-			}
+
+		if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED) {
+			if (equals(otherVal))
+				return Score.TP;
+			else
+				return Score.FN_FP;
+		} else if (evaluator.evaluationDetail == EEvaluationDetail.LITERAL) {
+			return super.evaluate(evaluator, otherVal);
+		} else if (evaluator.evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
+			return super.evaluate(evaluator, otherVal);
 		}
+
 		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationDetail);
 	}
-
-
 
 }

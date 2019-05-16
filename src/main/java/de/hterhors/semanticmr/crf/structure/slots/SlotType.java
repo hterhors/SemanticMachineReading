@@ -35,7 +35,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
 	private SlotType() {
 		this.slotName = null;
-		this.slotMaxCapacity = 0;
+		this.slotMaxCapacity = -1;
 		this.slotFillerEntityTypeNames = Collections.emptySet();
 	}
 
@@ -59,7 +59,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
 		if ((SlotType = slotTypeFactory.get(internalized)) == null) {
 			throw new UnkownSlotTypeException(
-					"The requested entity type is unkown, since it is not part of the specifications: " + slotTypeName);
+					"The requested slot type is unkown, since it is not part of the specifications: " + slotTypeName);
 		}
 		return SlotType;
 
@@ -89,7 +89,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 				slotTypeFactory.put(internalized, SlotType);
 			} else {
 				throw new UnkownEnityTypeException(
-						"Multiple occurrence for entity type " + slotTypeName + " in specifications.");
+						"Multiple occurrence for slot type " + slotTypeName + " in specifications.");
 			}
 
 		}

@@ -14,6 +14,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
+import de.hterhors.semanticmr.crf.templates.shared.IntraTokenTemplate.IntraTokenScope;
 import de.hterhors.semanticmr.crf.templates.shared.TokenContextTemplate.TokenContextScope;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
@@ -122,6 +123,16 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 
 			} else if (annotation.isInstanceOfEntityTemplate()) {
 
+				if (annotation.asInstanceOfEntityTemplate().getRootAnnotation()
+						.isInstanceOfDocumentLinkedAnnotation()) {
+
+					final DocumentLinkedAnnotation rootAnn = annotation.asInstanceOfEntityTemplate().getRootAnnotation()
+							.asInstanceOfDocumentLinkedAnnotation();
+
+					factors.add(new TokenContextScope(this, state.getInstance(), rootAnn.getEntityType(),
+							rootAnn.getStartDocCharOffset(), rootAnn.getEndDocCharOffset()));
+				}
+
 				final EntityTemplateAnnotationFilter filter = ((EntityTemplate) annotation).filter().singleSlots()
 						.multiSlots().merge().nonEmpty().docLinkedAnnoation().build();
 
@@ -156,21 +167,24 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 					.getTokenByCharOffset(factor.getFactorScope().endOffset);
 
 			addContextFeatures(featureVector, factor.getFactorScope().instance.getDocument().tokenList,
-					factor.getFactorScope().entityType.entityName, beginToken.getDocTokenIndex(),
-					endToken.getDocTokenIndex());
+					factor.getFactorScope().entityType, beginToken.getDocTokenIndex(), endToken.getDocTokenIndex());
+
 		} catch (Exception e) {
 //			System.out.println("WARN! " + e.getMessage());
 		}
 	}
 
-	private void addContextFeatures(DoubleVector featureVector, List<DocumentToken> tokens, String className,
+	private void addContextFeatures(DoubleVector featureVector, List<DocumentToken> tokens, EntityType entity,
 			int beginTokenIndex, int endTokenIndex) {
 
 		final String[] leftContext = extractLeftContext(tokens, beginTokenIndex);
 
 		final String[] rightContext = extractRightContext(tokens, endTokenIndex);
 
-		getContextFeatures(featureVector, className, leftContext, rightContext);
+		getContextFeatures(featureVector, entity.entityName, leftContext, rightContext);
+		for (EntityType e : entity.getSuperEntityTypes()) {
+			getContextFeatures(featureVector, e.entityName, leftContext, rightContext);
+		}
 	}
 
 	private String[] extractLeftContext(List<DocumentToken> tokens, int beginTokenIndex) {
@@ -200,7 +214,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 
 	}
 
-	private void getContextFeatures(DoubleVector featureVector, final String contextClass, final String[] leftContext,
+	private void getContextFeatures(DoubleVector featureVector, final String entityName, final String[] leftContext,
 			final String[] rightContext) {
 
 		final StringBuffer lCs = new StringBuffer();
@@ -218,7 +232,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 			rCs.setLength(0);
 			lCs.insert(0, context + SPLITTER);
 			featureVector.set(
-					new StringBuffer(lCs).append(LEFT).append(contextClass).append(RIGHT).append(rCs).toString().trim(),
+					new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs).toString().trim(),
 					true);
 
 			for (int j = 0; j < rightContext.length; j++) {
@@ -228,7 +242,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 				else
 					context = rightContext[j];
 				rCs.append(SPLITTER).append(context);
-				featureVector.set(new StringBuffer(lCs).append(LEFT).append(contextClass).append(RIGHT).append(rCs)
+				featureVector.set(new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs)
 						.toString().trim(), true);
 
 			}
@@ -248,7 +262,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 			lCs.setLength(0);
 			rCs.append(SPLITTER).append(context);
 			featureVector.set(
-					new StringBuffer(lCs).append(LEFT).append(contextClass).append(RIGHT).append(rCs).toString().trim(),
+					new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs).toString().trim(),
 					true);
 
 			for (int j = 0; j < leftContext.length; j++) {
@@ -258,7 +272,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 				else
 					context = leftContext[j];
 				lCs.insert(0, context + SPLITTER);
-				featureVector.set(new StringBuffer(lCs).append(LEFT).append(contextClass).append(RIGHT).append(rCs)
+				featureVector.set(new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs)
 						.toString().trim(), true);
 
 				if (bof)

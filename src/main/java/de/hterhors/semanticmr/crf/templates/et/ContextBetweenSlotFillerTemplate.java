@@ -160,8 +160,17 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 
 		for (EntityTemplate annotation : super.<EntityTemplate>getPredictedAnnotations(state)) {
 
+			/**
+			 * TODO: get token index directly!
+			 */
+			Integer rootOffset = null;
+			if (annotation.asInstanceOfEntityTemplate().getRootAnnotation().isInstanceOfDocumentLinkedAnnotation()) {
+				rootOffset = annotation.getRootAnnotation().asInstanceOfDocumentLinkedAnnotation()
+						.getStartDocCharOffset();
+			}
+
 			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
-					.nonEmpty().literalAnnoation().build();
+					.nonEmpty().docLinkedAnnoation().build();
 
 			final List<AbstractAnnotation> slotFillers = filter.getMergedAnnotations().values().stream()
 					.flatMap(s -> s.stream()).collect(Collectors.toList());
@@ -169,11 +178,23 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 			for (int i = 0; i < slotFillers.size(); i++) {
 				final AbstractAnnotation fromSlotFiller = slotFillers.get(i);
 
+				final Integer fromOffset = fromSlotFiller.asInstanceOfDocumentLinkedAnnotation()
+						.getStartDocCharOffset();
+
+				if (annotation.asInstanceOfEntityTemplate().getRootAnnotation()
+						.isInstanceOfDocumentLinkedAnnotation()) {
+					if (rootOffset.intValue() > fromOffset.intValue()) {
+						factors.add(new ContextBetweenScope(this, state.getInstance(), fromSlotFiller.getEntityType(),
+								fromOffset, annotation.getEntityType(), rootOffset));
+					} else if (rootOffset.intValue() < fromOffset.intValue()) {
+						factors.add(new ContextBetweenScope(this, state.getInstance(), annotation.getEntityType(),
+								rootOffset, fromSlotFiller.getEntityType(), fromOffset));
+					}
+				}
+
 				for (int j = i + 1; j < slotFillers.size(); j++) {
 					final AbstractAnnotation toSlotFiller = slotFillers.get(j);
 
-					final Integer fromOffset = fromSlotFiller.asInstanceOfDocumentLinkedAnnotation()
-							.getStartDocCharOffset();
 					final Integer toOffset = toSlotFiller.asInstanceOfDocumentLinkedAnnotation()
 							.getStartDocCharOffset();
 
@@ -195,15 +216,16 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 
 	@Override
 	public void generateFeatureVector(Factor<ContextBetweenScope> factor) {
+
+		EntityType fromEntity = factor.getFactorScope().fromEntity;
+		EntityType toEntity = factor.getFactorScope().toEntity;
 		try {
 
 			DoubleVector featureVector = factor.getFeatureVector();
 
-			final String fromEntityType = factor.getFactorScope().fromEntity.entityName;
 			final int fromTokenIndex = factor.getFactorScope().instance.getDocument()
 					.getTokenByCharOffset(factor.getFactorScope().fromEntityCharacterOnset).getDocTokenIndex();
 
-			final String toEntityType = factor.getFactorScope().toEntity.entityName;
 			final int toTokenIndex = factor.getFactorScope().instance.getDocument()
 					.getTokenByCharOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
 
@@ -216,8 +238,19 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 			final List<DocumentToken> tokens = factor.getFactorScope().instance.getDocument().tokenList
 					.subList(fromTokenIndex + 1, toTokenIndex); // exclude start token.
 
-			if (tokens.size() > 2)
-				getTokenNgrams(featureVector, fromEntityType, toEntityType, tokens);
+			if (tokens.size() > 2) {
+
+				getTokenNgrams(featureVector, fromEntity.entityName, toEntity.entityName, tokens);
+
+				for (EntityType fe : fromEntity.getSuperEntityTypes()) {
+					for (EntityType te : toEntity.getSuperEntityTypes()) {
+
+						if (tokens.size() > 2)
+							getTokenNgrams(featureVector, fe.entityName, te.entityName, tokens);
+					}
+
+				}
+			}
 		} catch (DocumentLinkedAnnotationMismatchException e) {
 			System.out.println("WARN! " + e.getMessage());
 

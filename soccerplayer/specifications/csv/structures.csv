@@ -1,6 +1,0 @@
-#Entity	Slot	SlotSuperEntityType
-SoccerPlayer	hasPosition	Position
-SoccerPlayer	hasBirthPlace	BirthPlace
-SoccerPlayer	hasBirthYear	BirthYear
-SoccerPlayer	hasDeathYear	DeathYear
-SoccerPlayer	hasTeam	Team

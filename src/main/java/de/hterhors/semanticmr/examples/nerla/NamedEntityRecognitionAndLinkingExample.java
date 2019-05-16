@@ -25,7 +25,7 @@ import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.of.NerlaObjectiveFunction;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
-import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -224,7 +224,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * example we set the maximum chain length to 10. That means, only 10 changes
 		 * (annotations) can be added to each document.
 		 */
-		IStoppingCriterion maxStepCrit = new MaxChainLengthCrit(10);
+		ISamplingStoppingCriterion maxStepCrit = new MaxChainLengthCrit(10);
 
 		/**
 		 * The next stopping criterion checks for no or only little (based on a
@@ -232,8 +232,9 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * the last three states were scored equally, we assume the system to be
 		 * converged.
 		 */
-		IStoppingCriterion noModelChangeCrit = new ConverganceCrit(3, s -> s.getModelScore());
-
+		ISamplingStoppingCriterion noModelChangeCrit = new ConverganceCrit(3, s -> s.getModelScore());
+		ISamplingStoppingCriterion[] sampleStoppingCrits = new ISamplingStoppingCriterion[] { maxStepCrit,
+				noModelChangeCrit };
 		/**
 		 * Sampling strategy that defines how the system should be trained. We
 		 * distinguish between two sampling and strategies and two sampling modes.
@@ -298,8 +299,8 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 			/**
 			 * Train the CRF.
 			 */
-			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, maxStepCrit,
-					noModelChangeCrit);
+			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs,
+					sampleStoppingCrits);
 
 			/**
 			 * Save the model as binary. Do not override, in case a file already exists for

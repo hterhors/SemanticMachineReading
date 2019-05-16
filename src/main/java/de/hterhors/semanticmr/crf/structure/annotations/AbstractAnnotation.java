@@ -62,7 +62,7 @@ public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable 
 		if (asInstanceOfEntityTypeAnnotation != null)
 			return asInstanceOfEntityTypeAnnotation;
 
-		if (this instanceof DocumentLinkedAnnotation) {
+		if (this instanceof EntityTypeAnnotation) {
 			return asInstanceOfEntityTypeAnnotation = (EntityTypeAnnotation) this;
 		}
 		throw new ClassCastException("Annotation is not an instance of " + EntityTypeAnnotation.class.getSimpleName());

@@ -16,8 +16,8 @@ import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
-import de.hterhors.semanticmr.crf.sampling.stopcrit.IStoppingCriterion;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.ITrainingStoppingCriterion;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -82,7 +82,21 @@ public class SemanticParsingCRF {
 	}
 
 	public Map<Instance, State> train(final AdvancedLearner learner, final List<Instance> trainingInstances,
-			final int numberOfEpochs, final IStoppingCriterion... stoppingCriterion) {
+			final int numberOfEpochs, final ISamplingStoppingCriterion[] samplingStoppingCrits) {
+		return train(learner, trainingInstances, numberOfEpochs, new ITrainingStoppingCriterion[] {},
+				samplingStoppingCrits);
+
+	}
+
+	public Map<Instance, State> train(final AdvancedLearner learner, final List<Instance> trainingInstances,
+			final int numberOfEpochs, final ITrainingStoppingCriterion[] trainingStoppingCrits) {
+		return train(learner, trainingInstances, numberOfEpochs, trainingStoppingCrits,
+				new ISamplingStoppingCriterion[] {});
+	}
+
+	public Map<Instance, State> train(final AdvancedLearner learner, final List<Instance> trainingInstances,
+			final int numberOfEpochs, final ITrainingStoppingCriterion[] trainingStoppingCrits,
+			final ISamplingStoppingCriterion[] samplingStoppingCrits) {
 
 		log.info("Start training procedure...");
 
@@ -136,24 +150,39 @@ public class SemanticParsingCRF {
 
 					finalStates.put(instance, currentState);
 
-					if (meetsStoppingCriterion(stoppingCriterion, producedStateChain))
+					if (meetsSamplingStoppingCriterion(samplingStoppingCrits, producedStateChain))
 						break;
 
 				}
+				this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 				LogUtils.logState(log,
 						TRAIN_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + ++instanceIndex + "/"
 								+ trainingInstances.size() + "]" + "[" + (samplingStep + 1) + "]",
 						instance, currentState);
+				log.info("Time: " + this.trainingStatistics.getTotalDuration());
 			}
+
+			if (meetsTrainingStoppingCriterion(trainingStoppingCrits, finalStates))
+				break;
+
 		}
 		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 		return finalStates;
 	}
 
-	private boolean meetsStoppingCriterion(IStoppingCriterion[] stoppingCriterion,
+	private boolean meetsSamplingStoppingCriterion(ISamplingStoppingCriterion[] stoppingCriterion,
 			final List<State> producedStateChain) {
-		for (IStoppingCriterion sc : stoppingCriterion) {
+		for (ISamplingStoppingCriterion sc : stoppingCriterion) {
 			if (sc.meetsCondition(producedStateChain))
+				return true;
+		}
+		return false;
+	}
+
+	private boolean meetsTrainingStoppingCriterion(ITrainingStoppingCriterion[] stoppingCriterion,
+			final Map<Instance, State> producedStateChain) {
+		for (ITrainingStoppingCriterion sc : stoppingCriterion) {
+			if (sc.meetsCondition(producedStateChain.values()))
 				return true;
 		}
 		return false;
@@ -177,7 +206,7 @@ public class SemanticParsingCRF {
 		return this.testStatistics;
 	}
 
-	public Map<Instance, State> test(List<Instance> testInstances, IStoppingCriterion... stoppingCriterion) {
+	public Map<Instance, State> test(List<Instance> testInstances, ISamplingStoppingCriterion... stoppingCriterion) {
 		this.testStatistics.startTrainingTime = System.currentTimeMillis();
 
 		final Map<Instance, State> finalStates = new LinkedHashMap<>();
@@ -214,13 +243,16 @@ public class SemanticParsingCRF {
 
 				finalStates.put(instance, currentState);
 
-				if (meetsStoppingCriterion(stoppingCriterion, producedStateChain))
+				if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain))
 					break;
 
 			}
+			this.testStatistics.endTrainingTime = System.currentTimeMillis();
 			LogUtils.logState(log,
 					TEST_CONTEXT + "[" + ++instanceIndex + "/" + testInstances.size() + "] [" + samplingStep + "]",
 					instance, currentState);
+			log.info("Time: " + this.testStatistics.getTotalDuration());
+
 		}
 		this.testStatistics.endTrainingTime = System.currentTimeMillis();
 		return finalStates;

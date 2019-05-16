@@ -10,7 +10,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  * @author hterhors
  *
  */
-public interface IStoppingCriterion {
+public interface ISamplingStoppingCriterion {
 
 	/**
 	 * Returns true if the condition of stopping criterion is fulfilled

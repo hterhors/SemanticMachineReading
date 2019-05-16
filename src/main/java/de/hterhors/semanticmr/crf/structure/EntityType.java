@@ -143,7 +143,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		return multiAnnotationSlotTypes;
 	}
 
-	private Set<EntityType> getSuperEntityTypes() {
+	public Set<EntityType> getSuperEntityTypes() {
 		if (superEntityTypes == null) {
 			superEntityTypes = Collections.unmodifiableSet(this.superEntityTypeNames.stream()
 					.map(slotTypeName -> EntityType.get(slotTypeName)).sorted().collect(Collectors.toSet()));

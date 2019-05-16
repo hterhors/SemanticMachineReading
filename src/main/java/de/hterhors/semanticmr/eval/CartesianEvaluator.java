@@ -30,7 +30,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 
 	private static Stream<List<Integer>> getPermutationStream(final int size) {
 
-		if (permutationCache.length < size)
+		if (permutationCache.length <= size)
 			throw new IllegalArgumentException(
 					"Requested permutation size " + size + " exceeds maximum size of: " + MAXIMUM_PERMUTATION_SIZE);
 

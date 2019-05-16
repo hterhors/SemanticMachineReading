@@ -110,9 +110,15 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 		for (AbstractAnnotation annotation : getPredictedAnnotations(state)) {
 
 			if (annotation.isInstanceOfDocumentLinkedAnnotation()) {
-				factors.add(new IntraTokenScope(this, annotation.asInstanceOfDocumentLinkedAnnotation().getEntityType(),
-						annotation.asInstanceOfDocumentLinkedAnnotation().getSurfaceForm()));
+				factors.add(new IntraTokenScope(this, annotation.asInstanceOfLiteralAnnotation().getEntityType(),
+						annotation.asInstanceOfLiteralAnnotation().getSurfaceForm()));
 			} else if (annotation.isInstanceOfEntityTemplate()) {
+
+				if (annotation.asInstanceOfEntityTemplate().getRootAnnotation().isInstanceOfLiteralAnnotation())
+					factors.add(new IntraTokenScope(this,
+							annotation.asInstanceOfEntityTemplate().getRootAnnotation().getEntityType(),
+							annotation.asInstanceOfEntityTemplate().getRootAnnotation().asInstanceOfLiteralAnnotation()
+									.getSurfaceForm()));
 
 				final EntityTemplateAnnotationFilter filter = annotation.asInstanceOfEntityTemplate().filter()
 						.singleSlots().multiSlots().merge().nonEmpty().literalAnnoation().build();
@@ -137,6 +143,10 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 
 		getTokenNgrams(factor.getFeatureVector(), factor.getFactorScope().entityType.entityName,
 				factor.getFactorScope().surfaceForm);
+		for (EntityType e : factor.getFactorScope().entityType.getSuperEntityTypes()) {
+
+			getTokenNgrams(factor.getFeatureVector(), e.entityName, factor.getFactorScope().surfaceForm);
+		}
 
 	}
 

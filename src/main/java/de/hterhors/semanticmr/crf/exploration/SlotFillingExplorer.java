@@ -23,6 +23,8 @@ import de.hterhors.semanticmr.crf.variables.State;
 public class SlotFillingExplorer implements IExplorationStrategy {
 	private static Logger log = LogManager.getFormatterLogger(SlotFillingExplorer.class);
 
+	public static int MAX_NUMBER_OF_ANNOTATIONS;
+
 	final private AnnotationCandidateRetrievalCollection candidateProvider;
 
 	final private HardConstraintsProvider hardConstraintsProvider;
@@ -182,6 +184,9 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				 * Do not add if maximum number of fillers is reached.
 				 */
 				if (entityTemplate.getMultiFillerSlot(slot).containsMaximumFiller())
+					continue;
+
+				if (entityTemplate.getMultiFillerSlot(slot).size() == MAX_NUMBER_OF_ANNOTATIONS)
 					continue;
 
 				/*
