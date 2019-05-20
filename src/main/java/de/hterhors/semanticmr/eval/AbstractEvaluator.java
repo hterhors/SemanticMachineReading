@@ -1,7 +1,9 @@
 package de.hterhors.semanticmr.eval;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,16 +20,155 @@ public abstract class AbstractEvaluator {
 
 	final public EEvaluationDetail evaluationDetail;
 
+	/**
+	 * Mean computation time for computing pairwise scores. This variable is used to
+	 * update multi thread probabilities.
+	 */
+	private double meanComputationTime = 0;
+
+	/**
+	 * Probabilities of whether to rely on multi thread method or single thread
+	 * method for computing scores.
+	 */
+	private double[] multiThreadProbs = new double[] { 0.0D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D,
+			0.5D };
+
 	public AbstractEvaluator(EEvaluationDetail evaluationDetail) {
 		this.evaluationDetail = evaluationDetail;
 	}
 
+	private static class ComparePair {
+
+		final AbstractAnnotation value;
+		final AbstractAnnotation otherVal;
+		final boolean invert;
+		final int i;
+		final int j;
+
+		public ComparePair(AbstractAnnotation value, AbstractAnnotation othertVal, boolean invert, int i, int j) {
+			this.value = value;
+			this.otherVal = othertVal;
+			this.invert = invert;
+			this.i = i;
+			this.j = j;
+		}
+
+		@Override
+		public String toString() {
+			return "ComparePair [value=" + value + ", otherVal=" + otherVal + ", invert=" + invert + ", i=" + i + ", j="
+					+ j + "]";
+		}
+
+	}
+
+	/**
+	 * Computes the scores of all possible pairs between the two given collections
+	 * of slot filler variables.
+	 * 
+	 * This method makes use of single and multi threaded computation method. Based
+	 * on the computation time for the specific number of values that needs to be
+	 * compared, a probability is computed of whether the scores are computed multi
+	 * or single threaded.
+	 * 
+	 * @param slotFiller
+	 * @param otherSlotFiller
+	 * @param maxSize
+	 * @return
+	 */
 	protected Score[][] computeScores(final Collection<AbstractAnnotation> slotFiller,
 			final Collection<AbstractAnnotation> otherSlotFiller, final int maxSize) {
 
+		final double multiThreadProb = multiThreadProbs.length > maxSize ? multiThreadProbs[maxSize]
+				: multiThreadProbs[multiThreadProbs.length - 1];
+
+		final boolean multiThread = Math.random() < multiThreadProb;
+		final Score[][] scores;
+
+		long t = System.nanoTime();
+		if (multiThread) {
+			scores = multiThreaded(slotFiller, otherSlotFiller, maxSize);
+		} else {
+			scores = singleThreaded(slotFiller, otherSlotFiller, maxSize);
+		}
+		double newTime = System.nanoTime() - t;
+		updateProbs(maxSize, multiThread, meanComputationTime > newTime);
+		meanComputationTime += newTime;
+		meanComputationTime /= 2;
+
+		return scores;
+	}
+
+	private void updateProbs(int maxSize, boolean multiThread, boolean faster) {
+		if (maxSize >= multiThreadProbs.length)
+			return;
+
+		if (multiThread) {
+			if (faster) {
+				multiThreadProbs[maxSize] = Math.min(0.9D, multiThreadProbs[maxSize] + 0.01);
+			} else {
+				multiThreadProbs[maxSize] = Math.max(0.1D, multiThreadProbs[maxSize] - 0.01);
+			}
+		} else {
+			if (faster) {
+				multiThreadProbs[maxSize] = Math.max(0.1D, multiThreadProbs[maxSize] - 0.01);
+			} else {
+				multiThreadProbs[maxSize] = Math.min(0.9D, multiThreadProbs[maxSize] + 0.01);
+			}
+		}
+	}
+
+	public Score[][] singleThreaded(final Collection<AbstractAnnotation> slotFiller,
+			final Collection<AbstractAnnotation> otherSlotFiller, final int maxSize) {
 		final Score[][] scores = new Score[maxSize][maxSize];
 
 		final Iterator<AbstractAnnotation> slotFillerIterator = slotFiller.iterator();
+
+		int i = 0;
+
+		while (i != maxSize) {
+
+			final AbstractAnnotation slotFillerVal;
+
+			if (slotFillerIterator.hasNext()) {
+				slotFillerVal = slotFillerIterator.next();
+			} else {
+				slotFillerVal = null;
+			}
+
+			int j = 0;
+
+			final Iterator<AbstractAnnotation> otherSlotFillerIterator = otherSlotFiller.iterator();
+
+			while (j != maxSize) {
+
+				final AbstractAnnotation otherSlotFillerVal;
+
+				if (otherSlotFillerIterator.hasNext()) {
+					otherSlotFillerVal = otherSlotFillerIterator.next();
+				} else {
+					otherSlotFillerVal = null;
+				}
+
+				if (slotFillerVal == null) {
+					scores[i][j] = scoreSingle(otherSlotFillerVal, slotFillerVal).invert();
+				} else {
+					scores[i][j] = scoreSingle(slotFillerVal, otherSlotFillerVal);
+				}
+				j++;
+			}
+			i++;
+		}
+
+		return scores;
+	}
+
+	public Score[][] multiThreaded(final Collection<AbstractAnnotation> slotFiller,
+			final Collection<AbstractAnnotation> otherSlotFiller, final int maxSize) {
+		final Score[][] scores = new Score[maxSize][maxSize];
+
+		final Iterator<AbstractAnnotation> slotFillerIterator = slotFiller.iterator();
+
+		final List<ComparePair> listOfPairs = new ArrayList<>((int) Math.pow(maxSize, 2));
 
 		int i = 0;
 
@@ -54,14 +195,23 @@ public abstract class AbstractEvaluator {
 					otherSlotFillerVal = null;
 				}
 				if (slotFillerVal == null) {
-					scores[i][j] = scoreSingle(otherSlotFillerVal, slotFillerVal).invert();
+					listOfPairs.add(new ComparePair(otherSlotFillerVal, slotFillerVal, true, i, j));
 				} else {
-					scores[i][j] = scoreSingle(slotFillerVal, otherSlotFillerVal);
+					listOfPairs.add(new ComparePair(slotFillerVal, otherSlotFillerVal, false, i, j));
 				}
 				j++;
 			}
 			i++;
 		}
+		listOfPairs.parallelStream().forEach(pair -> {
+			final Score s;
+			if (pair.invert)
+				s = scoreSingle(pair.value, pair.otherVal).invert();
+			else
+				s = scoreSingle(pair.value, pair.otherVal);
+
+			scores[pair.i][pair.j] = s;
+		});
 
 		return scores;
 	}
@@ -89,93 +239,4 @@ public abstract class AbstractEvaluator {
 			Collection<AbstractAnnotation> otherAnnotations) {
 		return scoreMax(annotations, otherAnnotations);
 	}
-
-//	public static void test() throws DocumentLinkedAnnotationMismatchException {
-//
-//		List<DocumentToken> tokenList = new ArrayList<>();
-//		tokenList.add(new DocumentToken(0, 0, 0, 0, 0, "male"));
-//		tokenList.add(new DocumentToken(0, 1, 1, 5, 5, "Eight-week-old"));
-//		tokenList.add(new DocumentToken(0, 2, 2, 21, 21, "Eight-week-old"));
-//		tokenList.add(new DocumentToken(0, 3, 3, 36, 36, "8 w"));
-//		Document d = new Document("name1", tokenList);
-//
-//		SystemInitializer.initialize(new CSVSlotFillingSpecs().specificationProvider).apply();
-//
-//		DocumentLinkedAnnotation o1 = AnnotationBuilder.toAnnotation(d, "Male", "male", 0);
-//		LiteralAnnotation o2 = AnnotationBuilder.toAnnotation("Male", "male");
-//		EntityTypeAnnotation o3 = AnnotationBuilder.toAnnotation("Male");
-//
-//		DocumentLinkedAnnotation dl1 = AnnotationBuilder.toAnnotation(d, "Age", "Eight-week-old", 5);
-//		DocumentLinkedAnnotation dl2 = AnnotationBuilder.toAnnotation(d, "Age", "Eight-week-old", 21);
-//		DocumentLinkedAnnotation dl3 = AnnotationBuilder.toAnnotation(d, "Age", "8 w", 36);
-//
-//		System.out.println("false: " + scoreSingle(dl1, o1));
-//		System.out.println("false: " + scoreSingle(dl2, o2));
-//		System.out.println("false: " + scoreSingle(dl3, o3));
-//
-//		System.out.println();
-//
-//		System.out.println("false: " + scoreSingle(dl1, dl2));
-//		System.out.println("false: " + scoreSingle(dl1, dl3));
-//		System.out.println("false: " + scoreSingle(dl2, dl3));
-//		System.out.println();
-//
-//		System.out.println("true: " + scoreSingle(dl1, dl2));
-//		System.out.println("false: " + scoreSingle(dl1, dl3));
-//		System.out.println("false: " + scoreSingle(dl2, dl3));
-//		System.out.println();
-//
-//		System.out.println("true: " + scoreSingle(dl1, dl2));
-//		System.out.println("true: " + scoreSingle(dl1, dl3));
-//		System.out.println("true: " + scoreSingle(dl2, dl3));
-//
-//		System.out.println();
-//		System.out.println();
-//
-//		System.out.println("true: " + scoreSingle(o1, o1));
-//		System.out.println("true: " + scoreSingle(o2, o2));
-//		System.out.println("true: " + scoreSingle(o3, o3));
-//
-//		System.out.println("false: " + scoreSingle(o1, o2));
-//		System.out.println("false: " + scoreSingle(o1, o3));
-//
-//		System.out.println("false: " + scoreSingle(o2, o1));
-//		System.out.println("false: " + scoreSingle(o2, o3));
-//
-//		System.out.println("false: " + scoreSingle(o3, o1));
-//		System.out.println("false: " + scoreSingle(o3, o2));
-//
-//		System.out.println();
-//		System.out.println();
-//
-//		System.out.println("true: " + scoreSingle(o1, o1));
-//		System.out.println("true: " + scoreSingle(o2, o2));
-//		System.out.println("true: " + scoreSingle(o3, o3));
-//
-//		System.out.println("true: " + scoreSingle(o1, o2));
-//		System.out.println("false: " + scoreSingle(o1, o3));
-//
-//		System.out.println("true: " + scoreSingle(o2, o1));
-//		System.out.println("false: " + scoreSingle(o2, o3));
-//
-//		System.out.println("false: " + scoreSingle(o3, o1));
-//		System.out.println("false: " + scoreSingle(o3, o2));
-//
-//		System.out.println();
-//		System.out.println();
-//
-//		System.out.println("true: " + scoreSingle(o1, o1));
-//		System.out.println("true: " + scoreSingle(o2, o2));
-//		System.out.println("true: " + scoreSingle(o3, o3));
-//
-//		System.out.println("true: " + scoreSingle(o1, o2));
-//		System.out.println("true: " + scoreSingle(o1, o3));
-//
-//		System.out.println("true: " + scoreSingle(o2, o1));
-//		System.out.println("true: " + scoreSingle(o2, o3));
-//
-//		System.out.println("true: " + scoreSingle(o3, o1));
-//		System.out.println("true: " + scoreSingle(o3, o2));
-//
-//	}
 }

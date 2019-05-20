@@ -88,7 +88,7 @@ public class CreateJsonCorpus {
 			for (QuestionAnswerPair pair : i.getValue()) {
 
 				EntityTemplate qa = new EntityTemplate(AnnotationBuilder.toAnnotation("QAQuestion"));
-				ita.addMultiSlotFiller(SlotType.get("hasQAQuestions"), qa);
+				ita.addMultiSlotFiller(null,SlotType.get("hasQAQuestions"), qa);
 
 				qa.setSingleSlotFiller(SlotType.get("hasQuestion"),
 						AnnotationBuilder.toAnnotation("Question", pair.question));

@@ -247,7 +247,8 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * filling and is parameterized with a candidate retrieval and the
 		 * constraintsProvider.
 		 */
-		SlotFillingExplorer explorer = new SlotFillingExplorer(candidateRetrieval, constraintsProvider);
+		SlotFillingExplorer explorer = new SlotFillingExplorer(objectiveFunction, candidateRetrieval,
+				constraintsProvider);
 
 		/**
 		 * The learner defines the update strategy of learned weights. parameters are
@@ -366,7 +367,8 @@ public class SlotFillingExample extends AbstractSemReadProject {
 			/**
 			 * Train the CRF.
 			 */
-			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs, sampleStoppingCrits);
+			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs,
+					sampleStoppingCrits);
 
 			/**
 			 * Save the model as binary. Do not override, in case a file already exists for

@@ -96,7 +96,7 @@ public class Olp2ExtractionMain extends AbstractSemReadProject {
 		ISamplingStoppingCriterion noModelChangeCrit = new ConverganceCrit(3, s -> s.getModelScore());
 		ISamplingStoppingCriterion[] sampleStoppingCrits = new ISamplingStoppingCriterion[] { maxStepCrit,
 				noModelChangeCrit };
-		SlotFillingExplorer explorer = new SlotFillingExplorer(candidateProvider);
+		SlotFillingExplorer explorer = new SlotFillingExplorer(objectiveFunction,candidateProvider);
 
 		final File modelDir = new File("models/olp2/test1/");
 		final String modelName = "Model3";

@@ -10,6 +10,7 @@ import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection
 import de.hterhors.semanticmr.candprov.sf.IEntityTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.candprov.sf.ISlotTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
+import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
@@ -28,16 +29,20 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	final private AnnotationCandidateRetrievalCollection candidateProvider;
 
 	final private HardConstraintsProvider hardConstraintsProvider;
+	final private IObjectiveFunction objectiveFunction;
 
-	public SlotFillingExplorer(AnnotationCandidateRetrievalCollection candidateProvider,
-			HardConstraintsProvider hardConstraintsProvder) {
+	public SlotFillingExplorer(IObjectiveFunction objectiveFunction,
+			AnnotationCandidateRetrievalCollection candidateProvider, HardConstraintsProvider hardConstraintsProvder) {
 		this.candidateProvider = candidateProvider;
 		this.hardConstraintsProvider = hardConstraintsProvder;
+		this.objectiveFunction = objectiveFunction;
 	}
 
-	public SlotFillingExplorer(AnnotationCandidateRetrievalCollection candidateProvider) {
+	public SlotFillingExplorer(IObjectiveFunction objectiveFunction,
+			AnnotationCandidateRetrievalCollection candidateProvider) {
 		this.candidateProvider = candidateProvider;
 		this.hardConstraintsProvider = null;
+		this.objectiveFunction = objectiveFunction;
 	}
 
 	/**
@@ -151,7 +156,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				if (slotFillerCandidate == entityTemplate)
 					continue;
 
-				if (entityTemplate.getMultiFillerSlot(slot).containsSlotFiller(slotFillerCandidate))
+				if (entityTemplate.getMultiFillerSlot(slot).containsSlotFiller(objectiveFunction, slotFillerCandidate))
 					continue;
 
 				if (slotFillerCandidate.getEntityType().isLeafEntityType()
@@ -163,7 +168,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 					final EntityTemplate deepCopy = entityTemplate.deepCopy();
 
-					deepCopy.updateMultiFillerSlot(slot, slotFiller, slotFillerCandidate);
+					deepCopy.updateMultiFillerSlot(objectiveFunction, slot, slotFiller, slotFillerCandidate);
 
 					if (violatesConstraints(deepCopy))
 						continue;
@@ -195,7 +200,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				if (slotFillerCandidate == entityTemplate)
 					continue;
 
-				if (entityTemplate.getMultiFillerSlot(slot).containsSlotFiller(slotFillerCandidate))
+				if (entityTemplate.getMultiFillerSlot(slot).containsSlotFiller(objectiveFunction, slotFillerCandidate))
 					continue;
 
 				if (slotFillerCandidate.getEntityType().isLeafEntityType()
@@ -204,7 +209,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				}
 
 				final EntityTemplate deepCopy = entityTemplate.deepCopy();
-				deepCopy.addMultiSlotFiller(slot, slotFillerCandidate);
+				deepCopy.addMultiSlotFiller(objectiveFunction, slot, slotFillerCandidate);
 
 				if (violatesConstraints(deepCopy))
 					continue;

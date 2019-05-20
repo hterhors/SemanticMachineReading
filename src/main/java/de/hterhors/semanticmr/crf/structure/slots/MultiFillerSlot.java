@@ -3,8 +3,10 @@ package de.hterhors.semanticmr.crf.structure.slots;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
+import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.exce.ExceedsMaxSlotFillerException;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 
@@ -40,8 +42,18 @@ public class MultiFillerSlot extends AbstractSlot {
 		return slotFiller.size() == slotType.slotMaxCapacity;
 	}
 
-	public boolean containsSlotFiller(AbstractAnnotation slotFillerCandidate) {
-		return this.slotFiller.contains(slotFillerCandidate);
+	public boolean containsSlotFiller(IObjectiveFunction objectiveFunction, AbstractAnnotation slotFillerCandidate) {
+		if (objectiveFunction != null) {
+
+			for (AbstractAnnotation slotFillerValue : slotFiller) {
+				if (slotFillerValue.evaluate(objectiveFunction.getEvaluator(), slotFillerCandidate).getF1() == 1.0F) {
+					return true;
+				}
+			}
+//		} else {
+//			return this.slotFiller.contains(slotFillerCandidate);
+		}
+		return false;
 	}
 
 	@Override

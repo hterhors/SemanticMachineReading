@@ -5,8 +5,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.jena.sparql.function.library.eval;
+
 import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
 
+import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
@@ -121,13 +124,13 @@ final public class EntityTemplate extends AbstractAnnotation {
 		return this;
 	}
 
-	public void updateMultiFillerSlot(SlotType slotType, AbstractAnnotation slotFiller,
-			AbstractAnnotation slotFillerCandidate) {
+	public void updateMultiFillerSlot(IObjectiveFunction objectiveFunction, SlotType slotType,
+			AbstractAnnotation slotFiller, AbstractAnnotation slotFillerCandidate) {
 
 		if (slotFillerCandidate == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
 
-		if (getMultiFillerSlot(slotType).containsSlotFiller(slotFillerCandidate)) {
+		if (getMultiFillerSlot(slotType).containsSlotFiller(objectiveFunction, slotFillerCandidate)) {
 			System.out.println("WARN: can not add same object twice: " + slotFiller.toPrettyString());
 			throw new IllegalSlotFillerException("Can not update slot \"" + slotType.toPrettyString()
 					+ "\" with slot filler: \"" + slotFiller.toPrettyString() + "\"");
@@ -136,12 +139,32 @@ final public class EntityTemplate extends AbstractAnnotation {
 		getMultiFillerSlot(slotType).replace(slotFiller, slotFillerCandidate);
 	}
 
+	/**
+	 * Adds a new value to the slot without checking, whether the set already
+	 * contains this value or not.
+	 * 
+	 * @param slotType
+	 * @param slotFiller
+	 */
 	public void addMultiSlotFiller(SlotType slotType, final AbstractAnnotation slotFiller) {
+		addMultiSlotFiller(null, slotType, slotFiller);
+	}
+
+	/**
+	 * Adds the given value to the set of values, iff the value is not contained in
+	 * the set, based on the objective function return value equals 1 or not.
+	 * 
+	 * @param objectiveFunction
+	 * @param slotType
+	 * @param slotFiller
+	 */
+	public void addMultiSlotFiller(IObjectiveFunction objectiveFunction, SlotType slotType,
+			final AbstractAnnotation slotFiller) {
 
 		if (slotFiller == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
 
-		if (getMultiFillerSlot(slotType).containsSlotFiller(slotFiller)) {
+		if (getMultiFillerSlot(slotType).containsSlotFiller(objectiveFunction, slotFiller)) {
 			System.out.println("WARN: can not add same object twice: " + slotFiller.toPrettyString());
 			throw new IllegalSlotFillerException("Can not add same object twice: \"" + slotType.toPrettyString()
 					+ "\" with slot filler: \"" + slotFiller.toPrettyString() + "\"");

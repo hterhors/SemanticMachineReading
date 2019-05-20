@@ -2,8 +2,6 @@ package de.hterhors.semanticmr.crf.of;
 
 import java.util.List;
 
-import org.apache.jena.sparql.function.library.eval;
-
 import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
@@ -29,6 +27,11 @@ public class SlotFillingObjectiveFunction implements IObjectiveFunction {
 	@Override
 	public void score(List<State> states) {
 		states.parallelStream().forEach(state -> score(state));
+	}
+
+	@Override
+	public AbstractEvaluator getEvaluator() {
+		return evaluator;
 	}
 
 }

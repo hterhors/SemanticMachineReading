@@ -3,20 +3,20 @@ package de.hterhors.semanticmr.eval;
 public enum EEvaluationDetail {
 
 	/**
-	 * Most detailed annotation, checks the full fields of a document linked
-	 * annotation.
+	 * Most detailed annotation, checks all attributes of a document linked
+	 * annotation. This includes: surface form, textual position and entity type.
 	 */
 	DOCUMENT_LINKED,
 
 	/**
-	 * Second most detailed evaluation. Checks only the literal and entity type of
-	 * each annotation (includes document linked annotation)
+	 * Second most detailed evaluation. Checks only the surface form and entity
+	 * type. The offset position in the text is not checked.
 	 */
 	LITERAL,
 
 	/**
-	 * Least detailed evaluation mode. Checks only for entity types. Ignores
-	 * literals and document positions.
+	 * Least detailed evaluation. Checks only for entity types. Ignores surface
+	 * forms and offset positions.
 	 */
 	ENTITY_TYPE;
 }

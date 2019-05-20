@@ -151,7 +151,7 @@ public class JsonInstanceWrapperToInstance {
 					multiSlotWrapper.getValue().getEntityTemplateAnnotations());
 
 			for (AbstractAnnotation abstractSlotFiller : annotations) {
-				entityTemplate.addMultiSlotFiller(toSlotType(multiSlotWrapper.getKey()), abstractSlotFiller);
+				entityTemplate.addMultiSlotFiller(null, toSlotType(multiSlotWrapper.getKey()), abstractSlotFiller);
 			}
 
 		}

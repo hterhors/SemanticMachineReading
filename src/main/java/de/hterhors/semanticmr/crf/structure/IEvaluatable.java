@@ -154,6 +154,42 @@ public interface IEvaluatable {
 				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
 			this.fn++;
 		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + fn;
+			result = prime * result + fp;
+			result = prime * result + tn;
+			result = prime * result + tp;
+			result = prime * result + (unmod ? 1231 : 1237);
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Score other = (Score) obj;
+			if (fn != other.fn)
+				return false;
+			if (fp != other.fp)
+				return false;
+			if (tn != other.tn)
+				return false;
+			if (tp != other.tp)
+				return false;
+			if (unmod != other.unmod)
+				return false;
+			return true;
+		}
+		
+		
 	}
 
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal);

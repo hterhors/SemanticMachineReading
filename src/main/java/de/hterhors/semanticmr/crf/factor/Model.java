@@ -291,6 +291,8 @@ public class Model {
 
 			in.close();
 			final Model m = toModel(modelWrapper);
+			m.modelName = modelName;
+			m.modelBaseDir = modelBaseDir;
 			log.info("Model successfully loaded from: " + modelFile);
 			return m;
 		} catch (Exception e) {
