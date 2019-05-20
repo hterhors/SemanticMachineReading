@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.slotfilling;
+package de.hterhors.semanticmr.projects.examples.slotfilling;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,12 +42,12 @@ import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
-import de.hterhors.semanticmr.examples.slotfilling.specs.SFSpecs;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.JsonNerlaProvider;
 import de.hterhors.semanticmr.nerla.NerlaCollector;
 import de.hterhors.semanticmr.projects.AbstractSemReadProject;
-import de.hterhors.semanticmr.projects.psink.normalization.WeightNormalization;
+import de.hterhors.semanticmr.projects.examples.WeightNormalization;
+import de.hterhors.semanticmr.projects.examples.slotfilling.specs.SFSpecs;
 
 /**
  * Example of how to perform slot filling.

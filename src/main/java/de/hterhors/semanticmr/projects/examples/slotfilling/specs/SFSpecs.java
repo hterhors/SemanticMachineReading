@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.slotfilling.specs;
+package de.hterhors.semanticmr.projects.examples.slotfilling.specs;
 
 import java.io.File;
 

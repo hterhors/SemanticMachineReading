@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.examples.nerla;
+package de.hterhors.semanticmr.projects.examples.nerla;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,17 +31,16 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.dla.ContextBetweenAnnotationsTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.IntraTokenTemplate;
-import de.hterhors.semanticmr.crf.templates.shared.LevenshteinTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.TokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
-import de.hterhors.semanticmr.examples.nerla.specs.NERLASpecs;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.projects.AbstractSemReadProject;
-import de.hterhors.semanticmr.projects.psink.normalization.WeightNormalization;
+import de.hterhors.semanticmr.projects.examples.WeightNormalization;
+import de.hterhors.semanticmr.projects.examples.nerla.specs.NERLASpecs;
 
 /**
  * Example of how to perform named entity recognition and linking.

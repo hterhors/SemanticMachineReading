@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.examples.slotfilling.SlotFillingExample;
 import de.hterhors.semanticmr.exce.InvalidSpecificationFileFormatException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
 import de.hterhors.semanticmr.init.specifications.Specifications;
+import de.hterhors.semanticmr.projects.examples.slotfilling.SlotFillingExample;
 
 public class CSVScopeReader implements ISpecificationsReader {
 	private static Logger log = LogManager.getFormatterLogger(CSVScopeReader.class);

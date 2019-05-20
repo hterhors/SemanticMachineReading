@@ -15,8 +15,8 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.examples.slotfilling.SlotFillingExample;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
+import de.hterhors.semanticmr.projects.examples.slotfilling.SlotFillingExample;
 
 /**
  * @author hterhors
