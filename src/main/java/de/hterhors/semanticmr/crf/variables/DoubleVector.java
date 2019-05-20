@@ -3,7 +3,6 @@ package de.hterhors.semanticmr.crf.variables;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import de.hterhors.semanticmr.crf.factor.Model;
 
@@ -28,11 +27,6 @@ public class DoubleVector {
 	private double length = 0D;
 	private boolean isDirty = true;
 
-	/**
-	 * This class basically wraps a Map of feature names and values. Additionally,
-	 * it provides convenience functions for some of the computations during the
-	 * learning process.
-	 */
 	public DoubleVector() {
 		this.features = new HashMap<Integer, Double>();
 		this.isDirty = true;
@@ -46,16 +40,12 @@ public class DoubleVector {
 		} else {
 			features.remove(index);
 		}
+		this.isDirty = true;
 	}
 
 	public void set(String feature, Double value) {
 		final Integer index = Model.getIndexForFeatureName(feature);
-		if (value.doubleValue() != 0.0) {
-			features.put(index, value);
-		} else {
-			features.remove(index);
-		}
-		this.isDirty = true;
+		set(index, value);
 	}
 
 	public void set(String feature, boolean flag) {
@@ -81,10 +71,6 @@ public class DoubleVector {
 		return features;
 	}
 
-	public Set<Integer> getFeatureKeys() {
-		return features.keySet();
-	}
-
 	private void addToValue(Integer feature, double alpha) {
 		Double featureValue = getValueOfFeature(feature);
 		set(feature, new Double(featureValue.doubleValue() + alpha));
@@ -100,7 +86,7 @@ public class DoubleVector {
 	public double dotProduct(DoubleVector weights) {
 		DoubleVector smaller = null;
 		DoubleVector bigger = null;
-		if (getFeatureKeys().size() <= weights.getFeatureKeys().size()) {
+		if (features.size() <= weights.features.size()) {
 			smaller = this;
 			bigger = weights;
 		} else {

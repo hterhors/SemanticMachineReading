@@ -5,14 +5,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.jena.sparql.function.library.eval;
-
 import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
 
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
+import de.hterhors.semanticmr.crf.structure.slots.AbstractSlot;
 import de.hterhors.semanticmr.crf.structure.slots.MultiFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
@@ -20,6 +19,7 @@ import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 import de.hterhors.semanticmr.exce.UnkownMultiSlotException;
 import de.hterhors.semanticmr.exce.UnkownSingleSlotException;
+import de.hterhors.semanticmr.exce.UnkownSlotException;
 
 /**
  * The information extraction template that needs to be filled.
@@ -95,6 +95,22 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 	public boolean containsMultiFillerSlot(SlotType slotType) {
 		return multiFillerSlots.containsKey(slotType);
+	}
+
+	public AbstractSlot getSlot(SlotType slotType) {
+		AbstractSlot slot = singleFillerSlots.get(slotType);
+
+		if (slot != null)
+			return slot;
+
+		slot = multiFillerSlots.get(slotType);
+
+		if (slot != null)
+			return slot;
+
+		throw new UnkownSlotException(
+				"The requested  slot is unkown: " + slotType + " for entity type: " + getEntityType().entityName);
+
 	}
 
 	public SingleFillerSlot getSingleFillerSlot(SlotType slotType) {

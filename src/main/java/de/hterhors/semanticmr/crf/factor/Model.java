@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,7 +20,6 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
@@ -191,31 +191,57 @@ public class Model {
 		learner.updateWeights(this.factorTemplates, currentState, candidateState);
 	}
 
-	@Override
-	public String toString() {
-		factorTemplates.get(0).getWeights().getFeatures().entrySet()
-				.forEach(f -> System.out.println(indexFeatureName.get(f.getKey()) + ":" + f.getValue()));
-		return "";
-	}
-
 	public void printReadable() {
 		printReadable(this.modelBaseDir, this.modelName);
 	}
 
+//	public void printReadable(File modelDir, String modelName) {
+//		log.info("Print model in readable format...");
+//		try {
+//			for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
+//				File parentDir = new File(modelDir, modelName + DEFAULT_READABLE_DIR);
+//				parentDir.mkdirs();
+//
+//				final File f = new File(parentDir, template.getClass().getSimpleName());
+//
+//				PrintStream ps = new PrintStream(f);
+//				log.info("Print template to " + f.getAbsolutePath());
+//
+//				Map<Integer, Double> map = new HashMap<>();
+//				for (int i = 0; i < template.getWeights().getFeatures().length; i++) {
+//					map.put(i, template.getWeights().getFeatures()[i]);
+//				}
+//
+//				List<Entry<Integer, Double>> sortedWeights = new ArrayList<>(map.entrySet());
+//
+//				if (sortedWeights.size() == 0)
+//					log.warn("No features found for template: " + template.getClass().getSimpleName());
+//				Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
+//				for (Entry<Integer, Double> feature : sortedWeights) {
+//					ps.println(indexFeatureName.get(feature.getKey()) + "\t" + feature.getValue());
+//				}
+//				ps.close();
+//
+//			}
+//		} catch (IOException ex) {
+//			throw new RuntimeException("The model could not be printed. Failed with error: " + ex.getMessage());
+//		}
+//	}
+	
 	public void printReadable(File modelDir, String modelName) {
 		log.info("Print model in readable format...");
 		try {
 			for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
 				File parentDir = new File(modelDir, modelName + DEFAULT_READABLE_DIR);
 				parentDir.mkdirs();
-
+				
 				final File f = new File(parentDir, template.getClass().getSimpleName());
-
+				
 				PrintStream ps = new PrintStream(f);
 				log.info("Print template to " + f.getAbsolutePath());
 				List<Entry<Integer, Double>> sortedWeights = new ArrayList<>(
 						template.getWeights().getFeatures().entrySet());
-
+				
 				if (sortedWeights.size() == 0)
 					log.warn("No features found for template: " + template.getClass().getSimpleName());
 				Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
@@ -223,7 +249,7 @@ public class Model {
 					ps.println(indexFeatureName.get(feature.getKey()) + "\t" + feature.getValue());
 				}
 				ps.close();
-
+				
 			}
 		} catch (IOException ex) {
 			throw new RuntimeException("The model could not be printed. Failed with error: " + ex.getMessage());

@@ -7,7 +7,7 @@ package de.hterhors.semanticmr.exce;
  * @author hterhors
  *
  */
-public class UnkownSingleSlotException extends RuntimeException {
+public class UnkownSingleSlotException extends UnkownSlotException {
 
 	/**
 	 * 
