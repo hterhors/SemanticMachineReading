@@ -53,8 +53,8 @@ public class SemanticParsingCRF {
 	 */
 	final static public int MAX_SAMPLING = 100;
 
-	private static final String TEST_CONTEXT = "Test";
-	private static final String TRAIN_CONTEXT = "Train";
+	private static final String TRAIN_CONTEXT = "===========TRAIN============\n";
+	private static final String TEST_CONTEXT = "===========TEST============\n";
 
 	final IExplorationStrategy explorer;
 

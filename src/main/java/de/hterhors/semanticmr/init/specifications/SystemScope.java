@@ -20,13 +20,16 @@ public class SystemScope {
 
 	private static SystemScope instance = null;
 
-	private SystemScope() {
+	private Set<Specifications> specifications = new HashSet<>();
+
+	private SystemScope(Set<Specifications> specifications) {
 		EntityType.getEntityTypes().stream().forEach(et -> {
 			if (et.isLiteral && et.getNormalizationFunction() == IdentityNormalization.getInstance()) {
 				log.warn("No normalization function for literal entity type \"" + et.entityName
-						+ "\" was specified. Set default to \"" + IdentityNormalization.class.getSimpleName()+"\"");
+						+ "\" was specified. Set default to \"" + IdentityNormalization.class.getSimpleName() + "\"");
 			}
 		});
+		this.specifications = specifications;
 		log.info("System successfully initialized!");
 	}
 
@@ -38,13 +41,19 @@ public class SystemScope {
 		return instance;
 	}
 
-	public Specifications getSpecifications() {
-		throw new NotImplementedException("NOT IMPL");
+	public Specifications getSpecification() {
+		if (specifications.size() > 1)
+			throw new NotImplementedException("NOT IMPL");
+		// TODO: Merge specs, for now just a single specs is supported
+
+		return specifications.iterator().next();
 	}
 
 	static public class Builder {
 
 		private static Builder builder = null;
+
+		private Set<Specifications> specifications = new HashSet<>();
 
 		private Builder() {
 			log.info("Initialize system...");
@@ -59,8 +68,12 @@ public class SystemScope {
 		}
 
 		public SystemScope build() {
-			instance = new SystemScope();
+			instance = new SystemScope(specifications);
 			return instance;
+		}
+
+		public void addSpecs(Specifications specification) {
+			specifications.add(specification);
 		}
 
 	}
@@ -106,7 +119,7 @@ public class SystemScope {
 
 		public NormalizationFunctionHandler apply() {
 			if (specsReaderSet.isEmpty()) {
-				log.error("No specifications were added. System might not run properly! Call System.exit()");
+				log.error("No specifications were added. System might not run properly! System exit!");
 				System.exit(-1);
 			}
 
@@ -116,6 +129,8 @@ public class SystemScope {
 
 				SlotType.getInitializationInstance().system_init(specification);
 				EntityType.getInitializationInstance().system_init(specification);
+
+				builder.addSpecs(specification);
 			}
 
 			return NormalizationFunctionHandler.getInstance(builder);

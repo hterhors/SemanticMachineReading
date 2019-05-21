@@ -75,7 +75,7 @@ public class SantoRDFConverter {
 
 			try {
 				EntityTemplate entityTemplate = new EntityTemplate(
-						toEntityTypeAnnotation(document, SantoHelper.getResource(object), annotation));
+						toEntityTemplateTypeAnnotation(document, SantoHelper.getResource(object), annotation));
 
 				fillRec(document, entityTemplate, rootDataPoint);
 
@@ -222,7 +222,7 @@ public class SantoRDFConverter {
 		}
 	}
 
-	private EntityTypeAnnotation toEntityTypeAnnotation(Document document, String resource,
+	private EntityTypeAnnotation toEntityTemplateTypeAnnotation(Document document, String resource,
 			RDFRelatedAnnotation annotation) throws DocumentLinkedAnnotationMismatchException {
 		if (annotation == null) {
 			return AnnotationBuilder.toAnnotation(resource);
@@ -251,7 +251,7 @@ public class SantoRDFConverter {
 		final Set<String> subEntities = new HashSet<>();
 
 		for (String rootEntityType : rootEntityTypes) {
-			subEntities.addAll(this.systemScope.getSpecifications().getSubEntityTypeNames(rootEntityType));
+			subEntities.addAll(this.systemScope.getSpecification().getSubEntityTypeNames(rootEntityType));
 		}
 
 		for (Entry<String, Map<String, Set<String>>> triple : rdfData.entrySet()) {
@@ -274,8 +274,9 @@ public class SantoRDFConverter {
 	private Map<String, Map<String, Set<String>>> readRDFData(File inputFile) throws IOException {
 		final Map<String, Map<String, Set<String>>> rdfData = new HashMap<>();
 
-		Files.readAllLines(inputFile.toPath()).stream().forEach(l -> {
+		Files.readAllLines(inputFile.toPath()).stream().filter(l -> !l.startsWith("#")).forEach(l -> {
 			Matcher m = PatternCollection.TRIPLE_EXTRACTOR_PATTERN.matcher(l);
+		
 			if (m.find()) {
 
 				String domain = m.group(1);
