@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.tokenizer;
+package de.hterhors.semanticmr.crf.helper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
+import de.hterhors.semanticmr.tokenizer.RegExTokenizer;
+import de.hterhors.semanticmr.tokenizer.SentenceSplitter;
+import de.hterhors.semanticmr.tokenizer.Tokenization;
 import de.hterhors.semanticmr.tokenizer.Tokenization.Token;
 
 public class DefaultDocumentTokenizer {

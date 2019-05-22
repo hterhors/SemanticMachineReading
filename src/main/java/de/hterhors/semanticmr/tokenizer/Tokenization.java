@@ -23,7 +23,7 @@ public class Tokenization {
 				+ tokens + "]";
 	}
 
-	static class Token implements Serializable {
+	public static class Token implements Serializable {
 
 		/**
 		 * 

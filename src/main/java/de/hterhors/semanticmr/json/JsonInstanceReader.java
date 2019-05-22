@@ -16,12 +16,12 @@ import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.json.converter.JsonInstanceWrapperToInstance;
 import de.hterhors.semanticmr.json.wrapper.JsonInstanceWrapper;
 
-public class JsonInstancesReader {
-	private static Logger log = LogManager.getFormatterLogger(JsonInstancesReader.class);
+public class JsonInstanceReader {
+	private static Logger log = LogManager.getFormatterLogger(JsonInstanceReader.class);
 
 	private final File corpusDirectory;
 
-	public JsonInstancesReader(final File corpusDirectory) {
+	public JsonInstanceReader(final File corpusDirectory) {
 		this.corpusDirectory = corpusDirectory;
 	}
 
@@ -49,8 +49,7 @@ public class JsonInstancesReader {
 			if (count % 100 == 0) {
 				log.debug(" - " + count + " - ");
 			}
-			List<JsonInstanceWrapper> jsonInstances = new JsonInstanceIO(true)
-					.readInstances(new String(Files.readAllBytes(jsonFile.toPath())));
+			List<JsonInstanceWrapper> jsonInstances = new JsonInstanceIO(true).readInstances(jsonFile);
 
 			trainingInstances.addAll(new JsonInstanceWrapperToInstance(jsonInstances).convertToInstances());
 		}

@@ -108,6 +108,12 @@
 			<AppenderRef ref="Console" />
 			<AppenderRef ref="LogFile" />
 		</Logger>
+		<Logger
+			name="de.hterhors.semanticmr.projects.examples.corpus.nerl.NerlCorpusCreationExample"
+			level="INFO" additivity="false">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="LogFile" />
+		</Logger>
 
 	</Loggers>
 

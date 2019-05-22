@@ -30,13 +30,13 @@ public class SystemScope {
 			}
 		});
 		this.specifications = specifications;
-		log.info("System successfully initialized!");
+		log.info("Systems scope successfully initialized!");
 	}
 
 	public static SystemScope getInstance() {
 
 		if (instance == null)
-			throw new SystemNotInitializedException("System was not initialized!");
+			throw new SystemNotInitializedException("Systems scope is not initialized!");
 
 		return instance;
 	}
@@ -56,7 +56,7 @@ public class SystemScope {
 		private Set<Specifications> specifications = new HashSet<>();
 
 		private Builder() {
-			log.info("Initialize system...");
+			log.info("Initialize systems scope...");
 		}
 
 		public static SpecificationScopeHandler getSpecsHandler() {

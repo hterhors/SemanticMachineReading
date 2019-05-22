@@ -125,7 +125,7 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 									currentState.getInstance().getDocument(), entityType.entityName, text,
 									fromToken.getDocCharOffset());
 							proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));
-						} catch (DocumentLinkedAnnotationMismatchException e) {
+						} catch (RuntimeException e) {
 							e.printStackTrace();
 						}
 

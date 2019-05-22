@@ -2,6 +2,7 @@ package de.hterhors.semanticmr.init.reader.csv;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import de.hterhors.semanticmr.exce.InvalidSpecificationFileFormatException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
 import de.hterhors.semanticmr.init.specifications.Specifications;
-import de.hterhors.semanticmr.projects.examples.slotfilling.SlotFillingExample;
 
 public class CSVScopeReader implements ISpecificationsReader {
 	private static Logger log = LogManager.getFormatterLogger(CSVScopeReader.class);
@@ -24,6 +24,13 @@ public class CSVScopeReader implements ISpecificationsReader {
 	private final File hierarchiesFile;
 	private final File slotsFile;
 	private final File structuresFile;
+
+	public CSVScopeReader(File entitiesFile) {
+		this.entitiesFile = entitiesFile;
+		this.hierarchiesFile = null;
+		this.slotsFile = null;
+		this.structuresFile = null;
+	}
 
 	public CSVScopeReader(File entitiesFile, File hierarchiesFile, File slotsFile, File structuresFile) {
 		this.entitiesFile = entitiesFile;
@@ -38,14 +45,15 @@ public class CSVScopeReader implements ISpecificationsReader {
 
 			List<String[]> entities = Files.readAllLines(entitiesFile.toPath()).stream().filter(l -> !l.startsWith("#"))
 					.filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t")).collect(Collectors.toList());
-			List<String[]> hierarchies = Files.readAllLines(hierarchiesFile.toPath()).stream()
-					.filter(l -> !l.startsWith("#")).filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t"))
-					.collect(Collectors.toList());
-			List<String[]> slots = Files.readAllLines(slotsFile.toPath()).stream().filter(l -> !l.startsWith("#"))
-					.filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t")).collect(Collectors.toList());
-			List<String[]> structures = Files.readAllLines(structuresFile.toPath()).stream()
-					.filter(l -> !l.startsWith("#")).filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t"))
-					.collect(Collectors.toList());
+			List<String[]> hierarchies = hierarchiesFile == null ? Collections.emptyList()
+					: Files.readAllLines(hierarchiesFile.toPath()).stream().filter(l -> !l.startsWith("#"))
+							.filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t")).collect(Collectors.toList());
+			List<String[]> slots = slotsFile == null ? Collections.emptyList()
+					: Files.readAllLines(slotsFile.toPath()).stream().filter(l -> !l.startsWith("#"))
+							.filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t")).collect(Collectors.toList());
+			List<String[]> structures = structuresFile == null ? Collections.emptyList()
+					: Files.readAllLines(structuresFile.toPath()).stream().filter(l -> !l.startsWith("#"))
+							.filter(l -> !l.trim().isEmpty()).map(l -> l.split("\t")).collect(Collectors.toList());
 
 			Set<String> slotTypeNames = slots.stream().map(l -> l[0]).collect(Collectors.toSet());
 			Set<String> entityTypeNames = entities.stream().map(l -> l[0]).collect(Collectors.toSet());

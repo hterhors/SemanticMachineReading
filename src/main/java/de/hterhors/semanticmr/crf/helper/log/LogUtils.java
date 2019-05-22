@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.corpus.log;
+package de.hterhors.semanticmr.crf.helper.log;
 
 import java.text.DecimalFormat;
 

@@ -84,11 +84,7 @@ public class Santo2JsonConverter {
 		InstancesToJsonInstanceWrapper conv = new InstancesToJsonInstanceWrapper(instances);
 
 		JsonInstanceIO writer = new JsonInstanceIO(jsonPrettyString);
-		String json = writer.writeInstances(conv.convertToWrapperInstances());
-
-		final PrintStream ps = new PrintStream(writeToFile);
-		ps.println(json);
-		ps.close();
+		writer.writeInstances(writeToFile, conv.convertToWrapperInstances());
 	}
 
 	private void validateFiles() {

@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.corpus.log.LogUtils;
+import de.hterhors.semanticmr.crf.helper.log.LogUtils;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;

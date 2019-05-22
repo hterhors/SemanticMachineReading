@@ -99,7 +99,7 @@ public class InstancesToJsonInstanceWrapper {
 				toTextualContentWrapper(wrapper.textualContent));
 	}
 
-	public JsonDocumentLinkedAnnotationWrapper toDocumentLinkedAnnotationWrapper(
+	private JsonDocumentLinkedAnnotationWrapper toDocumentLinkedAnnotationWrapper(
 			DocumentLinkedAnnotation docLinkedAnnotation) {
 		return new JsonDocumentLinkedAnnotationWrapper(
 				toEntityTypeAnnotationWrapper(docLinkedAnnotation.getEntityType()),

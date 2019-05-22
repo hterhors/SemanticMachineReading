@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.projects.examples.nerla.specs;
+package de.hterhors.semanticmr.projects.examples.nerl.specs;
 
 import java.io.File;
 

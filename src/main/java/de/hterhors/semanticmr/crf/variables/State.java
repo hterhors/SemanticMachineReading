@@ -5,12 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hterhors.semanticmr.crf.factor.FactorGraph;
-import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
-import de.hterhors.semanticmr.eval.EEvaluationDetail;
+
 
 public class State {
 

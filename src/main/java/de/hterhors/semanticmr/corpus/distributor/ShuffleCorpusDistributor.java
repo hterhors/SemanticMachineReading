@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
@@ -184,6 +185,7 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 			@Override
 			public IDistributorStrategy distributeTrainingInstances(List<Instance> trainingDocuments) {
 				trainingDocuments.addAll(corpusProvider.getInstances().subList(0, numberForTraining));
+				trainingDocuments.stream().forEach(i -> i.setRedistributedContext(EInstanceContext.TRAIN));
 				return this;
 			}
 
@@ -191,6 +193,7 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 			public IDistributorStrategy distributeDevelopmentInstances(List<Instance> developmentDocuments) {
 				developmentDocuments.addAll(corpusProvider.getInstances().subList(numberForTraining,
 						numberForTraining + numberForDevelopment));
+				developmentDocuments.stream().forEach(i -> i.setRedistributedContext(EInstanceContext.DEVELOPMENT));
 				return this;
 			}
 
@@ -198,6 +201,7 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 			public IDistributorStrategy distributeTestInstances(List<Instance> testDocuments) {
 				testDocuments.addAll(corpusProvider.getInstances().subList(numberForTraining + numberForDevelopment,
 						numberForTraining + numberForDevelopment + numberForTest));
+				testDocuments.stream().forEach(i -> i.setRedistributedContext(EInstanceContext.TEST));
 				return this;
 			}
 		};

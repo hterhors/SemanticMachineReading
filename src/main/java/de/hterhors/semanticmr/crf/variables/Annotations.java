@@ -106,7 +106,7 @@ public class Annotations implements IEvaluatable {
 	@Override
 	public String toString() {
 		return "Annotations [annotations="
-				+ annotations.stream().map(p -> p.toPrettyString()).reduce("", String::concat) + "]";
+				+ annotations.stream().map(p -> "\n" + p.toPrettyString()).reduce("", String::concat) + "]";
 	}
 
 	public boolean containsAnnotationOnTokens(DocumentToken... tokens) {

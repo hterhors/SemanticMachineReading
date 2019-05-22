@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.hterhors.semanticmr.crf.helper.DefaultDocumentTokenizer;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 import de.hterhors.semanticmr.exce.DuplicateDocumentException;
 
@@ -57,6 +58,17 @@ public class Document {
 	}
 
 	/**
+	 * Create a new document with textual content. The content is automatically
+	 * tokenized using the {@link DefaultDocumentTokenizer}.
+	 * 
+	 * @param documentID
+	 * @param tokenList
+	 */
+	public Document(String documentID, final String documentsContent) {
+		this(documentID, DefaultDocumentTokenizer.tokenizeDocumentsContent(documentsContent));
+	}
+
+	/**
 	 * Create a new document with textual content.
 	 * 
 	 * @param documentID
@@ -64,9 +76,6 @@ public class Document {
 	 */
 	public Document(String documentID, List<DocumentToken> tokenList) {
 		this.documentID = documentID;
-
-		if (Document.documents.containsKey(this.documentID))
-			throw new DuplicateDocumentException("Document ID was already used: " + documentID);
 
 		Document.documents.put(this.documentID, this);
 

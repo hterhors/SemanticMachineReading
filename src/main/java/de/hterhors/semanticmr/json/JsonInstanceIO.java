@@ -1,16 +1,19 @@
 package de.hterhors.semanticmr.json;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.jena.ext.com.google.common.reflect.TypeToken;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
-import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.wrapper.JsonInstanceWrapper;
 
 public class JsonInstanceIO {
@@ -36,11 +39,20 @@ public class JsonInstanceIO {
 
 	}
 
-	public List<JsonInstanceWrapper> readInstances(String json) {
-		return gson.fromJson(json, type);
+	public List<JsonInstanceWrapper> readInstances(final File inputFile) throws JsonSyntaxException, IOException {
+
+		return gson.fromJson(new String(Files.readAllBytes(inputFile.toPath())), type);
 	}
 
-	public String writeInstances(List<JsonInstanceWrapper> instances) {
-		return gson.toJson(instances, type);
+	public void writeInstances(final File outputFile, List<JsonInstanceWrapper> instances) throws IOException {
+		PrintStream ps = new PrintStream(outputFile);
+		ps.println(gson.toJson(instances, type));
+		ps.close();
+	}
+
+	public void writeInstance(final File outputFile, JsonInstanceWrapper instance) throws IOException {
+		PrintStream ps = new PrintStream(outputFile);
+		ps.println(gson.toJson(Arrays.asList(instance), type));
+		ps.close();
 	}
 }

@@ -3,9 +3,12 @@ package de.hterhors.semanticmr.corpus;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -16,7 +19,8 @@ import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
-import de.hterhors.semanticmr.json.JsonInstancesReader;
+import de.hterhors.semanticmr.exce.DuplicateDocumentException;
+import de.hterhors.semanticmr.json.JsonInstanceReader;
 
 /**
  * Reads and provides instances.
@@ -101,6 +105,11 @@ public class InstanceProvider {
 				numToRead);
 	}
 
+	private <T> Set<T> findDuplicates(Collection<T> collection) {
+		final Set<T> uniques = new HashSet<>();
+		return collection.stream().filter(e -> !uniques.add(e)).collect(Collectors.toSet());
+	}
+
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
 			final int numToRead) {
 		try {
@@ -110,7 +119,13 @@ public class InstanceProvider {
 
 			this.validateFiles();
 
-			this.instances = new JsonInstancesReader(jsonInstancesDirectory).readInstances(numToRead);
+			this.instances = new JsonInstanceReader(jsonInstancesDirectory).readInstances(numToRead);
+
+			Set<String> dups = findDuplicates(
+					this.instances.stream().map(i -> i.getDocument().documentID).collect(Collectors.toList()));
+
+			if (!dups.isEmpty())
+				throw new DuplicateDocumentException("Duplicate document IDs detected: " + dups);
 
 			log.info("Total number of instances loaded: " + getInstances().size());
 

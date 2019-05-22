@@ -276,7 +276,7 @@ public class SantoRDFConverter {
 
 		Files.readAllLines(inputFile.toPath()).stream().filter(l -> !l.startsWith("#")).forEach(l -> {
 			Matcher m = PatternCollection.TRIPLE_EXTRACTOR_PATTERN.matcher(l);
-		
+
 			if (m.find()) {
 
 				String domain = m.group(1);

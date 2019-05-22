@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.projects.examples.nerla;
+package de.hterhors.semanticmr.projects.examples.nerl;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +40,7 @@ import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.projects.AbstractSemReadProject;
 import de.hterhors.semanticmr.projects.examples.WeightNormalization;
-import de.hterhors.semanticmr.projects.examples.nerla.specs.NERLASpecs;
+import de.hterhors.semanticmr.projects.examples.nerl.specs.NERLASpecs;
 
 /**
  * Example of how to perform named entity recognition and linking.
