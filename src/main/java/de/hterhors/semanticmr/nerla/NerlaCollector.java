@@ -1,6 +1,5 @@
 package de.hterhors.semanticmr.nerla;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,21 +18,16 @@ public class NerlaCollector {
 
 		for (INerlaProvider provider : nerlaProvider) {
 
-			try {
-				final Map<Instance, List<DocumentLinkedAnnotation>> nerla = provider.getForInstances(this.instances);
+			final Map<Instance, List<DocumentLinkedAnnotation>> nerla = provider.getForInstances(this.instances);
 
-				for (Instance instance : nerla.keySet()) {
-					if (instance != null) {
-						GeneralCandidateProvider ap = new GeneralCandidateProvider(instance);
-						for (DocumentLinkedAnnotation dla : nerla.get(instance)) {
-							ap.addSlotFiller(dla);
-						}
-						candidateProvider.registerCandidateProvider(ap);
+			for (Instance instance : nerla.keySet()) {
+				if (instance != null) {
+					GeneralCandidateProvider ap = new GeneralCandidateProvider(instance);
+					for (DocumentLinkedAnnotation dla : nerla.get(instance)) {
+						ap.addSlotFiller(dla);
 					}
+					candidateProvider.registerCandidateProvider(ap);
 				}
-
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 
 		}

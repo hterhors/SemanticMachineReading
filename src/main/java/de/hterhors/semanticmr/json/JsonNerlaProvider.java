@@ -34,19 +34,28 @@ public class JsonNerlaProvider implements INerlaProvider {
 	}
 
 	@Override
-	public Map<Instance, List<DocumentLinkedAnnotation>> getForInstances(List<Instance> instances) throws IOException {
+	public Map<Instance, List<DocumentLinkedAnnotation>> getForInstances(List<Instance> instances) {
 		log.info("Read named entity recognition and linking annotations...");
 
-		final List<JsonEntityAnnotationWrapper> jsonNerla;
+		List<JsonEntityAnnotationWrapper> jsonNerla = new ArrayList<>();
 
 		if (nerlaFileOrDir.isDirectory()) {
 			jsonNerla = new ArrayList<>();
 			for (File nerlaJsonFile : nerlaFileOrDir.listFiles()) {
-				jsonNerla.addAll(
-						new JsonNerlaIO(true).fromJsonString(new String(Files.readAllBytes(nerlaJsonFile.toPath()))));
+				try {
+					jsonNerla.addAll(new JsonNerlaIO(true)
+							.fromJsonString(new String(Files.readAllBytes(nerlaJsonFile.toPath()))));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		} else {
-			jsonNerla = new JsonNerlaIO(true).fromJsonString(new String(Files.readAllBytes(nerlaFileOrDir.toPath())));
+			try {
+				jsonNerla = new JsonNerlaIO(true)
+						.fromJsonString(new String(Files.readAllBytes(nerlaFileOrDir.toPath())));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		final Map<String, Instance> map = new HashMap<>();
