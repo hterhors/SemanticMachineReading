@@ -159,9 +159,10 @@ public class Document {
 	public DocumentToken getTokenByCharOffset(Integer offset) throws DocumentLinkedAnnotationMismatchException {
 		final DocumentToken token = startOffsetCharPositionTokens.getOrDefault(offset,
 				endOffsetCharPositionTokens.get(offset));
-		if (token == null)
+		if (token == null) {
 			throw new DocumentLinkedAnnotationMismatchException(
 					"Can not map charachter offset: " + offset + " to token in document: " + documentID);
+		}
 		return token;
 	}
 

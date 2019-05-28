@@ -133,7 +133,7 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 	}
 
 	final public String getNormalizedSurfaceForm() {
-		return textualContent.normalizedSurfaceForm;
+		return textualContent.getNormalizedSurfaceForm();
 	}
 
 	final public int getSurfaceFormAsInt() {

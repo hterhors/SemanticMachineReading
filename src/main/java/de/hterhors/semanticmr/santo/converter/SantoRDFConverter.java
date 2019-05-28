@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,11 +14,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 
+import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
+import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
@@ -46,8 +49,13 @@ public class SantoRDFConverter {
 	final private String ontologyNameSpace;
 	final private String dataNameSpace;
 
-	public SantoRDFConverter(SystemScope systemScope, Map<Triple, RDFRelatedAnnotation> annotations,
-			File rdfAnnotationsFile, final String ontologyNameSpace, final String dataNameSpace) throws IOException {
+	final private boolean onlyLeafEntities;
+
+	public SantoRDFConverter(boolean onlyLeafEntities, SystemScope systemScope,
+			Map<Triple, RDFRelatedAnnotation> annotations, File rdfAnnotationsFile, final String ontologyNameSpace,
+			final String dataNameSpace) throws IOException {
+
+		this.onlyLeafEntities = onlyLeafEntities;
 		this.systemScope = systemScope;
 		this.annotations = annotations;
 		this.rdfAnnotationsFile = rdfAnnotationsFile;
@@ -78,7 +86,10 @@ public class SantoRDFConverter {
 						toEntityTemplateTypeAnnotation(document, SantoHelper.getResource(object), annotation));
 
 				fillRec(document, entityTemplate, rootDataPoint);
-
+//				if (entityTemplate.getSingleFillerSlot(SlotType.get("hasOrganismSpecies")).containsSlotFiller()) {
+//					entityTemplate.rootAnnotation = fix(
+//							entityTemplate.getSingleFillerSlot(SlotType.get("hasOrganismSpecies")));
+//				}
 				instances.add(entityTemplate);
 			} catch (DocumentLinkedAnnotationMismatchException e) {
 				e.printStackTrace();
@@ -88,6 +99,41 @@ public class SantoRDFConverter {
 
 		return instances;
 
+	}
+
+	/**
+	 * QUICK FIX adding organismModel annotations.
+	 */
+	private final Set<EntityType> ratModels = new HashSet<>(Arrays.asList(EntityType.get("RatSpecies"),
+			EntityType.get("WistarRat"), EntityType.get("SpragueDawleyRat"), EntityType.get("ListerHoodedRat"),
+			EntityType.get("FischerRat"), EntityType.get("LongEvansRat"), EntityType.get("LewisRat")));
+	private final Set<EntityType> mouseModels = new HashSet<>(
+			Arrays.asList(EntityType.get("C57_BL6_Mouse"), EntityType.get("MouseSpecies")));
+	private final Set<EntityType> catModels = new HashSet<>(Arrays.asList(EntityType.get("CatSpecies")));
+	private final Set<EntityType> dogModels = new HashSet<>(Arrays.asList(EntityType.get("DogSpecies")));
+
+	private EntityTypeAnnotation fix(SingleFillerSlot slot) {
+
+		EntityType speciesType = slot.getSlotFiller().getEntityType();
+		System.out.println("Fix annotation: " + speciesType);
+		if (ratModels.contains(speciesType))
+			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
+					"RatModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
+					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
+		if (mouseModels.contains(speciesType))
+			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
+					"MouseModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
+					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
+		if (catModels.contains(speciesType))
+			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
+					"CatModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
+					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
+		if (dogModels.contains(speciesType))
+			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
+					"DogModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
+					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
+
+		return null;
 	}
 
 	private void fillRec(Document document, final EntityTemplate object, String subject) {
@@ -150,6 +196,8 @@ public class SantoRDFConverter {
 				LiteralAnnotation literalAnnotation;
 				try {
 					literalAnnotation = toLiteralAnnotation(document, slotType, linkedID);
+					if (onlyLeafEntities && !isLeafEntity(literalAnnotation.entityType))
+						continue;
 					predicateValues.add(literalAnnotation);
 				} catch (DocumentLinkedAnnotationMismatchException e) {
 					System.out.println("WARN! " + e.getMessage());
@@ -158,6 +206,8 @@ public class SantoRDFConverter {
 			} else if (nameSpace.equals(ontologyNameSpace)) {
 				try {
 					final EntityTypeAnnotation entityTypeAnnotation = toEntityTypeAnnotation(document, linkedID);
+					if (onlyLeafEntities && !isLeafEntity(entityTypeAnnotation.entityType))
+						continue;
 					predicateValues.add(entityTypeAnnotation);
 				} catch (DocumentLinkedAnnotationMismatchException e) {
 					System.out.println("WARN! " + e.getMessage());
@@ -166,6 +216,8 @@ public class SantoRDFConverter {
 			} else if (nameSpace.equals(dataNameSpace)) {
 				try {
 					final EntityTemplate entityTemplateAnnotation = toEntityTemplate(document, slotName, linkedID);
+					if (onlyLeafEntities && !isLeafEntity(entityTemplateAnnotation.getEntityType()))
+						continue;
 					fillRec(document, entityTemplateAnnotation, linkedID.object);
 					predicateValues.add(entityTemplateAnnotation);
 				} catch (DocumentLinkedAnnotationMismatchException e) {
@@ -176,6 +228,10 @@ public class SantoRDFConverter {
 
 		}
 		return predicateValues;
+	}
+
+	private boolean isLeafEntity(EntityType entityType) {
+		return entityType.getSubEntityTypes().isEmpty();
 	}
 
 	private EntityTemplate toEntityTemplate(Document document, String slotName, Triple linkedID)

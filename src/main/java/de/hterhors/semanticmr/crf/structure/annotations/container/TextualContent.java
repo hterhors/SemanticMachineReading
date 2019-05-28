@@ -19,17 +19,15 @@ public class TextualContent {
 	/**
 	 * Normalized literal.
 	 */
-	public String normalizedSurfaceForm;
+	transient public String normalizedSurfaceForm;
 
-	final public String cleanedSurfaceForm;
+	transient final public String cleanedSurfaceForm;
+
+	transient private Boolean isNormalized = null;
 
 	public TextualContent(String surfaceForm) {
 		this.surfaceForm = surfaceForm;
 		this.cleanedSurfaceForm = cleanSurfaceForm(this.surfaceForm);
-	}
-
-	private String cleanSurfaceForm(String textMention) {
-		return textMention.replaceAll("[0-9]", "#").replaceAll("[^\\x20-\\x7E]+", "§");
 	}
 
 	/**
@@ -38,17 +36,50 @@ public class TextualContent {
 	 * @param surfaceForm
 	 * @param normalizedSurfaceForm
 	 */
-	private TextualContent(String surfaceForm, String normalizedSurfaceForm, String cleanedSurfaceForm) {
+	private TextualContent(String surfaceForm, String cleanedSurfaceForm, String normalizedSurfaceForm) {
 		this.surfaceForm = surfaceForm;
-		this.normalizedSurfaceForm = normalizedSurfaceForm;
 		this.cleanedSurfaceForm = cleanedSurfaceForm;
+		this.normalizedSurfaceForm = normalizedSurfaceForm;
+	}
+
+	private String cleanSurfaceForm(String textMention) {
+		return textMention.replaceAll("[0-9]", "#").replaceAll("[^\\x20-\\x7E]+", "§");
+	}
+
+	public void normalize(String normalizedSurfaceForm) {
+		this.normalizedSurfaceForm = normalizedSurfaceForm;
+	}
+
+	public TextualContent deepCopy() {
+		return new TextualContent(surfaceForm, cleanedSurfaceForm, normalizedSurfaceForm);
+	}
+
+	public String toPrettyString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("\"");
+		sb.append(this.surfaceForm);
+		sb.append("\"");
+		if (isNormalized()) {
+			sb.append("\t(\"").append(getNormalizedSurfaceForm()).append("\")");
+		}
+		return sb.toString().toString();
+	}
+
+	private boolean isNormalized() {
+		if (isNormalized == null)
+			isNormalized = new Boolean(normalizedSurfaceForm != this.surfaceForm);
+		return isNormalized.booleanValue();
+	}
+
+	public String getNormalizedSurfaceForm() {
+		return normalizedSurfaceForm;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((normalizedSurfaceForm == null) ? 0 : normalizedSurfaceForm.hashCode());
+		result = prime * result + ((surfaceForm == null) ? 0 : surfaceForm.hashCode());
 		return result;
 	}
 
@@ -61,34 +92,16 @@ public class TextualContent {
 		if (getClass() != obj.getClass())
 			return false;
 		TextualContent other = (TextualContent) obj;
-		if (normalizedSurfaceForm == null) {
-			if (other.normalizedSurfaceForm != null)
+		if (surfaceForm == null) {
+			if (other.surfaceForm != null)
 				return false;
-		} else if (!normalizedSurfaceForm.equals(other.normalizedSurfaceForm))
+		} else if (!surfaceForm.equals(other.surfaceForm))
 			return false;
 		return true;
 	}
 
-	@Override
-	public String toString() {
-		return "TextualContent [surfaceForm=" + surfaceForm + ", normalizedSurfaceForm=" + normalizedSurfaceForm + "]";
-	}
-
-	public void normalize(INormalizationFunction iNormalizationFunction) {
-		this.normalizedSurfaceForm = iNormalizationFunction.normalize(this.surfaceForm);
-	}
-
-	public TextualContent deepCopy() {
-		return new TextualContent(surfaceForm, normalizedSurfaceForm, cleanedSurfaceForm);
-	}
-
-	public String toPrettyString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append("\"");
-		sb.append(this.surfaceForm);
-		sb.append("\"");
-		sb.append("\t(\"").append(normalizedSurfaceForm).append("\")");
-		return sb.toString().toString();
+	public void normalize(INormalizationFunction normalizationFunction) {
+		this.normalizedSurfaceForm = normalizationFunction.interprete(this.surfaceForm);
 	}
 
 }

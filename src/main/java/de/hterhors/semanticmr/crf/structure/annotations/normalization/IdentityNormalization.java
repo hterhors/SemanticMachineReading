@@ -10,19 +10,15 @@ public class IdentityNormalization implements INormalizationFunction {
 
 	private static IdentityNormalization instance = null;
 
-	private IdentityNormalization() {
-	}
-
 	public static IdentityNormalization getInstance() {
 		if (instance == null) {
 			instance = new IdentityNormalization();
-
 		}
 		return instance;
 	}
 
 	@Override
-	public String normalize(String annotation) {
+	public String interprete(String annotation) {
 		return annotation;
 	}
 

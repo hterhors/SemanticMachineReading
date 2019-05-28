@@ -96,7 +96,6 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 		}
 
 		updateAverage(proposalStates);
-
 		return proposalStates;
 
 	}

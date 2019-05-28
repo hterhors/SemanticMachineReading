@@ -41,6 +41,7 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public EntityTypeAnnotation deepCopy() {
 		return this;
 	}

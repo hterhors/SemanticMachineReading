@@ -308,7 +308,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 	@Override
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable other) {
 
-		if (other!=null && !(other instanceof EntityTemplate))
+		if (other != null && !(other instanceof EntityTemplate))
 			return Score.ZERO;
 
 		final Score score = new Score();

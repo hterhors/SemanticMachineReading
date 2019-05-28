@@ -60,8 +60,10 @@ public class Santo2JsonConverter {
 
 		this.annotations = new TextualAnnotationsReader(this.document, textualAnnotationsFile).getAnnotations();
 
-		this.rdfConverter = new SantoRDFConverter(systemScope, annotations, rdfAnnotationsFile, ontologyNameSpace,
-				resourceNameSpace);
+		boolean onlyLeafEntities = true;
+
+		this.rdfConverter = new SantoRDFConverter(onlyLeafEntities, systemScope, annotations, rdfAnnotationsFile,
+				ontologyNameSpace, resourceNameSpace);
 	}
 
 	public void convert(final File writeToFile, String rootEntityTypes, boolean includeSubEntities,
