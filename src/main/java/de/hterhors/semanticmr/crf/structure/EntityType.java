@@ -183,7 +183,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		return transitiveClosureSuperEntityTypes;
 	}
 
-	public Set<EntityType> getTransClosSubEntityTypes() {
+	public Set<EntityType> getTransClosureSubEntityTypes() {
 		if (transitiveClosureSubEntityTypes == null) {
 			transitiveClosureSubEntityTypes = Collections.unmodifiableSet(this.transitiveClosureSubEntityTypeNames
 					.stream().map(slotTypeName -> EntityType.get(slotTypeName)).sorted().collect(Collectors.toSet()));
@@ -191,6 +191,12 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		return transitiveClosureSubEntityTypes;
 	}
 
+	/**
+	 * Returns a set of all entities that are either sub* or super* entities of this
+	 * entity.
+	 * 
+	 * @return
+	 */
 	public Set<EntityType> getHierarchicalEntityTypes() {
 		if (relatedEntityTypes == null) {
 			relatedEntityTypes = Collections.unmodifiableSet(Stream
@@ -225,7 +231,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	 * @return true if
 	 */
 	public boolean isSuperEntityOf(EntityType subEntityType) {
-		final Set<EntityType> directSubEntities = getTransClosSubEntityTypes();
+		final Set<EntityType> directSubEntities = getTransClosureSubEntityTypes();
 
 		if (directSubEntities.contains(subEntityType)) {
 			return true;

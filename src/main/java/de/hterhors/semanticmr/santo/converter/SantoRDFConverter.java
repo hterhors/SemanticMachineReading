@@ -231,7 +231,7 @@ public class SantoRDFConverter {
 	}
 
 	private boolean isLeafEntity(EntityType entityType) {
-		return entityType.getTransClosSubEntityTypes().isEmpty();
+		return entityType.getTransClosureSubEntityTypes().isEmpty();
 	}
 
 	private EntityTemplate toEntityTemplate(Document document, String slotName, Triple linkedID)
