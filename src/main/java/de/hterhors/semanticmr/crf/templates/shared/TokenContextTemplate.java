@@ -182,7 +182,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 		final String[] rightContext = extractRightContext(tokens, endTokenIndex);
 
 		getContextFeatures(featureVector, entity.entityName, leftContext, rightContext);
-		for (EntityType e : entity.getSuperEntityTypes()) {
+		for (EntityType e : entity.getTransitiveClosureSuperEntityTypes()) {
 			getContextFeatures(featureVector, e.entityName, leftContext, rightContext);
 		}
 	}

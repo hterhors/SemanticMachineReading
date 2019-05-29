@@ -231,7 +231,7 @@ public class SantoRDFConverter {
 	}
 
 	private boolean isLeafEntity(EntityType entityType) {
-		return entityType.getSubEntityTypes().isEmpty();
+		return entityType.getTransClosSubEntityTypes().isEmpty();
 	}
 
 	private EntityTemplate toEntityTemplate(Document document, String slotName, Triple linkedID)
@@ -307,7 +307,7 @@ public class SantoRDFConverter {
 		final Set<String> subEntities = new HashSet<>();
 
 		for (String rootEntityType : rootEntityTypes) {
-			subEntities.addAll(this.systemScope.getSpecification().getSubEntityTypeNames(rootEntityType));
+			subEntities.addAll(this.systemScope.getSpecification().getTransiitveClosureSubEntityTypeNames(rootEntityType));
 		}
 
 		for (Entry<String, Map<String, Set<String>>> triple : rdfData.entrySet()) {

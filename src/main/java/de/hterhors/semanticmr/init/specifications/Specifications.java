@@ -24,8 +24,11 @@ public class Specifications {
 	/**
 	 * Map of entities and a set of super entities.
 	 */
-	private final Map<String, Set<String>> superEntityTypes;
-	private final Map<String, Set<String>> subEntityTypes;
+	private final Map<String, Set<String>> transitiveClosureSuperEntityTypes;
+	private final Map<String, Set<String>> transitiveClosureSubEntityTypes;
+
+	private final Map<String, Set<String>> directSuperEntityTypes;
+	private final Map<String, Set<String>> directSubEntityTypes;
 
 	private final Map<String, Set<String>> slotsForEntity;
 	private final Map<String, Integer> slotMaxSizes;
@@ -40,11 +43,14 @@ public class Specifications {
 
 		this.isLiteralValueSlotTypes = Collections.unmodifiableMap(new HashMap<>(isLiteralValueSlotTypes));
 
-		this.superEntityTypes = new HashMap<>();
+		this.directSubEntityTypes = subEntityTypes;
+		this.directSuperEntityTypes = superEntityTypes;
+
+		this.transitiveClosureSuperEntityTypes = new HashMap<>();
 		for (String entityTypeName : this.entityTypeNames) {
 			resolveSuperClassTransitivity(superEntityTypes, entityTypeName, entityTypeName);
 		}
-		this.subEntityTypes = new HashMap<>();
+		this.transitiveClosureSubEntityTypes = new HashMap<>();
 		for (String entityTypeName : this.entityTypeNames) {
 			resolveSubClassTransitivity(subEntityTypes, entityTypeName, entityTypeName);
 		}
@@ -66,8 +72,8 @@ public class Specifications {
 			return;
 
 		for (String superEntity : superEntityTypes.get(superEntityName)) {
-			this.superEntityTypes.putIfAbsent(baseEntityTypeName, new HashSet<>());
-			this.superEntityTypes.get(baseEntityTypeName).add(superEntity);
+			this.transitiveClosureSuperEntityTypes.putIfAbsent(baseEntityTypeName, new HashSet<>());
+			this.transitiveClosureSuperEntityTypes.get(baseEntityTypeName).add(superEntity);
 
 			resolveSuperClassTransitivity(superEntityTypes, baseEntityTypeName, superEntity);
 		}
@@ -81,8 +87,8 @@ public class Specifications {
 			return;
 
 		for (String subEntity : subEntityTypes.get(subEntityName)) {
-			this.subEntityTypes.putIfAbsent(baseEntityTypeName, new HashSet<>());
-			this.subEntityTypes.get(baseEntityTypeName).add(subEntity);
+			this.transitiveClosureSubEntityTypes.putIfAbsent(baseEntityTypeName, new HashSet<>());
+			this.transitiveClosureSubEntityTypes.get(baseEntityTypeName).add(subEntity);
 			resolveSubClassTransitivity(subEntityTypes, baseEntityTypeName, subEntity);
 		}
 
@@ -94,11 +100,11 @@ public class Specifications {
 
 			for (String entitType : slotFillerEntityType.getValue()) {
 
-				if (!this.subEntityTypes.containsKey(entitType))
+				if (!this.transitiveClosureSubEntityTypes.containsKey(entitType))
 					continue;
 
 				this.slotFillerEntityTypes.get(slotFillerEntityType.getKey())
-						.addAll(this.subEntityTypes.getOrDefault(entitType, Collections.emptySet()));
+						.addAll(this.transitiveClosureSubEntityTypes.getOrDefault(entitType, Collections.emptySet()));
 			}
 		}
 	}
@@ -107,10 +113,10 @@ public class Specifications {
 
 		for (String entityWithSlots : slotsForEntities.keySet()) {
 
-			if (!this.subEntityTypes.containsKey(entityWithSlots))
+			if (!this.transitiveClosureSubEntityTypes.containsKey(entityWithSlots))
 				continue;
 
-			for (String subEntity : subEntityTypes.get(entityWithSlots)) {
+			for (String subEntity : transitiveClosureSubEntityTypes.get(entityWithSlots)) {
 
 				this.slotsForEntity.putIfAbsent(subEntity, new HashSet<>());
 				this.slotsForEntity.get(subEntity)
@@ -139,12 +145,20 @@ public class Specifications {
 		return slotFillerEntityTypes.getOrDefault(internalizedSlotTypeName, Collections.emptySet());
 	}
 
-	public Set<String> getSuperEntityTypeNames(String entityTypeName) {
-		return superEntityTypes.getOrDefault(entityTypeName, Collections.emptySet());
+	public Set<String> getTransitiveClosureSuperEntityTypeNames(String entityTypeName) {
+		return transitiveClosureSuperEntityTypes.getOrDefault(entityTypeName, Collections.emptySet());
 	}
 
-	public Set<String> getSubEntityTypeNames(String entityTypeName) {
-		return subEntityTypes.getOrDefault(entityTypeName, Collections.emptySet());
+	public Set<String> getTransiitveClosureSubEntityTypeNames(String entityTypeName) {
+		return transitiveClosureSubEntityTypes.getOrDefault(entityTypeName, Collections.emptySet());
+	}
+
+	public Set<String> getDirectSuperEntityTypeNames(String entityTypeName) {
+		return directSuperEntityTypes.getOrDefault(entityTypeName, Collections.emptySet());
+	}
+
+	public Set<String> getDirectSubEntityTypeNames(String entityTypeName) {
+		return directSubEntityTypes.getOrDefault(entityTypeName, Collections.emptySet());
 	}
 
 	public int getMultiAnnotationSlotMaxSize(String internalizedSlotTypeName) {

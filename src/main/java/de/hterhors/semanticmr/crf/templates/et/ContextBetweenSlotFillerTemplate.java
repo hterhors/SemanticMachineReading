@@ -242,8 +242,8 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 
 				getTokenNgrams(featureVector, fromEntity.entityName, toEntity.entityName, tokens);
 
-				for (EntityType fe : fromEntity.getSuperEntityTypes()) {
-					for (EntityType te : toEntity.getSuperEntityTypes()) {
+				for (EntityType fe : fromEntity.getTransitiveClosureSuperEntityTypes()) {
+					for (EntityType te : toEntity.getTransitiveClosureSuperEntityTypes()) {
 
 						if (tokens.size() > 2)
 							getTokenNgrams(featureVector, fe.entityName, te.entityName, tokens);

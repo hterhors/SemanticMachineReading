@@ -112,7 +112,7 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 		EntityType entity = factor.getFactorScope().entityTemplateType;
 		add(factor, featureVector, entity);
 
-		for (EntityType e : entity.getSuperEntityTypes()) {
+		for (EntityType e : entity.getTransitiveClosureSuperEntityTypes()) {
 			add(factor, featureVector, e);
 		}
 

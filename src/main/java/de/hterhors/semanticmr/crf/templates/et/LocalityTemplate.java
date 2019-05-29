@@ -119,9 +119,9 @@ public class LocalityTemplate extends AbstractFeatureTemplate<LocalityScope> {
 	@Override
 	public void generateFeatureVector(Factor<LocalityScope> factor) {
 
-		for (EntityType pe : factor.getFactorScope().parentEntity.getSuperEntityTypes()) {
+		for (EntityType pe : factor.getFactorScope().parentEntity.getTransitiveClosureSuperEntityTypes()) {
 
-			for (EntityType ce : factor.getFactorScope().childEntity.getSuperEntityTypes()) {
+			for (EntityType ce : factor.getFactorScope().childEntity.getTransitiveClosureSuperEntityTypes()) {
 
 				factor.getFeatureVector().set(pe.entityName + "->" + ce.entityName + " sentence dist = "
 						+ factor.getFactorScope().sentenceDistance, true);

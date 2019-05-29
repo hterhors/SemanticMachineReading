@@ -55,9 +55,13 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	 */
 	private Set<SlotType> slotFillerOfSlotTypes;
 
-	private Set<EntityType> superEntityTypes;
+	private Set<EntityType> transitiveClosureSuperEntityTypes;
 
-	private Set<EntityType> subEntityTypes;
+	private Set<EntityType> transitiveClosureSubEntityTypes;
+
+	private Set<EntityType> directSuperEntityTypes;
+
+	private Set<EntityType> directSubEntityTypes;
 
 	/**
 	 * A set of entity types that are either sub entities or super entities;
@@ -69,9 +73,13 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	 */
 	final private List<String> slotNames;
 
-	final private Set<String> superEntityTypeNames;
+	final private Set<String> transitiveClosureSuperEntityTypeNames;
 
-	final private Set<String> subEntityTypeNames;
+	final private Set<String> transitiveClosureSubEntityTypeNames;
+
+	final private Set<String> directSuperEntityTypeNames;
+
+	final private Set<String> directSubEntityTypeNames;
 
 	private INormalizationFunction normalizationFunction = IdentityNormalization.getInstance();
 
@@ -82,8 +90,10 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		this.slots = Collections.emptySet();
 		this.singleAnnotationSlotTypes = Collections.emptyList();
 		this.multiAnnotationSlotTypes = Collections.emptyList();
-		this.superEntityTypeNames = Collections.emptySet();
-		this.subEntityTypeNames = Collections.emptySet();
+		this.transitiveClosureSuperEntityTypeNames = Collections.emptySet();
+		this.transitiveClosureSubEntityTypeNames = Collections.emptySet();
+		this.directSuperEntityTypeNames = Collections.emptySet();
+		this.directSubEntityTypeNames = Collections.emptySet();
 		this.slotNames = Collections.emptyList();
 		this.isLiteral = false;
 	}
@@ -93,10 +103,16 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		this.isLiteral = specifications.isLiteralEntityType(internalizedEntityTypeName);
 		this.slotNames = Collections.unmodifiableList(
 				specifications.getSlotsForEntityType(this.entityName).stream().sorted().collect(Collectors.toList()));
-		this.superEntityTypeNames = Collections.unmodifiableSet(
-				specifications.getSuperEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
-		this.subEntityTypeNames = Collections.unmodifiableSet(
-				specifications.getSubEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
+		this.transitiveClosureSuperEntityTypeNames = Collections
+				.unmodifiableSet(specifications.getTransitiveClosureSuperEntityTypeNames(this.entityName).stream()
+						.sorted().collect(Collectors.toSet()));
+		this.transitiveClosureSubEntityTypeNames = Collections.unmodifiableSet(specifications
+				.getTransiitveClosureSubEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
+
+		this.directSuperEntityTypeNames = Collections.unmodifiableSet(specifications
+				.getDirectSuperEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
+		this.directSubEntityTypeNames = Collections.unmodifiableSet(specifications
+				.getDirectSubEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
 
 		this.slotFillerOfSlotTypeNames = specifications
 				.getSlotTypeNames().stream().filter(slotType -> specifications
@@ -143,27 +159,44 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		return multiAnnotationSlotTypes;
 	}
 
-	public Set<EntityType> getSuperEntityTypes() {
-		if (superEntityTypes == null) {
-			superEntityTypes = Collections.unmodifiableSet(this.superEntityTypeNames.stream()
+	public Set<EntityType> getDirectSuperEntityTypes() {
+		if (directSuperEntityTypes == null) {
+			directSuperEntityTypes = Collections.unmodifiableSet(this.directSuperEntityTypeNames.stream()
 					.map(slotTypeName -> EntityType.get(slotTypeName)).sorted().collect(Collectors.toSet()));
 		}
-		return superEntityTypes;
+		return directSuperEntityTypes;
 	}
 
-	public Set<EntityType> getSubEntityTypes() {
-		if (subEntityTypes == null) {
-			subEntityTypes = Collections.unmodifiableSet(this.subEntityTypeNames.stream()
+	public Set<EntityType> getDirectSubEntityTypes() {
+		if (directSubEntityTypes == null) {
+			directSubEntityTypes = Collections.unmodifiableSet(this.directSubEntityTypeNames.stream()
 					.map(slotTypeName -> EntityType.get(slotTypeName)).sorted().collect(Collectors.toSet()));
 		}
-		return subEntityTypes;
+		return directSubEntityTypes;
+	}
+
+	public Set<EntityType> getTransitiveClosureSuperEntityTypes() {
+		if (transitiveClosureSuperEntityTypes == null) {
+			transitiveClosureSuperEntityTypes = Collections.unmodifiableSet(this.transitiveClosureSuperEntityTypeNames
+					.stream().map(slotTypeName -> EntityType.get(slotTypeName)).sorted().collect(Collectors.toSet()));
+		}
+		return transitiveClosureSuperEntityTypes;
+	}
+
+	public Set<EntityType> getTransClosSubEntityTypes() {
+		if (transitiveClosureSubEntityTypes == null) {
+			transitiveClosureSubEntityTypes = Collections.unmodifiableSet(this.transitiveClosureSubEntityTypeNames
+					.stream().map(slotTypeName -> EntityType.get(slotTypeName)).sorted().collect(Collectors.toSet()));
+		}
+		return transitiveClosureSubEntityTypes;
 	}
 
 	public Set<EntityType> getHierarchicalEntityTypes() {
 		if (relatedEntityTypes == null) {
-			relatedEntityTypes = Collections
-					.unmodifiableSet(Stream.concat(this.subEntityTypeNames.stream(), this.superEntityTypeNames.stream())
-							.map(slotTypeName -> EntityType.get(slotTypeName)).sorted().collect(Collectors.toSet()));
+			relatedEntityTypes = Collections.unmodifiableSet(Stream
+					.concat(this.transitiveClosureSubEntityTypeNames.stream(),
+							this.transitiveClosureSuperEntityTypeNames.stream())
+					.map(slotTypeName -> EntityType.get(slotTypeName)).sorted().collect(Collectors.toSet()));
 		}
 		return relatedEntityTypes;
 	}
@@ -185,14 +218,14 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	}
 
 	/**
-	 * Checks recursively if the parameterized entity type is a sub entity of this
-	 * entity type.
+	 * Checks recursively if the given entity type is a sub entity of this entity
+	 * type.
 	 * 
 	 * @param subEntityType
 	 * @return true if
 	 */
 	public boolean isSuperEntityOf(EntityType subEntityType) {
-		final Set<EntityType> directSubEntities = getSubEntityTypes();
+		final Set<EntityType> directSubEntities = getTransClosSubEntityTypes();
 
 		if (directSubEntities.contains(subEntityType)) {
 			return true;
@@ -204,8 +237,15 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		return false;
 	}
 
+	/**
+	 * Checks recursively if the given entity type is a super entity of this entity
+	 * type.
+	 * 
+	 * @param subEntityType
+	 * @return true if
+	 */
 	public boolean isSubEntityOf(EntityType superEntityType) {
-		final Set<EntityType> directSuperEntities = getSuperEntityTypes();
+		final Set<EntityType> directSuperEntities = getTransitiveClosureSuperEntityTypes();
 
 		if (directSuperEntities.contains(superEntityType)) {
 			return true;
@@ -227,6 +267,11 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 
 	private static EntityType initInstance = null;
 
+	/**
+	 * Returns the initialization instance.
+	 * 
+	 * @return the initialization instance.
+	 */
 	public static EntityType getInitializationInstance() {
 		if (initInstance == null) {
 			initInstance = new EntityType();
@@ -254,6 +299,11 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		entityTypes = Collections.unmodifiableSet(new HashSet<>(entityTypeFactory.values()));
 	}
 
+	/**
+	 * Returns all entity types that were specified in the scope.
+	 * 
+	 * @return
+	 */
 	public static Set<EntityType> getEntityTypes() {
 		return entityTypes;
 	}
@@ -283,6 +333,12 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		return false;
 	}
 
+	/**
+	 * Checks if this entity type has the given slot.
+	 * 
+	 * @param slotType
+	 * @return
+	 */
 	public boolean containsSlotType(SlotType slotType) {
 		return getSlots().contains(slotType);
 	}
