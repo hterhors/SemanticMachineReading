@@ -307,7 +307,8 @@ public class SantoRDFConverter {
 		final Set<String> subEntities = new HashSet<>();
 
 		for (String rootEntityType : rootEntityTypes) {
-			subEntities.addAll(this.systemScope.getSpecification().getTransiitveClosureSubEntityTypeNames(rootEntityType));
+			subEntities
+					.addAll(this.systemScope.getSpecification().getTransiitveClosureSubEntityTypeNames(rootEntityType));
 		}
 
 		for (Entry<String, Map<String, Set<String>>> triple : rdfData.entrySet()) {

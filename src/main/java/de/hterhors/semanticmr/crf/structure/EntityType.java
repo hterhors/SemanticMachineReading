@@ -183,10 +183,6 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		return transitiveClosureSuperEntityTypes;
 	}
 
-	/**
-	 * Returns 
-	 * @return
-	 */
 	public Set<EntityType> getTransitiveClosureSubEntityTypes() {
 		if (transitiveClosureSubEntityTypes == null) {
 			transitiveClosureSubEntityTypes = Collections.unmodifiableSet(this.transitiveClosureSubEntityTypeNames

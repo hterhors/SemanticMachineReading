@@ -179,7 +179,11 @@ public class SystemScope {
 			log.info("Register normalization function  \"" + normalizationFunction.getClass().getSimpleName()
 					+ "\" for entity type \"" + normalizationFunction.entityType.entityName + "\"");
 			normalizationFunction.entityType.setNormalizationFunction(normalizationFunction);
+<<<<<<< HEAD
 			for (EntityType subEntity : normalizationFunction.entityType.getTransitiveClosureSubEntityTypes()) {
+=======
+			for (EntityType subEntity : normalizationFunction.entityType.getTransClosureSubEntityTypes()) {
+>>>>>>> branch 'master' of https://github.com/hterhors/SemanticMachineReading.git
 				subEntity.setNormalizationFunction(normalizationFunction);
 			}
 
