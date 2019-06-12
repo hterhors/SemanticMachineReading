@@ -6,32 +6,34 @@ import java.util.Map.Entry;
 import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.helper.log.LogUtils;
+import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.eval.CartesianEvaluator;
-import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 
 public class AbstractSemReadProject {
-	CartesianEvaluator c = new CartesianEvaluator(EEvaluationDetail.LITERAL);
 
 	public AbstractSemReadProject(SystemScope build) {
 	}
 
-	public void evaluate(Logger log, Map<Instance, State> testResults) {
+	public void evaluate(Logger log, Map<Instance, State> testResults, IObjectiveFunction predictionOF) {
+
 		Score mean = new Score();
+
 		for (Entry<Instance, State> res : testResults.entrySet()) {
 
-			if (res.getKey().getDocument().documentID.equals("N008 Jin 2016 26852702")) {
-				System.out.println(c.scoreMultiValues(res.getKey().getGoldAnnotations().getAnnotations(),
-						res.getValue().getCurrentPredictions().getAnnotations()));
-			}
-
+			if (predictionOF != null)
+				predictionOF.score(res.getValue());
 			mean.add(res.getValue().getScore());
+
 			LogUtils.logState(log, "======Final Evaluation======", res.getKey(), res.getValue());
 		}
 		log.info("Mean Score: " + mean);
 
+	}
+
+	public void evaluate(Logger log, Map<Instance, State> testResults) {
+		evaluate(log, testResults, null);
 	}
 }

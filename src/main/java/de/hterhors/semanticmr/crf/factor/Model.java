@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,30 @@ public class Model {
 	}
 
 	final private List<AbstractFeatureTemplate<?>> factorTemplates;
+
+	/**
+	 * A comparator implementation that allows to sort states in descending order
+	 * with respect to their objective score.
+	 */
+	public static final Comparator<State> objectiveScoreComparator = new Comparator<State>() {
+
+		@Override
+		public int compare(State s1, State s2) {
+			return -Double.compare(s1.getObjectiveScore(), s2.getObjectiveScore());
+		}
+	};
+
+	/**
+	 * A comparator implementation that allows to sort states in descending order
+	 * with respect to their model score.
+	 */
+	public static final Comparator<State> modelScoreComparator = new Comparator<State>() {
+
+		@Override
+		public int compare(State s1, State s2) {
+			return -Double.compare(s1.getModelScore(), s2.getModelScore());
+		}
+	};
 
 	public Model(List<AbstractFeatureTemplate<?>> factorTemplates) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
@@ -143,19 +168,32 @@ public class Model {
 	private void computeRemainingFactors(AbstractFeatureTemplate<?> template,
 			@SuppressWarnings("rawtypes") Stream<AbstractFactorScope> stream) {
 
-		Stream<Factor<?>> s = stream.parallel().filter(fs -> !FACTOR_POOL_INSTANCE.containsFactorScope(fs))
-				.map(remainingFactorScope -> {
-					@SuppressWarnings({ "rawtypes" })
-					Factor f = new Factor(remainingFactorScope);
-					template.generateFeatureVector(f);
-					return f;
-				});
+//		System.out.println(stream.count());
 
-		s.sequential().forEach(factor -> FACTOR_POOL_INSTANCE.addFactor(factor));
+		Stream<Factor<?>> s = stream.parallel().filter(fs -> {
+
+			return !FACTOR_POOL_INSTANCE.containsFactorScope(fs);
+		}).map(remainingFactorScope -> {
+			@SuppressWarnings({ "rawtypes" })
+			Factor f = new Factor(remainingFactorScope);
+			template.generateFeatureVector(f);
+			return f;
+		});
+//System.out.println(s.count());
+		s.sequential().forEach(factor -> {
+
+			FACTOR_POOL_INSTANCE.addFactor(factor);
+		});
 	}
 
 	private void collectFactorScopesForState(AbstractFeatureTemplate<?> template, State state) {
-		state.getFactorGraph(template).addFactorScopes(template.generateFactorScopes(state));
+
+		List<? extends AbstractFactorScope<?>> x = template.generateFactorScopes(state);
+
+//		if (template.getClass().getSimpleName().startsWith("Prior") && !x.isEmpty())
+//			System.out.println("JP");
+
+		state.getFactorGraph(template).addFactorScopes(x);
 	}
 
 	/**
@@ -227,21 +265,21 @@ public class Model {
 //			throw new RuntimeException("The model could not be printed. Failed with error: " + ex.getMessage());
 //		}
 //	}
-	
+
 	public void printReadable(File modelDir, String modelName) {
 		log.info("Print model in readable format...");
 		try {
 			for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
 				File parentDir = new File(modelDir, modelName + DEFAULT_READABLE_DIR);
 				parentDir.mkdirs();
-				
+
 				final File f = new File(parentDir, template.getClass().getSimpleName());
-				
+
 				PrintStream ps = new PrintStream(f);
 				log.info("Print template to " + f.getAbsolutePath());
 				List<Entry<Integer, Double>> sortedWeights = new ArrayList<>(
 						template.getWeights().getFeatures().entrySet());
-				
+
 				if (sortedWeights.size() == 0)
 					log.warn("No features found for template: " + template.getClass().getSimpleName());
 				Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
@@ -249,7 +287,7 @@ public class Model {
 					ps.println(indexFeatureName.get(feature.getKey()) + "\t" + feature.getValue());
 				}
 				ps.close();
-				
+
 			}
 		} catch (IOException ex) {
 			throw new RuntimeException("The model could not be printed. Failed with error: " + ex.getMessage());

@@ -91,12 +91,7 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 		if (otherVal == null)
 			return Score.FN;
 
-//		if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED) {
-//			if (equals(otherVal))
-//				return Score.TP;
-//			return Score.FN_FP;
-//		} else 
-		if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED
+		if (entityType.isLiteral || evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED
 				|| evaluator.evaluationDetail == EEvaluationDetail.LITERAL) {
 			if (getClass() == otherVal.getClass()) {
 				if (getClass() != LiteralAnnotation.class)

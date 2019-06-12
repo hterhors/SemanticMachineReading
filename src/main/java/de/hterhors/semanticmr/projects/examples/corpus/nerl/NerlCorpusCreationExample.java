@@ -79,7 +79,7 @@ public class NerlCorpusCreationExample {
 		/**
 		 * We initialize the system.
 		 */
-		SystemScope.Builder.getSpecsHandler().addScopeSpecification(specsReader).build();
+		SystemScope.Builder.getScopeHandler().addScopeSpecification(specsReader).build();
 
 		/**
 		 * The corpus.

@@ -87,7 +87,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * entities-file is important) defined specification files. The scope mainly
 		 * affects the exploration.
 		 */
-		super(SystemScope.Builder.getSpecsHandler()
+		super(SystemScope.Builder.getScopeHandler()
 				/**
 				 * We add a scope reader that reads and interprets the 4 specification files.
 				 */
@@ -319,7 +319,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * in this case. This method returns for each instances a final state (best
 		 * state based on the trained model) that contains annotations.
 		 */
-		Map<Instance, State> testResults = crf.test(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
+		Map<Instance, State> testResults = crf.predict(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
 				noModelChangeCrit);
 
 		/**

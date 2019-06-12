@@ -10,7 +10,6 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 
-
 public class State {
 
 	private final Instance instance;
@@ -89,9 +88,9 @@ public class State {
 
 	@Override
 	public String toString() {
-		return "State [modelScore=" + modelScore + ", objectiveScore=" + objectiveScore + ", goldAnnotation="
-				+ instance.getGoldAnnotations() + ", currentPredictions=" + currentPredictions + ", instance="
-				+ instance.getDocument().documentID + "]";
+		return "State [instance=" + instance.getDocument().documentID + ", modelScore=" + modelScore
+				+ ", objectiveScore=" + objectiveScore + ", goldAnnotation=" + instance.getGoldAnnotations()
+				+ ", currentPredictions=" + currentPredictions + "]";
 	}
 
 	public Collection<FactorGraph> getFactorGraphs() {

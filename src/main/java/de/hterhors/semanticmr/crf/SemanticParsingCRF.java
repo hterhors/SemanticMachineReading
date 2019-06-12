@@ -1,14 +1,22 @@
 package de.hterhors.semanticmr.crf;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.exploration.IExplorationStrategy;
+import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.factor.FactorGraph;
 import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.helper.log.LogUtils;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
@@ -18,11 +26,13 @@ import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ITrainingStoppingCriterion;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 
 public class SemanticParsingCRF {
+	public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.00000");
 
 	private static Logger log = LogManager.getFormatterLogger(SemanticParsingCRF.class);
 
@@ -162,11 +172,21 @@ public class SemanticParsingCRF {
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
 			}
 
+			Score meanTrainOFScore = new Score();
+			for (Entry<Instance, State> finalState : finalStates.entrySet()) {
+				objectiveFunction.score(finalState.getValue());
+				log.info(finalState.getKey().getName().substring(0, 5) + "... \t"
+						+ SCORE_FORMAT.format(finalState.getValue().getObjectiveScore()));
+				meanTrainOFScore.add(finalState.getValue().getScore());
+			}
+			log.info("Mean objective score during training:\t" + meanTrainOFScore);
+
 			if (meetsTrainingStoppingCriterion(trainingStoppingCrits, finalStates))
 				break;
 
 		}
 		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
+
 		return finalStates;
 	}
 
@@ -206,7 +226,8 @@ public class SemanticParsingCRF {
 		return this.testStatistics;
 	}
 
-	public Map<Instance, State> test(List<Instance> testInstances, ISamplingStoppingCriterion... stoppingCriterion) {
+	public Map<Instance, State> predict(Model model, List<Instance> testInstances,
+			ISamplingStoppingCriterion... stoppingCriterion) {
 		this.testStatistics.startTrainingTime = System.currentTimeMillis();
 
 		final Map<Instance, State> finalStates = new LinkedHashMap<>();
@@ -217,8 +238,8 @@ public class SemanticParsingCRF {
 			final List<State> producedStateChain = new ArrayList<>();
 
 			State currentState = initializer.getInitState(instance);
-			objectiveFunction.score(currentState);
 			finalStates.put(instance, currentState);
+			objectiveFunction.score(currentState);
 			producedStateChain.add(currentState);
 			int samplingStep;
 			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
@@ -234,6 +255,16 @@ public class SemanticParsingCRF {
 
 				boolean accepted = AcceptStrategies.strictModelAccept().isAccepted(candidateState, currentState);
 
+				Collections.sort(proposalStates, Model.modelScoreComparator);
+
+				for (int i = 0; i < proposalStates.size(); i++) {
+					log.info("Index: " + i);
+					compare(currentState, proposalStates.get(i));
+				}
+
+				log.info("SampledState: ");
+				compare(currentState, candidateState);
+
 				if (accepted) {
 					currentState = candidateState;
 					objectiveFunction.score(currentState);
@@ -243,11 +274,13 @@ public class SemanticParsingCRF {
 
 				finalStates.put(instance, currentState);
 
-				if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain))
+				if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain)) {
 					break;
-
+				}
 			}
+
 			this.testStatistics.endTrainingTime = System.currentTimeMillis();
+
 			LogUtils.logState(log,
 					TEST_CONTEXT + "[" + ++instanceIndex + "/" + testInstances.size() + "] [" + samplingStep + "]",
 					instance, currentState);
@@ -256,6 +289,81 @@ public class SemanticParsingCRF {
 		}
 		this.testStatistics.endTrainingTime = System.currentTimeMillis();
 		return finalStates;
+	}
+
+	public Map<Instance, State> predict(List<Instance> testInstances, ISamplingStoppingCriterion... stoppingCriterion) {
+		return predict(this.model, testInstances, stoppingCriterion);
+	}
+
+	private void compare(State currentState, State candidateState) {
+
+		Map<String, Double> differences = getDifferences(collectFeatures(currentState),
+				collectFeatures(candidateState));
+		if (differences.isEmpty())
+			return;
+
+		List<Entry<String, Double>> sortedWeights = new ArrayList<>(differences.entrySet());
+
+		Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
+
+		log.info(currentState.getInstance().getName());
+		sortedWeights.forEach(log::info);
+		log.info("_____________GoldAnnotations:_____________");
+		log.info(currentState.getGoldAnnotations());
+		log.info("_____________PrevState:_____________");
+		log.info("ModelScore: " + currentState.getModelScore() + ": " + currentState.getCurrentPredictions());
+		log.info("_____________CandState:_____________");
+		log.info("ModelScore: " + candidateState.getModelScore() + ": " + candidateState.getCurrentPredictions());
+		log.info("------------------");
+	}
+
+	@SuppressWarnings("boxing")
+	public Map<String, Double> getDifferences(Map<String, Double> currentFeatures,
+			Map<String, Double> candidateFeatures) {
+		Map<String, Double> differences = new HashMap<>();
+
+		Set<String> keys = new HashSet<>();
+
+		keys.addAll(candidateFeatures.keySet());
+		keys.addAll(currentFeatures.keySet());
+
+		for (String key : keys) {
+
+			if (candidateFeatures.containsKey(key) && currentFeatures.containsKey(key)) {
+				double diff = 0;
+				if ((diff = Math.abs(currentFeatures.get(key) - candidateFeatures.get(key))) != 0.0D) {
+					// This should or can not happen as feature weights are shared throughout states
+					differences.put(key, diff);
+				}
+			} else if (currentFeatures.containsKey(key)) {
+				differences.put(key, currentFeatures.get(key));
+			} else {
+				differences.put(key, candidateFeatures.get(key));
+			}
+
+		}
+		return differences;
+	}
+
+	@SuppressWarnings("boxing")
+	public Map<String, Double> collectFeatures(State currentState) {
+		Map<String, Double> features = new HashMap<>();
+
+		for (FactorGraph fg : currentState.getFactorGraphs()) {
+			for (Factor<?> f : fg.getFactors()) {
+
+				for (Entry<Integer, Double> feature : f.getFeatureVector().getFeatures().entrySet()) {
+					if (f.getFactorScope().getTemplate().getWeights().getFeatures().containsKey(feature.getKey()))
+						features.put(
+								f.getFactorScope().getTemplate().getClass().getSimpleName() + ":"
+										+ Model.getFeatureForIndex(feature.getKey()),
+								feature.getValue() * f.getFactorScope().getTemplate().getWeights().getFeatures()
+										.get(feature.getKey()));
+
+				}
+			}
+		}
+		return features;
 	}
 
 }

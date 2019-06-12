@@ -232,15 +232,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	 */
 	public boolean isSuperEntityOf(EntityType subEntityType) {
 		final Set<EntityType> directSubEntities = getTransitiveClosureSubEntityTypes();
-
-		if (directSubEntities.contains(subEntityType)) {
-			return true;
-		}
-		for (EntityType entityType : directSubEntities) {
-			if (entityType.isSuperEntityOf(subEntityType))
-				return true;
-		}
-		return false;
+		return directSubEntities.contains(subEntityType);
 	}
 
 	/**
@@ -251,22 +243,24 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	 * @return true if
 	 */
 	public boolean isSubEntityOf(EntityType superEntityType) {
-		final Set<EntityType> directSuperEntities = getTransitiveClosureSuperEntityTypes();
-
-		if (directSuperEntities.contains(superEntityType)) {
-			return true;
-		}
-		for (EntityType entityType : directSuperEntities) {
-			if (entityType.isSubEntityOf(superEntityType))
-				return true;
-		}
-		return false;
+		final Set<EntityType> superEntities = getTransitiveClosureSuperEntityTypes();
+		return superEntities.contains(superEntityType);
 	}
 
+	/**
+	 * Sets the normalization function for this entity type.
+	 * 
+	 * @param normalizationFunction
+	 */
 	public void setNormalizationFunction(INormalizationFunction normalizationFunction) {
 		this.normalizationFunction = normalizationFunction;
 	}
 
+	/**
+	 * Returns the normalization function for that entity type.
+	 * 
+	 * @return
+	 */
 	public INormalizationFunction getNormalizationFunction() {
 		return normalizationFunction;
 	}
@@ -354,8 +348,17 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	 * 
 	 * @return
 	 */
-	public boolean isLeafEntityType() {
+	public boolean hasNoSlots() {
 		return getSlots().isEmpty();
+	}
+
+	/**
+	 * Returns true if this entity type has no sub entity types.
+	 * 
+	 * @return
+	 */
+	public boolean isLeafEntityType() {
+		return getTransitiveClosureSubEntityTypes().isEmpty();
 	}
 
 }

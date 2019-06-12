@@ -153,7 +153,7 @@ public class InstanceProvider {
 
 			}
 
-			if (distributor != null)
+			if (this.distributor != null)
 				redistribute(this.distributor);
 
 		} catch (IOException e) {

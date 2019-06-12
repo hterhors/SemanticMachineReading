@@ -19,7 +19,7 @@ final class FactorPool {
 	/**
 	 * The factor cache
 	 */
-	final private Map<AbstractFactorScope, Factor<?>> factorCache = new HashMap<>();
+	final private Map<AbstractFactorScope<?>, Factor<?>> factorCache = new HashMap<>();
 
 	/**
 	 * The instance of this caching pool.
@@ -48,7 +48,9 @@ final class FactorPool {
 	 * @param factorScope
 	 * @return true if the pool contains the given factor scope.
 	 */
-	protected boolean containsFactorScope(AbstractFactorScope factorScope) {
+	protected boolean containsFactorScope(AbstractFactorScope<?> factorScope) {
+//		System.out.println("HERE");
+
 		return factorCache.get(factorScope) != null;
 	}
 
@@ -63,14 +65,14 @@ final class FactorPool {
 	 * @return an unmodifiable list of factors that corresponds to the list of
 	 *         factor scopes.
 	 */
-	protected List<Factor<?>> getFactors(List<AbstractFactorScope> factorScopes) {
+	protected List<Factor<?>> getFactors(List<AbstractFactorScope<?>> factorScopes) {
 
 		if (factorScopes.isEmpty())
 			return Collections.emptyList();
 
 		final List<Factor<?>> factors = new ArrayList<>();
 
-		for (AbstractFactorScope factorVariables : factorScopes) {
+		for (AbstractFactorScope<?> factorVariables : factorScopes) {
 
 			final Factor<?> factor;
 

@@ -59,7 +59,7 @@ public class SystemScope {
 			log.info("Initialize systems scope...");
 		}
 
-		public static SpecificationScopeHandler getSpecsHandler() {
+		public static SpecificationScopeHandler getScopeHandler() {
 
 			if (builder == null)
 				builder = new Builder();

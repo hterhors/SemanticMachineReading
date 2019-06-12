@@ -59,13 +59,13 @@ public class TextualContent {
 		sb.append("\"");
 		sb.append(this.surfaceForm);
 		sb.append("\"");
-		if (isNormalized()) {
+		if (normalizedIsDifferent()) {
 			sb.append("\t(\"").append(getNormalizedSurfaceForm()).append("\")");
 		}
 		return sb.toString().toString();
 	}
 
-	private boolean isNormalized() {
+	private boolean normalizedIsDifferent() {
 		if (isNormalized == null)
 			isNormalized = new Boolean(normalizedSurfaceForm != this.surfaceForm);
 		return isNormalized.booleanValue();
@@ -77,27 +77,50 @@ public class TextualContent {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((surfaceForm == null) ? 0 : surfaceForm.hashCode());
-		return result;
+		if (normalizedIsDifferent()) {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((normalizedSurfaceForm == null) ? 0 : normalizedSurfaceForm.hashCode());
+			return result;
+		} else {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((surfaceForm == null) ? 0 : surfaceForm.hashCode());
+			return result;
+		}
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		TextualContent other = (TextualContent) obj;
-		if (surfaceForm == null) {
-			if (other.surfaceForm != null)
+		if (normalizedIsDifferent()) {
+			if (this == obj)
+				return true;
+			if (obj == null)
 				return false;
-		} else if (!surfaceForm.equals(other.surfaceForm))
-			return false;
-		return true;
+			if (getClass() != obj.getClass())
+				return false;
+			TextualContent other = (TextualContent) obj;
+			if (normalizedSurfaceForm == null) {
+				if (other.normalizedSurfaceForm != null)
+					return false;
+			} else if (!normalizedSurfaceForm.equals(other.normalizedSurfaceForm))
+				return false;
+			return true;
+		} else {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			TextualContent other = (TextualContent) obj;
+			if (surfaceForm == null) {
+				if (other.surfaceForm != null)
+					return false;
+			} else if (!surfaceForm.equals(other.surfaceForm))
+				return false;
+			return true;
+		}
 	}
 
 	public void normalize(INormalizationFunction normalizationFunction) {

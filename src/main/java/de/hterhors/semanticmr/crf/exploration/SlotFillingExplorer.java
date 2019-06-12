@@ -158,8 +158,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				if (entityTemplate.getMultiFillerSlot(slot).containsSlotFiller(objectiveFunction, slotFillerCandidate))
 					continue;
 
-				if (slotFillerCandidate.getEntityType().isLeafEntityType()
-						&& slotFillerCandidate instanceof EntityTemplate) {
+				if (slotFillerCandidate.getEntityType().hasNoSlots() && slotFillerCandidate instanceof EntityTemplate) {
 					continue;
 				}
 
@@ -202,8 +201,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				if (entityTemplate.getMultiFillerSlot(slot).containsSlotFiller(objectiveFunction, slotFillerCandidate))
 					continue;
 
-				if (slotFillerCandidate.getEntityType().isLeafEntityType()
-						&& slotFillerCandidate instanceof EntityTemplate) {
+				if (slotFillerCandidate.getEntityType().hasNoSlots() && slotFillerCandidate instanceof EntityTemplate) {
 					continue;
 				}
 
@@ -245,7 +243,10 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				if (slotFillerCandidate == entityTemplate)
 					continue;
 
-				if (!(slotFillerCandidate.getEntityType().isLeafEntityType())
+				/*
+				 * Continue if the entity has slots but is no instance of entity template.
+				 */
+				if (!(slotFillerCandidate.getEntityType().hasNoSlots())
 						&& !(slotFillerCandidate instanceof EntityTemplate)) {
 					continue;
 				}

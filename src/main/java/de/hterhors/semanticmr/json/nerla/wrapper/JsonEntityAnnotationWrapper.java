@@ -2,6 +2,8 @@ package de.hterhors.semanticmr.json.nerla.wrapper;
 
 import com.google.gson.annotations.SerializedName;
 
+import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
+
 public class JsonEntityAnnotationWrapper {
 
 	@SerializedName("docID")
@@ -18,6 +20,13 @@ public class JsonEntityAnnotationWrapper {
 		this.entityType = entityType;
 		this.offset = offset;
 		this.surfaceForm = surfaceForm;
+	}
+
+	public JsonEntityAnnotationWrapper(DocumentLinkedAnnotation d) {
+		this.documentID = d.document.documentID;
+		this.entityType = d.getEntityType().entityName;
+		this.offset = d.getStartDocCharOffset();
+		this.surfaceForm = d.getSurfaceForm();
 	}
 
 	public String getDocumentID() {

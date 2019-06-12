@@ -66,13 +66,14 @@ public class Santo2JsonConverter {
 				ontologyNameSpace, resourceNameSpace);
 	}
 
-	public void convert(final File writeToFile, String rootEntityTypes, boolean includeSubEntities,
-			boolean jsonPrettyString) throws IOException {
-		convert(writeToFile, new HashSet<>(Arrays.asList(rootEntityTypes)), includeSubEntities, jsonPrettyString);
+	public void convert(EInstanceContext instanceContext, final File writeToFile, String rootEntityTypes,
+			boolean includeSubEntities, boolean jsonPrettyString) throws IOException {
+		convert(instanceContext, writeToFile, new HashSet<>(Arrays.asList(rootEntityTypes)), includeSubEntities,
+				jsonPrettyString);
 	}
 
-	public void convert(final File writeToFile, Set<String> rootEntityTypes, boolean includeSubEntities,
-			boolean jsonPrettyString) throws IOException {
+	public void convert(final EInstanceContext instanceContext, final File writeToFile, Set<String> rootEntityTypes,
+			boolean includeSubEntities, boolean jsonPrettyString) throws IOException {
 
 		final List<AbstractAnnotation> rdfAnnotations = rdfConverter.extract(document, rootEntityTypes,
 				includeSubEntities);
@@ -81,7 +82,7 @@ public class Santo2JsonConverter {
 
 		Annotations goldAnnotations = new Annotations(rdfAnnotations);
 
-		instances.add(new Instance(EInstanceContext.UNSPECIFIED, document, goldAnnotations));
+		instances.add(new Instance(instanceContext, document, goldAnnotations));
 
 		InstancesToJsonInstanceWrapper conv = new InstancesToJsonInstanceWrapper(instances);
 

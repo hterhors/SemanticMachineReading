@@ -1,37 +1,14 @@
 package de.hterhors.semanticmr.crf.sampling.impl;
 
-import java.util.Comparator;
 import java.util.List;
 
+import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.AcceptStrategy;
 import de.hterhors.semanticmr.crf.sampling.SamplingUtils;
 import de.hterhors.semanticmr.crf.variables.State;
 
 public class SamplerCollection {
-	/**
-	 * A comparator implementation that allows to sort states in descending order
-	 * with respect to their model score.
-	 */
-	public static final Comparator<State> modelScoreComparator = new Comparator<State>() {
-
-		@Override
-		public int compare(State s1, State s2) {
-			return -Double.compare(s1.getModelScore(), s2.getModelScore());
-		}
-	};
-	/**
-	 * A comparator implementation that allows to sort states in descending order
-	 * with respect to their objective score.
-	 */
-	public static final Comparator<State> objectiveScoreComparator = new Comparator<State>() {
-
-		@Override
-		public int compare(State s1, State s2) {
-			return -Double.compare(s1.getObjectiveScore(), s2.getObjectiveScore());
-		}
-	};
-
 	public static AbstractSampler greedyModelStrategy() {
 		return new AbstractSampler(false) {
 
@@ -70,7 +47,7 @@ public class SamplerCollection {
 
 			@Override
 			public State sampleCandidate(List<State> candidates) {
-				candidates.sort(modelScoreComparator);
+				candidates.sort(Model.modelScoreComparator);
 				return SamplingUtils.drawFromDistribution(candidates.subList(0, k), true);
 			}
 
@@ -87,7 +64,7 @@ public class SamplerCollection {
 
 			@Override
 			public State sampleCandidate(List<State> candidates) {
-				candidates.sort(objectiveScoreComparator);
+				candidates.sort(Model.objectiveScoreComparator);
 				return SamplingUtils.drawFromDistribution(candidates.subList(0, k), false);
 			}
 

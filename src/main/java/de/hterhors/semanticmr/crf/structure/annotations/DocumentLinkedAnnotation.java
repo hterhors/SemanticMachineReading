@@ -127,9 +127,8 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 				return Score.TP;
 			else
 				return Score.FN_FP;
-		} else if (evaluator.evaluationDetail == EEvaluationDetail.LITERAL) {
-			return super.evaluate(evaluator, otherVal);
-		} else if (evaluator.evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
+		} else if (entityType.isLiteral || evaluator.evaluationDetail == EEvaluationDetail.LITERAL
+				|| evaluator.evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
 			return super.evaluate(evaluator, otherVal);
 		}
 

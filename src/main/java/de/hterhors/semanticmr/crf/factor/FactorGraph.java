@@ -21,7 +21,7 @@ public class FactorGraph {
 	/**
 	 * The factor scopes of that factor graph.
 	 */
-	final private List<AbstractFactorScope> factorScopes = new ArrayList<>();
+	final private List<AbstractFactorScope<?>> factorScopes = new ArrayList<>();
 
 	/**
 	 * A cache of computed factors which is computed only once after the factor
@@ -43,7 +43,7 @@ public class FactorGraph {
 	 * 
 	 * @see {@link AbstractFeatureTemplate}
 	 */
-	public void addFactorScopes(List<? extends AbstractFactorScope> generatedFactorScopes) {
+	public void addFactorScopes(List<? extends AbstractFactorScope<?>> generatedFactorScopes) {
 		this.factorScopes.addAll(generatedFactorScopes);
 		/*
 		 * Set dirty flag to true in case the factors need to be recomputed. This
@@ -75,7 +75,7 @@ public class FactorGraph {
 	 * 
 	 * @return list of factor scopes.
 	 */
-	public List<AbstractFactorScope> getFactorScopes() {
+	public List<AbstractFactorScope<?>> getFactorScopes() {
 		return factorScopes;
 	}
 
