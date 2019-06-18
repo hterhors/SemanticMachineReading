@@ -89,7 +89,7 @@ public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable 
 	}
 
 	final public boolean isInstanceOfLiteralAnnotation() {
-		return this instanceof DocumentLinkedAnnotation;
+		return this instanceof LiteralAnnotation;
 	}
 
 	final public boolean isInstanceOfEntityTypeAnnotation() {
