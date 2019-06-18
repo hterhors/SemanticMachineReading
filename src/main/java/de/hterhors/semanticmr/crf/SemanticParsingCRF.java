@@ -172,14 +172,14 @@ public class SemanticParsingCRF {
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
 			}
 
-			Score meanTrainOFScore = new Score();
-			for (Entry<Instance, State> finalState : finalStates.entrySet()) {
-				objectiveFunction.score(finalState.getValue());
-				log.info(finalState.getKey().getName().substring(0, 5) + "... \t"
-						+ SCORE_FORMAT.format(finalState.getValue().getObjectiveScore()));
-				meanTrainOFScore.add(finalState.getValue().getScore());
-			}
-			log.info("Mean objective score during training:\t" + meanTrainOFScore);
+//			Score meanTrainOFScore = new Score();
+//			for (Entry<Instance, State> finalState : finalStates.entrySet()) {
+//				objectiveFunction.score(finalState.getValue());
+//				log.info(finalState.getKey().getName().substring(0, 5) + "... \t"
+//						+ SCORE_FORMAT.format(finalState.getValue().getObjectiveScore()));
+//				meanTrainOFScore.add(finalState.getValue().getScore());
+//			}
+//			log.info("Mean objective score during training:\t" + meanTrainOFScore);
 
 			if (meetsTrainingStoppingCriterion(trainingStoppingCrits, finalStates))
 				break;
@@ -255,15 +255,15 @@ public class SemanticParsingCRF {
 
 				boolean accepted = AcceptStrategies.strictModelAccept().isAccepted(candidateState, currentState);
 
-				Collections.sort(proposalStates, Model.modelScoreComparator);
+//				Collections.sort(proposalStates, Model.modelScoreComparator);
 
-				for (int i = 0; i < proposalStates.size(); i++) {
-					log.info("Index: " + i);
-					compare(currentState, proposalStates.get(i));
-				}
-
-				log.info("SampledState: ");
-				compare(currentState, candidateState);
+//				for (int i = 0; i < proposalStates.size(); i++) {
+//					log.info("Index: " + i);
+//					compare(currentState, proposalStates.get(i));
+//				}
+//
+//				log.info("SampledState: ");
+//				compare(currentState, candidateState);
 
 				if (accepted) {
 					currentState = candidateState;
