@@ -9,11 +9,9 @@ import org.apache.logging.log4j.Logger;
 import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection;
 import de.hterhors.semanticmr.candprov.sf.IEntityTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
-import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.State;
 
 /**
@@ -51,6 +49,8 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 
 		EntityTypeAnnotation init = initAnnotation.deepCopy();
 
+		proposalStates.add(currentState.deepAddCopy(new EntityTemplate((init))));
+
 		for (IEntityTypeAnnotationCandidateProvider slotFillerCandidateProvider : candidateProvider
 				.getEntityTypeCandidateProvider(currentState.getInstance())) {
 
@@ -60,7 +60,7 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 				if (templateTypeCandidate.equals(init))
 					continue;
 
-				proposalStates.add(currentState.deepAddCopy(init));
+				proposalStates.add(currentState.deepAddCopy(new EntityTemplate((templateTypeCandidate))));
 			}
 
 		}
@@ -75,8 +75,6 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 		if (proposalStates.isEmpty()) {
 			log.warn("No states were generated for instance: " + currentState.getInstance().getName());
 		}
-
-		proposalStates.forEach(System.out::println);
 
 		updateAverage(proposalStates);
 		return proposalStates;
