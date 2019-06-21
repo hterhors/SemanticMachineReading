@@ -93,7 +93,7 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 		for (EntityTemplate annotation : super.<EntityTemplate>getPredictedAnnotations(state)) {
 
 			EntityTemplateAnnotationFilter filter = annotation.filter().entityTypeAnnoation().entityTemplateAnnoation()
-					.nonEmpty().multiSlots().singleSlots().merge().build();
+					.multiSlots().singleSlots().merge().build();
 
 			for (Entry<SlotType, Set<AbstractAnnotation>> slotIsFilledScope : filter.getMergedAnnotations()
 					.entrySet()) {
@@ -112,7 +112,7 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 		EntityType entity = factor.getFactorScope().entityTemplateType;
 		add(factor, featureVector, entity);
 
-		for (EntityType e : entity.getTransitiveClosureSuperEntityTypes()) {
+		for (EntityType e : entity.getDirectSuperEntityTypes()) {
 			add(factor, featureVector, e);
 		}
 

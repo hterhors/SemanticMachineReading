@@ -26,6 +26,7 @@ import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ITrainingStoppingCriterion;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -63,6 +64,7 @@ public class SemanticParsingCRF {
 	 */
 	final static public int MAX_SAMPLING = 100;
 
+	private static final String COVERAGE_CONTEXT = "===========COVERAGE============\n";
 	private static final String TRAIN_CONTEXT = "===========TRAIN============\n";
 	private static final String TEST_CONTEXT = "===========TEST============\n";
 
@@ -117,7 +119,7 @@ public class SemanticParsingCRF {
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
 
 			log.info("############");
-			log.info("# Epoch: " + epoch + " #");
+			log.info("# Epoch: " + (epoch + 1) + " #");
 			log.info("############");
 
 			final boolean sampleBasedOnObjectiveFunction = sampler.sampleBasedOnObjectiveScore(epoch);
@@ -171,15 +173,6 @@ public class SemanticParsingCRF {
 						instance, currentState);
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
 			}
-
-			Score meanTrainOFScore = new Score();
-			for (Entry<Instance, State> finalState : finalStates.entrySet()) {
-				objectiveFunction.score(finalState.getValue());
-				log.info(finalState.getKey().getName().substring(0, 5) + "... \t"
-						+ SCORE_FORMAT.format(finalState.getValue().getObjectiveScore()));
-				meanTrainOFScore.add(finalState.getValue().getScore());
-			}
-			log.info("Mean objective score during training:\t" + meanTrainOFScore);
 
 			if (meetsTrainingStoppingCriterion(trainingStoppingCrits, finalStates))
 				break;
@@ -368,6 +361,82 @@ public class SemanticParsingCRF {
 			}
 		}
 		return features;
+	}
+
+	/**
+	 * 
+	 * Computes the coverage of the given instances. The coverage is defined by the
+	 * objective mean score that can be reached relying on greedy objective function
+	 * sampling strategy. The coverage can be seen as the upper bound of the system.
+	 * The upper bound depends only on the exploration strategy, e.g. the provided
+	 * NER-annotations during slot-filling.
+	 * 
+	 * @param printDetailedLog whether detailed log should be printed or not.
+	 * @param instances        the instances to compute the coverage on.
+	 * @return a score that contains information of the coverage.
+	 */
+	public Score computeCoverage(final boolean printDetailedLog, final List<Instance> instances) {
+
+		log.info("Compute coverage...");
+
+		ISamplingStoppingCriterion[] noObjectiveChangeCrit = new ISamplingStoppingCriterion[] {
+				new ConverganceCrit(1, s -> s.getObjectiveScore()) };
+
+		final Map<Instance, State> finalStates = new LinkedHashMap<>();
+
+		int instanceIndex = 0;
+
+		for (Instance instance : instances) {
+			final List<State> producedStateChain = new ArrayList<>();
+
+			State currentState = initializer.getInitState(instance);
+			objectiveFunction.score(currentState);
+			finalStates.put(instance, currentState);
+			producedStateChain.add(currentState);
+			int samplingStep;
+			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
+
+				final List<State> proposalStates = explorer.explore(currentState);
+
+				if (proposalStates.isEmpty())
+					proposalStates.add(currentState);
+
+				objectiveFunction.score(proposalStates);
+
+				final State candidateState = SamplerCollection.greedyObjectiveStrategy()
+						.sampleCandidate(proposalStates);
+
+				boolean isAccepted = SamplerCollection.greedyObjectiveStrategy().getAcceptanceStrategy(0)
+						.isAccepted(candidateState, currentState);
+
+				if (isAccepted) {
+					currentState = candidateState;
+				}
+
+				producedStateChain.add(currentState);
+
+				finalStates.put(instance, currentState);
+
+				if (meetsSamplingStoppingCriterion(noObjectiveChangeCrit, producedStateChain))
+					break;
+
+			}
+			if (printDetailedLog)
+				LogUtils.logState(log, COVERAGE_CONTEXT + " [1/1]" + "[" + ++instanceIndex + "/" + instances.size()
+						+ "]" + "[" + (samplingStep + 1) + "]", instance, currentState);
+		}
+
+		Score meanTrainOFScore = new Score();
+		for (Entry<Instance, State> finalState : finalStates.entrySet()) {
+			objectiveFunction.score(finalState.getValue());
+			if (printDetailedLog)
+				log.info(
+						finalState.getKey().getName().substring(0, Math.min(finalState.getKey().getName().length(), 10))
+								+ "... \t" + SCORE_FORMAT.format(finalState.getValue().getObjectiveScore()));
+			meanTrainOFScore.add(finalState.getValue().getScore());
+		}
+
+		return meanTrainOFScore;
 	}
 
 }

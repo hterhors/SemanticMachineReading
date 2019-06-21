@@ -122,8 +122,14 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 
 					final MultiFillerSlot slot = entityTemplate.getMultiFillerSlot(slotType);
 
-					if (nonEmpty && !slot.containsSlotFiller())
+					if (!slot.containsSlotFiller()) {
+						if (!nonEmpty) {
+							mergedAnnotations.putIfAbsent(slotType, Collections.emptySet());
+							multiAnnotations.putIfAbsent(slotType, Collections.emptySet());
+						}
 						continue;
+
+					}
 
 					for (AbstractAnnotation slotFiller : slot.getSlotFiller()) {
 
@@ -199,8 +205,13 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 
 					final SingleFillerSlot slot = entityTemplate.getSingleFillerSlot(slotType);
 
-					if (nonEmpty && !slot.containsSlotFiller())
+					if (!slot.containsSlotFiller()) {
+						if (!nonEmpty) {
+							mergedAnnotations.putIfAbsent(slotType, Collections.emptySet());
+							singleAnnotations.putIfAbsent(slotType, null);
+						}
 						continue;
+					}
 
 					if (docLinkedAnnoation && slot.getSlotFiller().isInstanceOfDocumentLinkedAnnotation()) {
 

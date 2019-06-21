@@ -31,7 +31,7 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.dla.ContextBetweenAnnotationsTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.IntraTokenTemplate;
-import de.hterhors.semanticmr.crf.templates.shared.TokenContextTemplate;
+import de.hterhors.semanticmr.crf.templates.shared.NGramTokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -198,7 +198,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 
 		featureTemplates.add(new ContextBetweenAnnotationsTemplate());
 //		featureTemplates.add(new MorphologicalNerlaTemplate());
-		featureTemplates.add(new TokenContextTemplate());
+		featureTemplates.add(new NGramTokenContextTemplate());
 		featureTemplates.add(new IntraTokenTemplate());
 //		featureTemplates.add(new LevenshteinTemplate());
 

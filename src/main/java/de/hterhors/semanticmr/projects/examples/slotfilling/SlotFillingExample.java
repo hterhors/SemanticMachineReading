@@ -35,7 +35,7 @@ import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.et.ContextBetweenSlotFillerTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.IntraTokenTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.LevenshteinTemplate;
-import de.hterhors.semanticmr.crf.templates.shared.TokenContextTemplate;
+import de.hterhors.semanticmr.crf.templates.shared.NGramTokenContextTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -271,7 +271,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 
 		featureTemplates.add(new LevenshteinTemplate());
 		featureTemplates.add(new IntraTokenTemplate());
-		featureTemplates.add(new TokenContextTemplate());
+		featureTemplates.add(new NGramTokenContextTemplate());
 		featureTemplates.add(new ContextBetweenSlotFillerTemplate());
 
 		/**
