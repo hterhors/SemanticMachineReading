@@ -28,14 +28,12 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 
 	private static final int DEFAULT_MAX_TOKEN_CONTEXT_LEFT = 10;
 	private static final int DEFAULT_MAX_TOKEN_CONTEXT_RIGHT = 10;
-	private static final int MAX_TOKEN_CONTEXT_LEFT = DEFAULT_MAX_TOKEN_CONTEXT_LEFT;
-	private static final int MAX_TOKEN_CONTEXT_RIGHT = DEFAULT_MAX_TOKEN_CONTEXT_RIGHT;
-
-	private static final char SPLITTER = ' ';
-	private static final char RIGHT = '>';
-	private static final char LEFT = '<';
 	private static final String BOF = "BOF";
 	private static final String EOF = "EOF";
+
+	public SingleTokenContextTemplate() {
+		super(false);
+	}
 
 	static class SingleTokenContextScope extends AbstractFactorScope<SingleTokenContextScope> {
 
@@ -154,33 +152,38 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 		DocumentToken beginToken = factor.getFactorScope().firstToken;
 		DocumentToken endToken = factor.getFactorScope().lastToken;
 
+		int distance = 0;
 		for (int i = Math.max(0, beginToken.getDocTokenIndex() - DEFAULT_MAX_TOKEN_CONTEXT_LEFT) - 1; i < beginToken
 				.getDocTokenIndex(); i++) {
 
 			if (i < 0)
-				featureVector.set(BOF, true);
+				featureVector.set(BOF + " " + factor.getFactorScope().entityType.entityName, true);
 			else {
 				final String text = factor.getFactorScope().instance.getDocument().tokenList.get(i).getText();
 				if (Document.getStopWords().contains(text))
 					continue;
-				featureVector.set(text, true);
-				featureVector.set("-" + i + " " + text, true);
+				featureVector.set(text + "... " + factor.getFactorScope().entityType.entityName, true);
+				featureVector.set(text + "... -" + distance + "... " + factor.getFactorScope().entityType.entityName,
+						true);
 			}
+			distance++;
 		}
-
+		distance = 0;
 		for (int i = beginToken.getDocTokenIndex(); i <= Math.min(
 				factor.getFactorScope().instance.getDocument().tokenList.size(),
 				endToken.getDocTokenIndex() + DEFAULT_MAX_TOKEN_CONTEXT_RIGHT); i++) {
 
 			if (i == factor.getFactorScope().instance.getDocument().tokenList.size())
-				featureVector.set(EOF, true);
+				featureVector.set(EOF + " " + factor.getFactorScope().entityType.entityName, true);
 			else {
 				final String text = factor.getFactorScope().instance.getDocument().tokenList.get(i).getText();
 				if (Document.getStopWords().contains(text))
 					continue;
-				featureVector.set(text, true);
-				featureVector.set("+" + i + " " + text, true);
+				featureVector.set(text + "... " + factor.getFactorScope().entityType.entityName, true);
+				featureVector.set(factor.getFactorScope().entityType.entityName + "... +" + distance + "... " + text,
+						true);
 			}
+			distance++;
 		}
 
 	}

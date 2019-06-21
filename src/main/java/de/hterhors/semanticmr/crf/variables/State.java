@@ -63,7 +63,7 @@ public class State {
 	public FactorGraph getFactorGraph(final AbstractFeatureTemplate<?> template) {
 		FactorGraph fg;
 		if ((fg = factorGraphs.get(template)) == null) {
-			fg = new FactorGraph();
+			fg = new FactorGraph(template);
 			factorGraphs.put(template, fg);
 		}
 

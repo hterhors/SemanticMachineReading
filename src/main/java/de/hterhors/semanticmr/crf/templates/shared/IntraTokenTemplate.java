@@ -41,7 +41,7 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 
 	private static final String RIGHT = ">";
 
-	class IntraTokenScope extends AbstractFactorScope<IntraTokenScope> {
+	static class IntraTokenScope extends AbstractFactorScope<IntraTokenScope> {
 
 		public EntityType entityType;
 		public final String surfaceForm;
@@ -57,7 +57,6 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 		public int hashCode() {
 			final int prime = 31;
 			int result = super.hashCode();
-			result = prime * result + getOuterType().hashCode();
 			result = prime * result + ((entityType == null) ? 0 : entityType.hashCode());
 			result = prime * result + ((surfaceForm == null) ? 0 : surfaceForm.hashCode());
 			return result;
@@ -72,8 +71,6 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 			if (getClass() != obj.getClass())
 				return false;
 			IntraTokenScope other = (IntraTokenScope) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
 			if (entityType == null) {
 				if (other.entityType != null)
 					return false;
@@ -97,8 +94,9 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 			return equals(obj);
 		}
 
-		private IntraTokenTemplate getOuterType() {
-			return IntraTokenTemplate.this;
+		@Override
+		public String toString() {
+			return "IntraTokenScope [entityType=" + entityType + ", surfaceForm=" + surfaceForm + "]";
 		}
 
 	}

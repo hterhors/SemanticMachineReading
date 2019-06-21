@@ -45,9 +45,6 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 
 	private static final int MIN_TOKEN_DIST = 2;
 
-	public ContextBetweenSlotFillerTemplate() {
-	}
-
 	static class PositionPairContainer {
 
 		final String fromClassNameType;

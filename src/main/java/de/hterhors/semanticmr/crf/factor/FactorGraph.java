@@ -2,6 +2,8 @@ package de.hterhors.semanticmr.crf.factor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -33,6 +35,11 @@ public class FactorGraph {
 	 * Is dirty flag for computing the factor cache.
 	 */
 	private boolean isDirty = true;
+	private final AbstractFeatureTemplate<?> template;
+
+	public FactorGraph(AbstractFeatureTemplate<?> template) {
+		this.template = template;
+	}
 
 	/**
 	 * Add factor scopes to that factor graph. This method is called for each
@@ -59,7 +66,13 @@ public class FactorGraph {
 	 * @return
 	 */
 	public List<Factor<?>> getFactors() {
+		if (this.template.enableFactorCaching)
+			return getCachedFactors();
+		else
+			return getUnCachedFactors();
+	}
 
+	public List<Factor<?>> getCachedFactors() {
 		if (this.isDirty || this.cache == null)
 			this.cache = FactorPool.getInstance().getFactors(factorScopes);
 
@@ -68,6 +81,15 @@ public class FactorGraph {
 		 */
 		this.isDirty = false;
 		return cache;
+	}
+
+	public List<Factor<?>> getUnCachedFactors() {
+		return factorScopes.parallelStream().map(remainingFactorScope -> {
+			@SuppressWarnings({ "rawtypes" })
+			Factor f = new Factor(remainingFactorScope);
+			this.template.generateFeatureVector(f);
+			return f;
+		}).collect(Collectors.toList());
 	}
 
 	/**

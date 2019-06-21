@@ -2,6 +2,7 @@ package de.hterhors.semanticmr.crf;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,7 +69,7 @@ public class SemanticParsingCRF {
 	private static final String TRAIN_CONTEXT = "===========TRAIN============\n";
 	private static final String TEST_CONTEXT = "===========TEST============\n";
 
-	final IExplorationStrategy explorer;
+	final List<IExplorationStrategy> explorerList;
 
 	final Model model;
 
@@ -84,8 +85,13 @@ public class SemanticParsingCRF {
 
 	public SemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
 			IStateInitializer initializer, IObjectiveFunction objectiveFunction) {
+		this(model, Arrays.asList(explorer), sampler, initializer, objectiveFunction);
+	}
+
+	public SemanticParsingCRF(Model model, List<IExplorationStrategy> explorer, AbstractSampler sampler,
+			IStateInitializer initializer, IObjectiveFunction objectiveFunction) {
 		this.model = model;
-		this.explorer = explorer;
+		this.explorerList = explorer;
 		this.objectiveFunction = objectiveFunction;
 		this.sampler = sampler;
 		this.initializer = initializer;
@@ -136,32 +142,36 @@ public class SemanticParsingCRF {
 				int samplingStep;
 				for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
 
-					final List<State> proposalStates = explorer.explore(currentState);
+					for (IExplorationStrategy explorer : explorerList) {
 
-					if (proposalStates.isEmpty())
-						proposalStates.add(currentState);
+						final List<State> proposalStates = explorer.explore(currentState);
 
-					if (sampleBasedOnObjectiveFunction) {
-						objectiveFunction.score(proposalStates);
-					} else {
-						model.score(proposalStates);
+						if (proposalStates.isEmpty())
+							proposalStates.add(currentState);
+
+						if (sampleBasedOnObjectiveFunction) {
+							objectiveFunction.score(proposalStates);
+						} else {
+							model.score(proposalStates);
+						}
+
+						final State candidateState = sampler.sampleCandidate(proposalStates);
+
+						scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
+
+						boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState,
+								currentState);
+
+						if (isAccepted) {
+							model.updateWeights(learner, currentState, candidateState);
+							currentState = candidateState;
+						}
+
+						producedStateChain.add(currentState);
+
+						finalStates.put(instance, currentState);
+
 					}
-
-					final State candidateState = sampler.sampleCandidate(proposalStates);
-
-					scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
-
-					boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState, currentState);
-
-					if (isAccepted) {
-						model.updateWeights(learner, currentState, candidateState);
-						currentState = candidateState;
-					}
-
-					producedStateChain.add(currentState);
-
-					finalStates.put(instance, currentState);
-
 					if (meetsSamplingStoppingCriterion(samplingStoppingCrits, producedStateChain))
 						break;
 
@@ -237,36 +247,41 @@ public class SemanticParsingCRF {
 			int samplingStep;
 			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
 
-				final List<State> proposalStates = explorer.explore(currentState);
+				for (IExplorationStrategy explorer : explorerList) {
 
-				if (proposalStates.isEmpty())
-					proposalStates.add(currentState);
+					final List<State> proposalStates = explorer.explore(currentState);
 
-				model.score(proposalStates);
+					if (proposalStates.isEmpty())
+						proposalStates.add(currentState);
 
-				final State candidateState = SamplerCollection.greedyModelStrategy().sampleCandidate(proposalStates);
+					model.score(proposalStates);
 
-				boolean accepted = AcceptStrategies.strictModelAccept().isAccepted(candidateState, currentState);
+					final State candidateState = SamplerCollection.greedyModelStrategy()
+							.sampleCandidate(proposalStates);
 
-				Collections.sort(proposalStates, Model.modelScoreComparator);
+					boolean accepted = AcceptStrategies.strictModelAccept().isAccepted(candidateState, currentState);
 
-				for (int i = 0; i < proposalStates.size(); i++) {
-					log.info("Index: " + i);
-					compare(currentState, proposalStates.get(i));
+//					{
+//						Collections.sort(proposalStates, Model.modelScoreComparator);
+//
+//						for (int i = 0; i < proposalStates.size(); i++) {
+//							log.info("Index: " + i);
+//							compare(currentState, proposalStates.get(i));
+//						}
+//
+//						log.info("SampledState: ");
+//						compare(currentState, candidateState);
+//					}
+
+					if (accepted) {
+						currentState = candidateState;
+						objectiveFunction.score(currentState);
+					}
+
+					producedStateChain.add(currentState);
+
+					finalStates.put(instance, currentState);
 				}
-
-				log.info("SampledState: ");
-				compare(currentState, candidateState);
-
-				if (accepted) {
-					currentState = candidateState;
-					objectiveFunction.score(currentState);
-				}
-
-				producedStateChain.add(currentState);
-
-				finalStates.put(instance, currentState);
-
 				if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain)) {
 					break;
 				}
@@ -396,27 +411,30 @@ public class SemanticParsingCRF {
 			int samplingStep;
 			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
 
-				final List<State> proposalStates = explorer.explore(currentState);
+				for (IExplorationStrategy explorer : explorerList) {
 
-				if (proposalStates.isEmpty())
-					proposalStates.add(currentState);
+					final List<State> proposalStates = explorer.explore(currentState);
 
-				objectiveFunction.score(proposalStates);
+					if (proposalStates.isEmpty())
+						proposalStates.add(currentState);
 
-				final State candidateState = SamplerCollection.greedyObjectiveStrategy()
-						.sampleCandidate(proposalStates);
+					objectiveFunction.score(proposalStates);
 
-				boolean isAccepted = SamplerCollection.greedyObjectiveStrategy().getAcceptanceStrategy(0)
-						.isAccepted(candidateState, currentState);
+					final State candidateState = SamplerCollection.greedyObjectiveStrategy()
+							.sampleCandidate(proposalStates);
 
-				if (isAccepted) {
-					currentState = candidateState;
+					boolean isAccepted = SamplerCollection.greedyObjectiveStrategy().getAcceptanceStrategy(0)
+							.isAccepted(candidateState, currentState);
+
+					if (isAccepted) {
+						currentState = candidateState;
+					}
+
+					producedStateChain.add(currentState);
+
+					finalStates.put(instance, currentState);
+
 				}
-
-				producedStateChain.add(currentState);
-
-				finalStates.put(instance, currentState);
-
 				if (meetsSamplingStoppingCriterion(noObjectiveChangeCrit, producedStateChain))
 					break;
 

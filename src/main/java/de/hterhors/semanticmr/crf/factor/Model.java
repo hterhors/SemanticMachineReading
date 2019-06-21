@@ -10,7 +10,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -71,8 +70,6 @@ public class Model {
 		return indexFeatureName.get(feature);
 	}
 
-	final private List<AbstractFeatureTemplate<?>> factorTemplates;
-
 	/**
 	 * A comparator implementation that allows to sort states in descending order
 	 * with respect to their objective score.
@@ -97,6 +94,8 @@ public class Model {
 		}
 	};
 
+	final private List<AbstractFeatureTemplate<?>> factorTemplates;
+
 	public Model(List<AbstractFeatureTemplate<?>> factorTemplates) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
 	}
@@ -120,12 +119,11 @@ public class Model {
 
 			collectFactorScopesForState(template, state);
 
-			/*
-			 * Compute all selected factors in parallel.
-			 */
-			computeRemainingFactors(template,
-					state.getFactorGraphs().stream().flatMap(l -> l.getFactorScopes().stream()));
 		}
+		/*
+		 * Compute all selected factors in parallel.
+		 */
+		computeRemainingFactors(state.getFactorGraphs().stream().flatMap(l -> l.getFactorScopes().stream()));
 
 		/*
 		 * Compute and set model score
@@ -147,12 +145,12 @@ public class Model {
 
 			states.parallelStream().forEach(state -> collectFactorScopesForState(template, state));
 
-			/*
-			 * Compute all selected factors in parallel.
-			 */
-			computeRemainingFactors(template, states.stream().flatMap(state -> state.getFactorGraphs().stream())
-					.flatMap(l -> l.getFactorScopes().stream()));
 		}
+		/*
+		 * Compute all selected factors in parallel.
+		 */
+		computeRemainingFactors(states.stream().flatMap(state -> state.getFactorGraphs().stream())
+				.flatMap(l -> l.getFactorScopes().stream()));
 		/*
 		 * Compute and set model score
 		 */
@@ -165,35 +163,27 @@ public class Model {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void computeRemainingFactors(AbstractFeatureTemplate<?> template,
-			@SuppressWarnings("rawtypes") Stream<AbstractFactorScope> stream) {
+	private void computeRemainingFactors(@SuppressWarnings("rawtypes") Stream<AbstractFactorScope> stream) {
 
-//		System.out.println(stream.count());
+		List<Factor<?>> s = stream.parallel().distinct()
+				.filter(fs -> !fs.template.enableFactorCaching
+						|| (fs.template.enableFactorCaching && !FACTOR_POOL_INSTANCE.containsFactorScope(fs)))
+				.map(fs -> {
+					@SuppressWarnings({ "rawtypes" })
+					Factor f = new Factor(fs);
+					fs.template.generateFeatureVector(f);
+					return f;
+				}).collect(Collectors.toList());
 
-		Stream<Factor<?>> s = stream.parallel().filter(fs -> {
-
-			return !FACTOR_POOL_INSTANCE.containsFactorScope(fs);
-		}).map(remainingFactorScope -> {
-			@SuppressWarnings({ "rawtypes" })
-			Factor f = new Factor(remainingFactorScope);
-			template.generateFeatureVector(f);
-			return f;
-		});
-//System.out.println(s.count());
-		s.sequential().forEach(factor -> {
-
+		for (Factor<?> factor : s) {
+			if (!factor.getFactorScope().template.enableFactorCaching)
+				continue;
 			FACTOR_POOL_INSTANCE.addFactor(factor);
-		});
+		}
 	}
 
 	private void collectFactorScopesForState(AbstractFeatureTemplate<?> template, State state) {
-
-		List<? extends AbstractFactorScope<?>> x = template.generateFactorScopes(state);
-
-//		if (template.getClass().getSimpleName().startsWith("Prior") && !x.isEmpty())
-//			System.out.println("JP");
-
-		state.getFactorGraph(template).addFactorScopes(x);
+		state.getFactorGraph(template).addFactorScopes(template.generateFactorScopes(state));
 	}
 
 	/**

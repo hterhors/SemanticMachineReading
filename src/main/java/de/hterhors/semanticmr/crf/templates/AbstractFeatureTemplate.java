@@ -27,6 +27,16 @@ public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S>> 
 		return weights;
 	}
 
+	public final boolean enableFactorCaching;
+
+	public AbstractFeatureTemplate() {
+		this.enableFactorCaching = true;
+	}
+
+	public AbstractFeatureTemplate(final boolean chacheFactors) {
+		this.enableFactorCaching = chacheFactors;
+	}
+
 	/**
 	 * Returns all possible factor scopes that can be applied to the given state.
 	 * Each FactorScope declares which variables are relevant for its computation

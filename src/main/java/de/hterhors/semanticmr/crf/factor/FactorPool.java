@@ -49,7 +49,6 @@ final class FactorPool {
 	 * @return true if the pool contains the given factor scope.
 	 */
 	protected boolean containsFactorScope(AbstractFactorScope<?> factorScope) {
-
 		return factorCache.get(factorScope) != null;
 	}
 
