@@ -14,14 +14,13 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
-import de.hterhors.semanticmr.crf.templates.shared.IntraTokenTemplate.IntraTokenScope;
-import de.hterhors.semanticmr.crf.templates.shared.TokenContextTemplate.TokenContextScope;
+import de.hterhors.semanticmr.crf.templates.shared.NGramTokenContextTemplate.NGramTokenContextScope;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 
-public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextScope> {
+public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramTokenContextScope> {
 
 	private static final int DEFAULT_MAX_TOKEN_CONTEXT_LEFT = 3;
 	private static final int DEFAULT_MAX_TOKEN_CONTEXT_RIGHT = 3;
@@ -34,7 +33,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 	private static final String BOF = "BOF";
 	private static final String EOF = "EOF";
 
-	class TokenContextScope extends AbstractFactorScope<TokenContextScope> {
+	class NGramTokenContextScope extends AbstractFactorScope<NGramTokenContextScope> {
 
 		public final Instance instance;
 
@@ -44,7 +43,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 
 		public final int endOffset;
 
-		public TokenContextScope(AbstractFeatureTemplate<TokenContextScope> template, Instance instance,
+		public NGramTokenContextScope(AbstractFeatureTemplate<NGramTokenContextScope> template, Instance instance,
 				EntityType entityType, int startOffset, int endOffset) {
 			super(template);
 			this.instance = instance;
@@ -73,7 +72,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			TokenContextScope other = (TokenContextScope) obj;
+			NGramTokenContextScope other = (NGramTokenContextScope) obj;
 			if (!getOuterType().equals(other.getOuterType()))
 				return false;
 			if (endOffset != other.endOffset)
@@ -103,21 +102,21 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 			return equals(obj);
 		}
 
-		private TokenContextTemplate getOuterType() {
-			return TokenContextTemplate.this;
+		private NGramTokenContextTemplate getOuterType() {
+			return NGramTokenContextTemplate.this;
 		}
 
 	}
 
 	@Override
-	public List<TokenContextScope> generateFactorScopes(State state) {
-		List<TokenContextScope> factors = new ArrayList<>();
+	public List<NGramTokenContextScope> generateFactorScopes(State state) {
+		List<NGramTokenContextScope> factors = new ArrayList<>();
 
 		for (AbstractAnnotation annotation : getPredictedAnnotations(state)) {
 
 			if (annotation.isInstanceOfDocumentLinkedAnnotation()) {
 
-				factors.add(new TokenContextScope(this, state.getInstance(), annotation.getEntityType(),
+				factors.add(new NGramTokenContextScope(this, state.getInstance(), annotation.getEntityType(),
 						annotation.asInstanceOfDocumentLinkedAnnotation().getStartDocCharOffset(),
 						annotation.asInstanceOfDocumentLinkedAnnotation().getEndDocCharOffset()));
 
@@ -129,7 +128,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 					final DocumentLinkedAnnotation rootAnn = annotation.asInstanceOfEntityTemplate().getRootAnnotation()
 							.asInstanceOfDocumentLinkedAnnotation();
 
-					factors.add(new TokenContextScope(this, state.getInstance(), rootAnn.getEntityType(),
+					factors.add(new NGramTokenContextScope(this, state.getInstance(), rootAnn.getEntityType(),
 							rootAnn.getStartDocCharOffset(), rootAnn.getEndDocCharOffset()));
 				}
 
@@ -143,7 +142,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 						final DocumentLinkedAnnotation docLinkedAnnotation = slotFiller
 								.asInstanceOfDocumentLinkedAnnotation();
 
-						factors.add(new TokenContextScope(this, state.getInstance(),
+						factors.add(new NGramTokenContextScope(this, state.getInstance(),
 								docLinkedAnnotation.getEntityType(), docLinkedAnnotation.getStartDocCharOffset(),
 								docLinkedAnnotation.getEndDocCharOffset()));
 					}
@@ -156,7 +155,7 @@ public class TokenContextTemplate extends AbstractFeatureTemplate<TokenContextSc
 	}
 
 	@Override
-	public void generateFeatureVector(Factor<TokenContextScope> factor) {
+	public void generateFeatureVector(Factor<NGramTokenContextScope> factor) {
 		DoubleVector featureVector = factor.getFeatureVector();
 
 		try {
