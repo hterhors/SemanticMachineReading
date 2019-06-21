@@ -1,5 +1,6 @@
 package de.hterhors.semanticmr.crf.variables;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,7 +11,6 @@ import java.util.Set;
 
 import de.hterhors.semanticmr.crf.helper.DefaultDocumentTokenizer;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
-import de.hterhors.semanticmr.exce.DuplicateDocumentException;
 
 /**
  * The document class contains every necessary information of the textual
@@ -42,11 +42,13 @@ public class Document {
 	final public List<DocumentToken> tokenList;
 
 	/**
-	 * Tokens indexed by position.
+	 * TODO: to array? Tokens indexed by position.
 	 */
 	final private Map<Integer, DocumentToken> startOffsetCharPositionTokens = new HashMap<>();
 
 	final private Map<Integer, DocumentToken> endOffsetCharPositionTokens = new HashMap<>();
+
+	final private Map<Integer, List<DocumentToken>> sentencesByIndex = new HashMap<>();
 
 	/**
 	 * Create a new document without any textual content.
@@ -83,10 +85,25 @@ public class Document {
 
 		this.documentContent = builderDocumentContent(tokenList);
 
+		List<DocumentToken> sentence = new ArrayList<>();
+
+		int prevSenIndex = 0;
 		for (DocumentToken token : this.tokenList) {
 			startOffsetCharPositionTokens.put(new Integer(token.getDocCharOffset()), token);
 			endOffsetCharPositionTokens.put(new Integer(token.getDocCharOffset() + token.getText().length()), token);
+
+			if (prevSenIndex != token.getSentenceIndex()) {
+				sentencesByIndex.put(prevSenIndex, new ArrayList<>(sentence));
+				sentence.clear();
+				prevSenIndex = token.getSentenceIndex();
+			}
+
+			sentence.add(token);
+
 		}
+		sentencesByIndex.put(prevSenIndex, sentence);
+		sentence = new ArrayList<>();
+
 		updateStopWords(this);
 		updatePunctuationWords(this);
 	}
@@ -172,6 +189,10 @@ public class Document {
 
 		return this.documentContent.substring(fromToken.getDocCharOffset(),
 				toToken.getDocCharOffset() + toToken.getText().length());
+	}
+
+	public List<DocumentToken> getSentenceByIndex(int sentenceIndex) {
+		return sentencesByIndex.get(sentenceIndex);
 	}
 
 }

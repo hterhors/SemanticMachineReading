@@ -172,14 +172,14 @@ public class SemanticParsingCRF {
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
 			}
 
-//			Score meanTrainOFScore = new Score();
-//			for (Entry<Instance, State> finalState : finalStates.entrySet()) {
-//				objectiveFunction.score(finalState.getValue());
-//				log.info(finalState.getKey().getName().substring(0, 5) + "... \t"
-//						+ SCORE_FORMAT.format(finalState.getValue().getObjectiveScore()));
-//				meanTrainOFScore.add(finalState.getValue().getScore());
-//			}
-//			log.info("Mean objective score during training:\t" + meanTrainOFScore);
+			Score meanTrainOFScore = new Score();
+			for (Entry<Instance, State> finalState : finalStates.entrySet()) {
+				objectiveFunction.score(finalState.getValue());
+				log.info(finalState.getKey().getName().substring(0, 5) + "... \t"
+						+ SCORE_FORMAT.format(finalState.getValue().getObjectiveScore()));
+				meanTrainOFScore.add(finalState.getValue().getScore());
+			}
+			log.info("Mean objective score during training:\t" + meanTrainOFScore);
 
 			if (meetsTrainingStoppingCriterion(trainingStoppingCrits, finalStates))
 				break;
@@ -255,15 +255,15 @@ public class SemanticParsingCRF {
 
 				boolean accepted = AcceptStrategies.strictModelAccept().isAccepted(candidateState, currentState);
 
-//				Collections.sort(proposalStates, Model.modelScoreComparator);
+				Collections.sort(proposalStates, Model.modelScoreComparator);
 
-//				for (int i = 0; i < proposalStates.size(); i++) {
-//					log.info("Index: " + i);
-//					compare(currentState, proposalStates.get(i));
-//				}
-//
-//				log.info("SampledState: ");
-//				compare(currentState, candidateState);
+				for (int i = 0; i < proposalStates.size(); i++) {
+					log.info("Index: " + i);
+					compare(currentState, proposalStates.get(i));
+				}
+
+				log.info("SampledState: ");
+				compare(currentState, candidateState);
 
 				if (accepted) {
 					currentState = candidateState;
@@ -302,17 +302,21 @@ public class SemanticParsingCRF {
 		if (differences.isEmpty())
 			return;
 
-		List<Entry<String, Double>> sortedWeights = new ArrayList<>(differences.entrySet());
+		List<Entry<String, Double>> sortedWeightsPrevState = new ArrayList<>(collectFeatures(currentState).entrySet());
+		List<Entry<String, Double>> sortedWeightsCandState = new ArrayList<>(
+				collectFeatures(candidateState).entrySet());
 
-		Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
+		Collections.sort(sortedWeightsPrevState, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
+		Collections.sort(sortedWeightsCandState, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
 
 		log.info(currentState.getInstance().getName());
-		sortedWeights.forEach(log::info);
 		log.info("_____________GoldAnnotations:_____________");
 		log.info(currentState.getGoldAnnotations());
 		log.info("_____________PrevState:_____________");
+		sortedWeightsPrevState.stream().filter(k -> differences.containsKey(k.getKey())).forEach(log::info);
 		log.info("ModelScore: " + currentState.getModelScore() + ": " + currentState.getCurrentPredictions());
 		log.info("_____________CandState:_____________");
+		sortedWeightsCandState.stream().filter(k -> differences.containsKey(k.getKey())).forEach(log::info);
 		log.info("ModelScore: " + candidateState.getModelScore() + ": " + candidateState.getCurrentPredictions());
 		log.info("------------------");
 	}
