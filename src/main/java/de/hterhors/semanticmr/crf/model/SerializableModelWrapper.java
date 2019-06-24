@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.factor;
+package de.hterhors.semanticmr.crf.model;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ public class SerializableModelWrapper implements Serializable {
 
 	final List<GenericTemplate> templates;
 
-	public SerializableModelWrapper(List<AbstractFeatureTemplate<?>> templates) {
+	public SerializableModelWrapper(List<AbstractFeatureTemplate> templates) {
 		this.templates = templates.stream().map(t -> convert(t)).collect(Collectors.toList());
 	}
 
@@ -31,13 +31,13 @@ public class SerializableModelWrapper implements Serializable {
 //		return new GenericTemplate(features, t.getClass().getPackage().getName(), t.getClass().getSimpleName());
 //
 //	}
-	private GenericTemplate convert(AbstractFeatureTemplate<?> t) {
+	private GenericTemplate convert(AbstractFeatureTemplate t) {
 		final Map<String, Double> features = new HashMap<>();
 		for (Entry<Integer, Double> e : t.getWeights().getFeatures().entrySet()) {
 			features.put(Model.getFeatureForIndex(e.getKey()), e.getValue());
 		}
 		return new GenericTemplate(features, t.getClass().getPackage().getName(), t.getClass().getSimpleName());
-		
+
 	}
 
 }

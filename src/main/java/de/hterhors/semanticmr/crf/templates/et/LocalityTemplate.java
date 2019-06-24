@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
@@ -24,7 +24,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  */
 public class LocalityTemplate extends AbstractFeatureTemplate<LocalityScope> {
 
-	static class LocalityScope extends AbstractFactorScope<LocalityScope> {
+	static class LocalityScope extends AbstractFactorScope {
 
 		public final EntityType firstEntity;
 		public final EntityType secondEntity;

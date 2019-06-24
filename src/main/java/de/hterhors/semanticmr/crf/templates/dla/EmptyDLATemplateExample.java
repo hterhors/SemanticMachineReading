@@ -3,8 +3,8 @@ package de.hterhors.semanticmr.crf.templates.dla;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.dla.EmptyDLATemplateExample.Scope;
@@ -17,7 +17,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  */
 public class EmptyDLATemplateExample extends AbstractFeatureTemplate<Scope> {
 
-	static class Scope extends AbstractFactorScope<Scope> {
+	static class Scope extends AbstractFactorScope {
 
 		public Scope(AbstractFeatureTemplate<Scope> template) {
 			super(template);

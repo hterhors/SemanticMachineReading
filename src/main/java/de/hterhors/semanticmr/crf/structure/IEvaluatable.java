@@ -101,6 +101,16 @@ public interface IEvaluatable {
 			return d == 0 ? 0 : (2 * p * r) / d;
 		}
 
+		public double getFbeta(final double beta) {
+			final double p = getPrecision();
+			final double r = getRecall();
+			final double d = (p + r);
+			if (d == 0)
+				return 0;
+			final double pow = Math.pow(beta, 2);
+			return (1 + pow) * (p * r) / (pow * p + r);
+		}
+
 		public double getAccuracy() {
 			double d = (tp + tn + fp + fn);
 
@@ -188,8 +198,7 @@ public interface IEvaluatable {
 				return false;
 			return true;
 		}
-		
-		
+
 	}
 
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal);

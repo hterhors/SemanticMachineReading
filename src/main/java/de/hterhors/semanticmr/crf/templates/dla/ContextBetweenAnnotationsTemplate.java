@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
@@ -66,7 +66,7 @@ public class ContextBetweenAnnotationsTemplate extends AbstractFeatureTemplate<C
 
 	}
 
-	class ContextBetweenAnnotationsScope extends AbstractFactorScope<ContextBetweenAnnotationsScope> {
+	class ContextBetweenAnnotationsScope extends AbstractFactorScope {
 
 		public final Instance instance;
 		public final EntityType fromEntity;

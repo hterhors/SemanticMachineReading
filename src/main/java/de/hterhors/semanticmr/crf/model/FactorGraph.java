@@ -1,9 +1,8 @@
-package de.hterhors.semanticmr.crf.factor;
+package de.hterhors.semanticmr.crf.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -23,21 +22,21 @@ public class FactorGraph {
 	/**
 	 * The factor scopes of that factor graph.
 	 */
-	final private List<AbstractFactorScope<?>> factorScopes = new ArrayList<>();
+	final private List<AbstractFactorScope> factorScopes = new ArrayList<>();
 
 	/**
 	 * A cache of computed factors which is computed only once after the factor
 	 * scopes are added to this factor graph.
 	 */
-	private List<Factor<?>> cache = null;
+	private List<Factor> cache = null;
 
 	/**
 	 * Is dirty flag for computing the factor cache.
 	 */
 	private boolean isDirty = true;
-	private final AbstractFeatureTemplate<?> template;
+	private final AbstractFeatureTemplate template;
 
-	public FactorGraph(AbstractFeatureTemplate<?> template) {
+	public FactorGraph(AbstractFeatureTemplate template) {
 		this.template = template;
 	}
 
@@ -50,7 +49,8 @@ public class FactorGraph {
 	 * 
 	 * @see {@link AbstractFeatureTemplate}
 	 */
-	public void addFactorScopes(List<? extends AbstractFactorScope<?>> generatedFactorScopes) {
+	public void addFactorScopes(List<AbstractFactorScope> generatedFactorScopes) {
+
 		this.factorScopes.addAll(generatedFactorScopes);
 		/*
 		 * Set dirty flag to true in case the factors need to be recomputed. This
@@ -65,14 +65,14 @@ public class FactorGraph {
 	 * 
 	 * @return
 	 */
-	public List<Factor<?>> getFactors() {
+	public List<Factor> getFactors() {
 		if (this.template.enableFactorCaching)
 			return getCachedFactors();
 		else
 			return getUnCachedFactors();
 	}
 
-	public List<Factor<?>> getCachedFactors() {
+	public List<Factor> getCachedFactors() {
 		if (this.isDirty || this.cache == null)
 			this.cache = FactorPool.getInstance().getFactors(factorScopes);
 
@@ -83,13 +83,13 @@ public class FactorGraph {
 		return cache;
 	}
 
-	public List<Factor<?>> getUnCachedFactors() {
-		return factorScopes.parallelStream().map(remainingFactorScope -> {
-			@SuppressWarnings({ "rawtypes" })
-			Factor f = new Factor(remainingFactorScope);
-			this.template.generateFeatureVector(f);
-			return f;
-		}).collect(Collectors.toList());
+	public List<Factor> getUnCachedFactors() {
+
+		List<Factor> factors = factorScopes.parallelStream().map(fs -> new Factor(fs)).collect(Collectors.toList());
+
+		factors.parallelStream().forEach(f -> this.template.generateFeatureVector(f));
+		return factors;
+
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class FactorGraph {
 	 * 
 	 * @return list of factor scopes.
 	 */
-	public List<AbstractFactorScope<?>> getFactorScopes() {
+	public List<? extends AbstractFactorScope> getFactorScopes() {
 		return factorScopes;
 	}
 

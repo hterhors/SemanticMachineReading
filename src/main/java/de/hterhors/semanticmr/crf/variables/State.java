@@ -4,7 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.hterhors.semanticmr.crf.factor.FactorGraph;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.FactorGraph;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -24,7 +25,7 @@ public class State {
 		return currentPredictions;
 	}
 
-	final private Map<AbstractFeatureTemplate<?>, FactorGraph> factorGraphs;
+	final private Map<AbstractFeatureTemplate, FactorGraph> factorGraphs;
 
 	private double modelScore;
 
@@ -60,7 +61,7 @@ public class State {
 		return new State(this.instance, currentPredictions.deepRemoveCopy(annotationIndex));
 	}
 
-	public FactorGraph getFactorGraph(final AbstractFeatureTemplate<?> template) {
+	public FactorGraph getFactorGraph(final AbstractFeatureTemplate template) {
 		FactorGraph fg;
 		if ((fg = factorGraphs.get(template)) == null) {
 			fg = new FactorGraph(template);

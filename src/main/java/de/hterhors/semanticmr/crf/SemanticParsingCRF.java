@@ -16,11 +16,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.exploration.IExplorationStrategy;
-import de.hterhors.semanticmr.crf.factor.Factor;
-import de.hterhors.semanticmr.crf.factor.FactorGraph;
-import de.hterhors.semanticmr.crf.factor.Model;
 import de.hterhors.semanticmr.crf.helper.log.LogUtils;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
+import de.hterhors.semanticmr.crf.model.FactorGraph;
+import de.hterhors.semanticmr.crf.model.Model;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
@@ -362,7 +363,7 @@ public class SemanticParsingCRF {
 		Map<String, Double> features = new HashMap<>();
 
 		for (FactorGraph fg : currentState.getFactorGraphs()) {
-			for (Factor<?> f : fg.getFactors()) {
+			for (Factor f : fg.getFactors()) {
 
 				for (Entry<Integer, Double> feature : f.getFeatureVector().getFeatures().entrySet()) {
 					if (f.getFactorScope().getTemplate().getWeights().getFeatures().containsKey(feature.getKey()))

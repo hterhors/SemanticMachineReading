@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.crf.factor.Model;
+import de.hterhors.semanticmr.crf.model.Model;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ITrainingStoppingCriterion;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -38,7 +38,7 @@ public class NoModelChangeCrit implements ITrainingStoppingCriterion {
 //				countWeights++;
 //			}
 //		}
-		for (AbstractFeatureTemplate<?> template : model.getFactorTemplates()) {
+		for (AbstractFeatureTemplate template : model.getFactorTemplates()) {
 			for (Double weight : template.getWeights().getFeatures().values()) {
 				meanWeight += weight.doubleValue();
 				countWeights++;

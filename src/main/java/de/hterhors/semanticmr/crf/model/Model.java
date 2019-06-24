@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.factor;
+package de.hterhors.semanticmr.crf.model;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -94,13 +94,13 @@ public class Model {
 		}
 	};
 
-	final private List<AbstractFeatureTemplate<?>> factorTemplates;
+	final private List<AbstractFeatureTemplate> factorTemplates;
 
-	public Model(List<AbstractFeatureTemplate<?>> factorTemplates) {
+	public Model(List<AbstractFeatureTemplate> factorTemplates) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
 	}
 
-	public Model(List<AbstractFeatureTemplate<?>> factorTemplates, File modelDir, String modelName) {
+	public Model(List<AbstractFeatureTemplate> factorTemplates, File modelDir, String modelName) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
 		this.modelBaseDir = modelDir;
 		this.modelName = modelName;
@@ -111,7 +111,7 @@ public class Model {
 		/**
 		 * TODO: measure efficiency of streams
 		 */
-		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
+		for (AbstractFeatureTemplate template : this.factorTemplates) {
 
 			/*
 			 * Collect all factor scopes of all states to that this template can be applied
@@ -137,7 +137,7 @@ public class Model {
 		/**
 		 * TODO: measure efficiency of streams
 		 */
-		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
+		for (AbstractFeatureTemplate template : this.factorTemplates) {
 
 			/*
 			 * Collect all factor scopes of all states to that this template can be applied
@@ -162,27 +162,25 @@ public class Model {
 		state.setModelScore(computeScore(state));
 	}
 
-	@SuppressWarnings("unchecked")
-	private void computeRemainingFactors(@SuppressWarnings("rawtypes") Stream<AbstractFactorScope> stream) {
+	private void computeRemainingFactors(Stream<AbstractFactorScope> stream) {
 
-		List<Factor<?>> s = stream.parallel().distinct()
+		List<Factor> s = stream.parallel().distinct()
 				.filter(fs -> !fs.template.enableFactorCaching
 						|| (fs.template.enableFactorCaching && !FACTOR_POOL_INSTANCE.containsFactorScope(fs)))
 				.map(fs -> {
-					@SuppressWarnings({ "rawtypes" })
 					Factor f = new Factor(fs);
 					fs.template.generateFeatureVector(f);
 					return f;
 				}).collect(Collectors.toList());
 
-		for (Factor<?> factor : s) {
+		for (Factor factor : s) {
 			if (!factor.getFactorScope().template.enableFactorCaching)
 				continue;
 			FACTOR_POOL_INSTANCE.addFactor(factor);
 		}
 	}
 
-	private void collectFactorScopesForState(AbstractFeatureTemplate<?> template, State state) {
+	private void collectFactorScopesForState(AbstractFeatureTemplate template, State state) {
 		state.getFactorGraph(template).addFactorScopes(template.generateFactorScopes(state));
 	}
 
@@ -197,13 +195,13 @@ public class Model {
 
 		double score = 1;
 		boolean factorsAvailable = false;
-		for (FactorGraph abstractFactorTemplate : state.getFactorGraphs()) {
+		for (FactorGraph factorGraph : state.getFactorGraphs()) {
 
-			final List<Factor<?>> factors = abstractFactorTemplate.getFactors();
+			final List<Factor> factors = factorGraph.getFactors();
 
 			factorsAvailable |= factors.size() != 0;
 
-			for (Factor<?> factor : factors) {
+			for (Factor factor : factors) {
 				score *= factor.computeScalarScore();
 			}
 
@@ -226,7 +224,7 @@ public class Model {
 	public void printReadable(File modelDir, String modelName) {
 		log.info("Print model in readable format...");
 		try {
-			for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
+			for (AbstractFeatureTemplate template : this.factorTemplates) {
 				File parentDir = new File(modelDir, modelName + DEFAULT_READABLE_DIR);
 				parentDir.mkdirs();
 
@@ -330,9 +328,9 @@ public class Model {
 		return model;
 	}
 
-	private static AbstractFeatureTemplate<?> toAbstractFeaturetemplate(final GenericTemplate t) {
+	private static AbstractFeatureTemplate toAbstractFeaturetemplate(final GenericTemplate t) {
 		try {
-			final AbstractFeatureTemplate<?> template = (AbstractFeatureTemplate<?>) Class
+			final AbstractFeatureTemplate template = (AbstractFeatureTemplate) Class
 					.forName(t.packageName + "." + t.templateName).newInstance();
 
 			final DoubleVector v = new DoubleVector();
@@ -378,7 +376,7 @@ public class Model {
 		return modelName;
 	}
 
-	public List<AbstractFeatureTemplate<?>> getFactorTemplates() {
+	public List<AbstractFeatureTemplate> getFactorTemplates() {
 		return Collections.unmodifiableList(factorTemplates);
 	}
 

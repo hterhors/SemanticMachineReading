@@ -2,7 +2,7 @@ package de.hterhors.semanticmr.crf.sampling.impl;
 
 import java.util.List;
 
-import de.hterhors.semanticmr.crf.factor.Model;
+import de.hterhors.semanticmr.crf.model.Model;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.AcceptStrategy;
 import de.hterhors.semanticmr.crf.sampling.SamplingUtils;

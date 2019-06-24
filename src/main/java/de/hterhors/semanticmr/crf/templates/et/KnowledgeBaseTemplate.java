@@ -12,8 +12,8 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
@@ -147,7 +147,7 @@ public class KnowledgeBaseTemplate extends AbstractFeatureTemplate<KnowledgeBase
 		}
 	}
 
-	public static class KnowledgeBaseScope extends AbstractFactorScope<KnowledgeBaseScope> {
+	public static class KnowledgeBaseScope extends AbstractFactorScope {
 
 		/**
 		 * The parent class type of the obie-template in a parent-child relation.

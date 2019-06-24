@@ -8,8 +8,8 @@ import org.apache.commons.lang3.math.Fraction;
 
 import java.util.Set;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
@@ -35,7 +35,7 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 		super(false);
 	}
 
-	static class SingleTokenContextScope extends AbstractFactorScope<SingleTokenContextScope> {
+	static class SingleTokenContextScope extends AbstractFactorScope {
 
 		public final Instance instance;
 

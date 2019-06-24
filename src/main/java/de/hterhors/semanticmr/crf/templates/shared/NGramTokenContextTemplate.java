@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
@@ -33,7 +33,7 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 	private static final String BOF = "BOF";
 	private static final String EOF = "EOF";
 
-	class NGramTokenContextScope extends AbstractFactorScope<NGramTokenContextScope> {
+	class NGramTokenContextScope extends AbstractFactorScope {
 
 		public final Instance instance;
 
@@ -181,7 +181,7 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 		final String[] rightContext = extractRightContext(tokens, endTokenIndex);
 
 		getContextFeatures(featureVector, entity.entityName, leftContext, rightContext);
-		
+
 		for (EntityType e : entity.getDirectSuperEntityTypes()) {
 			getContextFeatures(featureVector, e.entityName, leftContext, rightContext);
 		}

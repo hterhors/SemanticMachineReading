@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.factor;
+package de.hterhors.semanticmr.crf.model;
 
 import java.io.Serializable;
 import java.util.Map;

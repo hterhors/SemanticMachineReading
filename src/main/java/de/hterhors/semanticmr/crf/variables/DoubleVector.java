@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.hterhors.semanticmr.crf.factor.Model;
+import de.hterhors.semanticmr.crf.model.Model;
 
 /**
  * This class basically wraps a Map of feature names (index) and values.

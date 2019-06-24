@@ -3,8 +3,8 @@ package de.hterhors.semanticmr.crf.templates.dla;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -18,7 +18,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  */
 public class MorphologicalNerlaTemplate extends AbstractFeatureTemplate<MorphologicalNerlaScope> {
 
-	static class MorphologicalNerlaScope extends AbstractFactorScope<MorphologicalNerlaScope> {
+	static class MorphologicalNerlaScope extends AbstractFactorScope {
 
 		final public EntityType type;
 		final public String surfaceForm;

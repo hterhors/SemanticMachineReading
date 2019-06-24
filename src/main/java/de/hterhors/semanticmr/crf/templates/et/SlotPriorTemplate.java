@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
@@ -24,7 +24,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  */
 public class SlotPriorTemplate extends AbstractFeatureTemplate<Scope> {
 
-	static class Scope extends AbstractFactorScope<Scope> {
+	static class Scope extends AbstractFactorScope {
 
 		final SlotType slotType;
 		final Set<String> values;

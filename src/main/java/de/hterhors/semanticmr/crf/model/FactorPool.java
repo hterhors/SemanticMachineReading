@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.factor;
+package de.hterhors.semanticmr.crf.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +19,7 @@ final class FactorPool {
 	/**
 	 * The factor cache
 	 */
-	final private Map<AbstractFactorScope<?>, Factor<?>> factorCache = new HashMap<>();
+	final private Map<AbstractFactorScope, Factor> factorCache = new HashMap<>();
 
 	/**
 	 * The instance of this caching pool.
@@ -48,7 +48,7 @@ final class FactorPool {
 	 * @param factorScope
 	 * @return true if the pool contains the given factor scope.
 	 */
-	protected boolean containsFactorScope(AbstractFactorScope<?> factorScope) {
+	protected boolean containsFactorScope(AbstractFactorScope factorScope) {
 		return factorCache.get(factorScope) != null;
 	}
 
@@ -63,22 +63,22 @@ final class FactorPool {
 	 * @return an unmodifiable list of factors that corresponds to the list of
 	 *         factor scopes.
 	 */
-	protected List<Factor<?>> getFactors(List<AbstractFactorScope<?>> factorScopes) {
+	protected <Scope extends AbstractFactorScope> List<Factor> getFactors(List<Scope> factorScopes) {
 
 		if (factorScopes.isEmpty())
 			return Collections.emptyList();
 
-		final List<Factor<?>> factors = new ArrayList<>();
+		final List<Factor> factors = new ArrayList<>();
 
-		for (AbstractFactorScope<?> factorVariables : factorScopes) {
+		for (Scope factorVariables : factorScopes) {
 
-			final Factor<?> factor;
+			final Factor factor;
 
 			if ((factor = factorCache.get(factorVariables)) == null)
 				throw new IllegalStateException(
 						String.format("Could not retrieve factor for requested factor variables: %s", factorVariables));
 
-			factors.add(factor);
+			factors.add((Factor) factor);
 
 		}
 		return Collections.unmodifiableList(factors);
@@ -93,8 +93,8 @@ final class FactorPool {
 	 * 
 	 * @param factor
 	 */
-	protected void addFactor(Factor<?> factor) {
-		final Factor<?> old = factorCache.put(factor.getFactorScope(), factor);
+	protected void addFactor(Factor factor) {
+		final Factor old = factorCache.put(factor.getFactorScope(), factor);
 		if (old != null)
 			throw new IllegalStateException("Factorpool already contains factor. " + factor);
 	}

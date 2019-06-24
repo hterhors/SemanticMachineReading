@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
@@ -24,7 +24,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  */
 public class LevenshteinTemplate extends AbstractFeatureTemplate<LevenshteinScope> {
 
-	static class LevenshteinScope extends AbstractFactorScope<LevenshteinScope> {
+	static class LevenshteinScope extends AbstractFactorScope {
 
 		public final EntityType entityType;
 		public final String surfaceForm;

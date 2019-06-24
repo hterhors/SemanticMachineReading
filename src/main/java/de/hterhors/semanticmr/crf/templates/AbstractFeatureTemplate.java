@@ -2,8 +2,8 @@ package de.hterhors.semanticmr.crf.templates;
 
 import java.util.List;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -13,9 +13,9 @@ import de.hterhors.semanticmr.crf.variables.State;
  * 
  * @author hterhors
  *
- * @param <S>
+ * @param <S> <S extends AbstractFactorScope>
  */
-public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S>> {
+public abstract class AbstractFeatureTemplate<Scope extends AbstractFactorScope> {
 
 	/**
 	 * Weights for the computation of factor scores. These weights are shared across
@@ -47,7 +47,7 @@ public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S>> 
 	 * @param state
 	 * @return
 	 */
-	public abstract List<S> generateFactorScopes(State state);
+	public abstract List<Scope> generateFactorScopes(State state);
 
 	/**
 	 * This method receives the previously created factor scopes and generates the
@@ -55,9 +55,9 @@ public abstract class AbstractFeatureTemplate<S extends AbstractFactorScope<S>> 
 	 * should include all the variables it needs to compute the respective factor.
 	 * 
 	 * @param state
-	 * @param factor
+	 * @param f
 	 */
-	public abstract void generateFeatureVector(Factor<S> factor);
+	public abstract void generateFeatureVector(Factor<Scope> f);
 
 	public void setWeights(DoubleVector weights) {
 		this.weights = weights;

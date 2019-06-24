@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
@@ -41,7 +41,7 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 
 	private static final String RIGHT = ">";
 
-	static class IntraTokenScope extends AbstractFactorScope<IntraTokenScope> {
+	static class IntraTokenScope extends AbstractFactorScope {
 
 		public EntityType entityType;
 		public final String surfaceForm;

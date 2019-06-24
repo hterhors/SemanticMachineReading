@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.apache.jena.sparql.function.library.max;
 
-import de.hterhors.semanticmr.crf.factor.AbstractFactorScope;
-import de.hterhors.semanticmr.crf.factor.Factor;
+import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
+import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
@@ -24,7 +24,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  */
 public class ClusterTemplate extends AbstractFeatureTemplate<ClusterScope> {
 
-	static class ClusterScope extends AbstractFactorScope<ClusterScope> {
+	static class ClusterScope extends AbstractFactorScope {
 
 		public final int sentenceSpread;
 
@@ -96,7 +96,6 @@ public class ClusterTemplate extends AbstractFeatureTemplate<ClusterScope> {
 				}
 			}
 
-			
 			factors.add(new ClusterScope(this, maxSenIndex - minSenIndex));
 
 		}
@@ -106,7 +105,7 @@ public class ClusterTemplate extends AbstractFeatureTemplate<ClusterScope> {
 
 	@Override
 	public void generateFeatureVector(Factor<ClusterScope> factor) {
-		
+
 		factor.getFeatureVector().set("Annotation Spread = 0", factor.getFactorScope().sentenceSpread == 0);
 		factor.getFeatureVector().set("Annotation Spread != 0", factor.getFactorScope().sentenceSpread != 0);
 //		factor.getFeatureVector().set("Annotation Spread = 1", factor.getFactorScope().sentenceSpread == 1);
