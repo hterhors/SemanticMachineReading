@@ -172,7 +172,7 @@ public class JsonInstanceWrapperToInstance {
 		} else if (wrapper.getLiteralAnnotation() != null) {
 			return toLiteralAnnotation(wrapper.getLiteralAnnotation());
 		}
-		throw new IllegalStateException("Root annotation has no value.");
+		throw new IllegalStateException("Root annotation has no value: " + wrapper);
 	}
 
 	private AbstractAnnotation toSlotFiller(Document document, JsonSingleFillerSlotWrapper wrapper) {

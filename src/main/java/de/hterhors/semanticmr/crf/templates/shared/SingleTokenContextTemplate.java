@@ -162,6 +162,7 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 				final String text = factor.getFactorScope().instance.getDocument().tokenList.get(i).getText();
 				if (Document.getStopWords().contains(text))
 					continue;
+				featureVector.set(text + " " + factor.getFactorScope().entityType.entityName, true);
 				featureVector.set(text + "... " + factor.getFactorScope().entityType.entityName, true);
 				featureVector.set(text + "... -" + distance + "... " + factor.getFactorScope().entityType.entityName,
 						true);
@@ -179,7 +180,8 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 				final String text = factor.getFactorScope().instance.getDocument().tokenList.get(i).getText();
 				if (Document.getStopWords().contains(text))
 					continue;
-				featureVector.set(text + "... " + factor.getFactorScope().entityType.entityName, true);
+				featureVector.set(text + " " + factor.getFactorScope().entityType.entityName, true);
+				featureVector.set(factor.getFactorScope().entityType.entityName+"... "+text, true);
 				featureVector.set(factor.getFactorScope().entityType.entityName + "... +" + distance + "... " + text,
 						true);
 			}

@@ -388,15 +388,17 @@ public class SemanticParsingCRF {
 	 * NER-annotations during slot-filling.
 	 * 
 	 * @param printDetailedLog whether detailed log should be printed or not.
+	 * @param predictionOF
 	 * @param instances        the instances to compute the coverage on.
 	 * @return a score that contains information of the coverage.
 	 */
-	public Score computeCoverage(final boolean printDetailedLog, final List<Instance> instances) {
+	public Score computeCoverage(final boolean printDetailedLog, IObjectiveFunction predictionOF,
+			final List<Instance> instances) {
 
 		log.info("Compute coverage...");
 
 		ISamplingStoppingCriterion[] noObjectiveChangeCrit = new ISamplingStoppingCriterion[] {
-				new ConverganceCrit(1, s -> s.getObjectiveScore()) };
+				new ConverganceCrit(explorerList.size(), s -> s.getObjectiveScore()) };
 
 		final Map<Instance, State> finalStates = new LinkedHashMap<>();
 
@@ -406,7 +408,7 @@ public class SemanticParsingCRF {
 			final List<State> producedStateChain = new ArrayList<>();
 
 			State currentState = initializer.getInitState(instance);
-			objectiveFunction.score(currentState);
+			predictionOF.score(currentState);
 			finalStates.put(instance, currentState);
 			producedStateChain.add(currentState);
 			int samplingStep;
@@ -419,7 +421,7 @@ public class SemanticParsingCRF {
 					if (proposalStates.isEmpty())
 						proposalStates.add(currentState);
 
-					objectiveFunction.score(proposalStates);
+					predictionOF.score(proposalStates);
 
 					final State candidateState = SamplerCollection.greedyObjectiveStrategy()
 							.sampleCandidate(proposalStates);
@@ -447,7 +449,7 @@ public class SemanticParsingCRF {
 
 		Score meanTrainOFScore = new Score();
 		for (Entry<Instance, State> finalState : finalStates.entrySet()) {
-			objectiveFunction.score(finalState.getValue());
+			predictionOF.score(finalState.getValue());
 			if (printDetailedLog)
 				log.info(
 						finalState.getKey().getName().substring(0, Math.min(finalState.getKey().getName().length(), 10))

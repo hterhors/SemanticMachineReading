@@ -14,6 +14,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 
+import org.apache.commons.collections.set.SynchronizedSet;
+
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
@@ -185,7 +187,6 @@ public class SantoRDFConverter {
 		List<AbstractAnnotation> predicateValues = new ArrayList<>();
 
 		for (String object : slotFiller) {
-
 			final String nameSpace = SantoHelper.getNameSpace(object);
 
 			if (object.isEmpty()) {
