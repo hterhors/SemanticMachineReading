@@ -2,9 +2,9 @@ package de.hterhors.semanticmr.santo.converter;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +12,7 @@ import java.util.Set;
 
 import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -46,6 +47,13 @@ public class Santo2JsonConverter {
 	public Santo2JsonConverter(SystemScope systemScope, final String documentID, File documentFile,
 			File textualAnnotationsFile, File rdfAnnotationsFile, final String ontologyNameSpace,
 			final String resourceNameSpace) throws IOException {
+		this(systemScope, Collections.emptySet(), documentID, documentFile, textualAnnotationsFile, rdfAnnotationsFile,
+				ontologyNameSpace, resourceNameSpace);
+	}
+
+	public Santo2JsonConverter(SystemScope systemScope, Set<SlotType> slotTypes, final String documentID,
+			File documentFile, File textualAnnotationsFile, File rdfAnnotationsFile, final String ontologyNameSpace,
+			final String resourceNameSpace) throws IOException {
 		this.documentFile = documentFile;
 		this.textualAnnotationsFile = textualAnnotationsFile;
 		this.rdfAnnotationsFile = rdfAnnotationsFile;
@@ -62,21 +70,21 @@ public class Santo2JsonConverter {
 
 		boolean onlyLeafEntities = true;
 
-		this.rdfConverter = new SantoRDFConverter(onlyLeafEntities, systemScope, annotations, rdfAnnotationsFile,
-				ontologyNameSpace, resourceNameSpace);
+		this.rdfConverter = new SantoRDFConverter(slotTypes, onlyLeafEntities, systemScope, annotations,
+				rdfAnnotationsFile, ontologyNameSpace, resourceNameSpace);
 	}
 
 	public void convert(EInstanceContext instanceContext, final File writeToFile, String rootEntityTypes,
-			boolean includeSubEntities, boolean jsonPrettyString) throws IOException {
+			boolean includeSubEntities, boolean jsonPrettyString, boolean deepRec) throws IOException {
 		convert(instanceContext, writeToFile, new HashSet<>(Arrays.asList(rootEntityTypes)), includeSubEntities,
-				jsonPrettyString);
+				jsonPrettyString, deepRec);
 	}
 
 	public void convert(final EInstanceContext instanceContext, final File writeToFile, Set<String> rootEntityTypes,
-			boolean includeSubEntities, boolean jsonPrettyString) throws IOException {
+			boolean includeSubEntities, boolean jsonPrettyString, boolean deepRec) throws IOException {
 
 		final List<AbstractAnnotation> rdfAnnotations = rdfConverter.extract(document, rootEntityTypes,
-				includeSubEntities);
+				includeSubEntities, deepRec);
 
 		List<Instance> instances = new ArrayList<>();
 

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -36,13 +37,27 @@ public class GeneralCandidateProvider
 			}
 		}
 
-		rootAnnotationsCache.putIfAbsent(slotFiller.getEntityType(), new HashSet<>());
-		rootAnnotationsCache.get(slotFiller.getEntityType()).add((EntityTypeAnnotation) slotFiller);
-		for (EntityType relatedEntitytype : slotFiller.getEntityType().getHierarchicalEntityTypes()) {
-			rootAnnotationsCache.putIfAbsent(relatedEntitytype, new HashSet<>());
-			rootAnnotationsCache.get(relatedEntitytype).add((EntityTypeAnnotation) slotFiller);
+		if (slotFiller.isInstanceOfEntityTypeAnnotation()) {
+			rootAnnotationsCache.putIfAbsent(slotFiller.getEntityType(), new HashSet<>());
+			rootAnnotationsCache.get(slotFiller.getEntityType()).add((EntityTypeAnnotation) slotFiller);
+		} else {
+			rootAnnotationsCache.putIfAbsent(slotFiller.getEntityType(), new HashSet<>());
+			rootAnnotationsCache.get(slotFiller.getEntityType()).add(((EntityTemplate) slotFiller).getRootAnnotation());
 		}
+
+		for (EntityType relatedEntitytype : slotFiller.getEntityType().getHierarchicalEntityTypes()) {
+			if (slotFiller.isInstanceOfEntityTypeAnnotation()) {
+				rootAnnotationsCache.putIfAbsent(relatedEntitytype, new HashSet<>());
+				rootAnnotationsCache.get(relatedEntitytype).add((EntityTypeAnnotation) slotFiller);
+			} else {
+				rootAnnotationsCache.putIfAbsent(relatedEntitytype, new HashSet<>());
+				rootAnnotationsCache.get(relatedEntitytype)
+						.add(((EntityTemplate) slotFiller).getRootAnnotation());
+			}
+		}
+
 		return this;
+
 	}
 
 	@Override

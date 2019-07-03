@@ -7,6 +7,7 @@ import java.util.Map;
 import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection;
 import de.hterhors.semanticmr.candprov.sf.GeneralCandidateProvider;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class NerlaCollector {
@@ -24,7 +25,11 @@ public class NerlaCollector {
 				if (instance != null) {
 					GeneralCandidateProvider ap = new GeneralCandidateProvider(instance);
 					for (DocumentLinkedAnnotation dla : nerla.get(instance)) {
-						ap.addSlotFiller(dla);
+
+						if (dla.getEntityType().hasNoSlots())
+							ap.addSlotFiller(dla);
+						else
+							ap.addSlotFiller(new EntityTemplate(dla));
 					}
 					candidateProvider.registerCandidateProvider(ap);
 				}

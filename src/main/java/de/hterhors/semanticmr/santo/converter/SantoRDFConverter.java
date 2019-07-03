@@ -52,11 +52,16 @@ public class SantoRDFConverter {
 	final private String dataNameSpace;
 
 	final private boolean onlyLeafEntities;
+	/**
+	 * A set of slot types that should be considered. All others are filtered out.
+	 */
+	private Set<SlotType> filterSlotTypes;
 
-	public SantoRDFConverter(boolean onlyLeafEntities, SystemScope systemScope,
+	public SantoRDFConverter(Set<SlotType> filterSlotTypes, boolean onlyLeafEntities, SystemScope systemScope,
 			Map<Triple, RDFRelatedAnnotation> annotations, File rdfAnnotationsFile, final String ontologyNameSpace,
 			final String dataNameSpace) throws IOException {
 
+		this.filterSlotTypes = filterSlotTypes == null ? Collections.emptySet() : filterSlotTypes;
 		this.onlyLeafEntities = onlyLeafEntities;
 		this.systemScope = systemScope;
 		this.annotations = annotations;
@@ -67,7 +72,7 @@ public class SantoRDFConverter {
 	}
 
 	public List<AbstractAnnotation> extract(final Document document, final Set<String> rootEntities,
-			final boolean includeSubEntities) {
+			final boolean includeSubEntities, boolean deepRec) {
 
 		setRootEntityTypes(rootEntities, includeSubEntities);
 
@@ -87,7 +92,10 @@ public class SantoRDFConverter {
 				EntityTemplate entityTemplate = new EntityTemplate(
 						toEntityTemplateTypeAnnotation(document, SantoHelper.getResource(object), annotation));
 
-				fillRec(document, entityTemplate, rootDataPoint);
+				fillRec(document, entityTemplate, rootDataPoint, deepRec);
+				/*
+				 * HOTFIX to put organism models.
+				 */
 //				if (entityTemplate.getSingleFillerSlot(SlotType.get("hasOrganismSpecies")).containsSlotFiller()) {
 //					entityTemplate.rootAnnotation = fix(
 //							entityTemplate.getSingleFillerSlot(SlotType.get("hasOrganismSpecies")));
@@ -138,7 +146,7 @@ public class SantoRDFConverter {
 		return null;
 	}
 
-	private void fillRec(Document document, final EntityTemplate object, String subject) {
+	private void fillRec(Document document, final EntityTemplate object, String subject, boolean deepRec) {
 		/*
 		 * Read rdf type separately to create new instance.
 		 */
@@ -158,11 +166,13 @@ public class SantoRDFConverter {
 
 			final SlotType slot = SlotType.get(slotName);
 
+			if (filterSlotTypes.isEmpty() || !filterSlotTypes.contains(slot))
+				continue;
 			/*
 			 * Get all values.
 			 */
 			List<AbstractAnnotation> slotFillers = extractValuesFromPredicates(document, subject, slot, props.getKey(),
-					props.getValue());
+					props.getValue(), deepRec);
 
 			if (slotFillers.size() == 0)
 				continue;
@@ -182,7 +192,7 @@ public class SantoRDFConverter {
 	}
 
 	private List<AbstractAnnotation> extractValuesFromPredicates(Document document, String subject, SlotType slotType,
-			String slotName, Set<String> slotFiller) {
+			String slotName, Set<String> slotFiller, boolean deepRec) {
 
 		List<AbstractAnnotation> predicateValues = new ArrayList<>();
 
@@ -219,7 +229,8 @@ public class SantoRDFConverter {
 					final EntityTemplate entityTemplateAnnotation = toEntityTemplate(document, slotName, linkedID);
 					if (onlyLeafEntities && !isLeafEntity(entityTemplateAnnotation.getEntityType()))
 						continue;
-					fillRec(document, entityTemplateAnnotation, linkedID.object);
+					if (deepRec)
+						fillRec(document, entityTemplateAnnotation, linkedID.object, deepRec);
 					predicateValues.add(entityTemplateAnnotation);
 				} catch (DocumentLinkedAnnotationMismatchException e) {
 					System.out.println("WARN! " + e.getMessage());

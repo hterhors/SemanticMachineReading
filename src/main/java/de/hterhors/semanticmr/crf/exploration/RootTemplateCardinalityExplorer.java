@@ -25,14 +25,11 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 
 	final private AnnotationCandidateRetrievalCollection candidateProvider;
 
-	final private IObjectiveFunction objectiveFunction;
-
 	final private EntityTypeAnnotation initAnnotation;
 
-	public RootTemplateCardinalityExplorer(IObjectiveFunction objectiveFunction,
-			AnnotationCandidateRetrievalCollection candidateProvider, EntityTypeAnnotation initAnnotation) {
+	public RootTemplateCardinalityExplorer(AnnotationCandidateRetrievalCollection candidateProvider,
+			EntityTypeAnnotation initAnnotation) {
 		this.candidateProvider = candidateProvider;
-		this.objectiveFunction = objectiveFunction;
 		this.initAnnotation = initAnnotation;
 	}
 
@@ -84,22 +81,6 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 	private void updateAverage(final List<State> proposalStates) {
 		averageNumberOfNewProposalStates += proposalStates.size();
 		averageNumberOfNewProposalStates /= 2;
-	}
-
-	private void changeTemplateType(final List<State> proposalStates, State currentState,
-			IEntityTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
-			int annotationIndex) {
-
-		for (EntityTypeAnnotation templateTypeCandidate : slotFillerCandidateProvider
-				.getCandidates(entityTemplate.getEntityType())) {
-
-			if (templateTypeCandidate.equals(entityTemplate.getRootAnnotation()))
-				continue;
-
-			final EntityTemplate deepCopy = entityTemplate.deepMergeCopy(templateTypeCandidate);
-
-			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
-		}
 	}
 
 }

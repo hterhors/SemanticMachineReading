@@ -32,8 +32,16 @@ public abstract class AbstractEvaluator {
 			return ((EntityTypeAnnotation) val).evaluate(this, (EntityTypeAnnotation) otherVal);
 		} else if (val instanceof EntityTemplate && (otherVal instanceof EntityTemplate || otherVal == null)) {
 			return ((EntityTemplate) val).evaluate(this, (EntityTemplate) otherVal);
+		} else if (val instanceof EntityTemplate && !(otherVal instanceof EntityTemplate)) {
+			return ((EntityTemplate) val).evaluate(this, otherVal);
+		} else if (otherVal instanceof EntityTemplate && !(val instanceof EntityTemplate)) {
+			return ((EntityTemplate) otherVal).evaluate(this, val).invert();
 		} else {
-			return Score.FN_FP;
+			/*
+			 * Should never happen!
+			 */
+			throw new IllegalStateException("Illegal state detected during evaluation!");
+//			return Score.FN_FP;
 		}
 	}
 

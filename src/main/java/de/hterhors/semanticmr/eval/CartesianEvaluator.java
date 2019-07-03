@@ -202,6 +202,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 				j++;
 			}
 			i++;
+			
 		}
 
 		return scores;

@@ -308,23 +308,38 @@ final public class EntityTemplate extends AbstractAnnotation {
 	@Override
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable other) {
 
-		if (other != null && !(other instanceof EntityTemplate))
-			return Score.ZERO;
+		if (other != null && !(other instanceof EntityTemplate)) {
 
-		final Score score = new Score();
+			final Score score = new Score();
 
-		EntityTemplate oet = (EntityTemplate) other;
-		if (other == null) {
-			score.increaseFalseNegative();
+			if (other == null) {
+				score.increaseFalseNegative();
+			} else {
+				score.add(this.rootAnnotation.evaluate(evaluator, other));
+			}
+
+			addScoresForSingleFillerSlots(evaluator, null, score);
+
+			addScoresForMultiFillerSlots(evaluator, null, score);
+
+			return score;
 		} else {
-			score.add(this.rootAnnotation.evaluate(evaluator, oet.rootAnnotation));
+
+			final Score score = new Score();
+
+			EntityTemplate oet = (EntityTemplate) other;
+			if (other == null) {
+				score.increaseFalseNegative();
+			} else {
+				score.add(this.rootAnnotation.evaluate(evaluator, oet.rootAnnotation));
+			}
+
+			addScoresForSingleFillerSlots(evaluator, oet, score);
+
+			addScoresForMultiFillerSlots(evaluator, oet, score);
+
+			return score;
 		}
-
-		addScoresForSingleFillerSlots(evaluator, oet, score);
-
-		addScoresForMultiFillerSlots(evaluator, oet, score);
-
-		return score;
 
 	}
 
