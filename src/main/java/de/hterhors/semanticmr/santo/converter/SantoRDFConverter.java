@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.set.SynchronizedSet;
 
@@ -71,7 +72,7 @@ public class SantoRDFConverter {
 		this.rdfData = readRDFData(rdfAnnotationsFile);
 	}
 
-	public List<AbstractAnnotation> extract(final Document document, final Set<String> rootEntities,
+	public List<AbstractAnnotation> extract(final Document document, final Set<EntityType> rootEntities,
 			final boolean includeSubEntities, boolean deepRec) {
 
 		setRootEntityTypes(rootEntities, includeSubEntities);
@@ -112,39 +113,39 @@ public class SantoRDFConverter {
 	}
 
 	/**
-	 * QUICK FIX adding organismModel annotations.
+	 * QUICK FIX adding organismModel root type annotations.
 	 */
-	private final Set<EntityType> ratModels = new HashSet<>(Arrays.asList(EntityType.get("RatSpecies"),
-			EntityType.get("WistarRat"), EntityType.get("SpragueDawleyRat"), EntityType.get("ListerHoodedRat"),
-			EntityType.get("FischerRat"), EntityType.get("LongEvansRat"), EntityType.get("LewisRat")));
-	private final Set<EntityType> mouseModels = new HashSet<>(
-			Arrays.asList(EntityType.get("C57_BL6_Mouse"), EntityType.get("MouseSpecies")));
-	private final Set<EntityType> catModels = new HashSet<>(Arrays.asList(EntityType.get("CatSpecies")));
-	private final Set<EntityType> dogModels = new HashSet<>(Arrays.asList(EntityType.get("DogSpecies")));
+//	private final Set<EntityType> ratModels = new HashSet<>(Arrays.asList(EntityType.get("RatSpecies"),
+//			EntityType.get("WistarRat"), EntityType.get("SpragueDawleyRat"), EntityType.get("ListerHoodedRat"),
+//			EntityType.get("FischerRat"), EntityType.get("LongEvansRat"), EntityType.get("LewisRat")));
+//	private final Set<EntityType> mouseModels = new HashSet<>(
+//			Arrays.asList(EntityType.get("C57_BL6_Mouse"), EntityType.get("MouseSpecies")));
+//	private final Set<EntityType> catModels = new HashSet<>(Arrays.asList(EntityType.get("CatSpecies")));
+//	private final Set<EntityType> dogModels = new HashSet<>(Arrays.asList(EntityType.get("DogSpecies")));
 
-	private EntityTypeAnnotation fix(SingleFillerSlot slot) {
-
-		EntityType speciesType = slot.getSlotFiller().getEntityType();
-		System.out.println("Fix annotation: " + speciesType);
-		if (ratModels.contains(speciesType))
-			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
-					"RatModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
-					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
-		if (mouseModels.contains(speciesType))
-			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
-					"MouseModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
-					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
-		if (catModels.contains(speciesType))
-			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
-					"CatModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
-					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
-		if (dogModels.contains(speciesType))
-			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
-					"DogModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
-					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
-
-		return null;
-	}
+//	private EntityTypeAnnotation fix(SingleFillerSlot slot) {
+//
+//		EntityType speciesType = slot.getSlotFiller().getEntityType();
+//		System.out.println("Fix annotation: " + speciesType);
+//		if (ratModels.contains(speciesType))
+//			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
+//					"RatModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
+//					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
+//		if (mouseModels.contains(speciesType))
+//			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
+//					"MouseModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
+//					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
+//		if (catModels.contains(speciesType))
+//			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
+//					"CatModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
+//					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
+//		if (dogModels.contains(speciesType))
+//			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
+//					"DogModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
+//					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
+//
+//		return null;
+//	}
 
 	private void fillRec(Document document, final EntityTemplate object, String subject, boolean deepRec) {
 		/*
@@ -312,15 +313,17 @@ public class SantoRDFConverter {
 	 * 
 	 * @param domainSuperClass
 	 */
-	private void setRootEntityTypes(final Set<String> rootEntityTypes, final boolean includeSubEntities) {
+	private void setRootEntityTypes(final Set<EntityType> rootEntityTypes, final boolean includeSubEntities) {
 
 		this.rootDataPoints = new HashSet<>();
 
 		final Set<String> subEntities = new HashSet<>();
+		final Set<String> rootEntityNames = rootEntityTypes.stream().map(r -> r.entityName).collect(Collectors.toSet());
 
-		for (String rootEntityType : rootEntityTypes) {
-			subEntities
-					.addAll(this.systemScope.getSpecification().getTransiitveClosureSubEntityTypeNames(rootEntityType));
+		for (EntityType rootEntityType : rootEntityTypes) {
+			for (EntityType string : rootEntityType.getTransitiveClosureSubEntityTypes()) {
+				subEntities.add(string.entityName);
+			}
 		}
 
 		for (Entry<String, Map<String, Set<String>>> triple : rdfData.entrySet()) {
@@ -333,7 +336,7 @@ public class SantoRDFConverter {
 
 					final String resource = SantoHelper.getResource(object);
 
-					if (rootEntityTypes.contains(resource) || (includeSubEntities && subEntities.contains(resource)))
+					if (rootEntityNames.contains(resource) || (includeSubEntities && subEntities.contains(resource)))
 						this.rootDataPoints.add(triple.getKey());
 				}
 			}

@@ -107,7 +107,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 				.unmodifiableSet(specifications.getTransitiveClosureSuperEntityTypeNames(this.entityName).stream()
 						.sorted().collect(Collectors.toSet()));
 		this.transitiveClosureSubEntityTypeNames = Collections.unmodifiableSet(specifications
-				.getTransiitveClosureSubEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
+				.getTransitveClosureSubEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
 
 		this.directSuperEntityTypeNames = Collections.unmodifiableSet(specifications
 				.getDirectSuperEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));

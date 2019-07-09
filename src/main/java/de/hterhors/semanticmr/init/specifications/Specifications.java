@@ -149,7 +149,7 @@ public class Specifications {
 		return transitiveClosureSuperEntityTypes.getOrDefault(entityTypeName, Collections.emptySet());
 	}
 
-	public Set<String> getTransiitveClosureSubEntityTypeNames(String entityTypeName) {
+	public Set<String> getTransitveClosureSubEntityTypeNames(String entityTypeName) {
 		return transitiveClosureSubEntityTypes.getOrDefault(entityTypeName, Collections.emptySet());
 	}
 

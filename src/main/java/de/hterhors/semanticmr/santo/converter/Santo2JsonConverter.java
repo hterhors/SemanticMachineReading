@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.hterhors.semanticmr.corpus.EInstanceContext;
+import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
@@ -74,13 +75,13 @@ public class Santo2JsonConverter {
 				rdfAnnotationsFile, ontologyNameSpace, resourceNameSpace);
 	}
 
-	public void convert(EInstanceContext instanceContext, final File writeToFile, String rootEntityTypes,
+	public void convert(EInstanceContext instanceContext, final File writeToFile, EntityType rootEntityTypes,
 			boolean includeSubEntities, boolean jsonPrettyString, boolean deepRec) throws IOException {
 		convert(instanceContext, writeToFile, new HashSet<>(Arrays.asList(rootEntityTypes)), includeSubEntities,
 				jsonPrettyString, deepRec);
 	}
 
-	public void convert(final EInstanceContext instanceContext, final File writeToFile, Set<String> rootEntityTypes,
+	public void convert(final EInstanceContext instanceContext, final File writeToFile, Set<EntityType> rootEntityTypes,
 			boolean includeSubEntities, boolean jsonPrettyString, boolean deepRec) throws IOException {
 
 		final List<AbstractAnnotation> rdfAnnotations = rdfConverter.extract(document, rootEntityTypes,
