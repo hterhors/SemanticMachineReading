@@ -8,8 +8,6 @@ import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection;
 import de.hterhors.semanticmr.candprov.sf.IEntityTypeAnnotationCandidateProvider;
-import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
-import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.variables.State;
