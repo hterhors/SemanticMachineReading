@@ -65,6 +65,6 @@ public abstract class AbstractFeatureTemplate<Scope extends AbstractFactorScope>
 
 	protected <A extends AbstractAnnotation> List<A> getPredictedAnnotations(State state) {
 		return state.getCurrentPredictions().getAnnotations();
-
 	}
+
 }

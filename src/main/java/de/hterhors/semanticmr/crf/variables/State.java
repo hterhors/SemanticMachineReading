@@ -25,7 +25,7 @@ public class State {
 		return currentPredictions;
 	}
 
-	final private Map<AbstractFeatureTemplate, FactorGraph> factorGraphs;
+	final private Map<AbstractFeatureTemplate<?>, FactorGraph> factorGraphs;
 
 	private double modelScore;
 

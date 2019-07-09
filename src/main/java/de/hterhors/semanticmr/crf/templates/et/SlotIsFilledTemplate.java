@@ -86,6 +86,8 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 
 	}
 
+	private static final String PREFIX = "SIFT\t";
+
 	@Override
 	public List<SlotIsFilledScope> generateFactorScopes(State state) {
 		List<SlotIsFilledScope> factors = new ArrayList<>();
@@ -124,11 +126,11 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 
 		final String slotName = factor.getFactorScope().slot.slotName;
 
-		featureVector.set("[" + parentClassName + "]" + slotName + " contains >2 element",
+		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains >2 element",
 				factor.getFactorScope().numberOfSlotFiller >= 2);
-		featureVector.set("[" + parentClassName + "]" + slotName + " contains >3 element",
+		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains >3 element",
 				factor.getFactorScope().numberOfSlotFiller >= 3);
-		featureVector.set("[" + parentClassName + "]" + slotName + " contains >4 element",
+		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains >4 element",
 				factor.getFactorScope().numberOfSlotFiller >= 4);
 
 //		featureVector.set("[" + parentClassName + "]" + propertyNameChain + " contains >2 distinct element",
@@ -147,8 +149,8 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 //			featureVector.set("[" + parentClassName + "]" + propertyNameChain + " all distinct", allDistinct);
 //		}
 
-		featureVector.set("[" + parentClassName + "]" + slotName + " contains elements", slotIsFilled);
-		featureVector.set("[" + parentClassName + "]" + slotName + " is empty", !slotIsFilled);
+		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains elements", slotIsFilled);
+		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " is empty", !slotIsFilled);
 	}
 
 }

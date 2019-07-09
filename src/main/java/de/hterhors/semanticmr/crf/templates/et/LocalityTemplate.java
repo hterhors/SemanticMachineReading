@@ -82,7 +82,15 @@ public class LocalityTemplate extends AbstractFeatureTemplate<LocalityScope> {
 			return false;
 		}
 
+		@Override
+		public String toString() {
+			return "LocalityScope [firstEntity=" + firstEntity + ", secondEntity=" + secondEntity
+					+ ", sentenceDistance=" + sentenceDistance + "]";
+		}
+
 	}
+
+	private static final String PREFIX = "LT\t";
 
 	@Override
 	public List<LocalityScope> generateFactorScopes(State state) {
@@ -154,20 +162,20 @@ public class LocalityTemplate extends AbstractFeatureTemplate<LocalityScope> {
 
 			for (EntityType ce : factor.getFactorScope().secondEntity.getDirectSuperEntityTypes()) {
 
-				factor.getFeatureVector().set(pe.entityName + "->" + ce.entityName + " sentence dist = "
+				factor.getFeatureVector().set(PREFIX + pe.entityName + "->" + ce.entityName + " sentence dist = "
 						+ factor.getFactorScope().sentenceDistance, true);
-				factor.getFeatureVector().set(pe.entityName + "->" + ce.entityName + " sentence dist >= 4",
+				factor.getFeatureVector().set(PREFIX + pe.entityName + "->" + ce.entityName + " sentence dist >= 4",
 						factor.getFactorScope().sentenceDistance >= 4);
 			}
 
 		}
 
 		factor.getFeatureVector()
-				.set(factor.getFactorScope().firstEntity.entityName + "->"
+				.set(PREFIX + factor.getFactorScope().firstEntity.entityName + "->"
 						+ factor.getFactorScope().secondEntity.entityName + " sentence dist = "
 						+ factor.getFactorScope().sentenceDistance, true);
 		factor.getFeatureVector()
-				.set(factor.getFactorScope().firstEntity.entityName + "->"
+				.set(PREFIX + factor.getFactorScope().firstEntity.entityName + "->"
 						+ factor.getFactorScope().secondEntity.entityName + " sentence dist >= 4",
 						factor.getFactorScope().sentenceDistance >= 4);
 	}

@@ -21,9 +21,9 @@ public abstract class AbstractFactorScope {
 	/**
 	 * The template context of the list of variables.
 	 */
-	protected final AbstractFeatureTemplate template;
+	protected final AbstractFeatureTemplate<?> template;
 
-	public AbstractFactorScope(AbstractFeatureTemplate template) {
+	public AbstractFactorScope(AbstractFeatureTemplate<?> template) {
 		this.template = template;
 	}
 
@@ -32,7 +32,7 @@ public abstract class AbstractFactorScope {
 	 * 
 	 * @return the template
 	 */
-	public AbstractFeatureTemplate getTemplate() {
+	public AbstractFeatureTemplate<?> getTemplate() {
 		return template;
 	}
 
@@ -80,5 +80,30 @@ public abstract class AbstractFactorScope {
 	public String toString() {
 		return "FactorScope [template=" + template + "]";
 	}
+
+//	@Override
+//	public int hashCode() {
+//		final int prime = 31;
+//		int result = 1;
+//		result = prime * result + ((template == null) ? 0 : template.hashCode());
+//		return result;
+//	}
+//
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj)
+//			return true;
+//		if (obj == null)
+//			return false;
+//		if (getClass() != obj.getClass())
+//			return false;
+//		AbstractFactorScope other = (AbstractFactorScope) obj;
+//		if (template == null) {
+//			if (other.template != null)
+//				return false;
+//		} else if (!template.equals(other.template))
+//			return false;
+//		return true;
+//	}
 
 }

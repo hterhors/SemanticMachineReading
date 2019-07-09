@@ -45,6 +45,8 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 
 	private static final int MIN_TOKEN_DIST = 2;
 
+	private static final String PREFIX = "CBSFT\t";
+
 	static class PositionPairContainer {
 
 		final String fromClassNameType;
@@ -63,7 +65,7 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 
 	}
 
-	class ContextBetweenScope extends AbstractFactorScope {
+	static class ContextBetweenScope extends AbstractFactorScope {
 
 		public final Instance instance;
 		public final EntityType fromEntity;
@@ -86,7 +88,6 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 		public int hashCode() {
 			final int prime = 31;
 			int result = super.hashCode();
-			result = prime * result + getOuterType().hashCode();
 			result = prime * result + ((fromEntity == null) ? 0 : fromEntity.hashCode());
 			result = prime * result + ((fromEntityCharacterOnset == null) ? 0 : fromEntityCharacterOnset.hashCode());
 			result = prime * result + ((instance == null) ? 0 : instance.hashCode());
@@ -104,8 +105,6 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 			if (getClass() != obj.getClass())
 				return false;
 			ContextBetweenScope other = (ContextBetweenScope) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
 			if (fromEntity == null) {
 				if (other.fromEntity != null)
 					return false;
@@ -134,10 +133,6 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 			return true;
 		}
 
-		private ContextBetweenSlotFillerTemplate getOuterType() {
-			return ContextBetweenSlotFillerTemplate.this;
-		}
-
 		@Override
 		public int implementHashCode() {
 			return hashCode();
@@ -146,6 +141,13 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 		@Override
 		public boolean implementEquals(Object obj) {
 			return equals(obj);
+		}
+
+		@Override
+		public String toString() {
+			return "ContextBetweenScope [instance=" + instance + ", fromEntity=" + fromEntity
+					+ ", fromEntityCharacterOnset=" + fromEntityCharacterOnset + ", toEntity=" + toEntity
+					+ ", toEntityCharacterOnset=" + toEntityCharacterOnset + "]";
 		}
 
 	}
@@ -300,7 +302,7 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 				if (featureName.isEmpty())
 					continue;
 
-				featureVector.set(LEFT + fromClassName + RIGHT + Document.TOKEN_SPLITTER + featureName
+				featureVector.set(PREFIX + LEFT + fromClassName + RIGHT + Document.TOKEN_SPLITTER + featureName
 						+ Document.TOKEN_SPLITTER + LEFT + toClassName + RIGHT, true);
 
 			}

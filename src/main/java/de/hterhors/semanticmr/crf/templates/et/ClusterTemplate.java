@@ -69,6 +69,8 @@ public class ClusterTemplate extends AbstractFeatureTemplate<ClusterScope> {
 
 	}
 
+	private static final String PREFIX = "CT\t";
+
 	@Override
 	public List<ClusterScope> generateFactorScopes(State state) {
 		List<ClusterScope> factors = new ArrayList<>();
@@ -106,8 +108,8 @@ public class ClusterTemplate extends AbstractFeatureTemplate<ClusterScope> {
 	@Override
 	public void generateFeatureVector(Factor<ClusterScope> factor) {
 
-		factor.getFeatureVector().set("Annotation Spread = 0", factor.getFactorScope().sentenceSpread == 0);
-		factor.getFeatureVector().set("Annotation Spread != 0", factor.getFactorScope().sentenceSpread != 0);
+		factor.getFeatureVector().set(PREFIX + "Annotation Spread = 0", factor.getFactorScope().sentenceSpread == 0);
+		factor.getFeatureVector().set(PREFIX + "Annotation Spread != 0", factor.getFactorScope().sentenceSpread != 0);
 //		factor.getFeatureVector().set("Annotation Spread = 1", factor.getFactorScope().sentenceSpread == 1);
 //		factor.getFeatureVector().set("Annotation Spread = 2", factor.getFactorScope().sentenceSpread == 2);
 	}

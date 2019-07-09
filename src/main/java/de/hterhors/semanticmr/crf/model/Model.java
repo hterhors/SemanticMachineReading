@@ -10,10 +10,10 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,13 +37,13 @@ public class Model {
 	/**
 	 * Converts a feature name to its index.
 	 */
-	private final static Map<String, Integer> featureNameIndex = new ConcurrentHashMap<>();
+	private final static Map<String, Integer> featureNameIndex = new HashMap<>();
 
 	private boolean isTrained = false;
 	/**
 	 * Converts an index to its feature name.
 	 */
-	private final static Map<Integer, String> indexFeatureName = new ConcurrentHashMap<>();
+	private final static Map<Integer, String> indexFeatureName = new HashMap<>();
 
 	private static final String DEFAULT_READABLE_DIR = "/readable/";
 
@@ -52,7 +52,13 @@ public class Model {
 	private File modelBaseDir;
 	private String modelName;
 
-	public static Integer getIndexForFeatureName(String feature) {
+	/**
+	 * Synchronized method
+	 * 
+	 * @param feature
+	 * @return
+	 */
+	public static synchronized Integer getIndexForFeatureName(String feature) {
 		Integer index;
 
 		if ((index = featureNameIndex.get(feature)) != null) {
@@ -66,7 +72,7 @@ public class Model {
 		return index;
 	}
 
-	public static String getFeatureForIndex(Integer feature) {
+	public static synchronized String getFeatureForIndex(Integer feature) {
 		return indexFeatureName.get(feature);
 	}
 
@@ -118,7 +124,11 @@ public class Model {
 			 */
 
 			collectFactorScopesForState(template, state);
-
+//
+//			System.out.println(template.getClass().getSimpleName());
+//			state.getFactorGraph(template).getFactorScopes().forEach(System.out::println);
+//
+//			System.out.println("------------------------------------------------------");
 		}
 		/*
 		 * Compute all selected factors in parallel.
@@ -150,7 +160,7 @@ public class Model {
 		 * Compute all selected factors in parallel.
 		 */
 		computeRemainingFactors(states.stream().flatMap(state -> state.getFactorGraphs().stream())
-				.flatMap(l -> l.getFactorScopes().stream()));
+				.flatMap(fg -> fg.getFactorScopes().stream()));
 		/*
 		 * Compute and set model score
 		 */

@@ -32,6 +32,7 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 	private static final char LEFT = '<';
 	private static final String BOF = "BOF";
 	private static final String EOF = "EOF";
+	private static final String PREFIX = "NGTCT\t";
 
 	class NGramTokenContextScope extends AbstractFactorScope {
 
@@ -231,8 +232,8 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 
 			rCs.setLength(0);
 			lCs.insert(0, context + SPLITTER);
-			featureVector.set(
-					new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs).toString().trim(),
+			featureVector.set(PREFIX
+					+ new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs).toString().trim(),
 					true);
 
 			for (int j = 0; j < rightContext.length; j++) {
@@ -242,8 +243,8 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 				else
 					context = rightContext[j];
 				rCs.append(SPLITTER).append(context);
-				featureVector.set(new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs)
-						.toString().trim(), true);
+				featureVector.set(PREFIX + new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT)
+						.append(rCs).toString().trim(), true);
 
 			}
 			if (bof)
@@ -261,8 +262,8 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 				context = rightContext[i];
 			lCs.setLength(0);
 			rCs.append(SPLITTER).append(context);
-			featureVector.set(
-					new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs).toString().trim(),
+			featureVector.set(PREFIX
+					+ new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs).toString().trim(),
 					true);
 
 			for (int j = 0; j < leftContext.length; j++) {
@@ -272,8 +273,8 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 				else
 					context = leftContext[j];
 				lCs.insert(0, context + SPLITTER);
-				featureVector.set(new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs)
-						.toString().trim(), true);
+				featureVector.set(PREFIX + new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT)
+						.append(rCs).toString().trim(), true);
 
 				if (bof)
 					break;

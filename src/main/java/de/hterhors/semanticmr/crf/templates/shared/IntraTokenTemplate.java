@@ -41,6 +41,8 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 
 	private static final String RIGHT = ">";
 
+	private static final String PREFIX = "ITT\t";
+
 	static class IntraTokenScope extends AbstractFactorScope {
 
 		public EntityType entityType;
@@ -156,7 +158,7 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 
 		final int maxNgramSize = tokens.length;
 
-		featureVector.set(LEFT + name + RIGHT + TOKEN_SPLITTER_SPACE + cM, true);
+		featureVector.set(PREFIX + LEFT + name + RIGHT + TOKEN_SPLITTER_SPACE + cM, true);
 
 		for (int ngram = 1; ngram < maxNgramSize; ngram++) {
 			for (int i = 0; i < maxNgramSize - 1; i++) {
@@ -194,7 +196,7 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 				if (featureName.isEmpty())
 					continue;
 
-				featureVector.set(LEFT + name + RIGHT + TOKEN_SPLITTER_SPACE + featureName, true);
+				featureVector.set(PREFIX + LEFT + name + RIGHT + TOKEN_SPLITTER_SPACE + featureName, true);
 
 			}
 		}
