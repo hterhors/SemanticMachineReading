@@ -95,7 +95,7 @@ public class SantoRDFConverter {
 
 				fillRec(document, entityTemplate, rootDataPoint, deepRec);
 				/*
-				 * HOTFIX to put organism models.
+				 * TODO: QUICK FIX to put organism models.
 				 */
 //				if (entityTemplate.getSingleFillerSlot(SlotType.get("hasOrganismSpecies")).containsSlotFiller()) {
 //					entityTemplate.rootAnnotation = fix(
@@ -113,7 +113,7 @@ public class SantoRDFConverter {
 	}
 
 	/**
-	 * QUICK FIX adding organismModel root type annotations.
+	 * TODO QUICK FIX adding organismModel root type annotations.
 	 */
 //	private final Set<EntityType> ratModels = new HashSet<>(Arrays.asList(EntityType.get("RatSpecies"),
 //			EntityType.get("WistarRat"), EntityType.get("SpragueDawleyRat"), EntityType.get("ListerHoodedRat"),
@@ -167,7 +167,7 @@ public class SantoRDFConverter {
 
 			final SlotType slot = SlotType.get(slotName);
 
-			if (filterSlotTypes.isEmpty() || !filterSlotTypes.contains(slot))
+			if (!filterSlotTypes.isEmpty() && !filterSlotTypes.contains(slot))
 				continue;
 			/*
 			 * Get all values.
