@@ -174,20 +174,39 @@ public class Model {
 
 	private void computeRemainingFactors(Stream<AbstractFactorScope> stream) {
 
-		List<Factor> s = stream.parallel().distinct()
+		List<Factor> factors = new ArrayList<>();
+
+		for (AbstractFactorScope scope : stream.distinct()
 				.filter(fs -> !fs.template.enableFactorCaching
 						|| (fs.template.enableFactorCaching && !FACTOR_POOL_INSTANCE.containsFactorScope(fs)))
-				.map(fs -> {
-					Factor f = new Factor(fs);
-					fs.template.generateFeatureVector(f);
-					return f;
-				}).collect(Collectors.toList());
+				.collect(Collectors.toList())) {
+			factors.add(new Factor(scope));
+		}
 
-		for (Factor factor : s) {
+		factors.parallelStream().forEach(factor->{
+			factor.getFactorScope().template.generateFeatureVector(factor);
+		});
+		
+		for (Factor factor : factors) {
 			if (!factor.getFactorScope().template.enableFactorCaching)
 				continue;
 			FACTOR_POOL_INSTANCE.addFactor(factor);
 		}
+
+//		List<Factor<?>> s = stream.parallel().distinct()
+//				.filter(fs -> !fs.template.enableFactorCaching
+//						|| (fs.template.enableFactorCaching && !FACTOR_POOL_INSTANCE.containsFactorScope(fs)))
+//				.map(fs -> {
+//					Factor f = new Factor(fs);
+//					fs.template.generateFeatureVector(f);
+//					return f;
+//				}).collect(Collectors.toList());
+
+//		for (Factor factor : s) {
+//			if (!factor.getFactorScope().template.enableFactorCaching)
+//				continue;
+//			FACTOR_POOL_INSTANCE.addFactor(factor);
+//		}
 	}
 
 	private void collectFactorScopesForState(AbstractFeatureTemplate template, State state) {
