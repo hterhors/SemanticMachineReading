@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.crf.structure.EntityType;
@@ -70,7 +72,6 @@ public class Santo2JsonConverter {
 		this.annotations = new TextualAnnotationsReader(this.document, textualAnnotationsFile).getAnnotations();
 
 		boolean onlyLeafEntities = true;
-
 		this.rdfConverter = new SantoRDFConverter(slotTypes, onlyLeafEntities, systemScope, annotations,
 				rdfAnnotationsFile, ontologyNameSpace, resourceNameSpace);
 	}
@@ -88,8 +89,8 @@ public class Santo2JsonConverter {
 				includeSubEntities, deepRec);
 
 		List<Instance> instances = new ArrayList<>();
-
-		Annotations goldAnnotations = new Annotations(rdfAnnotations);
+		
+		Annotations goldAnnotations = new Annotations(new ArrayList<>(new HashSet<>(rdfAnnotations)));
 
 		instances.add(new Instance(instanceContext, document, goldAnnotations));
 

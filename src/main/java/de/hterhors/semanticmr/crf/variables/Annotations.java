@@ -23,6 +23,10 @@ public class Annotations implements IEvaluatable {
 		this(Collections.emptyList());
 	}
 
+	public Annotations(AbstractAnnotation... annotation) {
+		this(Arrays.asList(annotation));
+	}
+
 	public Annotations(AbstractAnnotation annotation) {
 		this(Arrays.asList(annotation));
 	}

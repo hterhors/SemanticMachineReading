@@ -272,8 +272,8 @@ final public class EntityTemplate extends AbstractAnnotation {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((rootAnnotation == null) ? 0 : rootAnnotation.hashCode());
 		result = prime * result + ((multiFillerSlots == null) ? 0 : multiFillerSlots.hashCode());
+		result = prime * result + ((rootAnnotation == null) ? 0 : rootAnnotation.hashCode());
 		result = prime * result + ((singleFillerSlots == null) ? 0 : singleFillerSlots.hashCode());
 		return result;
 	}
@@ -287,15 +287,15 @@ final public class EntityTemplate extends AbstractAnnotation {
 		if (getClass() != obj.getClass())
 			return false;
 		EntityTemplate other = (EntityTemplate) obj;
-		if (rootAnnotation == null) {
-			if (other.rootAnnotation != null)
-				return false;
-		} else if (rootAnnotation != other.rootAnnotation)
-			return false;
 		if (multiFillerSlots == null) {
 			if (other.multiFillerSlots != null)
 				return false;
 		} else if (!multiFillerSlots.equals(other.multiFillerSlots))
+			return false;
+		if (rootAnnotation == null) {
+			if (other.rootAnnotation != null)
+				return false;
+		} else if (!rootAnnotation.equals(other.rootAnnotation))
 			return false;
 		if (singleFillerSlots == null) {
 			if (other.singleFillerSlots != null)
