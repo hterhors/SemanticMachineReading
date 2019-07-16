@@ -123,11 +123,12 @@ public class CartesianEvaluator extends AbstractEvaluator {
 	protected Score[][] computeScores(final Collection<AbstractAnnotation> slotFiller,
 			final Collection<AbstractAnnotation> otherSlotFiller, final int maxSize) {
 
+		final Score[][] scores;
+
 		final double multiThreadProb = multiThreadProbs.length > maxSize ? multiThreadProbs[maxSize]
 				: multiThreadProbs[multiThreadProbs.length - 1];
 
 		final boolean multiThread = Math.random() < multiThreadProb;
-		final Score[][] scores;
 
 		long t = System.nanoTime();
 		if (multiThread) {
@@ -202,7 +203,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 				j++;
 			}
 			i++;
-			
+
 		}
 
 		return scores;

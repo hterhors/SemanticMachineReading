@@ -71,7 +71,8 @@ public class Santo2JsonConverter {
 
 		this.annotations = new TextualAnnotationsReader(this.document, textualAnnotationsFile).getAnnotations();
 
-		boolean onlyLeafEntities = true;
+		boolean onlyLeafEntities = false;
+		
 		this.rdfConverter = new SantoRDFConverter(slotTypes, onlyLeafEntities, systemScope, annotations,
 				rdfAnnotationsFile, ontologyNameSpace, resourceNameSpace);
 	}

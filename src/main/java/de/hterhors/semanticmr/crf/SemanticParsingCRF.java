@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -11,15 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.jena.atlas.logging.Log;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.exploration.IExplorationStrategy;
 import de.hterhors.semanticmr.crf.helper.log.LogUtils;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
-import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.model.FactorGraph;
 import de.hterhors.semanticmr.crf.model.Model;
@@ -31,6 +31,8 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ITrainingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -231,21 +233,49 @@ public class SemanticParsingCRF {
 		return this.testStatistics;
 	}
 
-	public Map<Instance, State> predict(Model model, List<Instance> testInstances,
+	public Map<Instance, State> predict(List<Instance> instancesToPredict,
+			ISamplingStoppingCriterion... stoppingCriterion) {
+		return predictP(this.model, instancesToPredict, 1, stoppingCriterion).entrySet().stream()
+				.collect(Collectors.toMap(m -> m.getKey(), m -> m.getValue().get(0)));
+	}
+
+	public Map<Instance, State> predictHighRecall(List<Instance> instancesToPredict, final int n,
+			ISamplingStoppingCriterion... stoppingCriterion) {
+		return predictP(this.model, instancesToPredict, n, stoppingCriterion).entrySet().stream()
+				.collect(Collectors.toMap(m -> m.getKey(), m -> merge(m, n)));
+	}
+
+	public Map<Instance, State> predictHighRecall(Model model, List<Instance> instancesToPredict, final int n,
+			ISamplingStoppingCriterion... stoppingCriterion) {
+		return predictP(model, instancesToPredict, n, stoppingCriterion).entrySet().stream()
+				.collect(Collectors.toMap(m -> m.getKey(), m -> merge(m, n)));
+	}
+
+	public Map<Instance, State> predict(Model model, List<Instance> instancesToPredict,
+			ISamplingStoppingCriterion... stoppingCriterion) {
+		return predictP(model, instancesToPredict, 1, stoppingCriterion).entrySet().stream()
+				.collect(Collectors.toMap(m -> m.getKey(), m -> m.getValue().get(0)));
+	}
+
+	private Map<Instance, List<State>> predictP(Model model, List<Instance> instancesToPredict, final int n,
 			ISamplingStoppingCriterion... stoppingCriterion) {
 		this.testStatistics.startTrainingTime = System.currentTimeMillis();
 
-		final Map<Instance, State> finalStates = new LinkedHashMap<>();
+		final Map<Instance, List<State>> finalStates = new LinkedHashMap<>();
 
 		int instanceIndex = 0;
-		for (Instance instance : testInstances) {
+		for (Instance instance : instancesToPredict) {
 
 			final List<State> producedStateChain = new ArrayList<>();
 
+			List<State> currentStates = new ArrayList<>();
+
 			State currentState = initializer.getInitState(instance);
-			finalStates.put(instance, currentState);
+			finalStates.put(instance, Arrays.asList(currentState));
 			objectiveFunction.score(currentState);
+
 			producedStateChain.add(currentState);
+
 			int samplingStep;
 			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
 
@@ -258,31 +288,28 @@ public class SemanticParsingCRF {
 
 					model.score(proposalStates);
 
-					final State candidateState = SamplerCollection.greedyModelStrategy()
-							.sampleCandidate(proposalStates);
+					Collections.sort(proposalStates,
+							(s1, s2) -> -Double.compare(s1.getModelScore(), s2.getModelScore()));
+
+					final State candidateState = proposalStates.get(0);
 
 					boolean accepted = AcceptStrategies.strictModelAccept().isAccepted(candidateState, currentState);
-
-//					{
-//						Collections.sort(proposalStates, Model.modelScoreComparator);
-//
-//						for (int i = 0; i < proposalStates.size(); i++) {
-//							log.info("Index: " + i);
-//							compare(currentState, proposalStates.get(i));
-//						}
-//
-//						log.info("SampledState: ");
-//						compare(currentState, candidateState);
-//					}
 
 					if (accepted) {
 						currentState = candidateState;
 						objectiveFunction.score(currentState);
+
+						currentStates = new ArrayList<>(proposalStates.subList(0, Math.min(proposalStates.size(), n)));
+						objectiveFunction.score(currentStates);
 					}
 
 					producedStateChain.add(currentState);
 
-					finalStates.put(instance, currentState);
+					if (n == 1)
+						finalStates.put(instance, Arrays.asList(currentState));
+					else
+						finalStates.put(instance, currentStates);
+
 				}
 				if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain)) {
 					break;
@@ -292,7 +319,7 @@ public class SemanticParsingCRF {
 			this.testStatistics.endTrainingTime = System.currentTimeMillis();
 
 			LogUtils.logState(log,
-					TEST_CONTEXT + "[" + ++instanceIndex + "/" + testInstances.size() + "] [" + samplingStep + "]",
+					TEST_CONTEXT + "[" + ++instanceIndex + "/" + instancesToPredict.size() + "] [" + samplingStep + "]",
 					instance, currentState);
 			log.info("Time: " + this.testStatistics.getTotalDuration());
 
@@ -301,8 +328,27 @@ public class SemanticParsingCRF {
 		return finalStates;
 	}
 
-	public Map<Instance, State> predict(List<Instance> testInstances, ISamplingStoppingCriterion... stoppingCriterion) {
-		return predict(this.model, testInstances, stoppingCriterion);
+	/**
+	 * Merges the predictions of multiple states into one single state.
+	 * 
+	 * @param m
+	 * @return
+	 */
+	private State merge(Entry<Instance, List<State>> m, final int n) {
+		List<AbstractAnnotation> mergedAnnotations = new ArrayList<>();
+
+		outer: for (int i = 0; i < m.getValue().size(); i++) {
+
+			for (AbstractAnnotation abstractAnnotation : m.getValue().get(i).getCurrentPredictions().getAnnotations()) {
+
+				if (mergedAnnotations.size() == n)
+					break outer;
+				mergedAnnotations.add(abstractAnnotation);
+			}
+
+		}
+
+		return new State(m.getKey(), new Annotations(mergedAnnotations));
 	}
 
 	private void compare(State currentState, State candidateState) {

@@ -14,7 +14,10 @@ import de.hterhors.semanticmr.init.specifications.SystemScope;
 
 public class AbstractSemReadProject {
 
-	public AbstractSemReadProject(SystemScope build) {
+	protected final SystemScope scope;
+
+	public AbstractSemReadProject(SystemScope scope) {
+		this.scope = scope;
 	}
 
 	public void evaluate(Logger log, Map<Instance, State> testResults, IObjectiveFunction predictionOF) {

@@ -169,12 +169,16 @@ public class SantoRDFConverter {
 
 			if (!filterSlotTypes.isEmpty() && !filterSlotTypes.contains(slot))
 				continue;
+
+//			System.out.println(slot);
+
 			/*
 			 * Get all values.
 			 */
 			List<AbstractAnnotation> slotFillers = extractValuesFromPredicates(document, subject, slot, props.getKey(),
 					props.getValue(), deepRec);
 
+//			System.out.println(slotFillers);
 			if (slotFillers.size() == 0)
 				continue;
 
