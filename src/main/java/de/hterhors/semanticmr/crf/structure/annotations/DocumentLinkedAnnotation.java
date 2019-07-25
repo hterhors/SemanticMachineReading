@@ -63,7 +63,8 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	@Override
 	public String toString() {
-		return "DocumentLinkedSlotFiller [documentPosition=" + documentPosition + "]";
+		return "DocumentLinkedAnnotation [documentPosition=" + documentPosition + ", document=" + document
+				+ ", relatedTokens=" + relatedTokens + ", toString()=" + super.toString() + "]";
 	}
 
 	@SuppressWarnings("unchecked")

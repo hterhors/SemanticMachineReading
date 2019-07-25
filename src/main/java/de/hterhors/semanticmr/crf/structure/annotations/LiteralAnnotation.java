@@ -28,7 +28,7 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 
 	@Override
 	public String toString() {
-		return "LiteralSlotFiller [textualContent=" + textualContent + "]";
+		return "LiteralAnnotation [textualContent=" + textualContent + ", toString()=" + super.toString() + "]";
 	}
 
 	@Override

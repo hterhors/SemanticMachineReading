@@ -235,6 +235,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	private void changeSingleFiller(final List<State> proposalStates, State currentState,
 			ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
+
 		for (SlotType slotType : entityTemplate.getSingleFillerSlots().keySet()) {
 			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slotType)) {
 				/*
@@ -267,6 +268,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 			}
 		}
+
 	}
 
 	/**

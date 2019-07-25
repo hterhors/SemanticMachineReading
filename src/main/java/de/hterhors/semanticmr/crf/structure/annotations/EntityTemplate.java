@@ -2,6 +2,7 @@ package de.hterhors.semanticmr.crf.structure.annotations;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -62,20 +63,6 @@ final public class EntityTemplate extends AbstractAnnotation {
 	}
 
 	/**
-	 * Returns a set over all slot filler values for single- and multi-slot values.
-	 * 
-	 * @return a list of all direct slot filler values.
-	 */
-	public Set<AbstractAnnotation> getAllSlotFillerValues() {
-		return Streams.concat(
-				this.singleFillerSlots.values().stream().filter(s -> s.containsSlotFiller())
-						.map(s -> s.getSlotFiller()),
-				this.multiFillerSlots.values().stream().filter(l -> l.containsSlotFiller())
-						.flatMap(l -> l.getSlotFiller().stream()))
-				.collect(Collectors.toSet());
-	}
-
-	/**
 	 * Deep clone constructor.
 	 * 
 	 * @param templateType
@@ -87,6 +74,20 @@ final public class EntityTemplate extends AbstractAnnotation {
 		this.rootAnnotation = entityType;
 		this.singleFillerSlots = singleFillerSlots;
 		this.multiFillerSlots = multiFillerSlots;
+	}
+
+	/**
+	 * Returns a set over all slot filler values for single- and multi-slot values.
+	 * 
+	 * @return a list of all direct slot filler values.
+	 */
+	public Set<AbstractAnnotation> getAllSlotFillerValues() {
+		return Streams.concat(
+				this.singleFillerSlots.values().stream().filter(s -> s.containsSlotFiller())
+						.map(s -> s.getSlotFiller()),
+				this.multiFillerSlots.values().stream().filter(l -> l.containsSlotFiller())
+						.flatMap(l -> l.getSlotFiller().stream()))
+				.collect(Collectors.toSet());
 	}
 
 	public boolean containsSingleFillerSlot(SlotType slotType) {
@@ -259,13 +260,30 @@ final public class EntityTemplate extends AbstractAnnotation {
 	 * @return
 	 */
 	public EntityTemplate deepMergeCopy(EntityTypeAnnotation newTemplateType) {
-		return new EntityTemplate(newTemplateType.deepCopy(),
-				this.singleFillerSlots.entrySet().stream()
-						.filter(s -> newTemplateType.entityType.containsSlotType(s.getKey()))
-						.collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue().deepCopy())),
-				this.multiFillerSlots.entrySet().stream()
-						.filter(s -> newTemplateType.entityType.containsSlotType(s.getKey()))
-						.collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue().deepCopy())));
+
+		/*
+		 * Init new template with empty
+		 */
+		final Map<SlotType, SingleFillerSlot> singleFillerSlots = newTemplateType.entityType.getSingleFillerSlotTypes()
+				.stream().map(slotType -> new SingleFillerSlot(slotType))
+				.collect(Collectors.toMap(s -> s.slotType, s -> s));
+
+		final Map<SlotType, MultiFillerSlot> multiFillerSlots = newTemplateType.entityType.getMultiFillerSlotTypes()
+				.stream().map(slotType -> new MultiFillerSlot(slotType))
+				.collect(Collectors.toMap(s -> s.slotType, s -> s));
+
+		/*
+		 * Deep copy of existing and matching slots.
+		 */
+		this.singleFillerSlots.entrySet().stream().filter(s -> newTemplateType.entityType.containsSlotType(s.getKey()))
+				.forEach(s -> singleFillerSlots.put(s.getKey(), s.getValue().deepCopy()));
+
+		this.multiFillerSlots.entrySet().stream().filter(s -> newTemplateType.entityType.containsSlotType(s.getKey()))
+				.forEach(s -> multiFillerSlots.put(s.getKey(), s.getValue().deepCopy()));
+
+		return new EntityTemplate(newTemplateType.deepCopy(), Collections.unmodifiableMap(singleFillerSlots),
+				Collections.unmodifiableMap(multiFillerSlots));
+
 	}
 
 	@Override

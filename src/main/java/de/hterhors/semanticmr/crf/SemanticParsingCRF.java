@@ -99,8 +99,6 @@ public class SemanticParsingCRF {
 		this.objectiveFunction = objectiveFunction;
 		this.sampler = sampler;
 		this.initializer = initializer;
-		this.trainingStatistics = new CRFStatistics("Train");
-		this.testStatistics = new CRFStatistics("Test");
 	}
 
 	public Map<Instance, State> train(final AdvancedLearner learner, final List<Instance> trainingInstances,
@@ -120,6 +118,7 @@ public class SemanticParsingCRF {
 			final int numberOfEpochs, final ITrainingStoppingCriterion[] trainingStoppingCrits,
 			final ISamplingStoppingCriterion[] samplingStoppingCrits) {
 
+		this.trainingStatistics = new CRFStatistics("Train");
 		log.info("Start training procedure...");
 
 		this.trainingStatistics.startTrainingTime = System.currentTimeMillis();
@@ -259,6 +258,7 @@ public class SemanticParsingCRF {
 
 	private Map<Instance, List<State>> predictP(Model model, List<Instance> instancesToPredict, final int n,
 			ISamplingStoppingCriterion... stoppingCriterion) {
+		this.testStatistics = new CRFStatistics("Test");
 		this.testStatistics.startTrainingTime = System.currentTimeMillis();
 
 		final Map<Instance, List<State>> finalStates = new LinkedHashMap<>();

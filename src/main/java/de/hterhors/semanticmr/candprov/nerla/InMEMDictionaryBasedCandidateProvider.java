@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
@@ -55,16 +56,29 @@ public class InMEMDictionaryBasedCandidateProvider implements INerlaCandidatePro
 
 				for (String entry : data[1].split("\\|")) {
 
-					dictionary.putIfAbsent(EntityType.get(data[0]), new HashSet<>());
-					dictionary.get(EntityType.get(data[0])).add(entry);
-					reverseDictionary.putIfAbsent(entry, new HashSet<>());
-					reverseDictionary.get(entry).add(EntityType.get(data[0]));
+					this.dictionary.putIfAbsent(EntityType.get(data[0]), new HashSet<>());
+					this.dictionary.get(EntityType.get(data[0])).add(entry);
+					this.reverseDictionary.putIfAbsent(entry, new HashSet<>());
+					this.reverseDictionary.get(entry).add(EntityType.get(data[0]));
 				}
 
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage());
 		}
+	}
+
+	public InMEMDictionaryBasedCandidateProvider(Map<EntityType, Set<String>> dictionary) {
+
+		this.dictionary.putAll(dictionary);
+
+		for (Entry<EntityType, Set<String>> e : dictionary.entrySet()) {
+			for (String s : e.getValue()) {
+				this.reverseDictionary.putIfAbsent(s, new HashSet<>());
+				this.reverseDictionary.get(s).add(e.getKey());
+			}
+		}
+
 	}
 
 	@Override

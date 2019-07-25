@@ -20,7 +20,7 @@ public class AbstractSemReadProject {
 		this.scope = scope;
 	}
 
-	public void evaluate(Logger log, Map<Instance, State> testResults, IObjectiveFunction predictionOF) {
+	public static void evaluate(Logger log, Map<Instance, State> testResults, IObjectiveFunction predictionOF) {
 
 		Score mean = new Score();
 

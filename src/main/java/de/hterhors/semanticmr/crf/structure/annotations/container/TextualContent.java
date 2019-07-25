@@ -21,6 +21,11 @@ public class TextualContent {
 	 */
 	transient public String normalizedSurfaceForm;
 
+	@Override
+	public String toString() {
+		return "TextualContent [toPrettyString()=" + toPrettyString() + "]";
+	}
+
 	transient final public String cleanedSurfaceForm;
 
 	transient private Boolean isNormalized = null;
