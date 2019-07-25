@@ -11,6 +11,7 @@ import de.hterhors.semanticmr.candprov.sf.IEntityTypeAnnotationCandidateProvider
 import de.hterhors.semanticmr.candprov.sf.ISlotTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
+import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
@@ -96,6 +97,9 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 		}
 
 		updateAverage(proposalStates);
+
+//		proposalStates.forEach(System.out::println);
+
 		return proposalStates;
 
 	}
@@ -180,9 +184,15 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	private void addMultiFiller(final List<State> proposalStates, State currentState,
 			ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
-		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
-			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slot)) {
 
+		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
+//			if (slot == SlotType.get("hasLocation") && currentState.getInstance().getName().startsWith("N173"))
+//				System.out.println("halt stop");
+
+			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slot)) {
+//				System.out.println(slotFillerCandidate);
+//				if(slot == SlotType.get("hasLocation") && currentState.getInstance().getName().startsWith("N173") && slotFillerCandidate.getEntityType() == EntityType.get("VeinLocation"))
+//					System.out.println("STOP");
 				/*
 				 * Do not add if maximum number of fillers is reached.
 				 */

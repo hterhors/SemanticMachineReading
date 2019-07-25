@@ -98,15 +98,6 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 		if (otherVal == null)
 			return Score.FN;
 
-//		if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED) {
-//			if (equals(otherVal))
-//				return Score.TP;
-//			return Score.FN_FP;
-//		} else if (evaluator.evaluationDetail == EEvaluationDetail.LITERAL) {
-//			if (equals(otherVal))
-//				return Score.TP;
-//			return Score.FN_FP;
-//		} else 
 		if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED
 				|| evaluator.evaluationDetail == EEvaluationDetail.LITERAL
 				|| evaluator.evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {

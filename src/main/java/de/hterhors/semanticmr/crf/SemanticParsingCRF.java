@@ -242,6 +242,7 @@ public class SemanticParsingCRF {
 			ISamplingStoppingCriterion... stoppingCriterion) {
 		return predictP(this.model, instancesToPredict, n, stoppingCriterion).entrySet().stream()
 				.collect(Collectors.toMap(m -> m.getKey(), m -> merge(m, n)));
+
 	}
 
 	public Map<Instance, State> predictHighRecall(Model model, List<Instance> instancesToPredict, final int n,
@@ -348,7 +349,9 @@ public class SemanticParsingCRF {
 
 		}
 
-		return new State(m.getKey(), new Annotations(mergedAnnotations));
+		State s = new State(m.getKey(), new Annotations(mergedAnnotations));
+		objectiveFunction.score(s);
+		return s;
 	}
 
 	private void compare(State currentState, State candidateState) {
