@@ -67,7 +67,7 @@ public class Document {
 	 * @param tokenList
 	 */
 	public Document(String documentID, final String documentsContent) {
-		this(documentID, DefaultDocumentTokenizer.tokenizeDocumentsContent(documentsContent.trim()));
+		this(documentID, DefaultDocumentTokenizer.tokenizeDocumentsContent(documentsContent));
 	}
 
 	/**
