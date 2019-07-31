@@ -32,7 +32,7 @@ public class Model {
 
 	public static boolean alwaysTrainModel = false;
 
-	final private static FactorPool FACTOR_POOL_INSTANCE = FactorPool.getInstance();
+	final private FactorPool factorPool = new FactorPool();
 
 	/**
 	 * Converts a feature name to its index.
@@ -49,8 +49,8 @@ public class Model {
 
 	private static final String MODEL_SUFFIX = ".smcrf";
 
-	private File modelBaseDir;
-	private String modelName;
+	private final File modelBaseDir;
+	private final String modelName;
 
 	/**
 	 * Synchronized method
@@ -102,11 +102,11 @@ public class Model {
 
 	final private List<AbstractFeatureTemplate> factorTemplates;
 
-	public Model(List<AbstractFeatureTemplate> factorTemplates) {
-		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
+	public Model(List<AbstractFeatureTemplate<?>> factorTemplates) {
+		this(factorTemplates, null, null);
 	}
 
-	public Model(List<AbstractFeatureTemplate> factorTemplates, File modelDir, String modelName) {
+	public Model(List<AbstractFeatureTemplate<?>> factorTemplates, File modelDir, String modelName) {
 		this.factorTemplates = Collections.unmodifiableList(factorTemplates);
 		this.modelBaseDir = modelDir;
 		this.modelName = modelName;
@@ -178,19 +178,19 @@ public class Model {
 
 		for (AbstractFactorScope scope : stream.distinct()
 				.filter(fs -> !fs.template.enableFactorCaching
-						|| (fs.template.enableFactorCaching && !FACTOR_POOL_INSTANCE.containsFactorScope(fs)))
+						|| (fs.template.enableFactorCaching && !factorPool.containsFactorScope(fs)))
 				.collect(Collectors.toList())) {
 			factors.add(new Factor(scope));
 		}
 
-		factors.parallelStream().forEach(factor->{
+		factors.parallelStream().forEach(factor -> {
 			factor.getFactorScope().template.generateFeatureVector(factor);
 		});
-		
+
 		for (Factor factor : factors) {
 			if (!factor.getFactorScope().template.enableFactorCaching)
 				continue;
-			FACTOR_POOL_INSTANCE.addFactor(factor);
+			factorPool.addFactor(factor);
 		}
 
 //		List<Factor<?>> s = stream.parallel().distinct()
@@ -210,7 +210,15 @@ public class Model {
 	}
 
 	private void collectFactorScopesForState(AbstractFeatureTemplate template, State state) {
-		state.getFactorGraph(template).addFactorScopes(template.generateFactorScopes(state));
+
+		FactorGraph factorGraph = state.getFactorGraph(template);
+
+		if (factorGraph == null) {
+			factorGraph = new FactorGraph(factorPool, template);
+		}
+		state.addIfAbsentFactorGraph(template, factorGraph);
+
+		factorGraph.addFactorScopes(template.generateFactorScopes(state));
 	}
 
 	/**
@@ -327,6 +335,7 @@ public class Model {
 	}
 
 	public static Model load(final File modelBaseDir, final String modelName) {
+
 		log.info("Load model binaries from filesystem...");
 
 		try {
@@ -336,25 +345,34 @@ public class Model {
 			ObjectInputStream in = new ObjectInputStream(new FileInputStream(modelFile));
 
 			modelWrapper = (SerializableModelWrapper) in.readObject();
-
 			in.close();
-			final Model m = toModel(modelWrapper);
-			m.modelName = modelName;
-			m.modelBaseDir = modelBaseDir;
+
+			final Model m = toModel(modelWrapper, modelBaseDir, modelName);
 			log.info("Model successfully loaded from: " + modelFile);
 			return m;
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new ModelLoadException("The model could not be loaded. Failed with error: " + e.getMessage());
-
 		}
 
 	}
 
-	private static Model toModel(SerializableModelWrapper modelWrapper) {
+	private static Model toModel(SerializableModelWrapper modelWrapper, File modelBaseDir, String modelName) {
+
 		Model model = new Model(
 				modelWrapper.templates.stream().map(t -> toAbstractFeaturetemplate(t)).collect(Collectors.toList()));
 		model.isTrained = true;
+
 		return model;
+	}
+
+	public void setParameter(Map<Class<? extends AbstractFeatureTemplate<?>>, Object[]> parameter) {
+
+		for (AbstractFeatureTemplate<?> featureTemplate : this.factorTemplates) {
+			if (parameter.containsKey(featureTemplate.getClass())) {
+				featureTemplate.initalize(parameter.get(featureTemplate.getClass()));
+			}
+		}
 	}
 
 	private static AbstractFeatureTemplate toAbstractFeaturetemplate(final GenericTemplate t) {
@@ -393,20 +411,12 @@ public class Model {
 		return new File(getModelDir(modelBaseDir, modelName), modelName + MODEL_SUFFIX);
 	}
 
-	public void changeModelBaseDir(final File newBaseDir) {
-		this.modelBaseDir = newBaseDir;
-	}
-
-	public void changeModelName(final String newName) {
-		this.modelName = newName;
-	}
-
 	public String getName() {
 		return modelName;
 	}
 
 	public List<AbstractFeatureTemplate> getFactorTemplates() {
-		return Collections.unmodifiableList(factorTemplates);
+		return factorTemplates;
 	}
 
 }

@@ -237,8 +237,8 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 	@Override
 	public String toString() {
-		return "EntityTemplate [singleFillerSlots=" + singleFillerSlots + ", multiFillerSlots=" + multiFillerSlots
-				+ ", entityType=" + rootAnnotation + "]";
+		return "EntityTemplate [entityType=" + rootAnnotation + ", singleFillerSlots=" + singleFillerSlots
+				+ ", multiFillerSlots=" + multiFillerSlots + "]";
 	}
 
 	@SuppressWarnings("unchecked")

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.model.FactorGraph;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
@@ -61,14 +60,22 @@ public class State {
 		return new State(this.instance, currentPredictions.deepRemoveCopy(annotationIndex));
 	}
 
-	public FactorGraph getFactorGraph(final AbstractFeatureTemplate template) {
-		FactorGraph fg;
-		if ((fg = factorGraphs.get(template)) == null) {
-			fg = new FactorGraph(template);
-			factorGraphs.put(template, fg);
-		}
+	public void addIfAbsentFactorGraph(final AbstractFeatureTemplate<?> template, final FactorGraph factorGraph) {
+		factorGraphs.put(template, factorGraph);
+	}
 
-		return fg;
+//	public FactorGraph getFactorGraph(FactorPool factorPool, final AbstractFeatureTemplate<?> template) {
+//		FactorGraph fg;
+//		if ((fg = factorGraphs.get(template)) == null) {
+//			fg = new FactorGraph(factorPool, template);
+//			factorGraphs.put(template, fg);
+//		}
+//
+//		return fg;
+//	}
+
+	public FactorGraph getFactorGraph(final AbstractFeatureTemplate<?> template) {
+		return factorGraphs.get(template);
 	}
 
 	public double getModelScore() {

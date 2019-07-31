@@ -61,13 +61,16 @@ public class KnowledgeBaseTemplate extends AbstractFeatureTemplate<KnowledgeBase
 
 	private TripleStoreDatabase db;
 
-	public KnowledgeBaseTemplate(List<Instance> instances) {
-
-		readExternal(instances);
-//		readTrainingData(instances);
+	public KnowledgeBaseTemplate() {
 
 	}
 
+	@Override
+	public void initalize(Object[] parameter) {
+		List<Instance> instances = (List<Instance>) parameter[0];
+		readExternal(instances);
+//		readTrainingData(instances);
+	}
 //	private void readTrainingData(List<Instance> instances) {
 //		db = new TripleStoreDatabase();
 //

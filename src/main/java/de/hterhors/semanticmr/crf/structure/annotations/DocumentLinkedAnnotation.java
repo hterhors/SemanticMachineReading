@@ -2,6 +2,8 @@ package de.hterhors.semanticmr.crf.structure.annotations;
 
 import java.util.List;
 
+import javax.print.Doc;
+
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;

@@ -165,8 +165,10 @@ public class SemanticParsingCRF {
 						boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState,
 								currentState);
 
+
+						model.updateWeights(learner, currentState, candidateState);
+					
 						if (isAccepted) {
-							model.updateWeights(learner, currentState, candidateState);
 							currentState = candidateState;
 						}
 
@@ -242,7 +244,6 @@ public class SemanticParsingCRF {
 			ISamplingStoppingCriterion... stoppingCriterion) {
 		return predictP(this.model, instancesToPredict, n, stoppingCriterion).entrySet().stream()
 				.collect(Collectors.toMap(m -> m.getKey(), m -> merge(m, n)));
-
 	}
 
 	public Map<Instance, State> predictHighRecall(Model model, List<Instance> instancesToPredict, final int n,

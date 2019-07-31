@@ -34,10 +34,12 @@ public class FactorGraph {
 	 * Is dirty flag for computing the factor cache.
 	 */
 	private boolean isDirty = true;
-	private final AbstractFeatureTemplate template;
+	private final AbstractFeatureTemplate<?> template;
+	final private FactorPool factorPool;
 
-	public FactorGraph(AbstractFeatureTemplate template) {
+	public FactorGraph(FactorPool factorPool, AbstractFeatureTemplate<?> template) {
 		this.template = template;
+		this.factorPool = factorPool;
 	}
 
 	/**
@@ -74,7 +76,7 @@ public class FactorGraph {
 
 	public List<Factor> getCachedFactors() {
 		if (this.isDirty || this.cache == null)
-			this.cache = FactorPool.getInstance().getFactors(factorScopes);
+			this.cache = factorPool.getFactors(factorScopes);
 
 		/*
 		 * Set dirty flag to false.

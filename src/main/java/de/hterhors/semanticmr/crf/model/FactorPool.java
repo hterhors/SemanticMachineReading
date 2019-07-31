@@ -19,27 +19,28 @@ final class FactorPool {
 	/**
 	 * The factor cache
 	 */
-	final private Map<AbstractFactorScope, Factor> factorCache = new HashMap<>();
+	final private Map<AbstractFactorScope, Factor> factorCache;
 
 	/**
 	 * The instance of this caching pool.
 	 */
-	private static FactorPool sharedInstance = null;
+//	private static FactorPool sharedInstance = null;
 
-	private FactorPool() {
+	public FactorPool() {
+		factorCache = new HashMap<>();
 	}
 
-	/**
-	 * Singleton-method. Returns the FactorPool instance.
-	 * 
-	 * @return singleton instance.
-	 */
-	protected static FactorPool getInstance() {
-		if (sharedInstance == null) {
-			sharedInstance = new FactorPool();
-		}
-		return sharedInstance;
-	}
+//	/**
+//	 * Singleton-method. Returns the FactorPool instance.
+//	 * 
+//	 * @return singleton instance.
+//	 */
+//	protected static FactorPool getInstance() {
+//		if (sharedInstance == null) {
+//			sharedInstance = new FactorPool();
+//		}
+//		return sharedInstance;
+//	}
 
 	/**
 	 * 

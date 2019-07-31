@@ -21,6 +21,9 @@ public class NerlaCandidateProviderCollection {
 		candidateProvider.add(p);
 	}
 
+	public NerlaCandidateProviderCollection() {
+	}
+
 	/**
 	 * Add a new candidate provider to the list. Each candidate provider can only be
 	 * added once!
@@ -28,7 +31,7 @@ public class NerlaCandidateProviderCollection {
 	 * @param p the provider
 	 * @return this collection
 	 */
-	public NerlaCandidateProviderCollection addCandidateProvider(INerlaCandidateProvider p) {
+	public NerlaCandidateProviderCollection registerCandidateProvider(INerlaCandidateProvider p) {
 		if (candidateProvider.contains(p))
 			System.out.println(
 					"WARN: can not add candidate provider because it is already part of this collection: " + p);

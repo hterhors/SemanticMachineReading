@@ -26,7 +26,6 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	private static Logger log = LogManager.getFormatterLogger(SlotFillingExplorer.class);
 
 	public static int MAX_NUMBER_OF_ANNOTATIONS;
-
 	final private AnnotationCandidateRetrievalCollection candidateProvider;
 
 	final private HardConstraintsProvider hardConstraintsProvider;

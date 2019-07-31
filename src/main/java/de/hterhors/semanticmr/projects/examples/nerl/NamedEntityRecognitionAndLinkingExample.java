@@ -195,7 +195,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * TODO: Implement further templates / features to solve your problem.
 		 * 
 		 */
-		List<AbstractFeatureTemplate> featureTemplates = new ArrayList<>();
+		List<AbstractFeatureTemplate<?>> featureTemplates = new ArrayList<>();
 
 		featureTemplates.add(new ContextBetweenAnnotationsTemplate());
 //		featureTemplates.add(new MorphologicalNerlaTemplate());

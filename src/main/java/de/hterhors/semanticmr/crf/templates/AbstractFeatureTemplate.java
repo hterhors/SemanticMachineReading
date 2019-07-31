@@ -2,6 +2,8 @@ package de.hterhors.semanticmr.crf.templates;
 
 import java.util.List;
 
+import org.apache.commons.lang3.NotImplementedException;
+
 import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
@@ -13,7 +15,6 @@ import de.hterhors.semanticmr.crf.variables.State;
  * 
  * @author hterhors
  *
- * @param <S> <S extends AbstractFactorScope>
  */
 public abstract class AbstractFeatureTemplate<Scope extends AbstractFactorScope> {
 
@@ -50,6 +51,7 @@ public abstract class AbstractFeatureTemplate<Scope extends AbstractFactorScope>
 	public abstract List<Scope> generateFactorScopes(State state);
 
 	/**
+	 * 
 	 * This method receives the previously created factor scopes and generates the
 	 * features for this factor. For this, each previously created factor scope
 	 * should include all the variables it needs to compute the respective factor.
@@ -65,6 +67,14 @@ public abstract class AbstractFeatureTemplate<Scope extends AbstractFactorScope>
 
 	protected <A extends AbstractAnnotation> List<A> getPredictedAnnotations(State state) {
 		return state.getCurrentPredictions().getAnnotations();
+	}
+
+	public void initalize(Object[] parameter) {
+		if (parameter != null) {
+			throw new NotImplementedException(
+					"The 'initialize'-method in template-class: " + this.getClass().getSimpleName()
+							+ " is not proper implemented. Passed parameter won't have any effect!");
+		}
 	}
 
 }
