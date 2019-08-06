@@ -22,7 +22,7 @@ public abstract class AbstractFeatureTemplate<Scope extends AbstractFactorScope>
 	 * Weights for the computation of factor scores. These weights are shared across
 	 * all factors of this template.
 	 */
-	protected DoubleVector weights = new DoubleVector();
+	private DoubleVector weights = new DoubleVector();
 
 	public DoubleVector getWeights() {
 		return weights;

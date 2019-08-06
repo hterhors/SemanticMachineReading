@@ -1,6 +1,8 @@
 package de.hterhors.semanticmr.crf.sampling.impl;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import de.hterhors.semanticmr.crf.model.Model;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
@@ -47,8 +49,9 @@ public class SamplerCollection {
 
 			@Override
 			public State sampleCandidate(List<State> candidates) {
+				Collections.shuffle(candidates, new Random(100L));
 				candidates.sort(Model.modelScoreComparator);
-				return SamplingUtils.drawFromDistribution(candidates.subList(0, k), true);
+				return SamplingUtils.drawFromDistribution(candidates.subList(0, Math.min(candidates.size(), k)), true);
 			}
 
 			@Override

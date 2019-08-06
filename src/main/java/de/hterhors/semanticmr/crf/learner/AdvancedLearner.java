@@ -84,7 +84,7 @@ public class AdvancedLearner {
 		 * Collect differences of features for both states and remember respective
 		 * template
 		 */
-		final Map<AbstractFeatureTemplate, DoubleVector> featureDifferencesPerTemplate = new HashMap<>(
+		final Map<AbstractFeatureTemplate<?>, DoubleVector> featureDifferencesPerTemplate = new HashMap<>(
 				factorTemplates.size());
 
 		final State posState;
@@ -103,7 +103,9 @@ public class AdvancedLearner {
 		}
 
 		for (AbstractFeatureTemplate t : factorTemplates) {
+			
 			DoubleVector differences = VectorUtil.getFeatureDifferences(t, negState, posState);
+			
 			featureDifferencesPerTemplate.put(t, differences);
 			linearScore += differences.dotProduct(t.getWeights());
 			if (regularizer != null) {
@@ -153,9 +155,7 @@ public class AdvancedLearner {
 	 * @return
 	 */
 	private boolean preference(State state1, State state2) {
-		double O1 = state1.getObjectiveScore();
-		double O2 = state2.getObjectiveScore();
-		return O1 > O2;
+		return state1.getObjectiveScore() > state2.getObjectiveScore();
 	}
 
 }

@@ -32,6 +32,7 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.ITrainingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -157,7 +158,6 @@ public class SemanticParsingCRF {
 						} else {
 							model.score(proposalStates);
 						}
-
 						final State candidateState = sampler.sampleCandidate(proposalStates);
 
 						scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
@@ -167,7 +167,7 @@ public class SemanticParsingCRF {
 
 
 						model.updateWeights(learner, currentState, candidateState);
-					
+
 						if (isAccepted) {
 							currentState = candidateState;
 						}

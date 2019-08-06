@@ -138,15 +138,11 @@ public class Model {
 		/*
 		 * Compute and set model score
 		 */
-		computeAndSetModelScore(state);
-
+		state.setModelScore(computeScore(state));
 	}
 
 	public void score(List<State> states) {
 
-		/**
-		 * TODO: measure efficiency of streams
-		 */
 		for (AbstractFeatureTemplate template : this.factorTemplates) {
 
 			/*
@@ -164,12 +160,8 @@ public class Model {
 		/*
 		 * Compute and set model score
 		 */
-		states.parallelStream().forEach(state -> computeAndSetModelScore(state));
+		states.parallelStream().forEach(state -> state.setModelScore(computeScore(state)));
 
-	}
-
-	private void computeAndSetModelScore(State state) {
-		state.setModelScore(computeScore(state));
 	}
 
 	private void computeRemainingFactors(Stream<AbstractFactorScope> stream) {
@@ -187,26 +179,11 @@ public class Model {
 			factor.getFactorScope().template.generateFeatureVector(factor);
 		});
 
-		for (Factor factor : factors) {
+		for (Factor<?> factor : factors) {
 			if (!factor.getFactorScope().template.enableFactorCaching)
 				continue;
 			factorPool.addFactor(factor);
 		}
-
-//		List<Factor<?>> s = stream.parallel().distinct()
-//				.filter(fs -> !fs.template.enableFactorCaching
-//						|| (fs.template.enableFactorCaching && !FACTOR_POOL_INSTANCE.containsFactorScope(fs)))
-//				.map(fs -> {
-//					Factor f = new Factor(fs);
-//					fs.template.generateFeatureVector(f);
-//					return f;
-//				}).collect(Collectors.toList());
-
-//		for (Factor factor : s) {
-//			if (!factor.getFactorScope().template.enableFactorCaching)
-//				continue;
-//			FACTOR_POOL_INSTANCE.addFactor(factor);
-//		}
 	}
 
 	private void collectFactorScopesForState(AbstractFeatureTemplate template, State state) {

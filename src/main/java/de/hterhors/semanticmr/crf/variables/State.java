@@ -114,11 +114,6 @@ public class State {
 		return score;
 	}
 
-//	public Score score(IEvaluatable evaluator, EEvaluationDetail evaluationMode) {
-//		this.score = evaluator.evaluate(evaluationMode, instance.getGoldAnnotations(), currentPredictions);
-//		return score;
-//	}
-
 	public Score getScore() {
 		return score;
 	}

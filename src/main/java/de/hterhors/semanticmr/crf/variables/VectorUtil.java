@@ -1,5 +1,6 @@
 package de.hterhors.semanticmr.crf.variables;
 
+import java.util.Collections;
 import java.util.List;
 
 import de.hterhors.semanticmr.crf.model.Factor;
@@ -25,11 +26,16 @@ public class VectorUtil {
 	public static DoubleVector getFeatureDifferences(AbstractFeatureTemplate<?> template, State state1, State state2) {
 		DoubleVector diff = new DoubleVector();
 
-		if (!(state1.getFactorGraph(template) != null && state2.getFactorGraph(template) != null))
-			return diff;
+		/**
+		 * Remove / Bugfix 
+		 */
+//		if (!(state1.getFactorGraph(template) != null && state2.getFactorGraph(template) != null))
+//			return diff;
 
-		List<Factor> factors1 = state1.getFactorGraph(template).getFactors();
-		List<Factor> factors2 = state2.getFactorGraph(template).getFactors();
+		List<Factor> factors1 = state1.getFactorGraph(template) != null ? state1.getFactorGraph(template).getFactors()
+				: Collections.emptyList();
+		List<Factor> factors2 = state2.getFactorGraph(template) != null ? state2.getFactorGraph(template).getFactors()
+				: Collections.emptyList();
 
 		for (Factor factor : factors1) {
 			DoubleVector featureVector = factor.getFeatureVector();
