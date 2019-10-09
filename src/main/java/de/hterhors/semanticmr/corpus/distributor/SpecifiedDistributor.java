@@ -89,8 +89,16 @@ public class SpecifiedDistributor extends AbstractCorpusDistributor {
 			@Override
 			public IDistributorStrategy distributeTrainingInstances(List<Instance> trainingDocuments) {
 
-				trainingDocuments.addAll(corpusProvider.getInstances().stream()
-						.filter(i -> trainingInstanceNames.contains(i.getName())).collect(Collectors.toList()));
+				
+				for (Instance instance : corpusProvider.getInstances()) {
+					if(trainingInstanceNames.contains(instance.getName())){
+						trainingDocuments.add(instance);	
+					}
+					
+				}
+				
+//				trainingDocuments.addAll(corpusProvider.getInstances().stream()
+//						.filter(i -> trainingInstanceNames.contains(i.getName())).collect(Collectors.toList()));
 
 				return this;
 			}

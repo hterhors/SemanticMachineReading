@@ -2,6 +2,7 @@ package de.hterhors.semanticmr.crf.variables;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -193,6 +194,14 @@ public class Document {
 
 	public List<DocumentToken> getSentenceByIndex(int sentenceIndex) {
 		return sentencesByIndex.get(sentenceIndex);
+	}
+
+	public int getNumberOfSentences() {
+		return sentencesByIndex.size();
+	}
+
+	public Collection<List<DocumentToken>> getSentences() {
+		return sentencesByIndex.values();
 	}
 
 }

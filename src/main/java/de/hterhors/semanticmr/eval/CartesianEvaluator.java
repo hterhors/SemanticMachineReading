@@ -42,6 +42,13 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		}
 	}
 
+	public static void main(String[] args) {
+		for (Collection<List<Integer>> string : permutationCache) {
+			string.forEach(System.out::println);
+			System.out.println("--------------");
+		}
+	}
+
 	private static Stream<List<Integer>> getPermutationStream(final int size) {
 
 		if (permutationCache.length <= size)
@@ -54,7 +61,54 @@ public class CartesianEvaluator extends AbstractEvaluator {
 	@Override
 	protected Score scoreMax(Collection<AbstractAnnotation> annotations,
 			Collection<AbstractAnnotation> otherAnnotations) {
+		final Score bestScore;
+		if (annotations.size() == 1 || otherAnnotations.size() == 1) {
 
+			bestScore = linear(annotations, otherAnnotations);
+		} else {
+			bestScore = cartesian(annotations, otherAnnotations);
+		}
+
+		return bestScore;
+	}
+
+	private Score linear(Collection<AbstractAnnotation> annotations, Collection<AbstractAnnotation> otherAnnotations) {
+
+		final Score bestScore = new Score();
+
+		/**
+		 * Distinguish to get fp / fn correct.
+		 */
+		if (annotations.size() == 1) {
+			AbstractAnnotation singleInstance = annotations.iterator().next();
+			for (Iterator<AbstractAnnotation> mici = otherAnnotations.iterator(); mici.hasNext();) {
+				AbstractAnnotation annotation = (AbstractAnnotation) mici.next();
+				Score s = scoreSingle(annotation, singleInstance);
+				if (s.getF1() == 1.0D)
+					return s;
+				if (bestScore.getF1() <= s.getF1()) {
+					bestScore.set(s);
+				}
+			}
+		} else {
+			AbstractAnnotation singleInstance = otherAnnotations.iterator().next();
+			for (Iterator<AbstractAnnotation> mici = otherAnnotations.iterator(); mici.hasNext();) {
+				AbstractAnnotation annotation = (AbstractAnnotation) mici.next();
+				Score s = scoreSingle(singleInstance, annotation);
+				if (s.getF1() == 1.0D)
+					return s;
+
+				if (bestScore.getF1() <= s.getF1()) {
+					bestScore.set(s);
+				}
+
+			}
+		}
+		return bestScore;
+	}
+
+	public Score cartesian(Collection<AbstractAnnotation> annotations,
+			Collection<AbstractAnnotation> otherAnnotations) {
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
 		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
@@ -78,7 +132,6 @@ public class CartesianEvaluator extends AbstractEvaluator {
 			return f1 == 1.0D;
 
 		}).findFirst();
-
 		return bestScore;
 	}
 

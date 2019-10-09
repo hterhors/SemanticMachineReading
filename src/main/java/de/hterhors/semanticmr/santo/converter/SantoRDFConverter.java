@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,15 +14,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections.set.SynchronizedSet;
-
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
-import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
@@ -154,6 +150,18 @@ public class SantoRDFConverter {
 
 		for (Entry<String, Set<String>> props : rdfData.get(subject).entrySet()) {
 
+//			if(props.getKey().contains("hasTreatment"))
+//{
+//	System.out.println();
+//}
+			if (subject.contains("Investigation_")) {
+				
+				String id = subject.split("_")[1];
+				id = id.substring(0, id.length() - 1);
+				object.setSingleSlotFiller(SlotType.get("hasID"), AnnotationBuilder.toAnnotation("ID", id));
+				
+			}
+
 			if (skipProperties.contains(props.getKey()))
 				continue;
 
@@ -171,6 +179,7 @@ public class SantoRDFConverter {
 				continue;
 
 //			System.out.println(slot);
+
 
 			/*
 			 * Get all values.
@@ -231,12 +240,28 @@ public class SantoRDFConverter {
 				}
 			} else if (nameSpace.equals(dataNameSpace)) {
 				try {
-					final EntityTemplate entityTemplateAnnotation = toEntityTemplate(document, slotName, linkedID);
+//					if(slotName.contains("type"))
+//						System.out.println("nops");
+
+//					System.out.println("->" + slotName + "" + linkedID);
+
+//					final RecKey recKey = new RecKey(document.documentID, slotName, linkedID);
+					final EntityTemplate entityTemplateAnnotation;
+//					if (usedPointerMap.containsKey(recKey)) {
+//						entityTemplateAnnotation = usedPointerMap.get(recKey);
+//					} else {
+					entityTemplateAnnotation = toEntityTemplate(document, slotName, linkedID);
+//						usedPointerMap.put(recKey, entityTemplateAnnotation);
+
 					if (onlyLeafEntities && !isLeafEntity(entityTemplateAnnotation.getEntityType()))
 						continue;
+
 					if (deepRec)
 						fillRec(document, entityTemplateAnnotation, linkedID.object, deepRec);
+
+//					}
 					predicateValues.add(entityTemplateAnnotation);
+
 				} catch (DocumentLinkedAnnotationMismatchException e) {
 					System.out.println("WARN! " + e.getMessage());
 //					e.printStackTrace();
@@ -251,18 +276,105 @@ public class SantoRDFConverter {
 		return entityType.getTransitiveClosureSubEntityTypes().isEmpty();
 	}
 
+	static class RecKey {
+		public final String documentName;
+		public final String slotName;
+		public final Triple linkedID;
+
+		public RecKey(String documentName, String slotName, Triple linkedID) {
+			super();
+			this.documentName = documentName;
+			this.slotName = slotName;
+			this.linkedID = linkedID;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((documentName == null) ? 0 : documentName.hashCode());
+			result = prime * result + ((linkedID == null) ? 0 : linkedID.hashCode());
+			result = prime * result + ((slotName == null) ? 0 : slotName.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			RecKey other = (RecKey) obj;
+			if (documentName == null) {
+				if (other.documentName != null)
+					return false;
+			} else if (!documentName.equals(other.documentName))
+				return false;
+			if (linkedID == null) {
+				if (other.linkedID != null)
+					return false;
+			} else if (!linkedID.equals(other.linkedID))
+				return false;
+			if (slotName == null) {
+				if (other.slotName != null)
+					return false;
+			} else if (!slotName.equals(other.slotName))
+				return false;
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "RecKey [documentName=" + documentName + ", slotName=" + slotName + ", linkedID=" + linkedID + "]";
+		}
+
+	}
+
+	private Map<RecKey, EntityTemplate> usedPointerMap = new HashMap<>();
+
 	private EntityTemplate toEntityTemplate(Document document, String slotName, Triple linkedID)
 			throws DocumentLinkedAnnotationMismatchException {
 
 		final String objectType = rdfData.get(linkedID.object).get(RDF_TYPE_NAMESPACE).iterator().next();
+		/**
+		 * TODO: QUICK FIX: REMOVE!
+		 * 
+		 * Quick fix for missing rdf tripple in annodb file. Search for missing rdf type
+		 * in annotations
+		 */
 
+		EntityTemplate et;
+		RDFRelatedAnnotation FAKE_QUICK_FIX = null;
 		if (annotations.containsKey(linkedID)) {
-			return new EntityTemplate(AnnotationBuilder.toAnnotation(document, SantoHelper.getResource(objectType),
+			et = new EntityTemplate(AnnotationBuilder.toAnnotation(document, SantoHelper.getResource(objectType),
 					annotations.get(linkedID).textMention, annotations.get(linkedID).onset));
-		} else {
-			return new EntityTemplate(AnnotationBuilder.toAnnotation(SantoHelper.getResource(objectType)));
+		} else if ((FAKE_QUICK_FIX = QUICK_FIX(linkedID)) != null) {
+			System.err.println("APPLY QUICK FIX!: SantoRDFConverter.toEntityTemplate()");
+			et = new EntityTemplate(AnnotationBuilder.toAnnotation(document, SantoHelper.getResource(objectType),
+					FAKE_QUICK_FIX.textMention, FAKE_QUICK_FIX.onset));
 		}
 
+		else {
+			et = new EntityTemplate(AnnotationBuilder.toAnnotation(SantoHelper.getResource(objectType)));
+		}
+
+		return et;
+
+	}
+
+	private RDFRelatedAnnotation QUICK_FIX(Triple linkedID) {
+
+		Triple fakeRDFTypeTriple = new Triple(linkedID.object, RDF_TYPE_NAMESPACE, null);
+		for (Entry<Triple, RDFRelatedAnnotation> a : annotations.entrySet()) {
+			if (a.getKey().subject.equals(fakeRDFTypeTriple.subject)
+					&& a.getKey().predicate.equals(fakeRDFTypeTriple.predicate))
+				return a.getValue();
+
+		}
+
+		return null;
 	}
 
 	private EntityTypeAnnotation toEntityTypeAnnotation(Document document, final Triple linkedID)

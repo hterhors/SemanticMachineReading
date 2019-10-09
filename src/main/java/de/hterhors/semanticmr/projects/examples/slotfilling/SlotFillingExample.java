@@ -238,7 +238,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * 
 		 */
 		HardConstraintsProvider constraintsProvider = new HardConstraintsProvider();
-		constraintsProvider.addHardConstraints(EHardConstraintType.SLOT_PAIR_EXCLUSION,
+		constraintsProvider.addHardConstraintsFile(EHardConstraintType.SLOT_PAIR_EXCLUSION,
 				slotPairConstraitsSpecifications);
 
 		/**

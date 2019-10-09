@@ -22,13 +22,17 @@ public class SystemScope {
 
 	private Set<Specifications> specifications = new HashSet<>();
 
+	public static boolean verbose = true;
+
 	private SystemScope(Set<Specifications> specifications) {
-		EntityType.getEntityTypes().stream().forEach(et -> {
-			if (et.isLiteral && et.getNormalizationFunction() == IdentityNormalization.getInstance()) {
-				log.warn("No normalization function for literal entity type \"" + et.entityName
-						+ "\" was specified. Set default to \"" + IdentityNormalization.class.getSimpleName() + "\"");
-			}
-		});
+		if (verbose)
+			EntityType.getEntityTypes().stream().forEach(et -> {
+				if (et.isLiteral && et.getNormalizationFunction() == IdentityNormalization.getInstance()) {
+					log.warn("No normalization function for literal entity type \"" + et.entityName
+							+ "\" was specified. Set default to \"" + IdentityNormalization.class.getSimpleName()
+							+ "\"");
+				}
+			});
 		this.specifications = specifications;
 		log.info("Systems scope successfully initialized!");
 	}

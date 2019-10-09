@@ -16,7 +16,6 @@ import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 
 public class HardConstraintsProvider {
 
-
 	final List<AbstractHardConstraint> hardConstraints = new ArrayList<>();
 
 	public boolean violatesConstraints(EntityTemplate template) {
@@ -27,7 +26,12 @@ public class HardConstraintsProvider {
 		return false;
 	}
 
-	public HardConstraintsProvider addHardConstraints(EHardConstraintType type, File hardConstraintsFile) {
+	public HardConstraintsProvider addHardConstraints(AbstractHardConstraint hardConstraint) {
+		hardConstraints.add(hardConstraint);
+		return this;
+	}
+
+	public HardConstraintsProvider addHardConstraintsFile(EHardConstraintType type, File hardConstraintsFile) {
 
 		try {
 			switch (type) {
@@ -64,6 +68,7 @@ public class HardConstraintsProvider {
 							EntityType.get(constraint.excludeEntityTypeName))));
 		}
 	}
+
 	public static class ExcludeSlotTypePairNames {
 
 		public final String onTemplateType;

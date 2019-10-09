@@ -36,6 +36,27 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	public final List<DocumentToken> relatedTokens;
 
+	public List<DocumentToken> getTokenizedSentenceOfAnnotation() {
+		return document.getSentenceByIndex(relatedTokens.get(0).getSentenceIndex());
+	}
+
+	public String getSentenceOfAnnotation() {
+		StringBuffer sb = new StringBuffer();
+		List<DocumentToken> tokens = getTokenizedSentenceOfAnnotation();
+		for (int i = 0; i < tokens.size() - 1; i++) {
+			sb.append(tokens.get(i).getText());
+
+			for (int j = tokens.get(i).getDocCharOffset(); j < tokens.get(i + 1).getDocCharOffset()
+					- tokens.get(i).getLength(); j++) {
+				sb.append(" ");
+			}
+
+		}
+		sb.append(tokens.get(tokens.size() - 1).getText());
+
+		return sb.toString();
+	}
+
 	public DocumentLinkedAnnotation(Document document, EntityType entityType, TextualContent textualContent,
 			DocumentPosition documentPosition) throws DocumentLinkedAnnotationMismatchException {
 		super(entityType, textualContent);

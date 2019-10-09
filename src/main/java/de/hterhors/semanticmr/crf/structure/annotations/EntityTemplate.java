@@ -124,6 +124,10 @@ final public class EntityTemplate extends AbstractAnnotation {
 		return slot;
 	}
 
+	public SingleFillerSlot getSingleFillerSlot(String slotType) {
+		return getSingleFillerSlot(SlotType.get(slotType));
+	}
+
 	public EntityTemplate setSingleSlotFiller(SlotType slotType, final AbstractAnnotation slotFiller) {
 
 		if (slotFiller == null)
@@ -199,6 +203,10 @@ final public class EntityTemplate extends AbstractAnnotation {
 					+ " for entity: " + getEntityType().entityName);
 
 		return slot;
+	}
+
+	public MultiFillerSlot getMultiFillerSlot(String slotTypeName) {
+		return getMultiFillerSlot(SlotType.get(slotTypeName));
 	}
 
 	public Map<SlotType, SingleFillerSlot> getSingleFillerSlots() {

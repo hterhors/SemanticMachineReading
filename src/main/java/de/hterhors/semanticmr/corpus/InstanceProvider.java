@@ -46,6 +46,11 @@ public class InstanceProvider {
 
 	final private List<Instance> instances;
 
+	/**
+	 * Returns all instances that could be found in the corpus.
+	 * 
+	 * @return
+	 */
 	public List<Instance> getInstances() {
 		return instances;
 	}
@@ -53,7 +58,7 @@ public class InstanceProvider {
 	final private List<Instance> redistTrainInstances = new ArrayList<>();
 	final private List<Instance> redistDevInstances = new ArrayList<>();
 	final private List<Instance> redistTestInstances = new ArrayList<>();
-
+	public static boolean verbose = true;
 	private IInstanceDistributor distributor;
 
 	/**
@@ -132,22 +137,28 @@ public class InstanceProvider {
 			for (Iterator<Instance> iterator = instances.iterator(); iterator.hasNext();) {
 				Instance instance = iterator.next();
 				if (instance.getGoldAnnotations().getAnnotations().isEmpty()) {
+				if(verbose)
 					log.warn("Instance " + instance.getName() + " has no annotations!");
 					if (removeEmptyInstances) {
 						iterator.remove();
+						if(verbose)
 						log.warn("Remove instance!");
 					} else {
+						if(verbose)
 						log.warn("Keep instance!");
 					}
 				}
 
 				if (instance.getGoldAnnotations().getAnnotations().size() >= maxNumberOfAnnotations) {
+					if(verbose)
 					log.warn("WARN: Instance " + instance.getName() + " has to many annotations!");
 					if (removeInstancesWithToManyAnnotations) {
 						iterator.remove();
+						if(verbose)
 						log.warn("Remove instance!");
 					} else {
-						log.warn("Keep instance!");
+						if (verbose)
+							log.warn("Keep instance!");
 					}
 				}
 

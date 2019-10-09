@@ -1,8 +1,14 @@
 package de.hterhors.semanticmr.crf.structure.annotations;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IDeepCopyable;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 
 public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable {
 
@@ -99,8 +105,5 @@ public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable 
 	final public boolean isInstanceOfEntityTemplate() {
 		return this instanceof EntityTemplate;
 	}
-	
-	
-	
 
 }

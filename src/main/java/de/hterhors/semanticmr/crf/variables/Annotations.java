@@ -47,7 +47,11 @@ public class Annotations implements IEvaluatable {
 
 	@SuppressWarnings("unchecked")
 	public <Annotation extends AbstractAnnotation> List<Annotation> getAnnotations() {
-		return (List<Annotation>) annotations;
+		return  (List<Annotation>) annotations;
+	}
+
+	public List<AbstractAnnotation> getAbstractAnnotations() {
+		return   annotations;
 	}
 
 	@Override
