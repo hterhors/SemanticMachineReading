@@ -175,4 +175,8 @@ public class MultiFillerSlot extends AbstractSlot {
 		this.slotFiller.add(slotFillerCandidate);
 	}
 
+	public void removeAll() {
+		this.slotFiller.clear();
+	}
+
 }

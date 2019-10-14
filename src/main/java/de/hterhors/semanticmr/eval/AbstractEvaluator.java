@@ -45,11 +45,11 @@ public abstract class AbstractEvaluator {
 		}
 	}
 
-	protected abstract Score scoreMax(Collection<AbstractAnnotation> annotations,
-			Collection<AbstractAnnotation> otherAnnotations);
+	protected abstract Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations);
 
-	public Score scoreMultiValues(Collection<AbstractAnnotation> annotations,
-			Collection<AbstractAnnotation> otherAnnotations) {
+	public Score scoreMultiValues(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
 		return scoreMax(annotations, otherAnnotations);
 	}
 }

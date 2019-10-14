@@ -21,7 +21,8 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 	}
 
 	@Override
-	public Score scoreMax(Collection<AbstractAnnotation> annotations, Collection<AbstractAnnotation> otherAnnotations) {
+	public Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
 
 		final List<BeamAssignmentTree> assignments = new ArrayList<>();
 

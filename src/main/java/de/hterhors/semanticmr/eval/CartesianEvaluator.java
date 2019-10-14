@@ -59,8 +59,8 @@ public class CartesianEvaluator extends AbstractEvaluator {
 	}
 
 	@Override
-	protected Score scoreMax(Collection<AbstractAnnotation> annotations,
-			Collection<AbstractAnnotation> otherAnnotations) {
+	protected Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
 		final Score bestScore;
 		if (annotations.size() == 1 || otherAnnotations.size() == 1) {
 
@@ -72,7 +72,8 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		return bestScore;
 	}
 
-	private Score linear(Collection<AbstractAnnotation> annotations, Collection<AbstractAnnotation> otherAnnotations) {
+	private Score linear(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
 
 		final Score bestScore = new Score();
 
@@ -81,7 +82,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		 */
 		if (annotations.size() == 1) {
 			AbstractAnnotation singleInstance = annotations.iterator().next();
-			for (Iterator<AbstractAnnotation> mici = otherAnnotations.iterator(); mici.hasNext();) {
+			for (Iterator<? extends AbstractAnnotation> mici = otherAnnotations.iterator(); mici.hasNext();) {
 				AbstractAnnotation annotation = (AbstractAnnotation) mici.next();
 				Score s = scoreSingle(annotation, singleInstance);
 				if (s.getF1() == 1.0D)
@@ -92,7 +93,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 			}
 		} else {
 			AbstractAnnotation singleInstance = otherAnnotations.iterator().next();
-			for (Iterator<AbstractAnnotation> mici = otherAnnotations.iterator(); mici.hasNext();) {
+			for (Iterator<? extends AbstractAnnotation> mici = otherAnnotations.iterator(); mici.hasNext();) {
 				AbstractAnnotation annotation = (AbstractAnnotation) mici.next();
 				Score s = scoreSingle(singleInstance, annotation);
 				if (s.getF1() == 1.0D)
@@ -107,8 +108,8 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		return bestScore;
 	}
 
-	public Score cartesian(Collection<AbstractAnnotation> annotations,
-			Collection<AbstractAnnotation> otherAnnotations) {
+	public Score cartesian(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
 		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
@@ -173,8 +174,8 @@ public class CartesianEvaluator extends AbstractEvaluator {
 	 * @param maxSize
 	 * @return
 	 */
-	protected Score[][] computeScores(final Collection<AbstractAnnotation> slotFiller,
-			final Collection<AbstractAnnotation> otherSlotFiller, final int maxSize) {
+	protected Score[][] computeScores(final Collection<? extends AbstractAnnotation> slotFiller,
+			final Collection<? extends AbstractAnnotation> otherSlotFiller, final int maxSize) {
 
 		final Score[][] scores;
 
@@ -216,11 +217,11 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		}
 	}
 
-	public Score[][] singleThreaded(final Collection<AbstractAnnotation> slotFiller,
-			final Collection<AbstractAnnotation> otherSlotFiller, final int maxSize) {
+	public Score[][] singleThreaded(final Collection<? extends AbstractAnnotation> slotFiller,
+			final Collection<? extends AbstractAnnotation> otherSlotFiller, final int maxSize) {
 		final Score[][] scores = new Score[maxSize][maxSize];
 
-		final Iterator<AbstractAnnotation> slotFillerIterator = slotFiller.iterator();
+		final Iterator<? extends AbstractAnnotation> slotFillerIterator = slotFiller.iterator();
 
 		int i = 0;
 
@@ -236,7 +237,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 
 			int j = 0;
 
-			final Iterator<AbstractAnnotation> otherSlotFillerIterator = otherSlotFiller.iterator();
+			final Iterator<? extends AbstractAnnotation> otherSlotFillerIterator = otherSlotFiller.iterator();
 
 			while (j != maxSize) {
 
@@ -262,11 +263,11 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		return scores;
 	}
 
-	public Score[][] multiThreaded(final Collection<AbstractAnnotation> slotFiller,
-			final Collection<AbstractAnnotation> otherSlotFiller, final int maxSize) {
+	public Score[][] multiThreaded(final Collection<? extends AbstractAnnotation> slotFiller,
+			final Collection<? extends AbstractAnnotation> otherSlotFiller, final int maxSize) {
 		final Score[][] scores = new Score[maxSize][maxSize];
 
-		final Iterator<AbstractAnnotation> slotFillerIterator = slotFiller.iterator();
+		final Iterator<? extends AbstractAnnotation> slotFillerIterator = slotFiller.iterator();
 
 		final List<Compair> listOfPairs = new ArrayList<>((int) Math.pow(maxSize, 2));
 
@@ -284,7 +285,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 
 			int j = 0;
 
-			final Iterator<AbstractAnnotation> otherSlotFillerIterator = otherSlotFiller.iterator();
+			final Iterator<? extends AbstractAnnotation> otherSlotFillerIterator = otherSlotFiller.iterator();
 
 			while (j != maxSize) {
 

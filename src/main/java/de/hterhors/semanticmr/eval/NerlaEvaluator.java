@@ -13,12 +13,13 @@ public class NerlaEvaluator extends AbstractEvaluator {
 		super(evaluationDetail);
 	}
 
-	public Score prf1(Collection<AbstractAnnotation> annotations, Collection<AbstractAnnotation> otherAnnotations) {
+	public Score prf1(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
 		return prf1(evaluationDetail, annotations, otherAnnotations);
 	}
 
-	public Score prf1(EEvaluationDetail evaluationDetail, Collection<AbstractAnnotation> annotations,
-			Collection<AbstractAnnotation> otherAnnotations) {
+	public Score prf1(EEvaluationDetail evaluationDetail, Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
 
 		int tp = 0;
 		int fp = 0;
@@ -53,8 +54,8 @@ public class NerlaEvaluator extends AbstractEvaluator {
 	}
 
 	@Override
-	protected Score scoreMax(Collection<AbstractAnnotation> annotations,
-			Collection<AbstractAnnotation> otherAnnotations) {
+	protected Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
 		return prf1(annotations, otherAnnotations);
 	}
 
