@@ -27,18 +27,22 @@ public class CartesianEvaluator extends AbstractEvaluator {
 	private double[] multiThreadProbs = new double[] { 0.0D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D,
 			0.5D };
 
+	private final NerlaEvaluator stdEvalForDocLinked;
+
 	public CartesianEvaluator(EEvaluationDetail evaluationMode) {
 		super(evaluationMode);
+		this.stdEvalForDocLinked = new NerlaEvaluator(evaluationMode);
 	}
 
 	public static int MAXIMUM_PERMUTATION_SIZE = 8;
 
 	@SuppressWarnings("unchecked")
-	private static final Collection<List<Integer>>[] permutationCache = new Collection[1 + MAXIMUM_PERMUTATION_SIZE];
+	private static final List<List<Integer>>[] permutationCache = new ArrayList[1 + MAXIMUM_PERMUTATION_SIZE];
 
 	static {
 		for (int i = 0; i <= MAXIMUM_PERMUTATION_SIZE; i++) {
-			permutationCache[i] = Collections2.permutations(IntStream.range(0, i).boxed().collect(Collectors.toList()));
+			permutationCache[i] = new ArrayList<>(
+					Collections2.permutations(IntStream.range(0, i).boxed().collect(Collectors.toList())));
 		}
 	}
 
@@ -58,53 +62,37 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		return permutationCache[size].stream();
 	}
 
+	private static List<List<Integer>> getPermutations(final int size) {
+
+		if (permutationCache.length <= size)
+			throw new IllegalArgumentException(
+					"Requested permutation size " + size + " exceeds maximum size of: " + MAXIMUM_PERMUTATION_SIZE);
+
+		return permutationCache[size];
+	}
+
 	@Override
 	protected Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations) {
 		final Score bestScore;
-		if (annotations.size() == 1 || otherAnnotations.size() == 1) {
-
-			bestScore = linear(annotations, otherAnnotations);
-		} else {
+		boolean docLinked = true;
+		for (AbstractAnnotation abstractAnnotation : annotations) {
+			if (!abstractAnnotation.isInstanceOfDocumentLinkedAnnotation()) {
+				docLinked = false;
+				break;
+			}
+		}
+		for (AbstractAnnotation abstractAnnotation : otherAnnotations) {
+			if (!abstractAnnotation.isInstanceOfDocumentLinkedAnnotation()) {
+				docLinked = false;
+				break;
+			}
+		}
+		if (docLinked)
+			bestScore = stdEvalForDocLinked.prf1(annotations, otherAnnotations);
+		else
 			bestScore = cartesian(annotations, otherAnnotations);
-		}
 
-		return bestScore;
-	}
-
-	private Score linear(Collection<? extends AbstractAnnotation> annotations,
-			Collection<? extends AbstractAnnotation> otherAnnotations) {
-
-		final Score bestScore = new Score();
-
-		/**
-		 * Distinguish to get fp / fn correct.
-		 */
-		if (annotations.size() == 1) {
-			AbstractAnnotation singleInstance = annotations.iterator().next();
-			for (Iterator<? extends AbstractAnnotation> mici = otherAnnotations.iterator(); mici.hasNext();) {
-				AbstractAnnotation annotation = (AbstractAnnotation) mici.next();
-				Score s = scoreSingle(annotation, singleInstance);
-				if (s.getF1() == 1.0D)
-					return s;
-				if (bestScore.getF1() <= s.getF1()) {
-					bestScore.set(s);
-				}
-			}
-		} else {
-			AbstractAnnotation singleInstance = otherAnnotations.iterator().next();
-			for (Iterator<? extends AbstractAnnotation> mici = otherAnnotations.iterator(); mici.hasNext();) {
-				AbstractAnnotation annotation = (AbstractAnnotation) mici.next();
-				Score s = scoreSingle(singleInstance, annotation);
-				if (s.getF1() == 1.0D)
-					return s;
-
-				if (bestScore.getF1() <= s.getF1()) {
-					bestScore.set(s);
-				}
-
-			}
-		}
 		return bestScore;
 	}
 
@@ -112,11 +100,19 @@ public class CartesianEvaluator extends AbstractEvaluator {
 			Collection<? extends AbstractAnnotation> otherAnnotations) {
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
+//		System.out.println("Annotations:");
+//		annotations.forEach(a -> System.out.println(a.toPrettyString()));
+//		System.out.println("Other annotations:");
+//		otherAnnotations.forEach(a -> System.out.println(a.toPrettyString()));
+
 		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
 
 		final Score bestScore = new Score();
 
-		getPermutationStream(maxSize).filter(indexPermutation -> {
+		final List<List<Integer>> permutations = getPermutations(maxSize);
+
+		for (List<Integer> indexPermutation : permutations) {
+
 			final Score sum = new Score();
 
 			for (int index = 0; index < indexPermutation.size(); index++) {
@@ -130,10 +126,49 @@ public class CartesianEvaluator extends AbstractEvaluator {
 				bestScore.set(sum);
 			}
 
-			return f1 == 1.0D;
+			if (f1 == 1.0D)
+				break;
 
-		}).findFirst();
+		}
+//		System.out.println("Score: " + bestScore);
 		return bestScore;
+	}
+
+	public List<Integer> getBestAssignment(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
+		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
+
+		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
+
+		final Score bestScore = new Score();
+		final List<List<Integer>> permutations = getPermutations(maxSize);
+		int permutationRunIndex = 0;
+		int bestIndexPermutation = 0;
+
+		for (List<Integer> indexPermutation : permutations) {
+
+			final Score sum = new Score();
+
+			for (int index = 0; index < indexPermutation.size(); index++) {
+				final int permIndex = indexPermutation.get(index).intValue();
+				sum.add(scores[index][permIndex]);
+			}
+
+			final double f1 = sum.getF1();
+
+			if (bestScore.getF1() <= f1) {
+				bestScore.set(sum);
+				bestIndexPermutation = permutationRunIndex;
+			}
+
+			if (f1 == 1.0D)
+				break;
+
+			permutationRunIndex++;
+
+		}
+
+		return permutations.get(bestIndexPermutation);
 	}
 
 	private static class Compair {

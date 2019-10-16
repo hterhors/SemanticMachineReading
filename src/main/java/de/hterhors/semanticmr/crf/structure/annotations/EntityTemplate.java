@@ -397,7 +397,6 @@ final public class EntityTemplate extends AbstractAnnotation {
 	private void addScoresForMultiFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, final Score score) {
 
 		for (SlotType multiSlotType : this.multiFillerSlots.keySet()) {
-
 			final Set<AbstractAnnotation> slotFiller = this.getMultiFillerSlot(multiSlotType).getSlotFiller();
 			final Set<AbstractAnnotation> otherSlotFiller;
 
