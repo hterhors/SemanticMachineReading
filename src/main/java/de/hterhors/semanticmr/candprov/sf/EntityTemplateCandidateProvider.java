@@ -43,6 +43,9 @@ public class EntityTemplateCandidateProvider implements ISlotTypeAnnotationCandi
 
 	@Override
 	public List<EntityTemplate> getCandidates(SlotType slot) {
+		if (slot.excludeFromExploration)
+			return Collections.emptyList();
+
 		return entityAnnotationCache.getOrDefault(slot, Collections.emptyList());
 	}
 

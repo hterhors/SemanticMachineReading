@@ -165,7 +165,6 @@ public class SemanticParsingCRF {
 						boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState,
 								currentState);
 
-
 						model.updateWeights(learner, currentState, candidateState);
 
 						if (isAccepted) {
@@ -381,8 +380,7 @@ public class SemanticParsingCRF {
 		log.info("------------------");
 	}
 
-	@SuppressWarnings("boxing")
-	public Map<String, Double> getDifferences(Map<String, Double> currentFeatures,
+	private static Map<String, Double> getDifferences(Map<String, Double> currentFeatures,
 			Map<String, Double> candidateFeatures) {
 		Map<String, Double> differences = new HashMap<>();
 
@@ -409,8 +407,7 @@ public class SemanticParsingCRF {
 		return differences;
 	}
 
-	@SuppressWarnings("boxing")
-	public Map<String, Double> collectFeatures(State currentState) {
+	private static Map<String, Double> collectFeatures(State currentState) {
 		Map<String, Double> features = new HashMap<>();
 
 		for (FactorGraph fg : currentState.getFactorGraphs()) {
@@ -509,6 +506,10 @@ public class SemanticParsingCRF {
 		}
 
 		return meanTrainOFScore;
+	}
+
+	public String getModelName() {
+		return model.getName();
 	}
 
 }

@@ -101,7 +101,7 @@ public class SingleFillerSlot extends AbstractSlot {
 		return true;
 	}
 
-	public void removeFiller() {
+	public void clear() {
 		slotFiller = null;
 	}
 

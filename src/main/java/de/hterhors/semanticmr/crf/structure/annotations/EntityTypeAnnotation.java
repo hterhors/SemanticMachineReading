@@ -131,4 +131,6 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 		return "EntityTypeAnnotation [entityType=" + entityType + "]";
 	}
 
+
+
 }

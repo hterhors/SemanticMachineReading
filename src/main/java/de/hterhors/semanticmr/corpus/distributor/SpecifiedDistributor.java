@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
 /**
@@ -82,23 +81,23 @@ public class SpecifiedDistributor extends AbstractCorpusDistributor {
 	}
 
 	@Override
-	public IDistributorStrategy distributeInstances(InstanceProvider corpusProvider) {
+	public IDistributorStrategy distributeInstances(List<Instance> instancesToRedistribute) {
 
 		return new IDistributorStrategy() {
 
 			@Override
 			public IDistributorStrategy distributeTrainingInstances(List<Instance> trainingDocuments) {
 
-				
-				for (Instance instance : corpusProvider.getInstances()) {
-					if(trainingInstanceNames.contains(instance.getName())){
-						trainingDocuments.add(instance);	
-					}
-					
-				}
-				
-//				trainingDocuments.addAll(corpusProvider.getInstances().stream()
-//						.filter(i -> trainingInstanceNames.contains(i.getName())).collect(Collectors.toList()));
+//				for (Instance instance : instancesToRedistribute) {
+//					if (trainingInstanceNames.contains(instance.getName())) {
+//						trainingDocuments.add(instance);
+//						notDistributableInstances.remove(instance.getName());
+//					}
+//
+//				}
+
+				trainingDocuments.addAll(instancesToRedistribute.stream()
+						.filter(i -> trainingInstanceNames.contains(i.getName())).collect(Collectors.toList()));
 
 				return this;
 			}
@@ -106,7 +105,7 @@ public class SpecifiedDistributor extends AbstractCorpusDistributor {
 			@Override
 			public IDistributorStrategy distributeDevelopmentInstances(List<Instance> developmentDocuments) {
 
-				developmentDocuments.addAll(corpusProvider.getInstances().stream()
+				developmentDocuments.addAll(instancesToRedistribute.stream()
 						.filter(i -> developInstanceNames.contains(i.getName())).collect(Collectors.toList()));
 				return this;
 			}
@@ -114,7 +113,7 @@ public class SpecifiedDistributor extends AbstractCorpusDistributor {
 			@Override
 			public IDistributorStrategy distributeTestInstances(List<Instance> testDocuments) {
 
-				testDocuments.addAll(corpusProvider.getInstances().stream()
+				testDocuments.addAll(instancesToRedistribute.stream()
 						.filter(i -> testInstanceNames.contains(i.getName())).collect(Collectors.toList()));
 				return this;
 			}

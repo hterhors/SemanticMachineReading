@@ -1,7 +1,9 @@
 package de.hterhors.semanticmr.corpus.distributor;
 
-import de.hterhors.semanticmr.corpus.InstanceProvider;
+import java.util.List;
+
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor.IDistributorStrategy;
+import de.hterhors.semanticmr.crf.variables.Instance;
 
 /**
  * Classes that implement this interface contain the configuration for the
@@ -13,7 +15,7 @@ import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor.IDist
  */
 public interface IInstanceDistributor {
 
-	IDistributorStrategy distributeInstances(InstanceProvider corpusProvider);
+	IDistributorStrategy distributeInstances(List<Instance> instancesToRedistribute);
 
 	public String getDistributorID();
 

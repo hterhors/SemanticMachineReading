@@ -33,7 +33,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 	/**
 	 * Defines the entity type of this annotation.
 	 */
-	private final EntityTypeAnnotation rootAnnotation;
+	private EntityTypeAnnotation rootAnnotation;
 
 	/**
 	 * An unmodifiable map of slots to fill.
@@ -423,8 +423,26 @@ final public class EntityTemplate extends AbstractAnnotation {
 		return rootAnnotation;
 	}
 
+	/**
+	 * Reduces the root annotation of e.g. DocLinkedAnnotation to EntityType. This
+	 * is an irreversible process.
+	 */
+	public void reduceRootToEntityType() {
+		rootAnnotation = new EntityTypeAnnotation(rootAnnotation.entityType);
+	}
+
 	public EntityTemplateAnnotationFilter.Builder filter() {
 		return new EntityTemplateAnnotationFilter.Builder(this);
+	}
+
+	/**
+	 * Clears all properties from this entity temple. Note that the root annotation
+	 * remains.
+	 */
+	public void clearProperties() {
+		this.singleFillerSlots.values().stream().forEach(s -> s.clear());
+		this.multiFillerSlots.values().stream().forEach(s -> s.clear());
+
 	}
 
 }

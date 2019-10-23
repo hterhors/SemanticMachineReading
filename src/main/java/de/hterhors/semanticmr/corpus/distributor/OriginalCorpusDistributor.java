@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
-import de.hterhors.semanticmr.corpus.InstanceProvider;
+import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
 /**
@@ -48,7 +49,7 @@ public class OriginalCorpusDistributor extends AbstractCorpusDistributor {
 	 * @param investigationRestriction
 	 */
 	@Override
-	public IDistributorStrategy distributeInstances(InstanceProvider corpusProvider) {
+	public IDistributorStrategy distributeInstances(List<Instance> instancesToRedistribute) {
 
 		/**
 		 * TODO: Not very efficient! Convert interalINstances to Map with name as key.
@@ -73,13 +74,14 @@ public class OriginalCorpusDistributor extends AbstractCorpusDistributor {
 			@Override
 			public IDistributorStrategy distributeTrainingInstances(List<Instance> trainingDocuments) {
 
-				List<Instance> l = new ArrayList<>(corpusProvider.getOriginalTrainingInstances());
+				List<Instance> l = new ArrayList<>(instancesToRedistribute.stream()
+						.filter(i -> i.getOriginalContext() == EInstanceContext.TRAIN).collect(Collectors.toList()));
 
 				sortAndShuffleIf(l);
 
 				for (Instance instance : l) {
-					final float fraction = (float) trainingDocuments.size()
-							/ corpusProvider.getOriginalTrainingInstances().size();
+					final float fraction = (float) trainingDocuments.size() / instancesToRedistribute.stream()
+							.filter(i -> i.getOriginalContext() == EInstanceContext.TRAIN).count();
 
 					if (fraction >= corpusSizeFraction)
 						break;
@@ -97,13 +99,15 @@ public class OriginalCorpusDistributor extends AbstractCorpusDistributor {
 			@Override
 			public IDistributorStrategy distributeDevelopmentInstances(List<Instance> developmentDocuments) {
 
-				List<Instance> l = new ArrayList<>(corpusProvider.getOriginalDevelopInstances());
+				List<Instance> l = new ArrayList<>(instancesToRedistribute.stream()
+						.filter(i -> i.getOriginalContext() == EInstanceContext.DEVELOPMENT)
+						.collect(Collectors.toList()));
 
 				sortAndShuffleIf(l);
 
 				for (Instance instance : l) {
-					final float fraction = (float) developmentDocuments.size()
-							/ corpusProvider.getOriginalDevelopInstances().size();
+					final float fraction = (float) developmentDocuments.size() / instancesToRedistribute.stream()
+							.filter(i -> i.getOriginalContext() == EInstanceContext.DEVELOPMENT).count();
 
 					if (fraction >= corpusSizeFraction)
 						break;
@@ -121,13 +125,14 @@ public class OriginalCorpusDistributor extends AbstractCorpusDistributor {
 			@Override
 			public IDistributorStrategy distributeTestInstances(List<Instance> testDocuments) {
 
-				List<Instance> l = new ArrayList<>(corpusProvider.getOriginalTestInstances());
+				List<Instance> l = new ArrayList<>(instancesToRedistribute.stream()
+						.filter(i -> i.getOriginalContext() == EInstanceContext.TEST).collect(Collectors.toList()));
 
 				sortAndShuffleIf(l);
 
 				for (Instance instance : l) {
-					final float fraction = (float) testDocuments.size()
-							/ corpusProvider.getOriginalTestInstances().size();
+					final float fraction = (float) testDocuments.size() / instancesToRedistribute.stream()
+							.filter(i -> i.getOriginalContext() == EInstanceContext.DEVELOPMENT).count();
 
 					if (fraction >= corpusSizeFraction)
 						break;

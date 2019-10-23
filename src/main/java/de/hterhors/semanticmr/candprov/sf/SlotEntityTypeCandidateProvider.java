@@ -35,6 +35,9 @@ public class SlotEntityTypeCandidateProvider
 
 	@Override
 	public List<AbstractAnnotation> getCandidates(SlotType slot) {
+		if (slot.excludeFromExploration)
+			return Collections.emptyList();
+
 		if (!entityAnnotationCache.containsKey(slot)) {
 
 			for (EntityType slotEntityType : slot.getSlotFillerEntityTypes()) {

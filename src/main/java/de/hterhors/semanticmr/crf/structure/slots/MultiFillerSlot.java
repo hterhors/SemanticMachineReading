@@ -175,7 +175,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		this.slotFiller.add(slotFillerCandidate);
 	}
 
-	public void removeFillers() {
+	public void clear() {
 		this.slotFiller.clear();
 	}
 

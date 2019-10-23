@@ -2,15 +2,19 @@ package de.hterhors.semanticmr.crf.variables;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
+import de.hterhors.semanticmr.crf.variables.Instance.ModifyGoldRule;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 
 public class Annotations implements IEvaluatable {
@@ -41,17 +45,36 @@ public class Annotations implements IEvaluatable {
 		}
 	}
 
-	public void unmodifiable() {
+	public Annotations(Annotations goldAnnotations, Collection<ModifyGoldRule> modifyRules) {
+		this(applyModifications(goldAnnotations, modifyRules));
+	}
+
+	private static List<AbstractAnnotation> applyModifications(Annotations goldAnnotations,
+			Collection<ModifyGoldRule> modifyRules) {
+		final List<AbstractAnnotation> modifiedAnnotations = new ArrayList<>();
+		for (AbstractAnnotation goldAnnotation : goldAnnotations.getAbstractAnnotations()) {
+			for (ModifyGoldRule modifyGoldRule : modifyRules) {
+				if (goldAnnotation != null)
+					goldAnnotation = modifyGoldRule.modify(goldAnnotation);
+			}
+			if (goldAnnotation != null)
+				modifiedAnnotations.add(goldAnnotation);
+		}
+		return modifiedAnnotations;
+	}
+
+	public Annotations unmodifiable() {
 		annotations = Collections.unmodifiableList(annotations);
+		return this;
 	}
 
 	@SuppressWarnings("unchecked")
 	public <Annotation extends AbstractAnnotation> List<Annotation> getAnnotations() {
-		return  (List<Annotation>) annotations;
+		return (List<Annotation>) annotations;
 	}
 
 	public List<AbstractAnnotation> getAbstractAnnotations() {
-		return   annotations;
+		return annotations;
 	}
 
 	@Override

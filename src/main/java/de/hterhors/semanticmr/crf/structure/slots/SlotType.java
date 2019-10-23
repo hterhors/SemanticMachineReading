@@ -14,6 +14,8 @@ import de.hterhors.semanticmr.init.specifications.Specifications;
 
 public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
+	public boolean excludeFromExploration = false;
+
 	final public String slotName;
 
 	/**

@@ -1,5 +1,8 @@
 package de.hterhors.semanticmr.crf.variables;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
@@ -31,11 +34,16 @@ public class Instance implements Comparable<Instance> {
 	private final EInstanceContext originalContext;
 	private EInstanceContext redistributedContext = EInstanceContext.UNSPECIFIED;
 
-	public Instance(EInstanceContext context, Document document, Annotations goldAnnotations) {
+	public static interface ModifyGoldRule {
+		public AbstractAnnotation modify(AbstractAnnotation goldAnnotation);
+	}
+
+	public Instance(EInstanceContext context, Document document, Annotations goldAnnotations,
+			Collection<ModifyGoldRule> modifyRules) {
 		this.originalContext = context == null ? EInstanceContext.UNSPECIFIED : context;
-		this.goldAnnotations = goldAnnotations;
 		this.document = document;
-		this.goldAnnotations.unmodifiable();
+
+		this.goldAnnotations = new Annotations(goldAnnotations, modifyRules).unmodifiable();
 
 		for (AbstractAnnotation a : goldAnnotations.getAnnotations()) {
 			if (a instanceof DocumentLinkedAnnotation) {
@@ -44,6 +52,10 @@ public class Instance implements Comparable<Instance> {
 							+ "s are defined on the instance's document.");
 			}
 		}
+	}
+
+	public Instance(EInstanceContext context, Document document, Annotations goldAnnotations) {
+		this(context, document, goldAnnotations, Collections.emptySet());
 	}
 
 	public String getName() {

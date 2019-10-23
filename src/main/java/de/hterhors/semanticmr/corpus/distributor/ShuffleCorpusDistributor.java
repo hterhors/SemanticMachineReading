@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 import de.hterhors.semanticmr.corpus.EInstanceContext;
-import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
 /**
@@ -169,12 +168,12 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 	 * @param investigationRestriction
 	 */
 	@Override
-	public IDistributorStrategy distributeInstances(InstanceProvider corpusProvider) {
+	public IDistributorStrategy distributeInstances(List<Instance> instancesToRedistribute) {
 
-		Collections.sort(corpusProvider.getInstances());
-		Collections.shuffle(corpusProvider.getInstances(), rnd);
+		Collections.sort(instancesToRedistribute);
+		Collections.shuffle(instancesToRedistribute, rnd);
 
-		final int totalNumberOfDocuments = corpusProvider.getInstances().size();
+		final int totalNumberOfDocuments = instancesToRedistribute.size();
 
 		final int numberForTraining = numberOfTrainingData(totalNumberOfDocuments);
 		final int numberForDevelopment = numberOfDevelopmentData(totalNumberOfDocuments);
@@ -184,23 +183,23 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 
 			@Override
 			public IDistributorStrategy distributeTrainingInstances(List<Instance> trainingDocuments) {
-				trainingDocuments.addAll(corpusProvider.getInstances().subList(0, numberForTraining));
+				trainingDocuments.addAll(instancesToRedistribute.subList(0, numberForTraining));
 				trainingDocuments.stream().forEach(i -> i.setRedistributedContext(EInstanceContext.TRAIN));
 				return this;
 			}
 
 			@Override
 			public IDistributorStrategy distributeDevelopmentInstances(List<Instance> developmentDocuments) {
-				developmentDocuments.addAll(corpusProvider.getInstances().subList(numberForTraining,
-						numberForTraining + numberForDevelopment));
+				developmentDocuments.addAll(
+						instancesToRedistribute.subList(numberForTraining, numberForTraining + numberForDevelopment));
 				developmentDocuments.stream().forEach(i -> i.setRedistributedContext(EInstanceContext.DEVELOPMENT));
 				return this;
 			}
 
 			@Override
 			public IDistributorStrategy distributeTestInstances(List<Instance> testDocuments) {
-				testDocuments.addAll(corpusProvider.getInstances().subList(numberForTraining + numberForDevelopment,
-						corpusProvider.getInstances().size()));
+				testDocuments.addAll(instancesToRedistribute.subList(numberForTraining + numberForDevelopment,
+						instancesToRedistribute.size()));
 				testDocuments.stream().forEach(i -> i.setRedistributedContext(EInstanceContext.TEST));
 				return this;
 			}

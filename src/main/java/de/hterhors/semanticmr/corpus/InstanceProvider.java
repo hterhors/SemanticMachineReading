@@ -14,10 +14,13 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
+
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
+import de.hterhors.semanticmr.crf.variables.Instance.ModifyGoldRule;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.exce.DuplicateDocumentException;
 import de.hterhors.semanticmr.json.JsonInstanceReader;
@@ -66,15 +69,62 @@ public class InstanceProvider {
 	 * strategy.
 	 * 
 	 * @param distributor
+	 * @return
 	 */
-	public void redistribute(final IInstanceDistributor distributor) {
-		this.distributor = distributor;
-		log.info("Redistribute instances based on: " + distributor.getDistributorID() + "...");
-		this.distributor.distributeInstances(this).distributeTrainingInstances(redistTrainInstances)
+	private List<Instance> redistribute(List<Instance> instancesToRedistribute) {
+		log.info("Redistribute instances based on: " + this.distributor.getDistributorID() + "...");
+		this.distributor.distributeInstances(instancesToRedistribute).distributeTrainingInstances(redistTrainInstances)
 				.distributeDevelopmentInstances(redistDevInstances).distributeTestInstances(redistTestInstances);
+		List<Instance> redistributedInstances = Streams.concat(this.redistTrainInstances.stream(),
+				this.redistDevInstances.stream(), this.redistTestInstances.stream()).collect(Collectors.toList());
+
+		final List<String> notDistributableInstances = new ArrayList<>();
+		notDistributableInstances
+				.addAll(instancesToRedistribute.stream().map(i -> i.getName()).collect(Collectors.toList()));
+		log.info("Could not redistribute following instances: ");
+		notDistributableInstances
+				.removeAll(redistributedInstances.stream().map(i -> i.getName()).collect(Collectors.toList()));
+		notDistributableInstances.forEach(log::warn);
+
 		log.info("Number of trainings instances: " + redistTrainInstances.size());
 		log.info("Number of develop instances: " + redistDevInstances.size());
 		log.info("Number of test instances: " + redistTestInstances.size());
+		return redistributedInstances;
+	}
+
+	/**
+	 * Reads all .json files from the given directory.
+	 * 
+	 * @param jsonInstancesDirectory the data set directory.
+	 */
+	public InstanceProvider(final File jsonInstancesDirectory, Collection<ModifyGoldRule> modifyGoldRules) {
+		this(jsonInstancesDirectory, null, Integer.MAX_VALUE, modifyGoldRules);
+	}
+
+	/**
+	 * Reads all .json files from the given directory.
+	 * 
+	 * Applies the distributor to the original data set.
+	 * 
+	 * 
+	 * @param jsonInstancesDirectory the data set directory.
+	 * @param distributor            the distributor.
+	 */
+	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
+			Collection<ModifyGoldRule> modifyGoldRules) {
+		this(jsonInstancesDirectory, distributor, Integer.MAX_VALUE, modifyGoldRules);
+	}
+
+	/**
+	 * Reads <code>numToRead</code> .json files from the given directory.
+	 * 
+	 * @param jsonInstancesDirectory the data set directory.
+	 * @param numToRead              number to read.
+	 */
+	public InstanceProvider(final File jsonInstancesDirectory, final int numToRead,
+			Collection<ModifyGoldRule> modifyGoldRules) {
+		this(jsonInstancesDirectory, new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build(),
+				numToRead, modifyGoldRules);
 	}
 
 	/**
@@ -83,7 +133,7 @@ public class InstanceProvider {
 	 * @param jsonInstancesDirectory the data set directory.
 	 */
 	public InstanceProvider(final File jsonInstancesDirectory) {
-		this(jsonInstancesDirectory, null, Integer.MAX_VALUE);
+		this(jsonInstancesDirectory, null, Integer.MAX_VALUE, Collections.emptySet());
 	}
 
 	/**
@@ -96,7 +146,7 @@ public class InstanceProvider {
 	 * @param distributor            the distributor.
 	 */
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor) {
-		this(jsonInstancesDirectory, distributor, Integer.MAX_VALUE);
+		this(jsonInstancesDirectory, distributor, Integer.MAX_VALUE, Collections.emptySet());
 	}
 
 	/**
@@ -107,7 +157,7 @@ public class InstanceProvider {
 	 */
 	public InstanceProvider(final File jsonInstancesDirectory, final int numToRead) {
 		this(jsonInstancesDirectory, new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build(),
-				numToRead);
+				numToRead, Collections.emptySet());
 	}
 
 	private <T> Set<T> findDuplicates(Collection<T> collection) {
@@ -116,7 +166,7 @@ public class InstanceProvider {
 	}
 
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
-			final int numToRead) {
+			final int numToRead, Collection<ModifyGoldRule> modifyGoldRules) {
 		try {
 			this.jsonInstancesDirectory = jsonInstancesDirectory;
 
@@ -124,52 +174,65 @@ public class InstanceProvider {
 
 			this.validateFiles();
 
-			this.instances = new JsonInstanceReader(jsonInstancesDirectory).readInstances(numToRead);
+			List<Instance> instancesToRedistribute = new JsonInstanceReader(jsonInstancesDirectory, modifyGoldRules)
+					.readInstances(numToRead);
 
-			Set<String> dups = findDuplicates(
-					this.instances.stream().map(i -> i.getDocument().documentID).collect(Collectors.toList()));
+			checkInstancesForDuplicats(instancesToRedistribute);
 
-			if (!dups.isEmpty())
-				throw new DuplicateDocumentException("Duplicate document IDs detected: " + dups);
-
-			log.info("Total number of instances loaded: " + getInstances().size());
-
-			for (Iterator<Instance> iterator = instances.iterator(); iterator.hasNext();) {
-				Instance instance = iterator.next();
-				if (instance.getGoldAnnotations().getAnnotations().isEmpty()) {
-				if(verbose)
-					log.warn("Instance " + instance.getName() + " has no annotations!");
-					if (removeEmptyInstances) {
-						iterator.remove();
-						if(verbose)
-						log.warn("Remove instance!");
-					} else {
-						if(verbose)
-						log.warn("Keep instance!");
-					}
-				}
-
-				if (instance.getGoldAnnotations().getAnnotations().size() >= maxNumberOfAnnotations) {
-					if(verbose)
-					log.warn("WARN: Instance " + instance.getName() + " has to many annotations!");
-					if (removeInstancesWithToManyAnnotations) {
-						iterator.remove();
-						if(verbose)
-						log.warn("Remove instance!");
-					} else {
-						if (verbose)
-							log.warn("Keep instance!");
-					}
-				}
-
-			}
+			log.info("Total number of instances loaded: " + instancesToRedistribute.size());
+			filterInstancesByCardinality(instancesToRedistribute);
+			log.info("Instances remain after cardinality filter: " + instancesToRedistribute.size());
 
 			if (this.distributor != null)
-				redistribute(this.distributor);
+				this.instances = redistribute(instancesToRedistribute);
+			else
+				this.instances = instancesToRedistribute;
+
+			log.info("Total number of distributed instances: " + getInstances().size());
 
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
+		}
+	}
+
+	public void checkInstancesForDuplicats(List<Instance> instancesToRedistribute) {
+		Set<String> dups = findDuplicates(
+				instancesToRedistribute.stream().map(i -> i.getDocument().documentID).collect(Collectors.toList()));
+
+		if (!dups.isEmpty())
+			throw new DuplicateDocumentException("Duplicate document IDs detected: " + dups);
+	}
+
+	public void filterInstancesByCardinality(List<Instance> allInstances) {
+		for (Iterator<Instance> iterator = allInstances.iterator(); iterator.hasNext();) {
+			Instance instance = iterator.next();
+			if (instance.getGoldAnnotations().getAnnotations().isEmpty()) {
+				if (verbose)
+					log.warn("Instance " + instance.getName() + " has no annotations!");
+				if (removeEmptyInstances) {
+					iterator.remove();
+					if (verbose)
+						log.warn("Remove instance!");
+				} else {
+					if (verbose)
+						log.warn("Keep instance!");
+				}
+			}
+
+			if (instance.getGoldAnnotations().getAnnotations().size() >= maxNumberOfAnnotations) {
+				if (verbose)
+					log.warn("WARN: Instance " + instance.getName() + " has to many annotations!");
+				if (removeInstancesWithToManyAnnotations) {
+					iterator.remove();
+					if (verbose)
+						log.warn("Remove instance!");
+				} else {
+					if (verbose)
+						log.warn("Keep instance!");
+				}
+			}
+
 		}
 	}
 

@@ -69,6 +69,9 @@ public class GeneralCandidateProvider
 
 	@Override
 	public List<AbstractAnnotation> getCandidates(SlotType slotType) {
+		if (slotType.excludeFromExploration)
+			return Collections.emptyList();
+
 		return entityAnnotationCache.getOrDefault(slotType, Collections.emptyList());
 	}
 

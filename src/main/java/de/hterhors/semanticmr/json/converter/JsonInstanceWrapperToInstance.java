@@ -1,6 +1,7 @@
 package de.hterhors.semanticmr.json.converter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.Instance;
+import de.hterhors.semanticmr.crf.variables.Instance.ModifyGoldRule;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 import de.hterhors.semanticmr.json.wrapper.JsonAnnotationsWrapper;
 import de.hterhors.semanticmr.json.wrapper.JsonDocumentLinkedAnnotationWrapper;
@@ -46,14 +48,15 @@ public class JsonInstanceWrapperToInstance {
 		this.jsonInstances = jsonInstances;
 	}
 
-	public List<Instance> convertToInstances() {
-		return jsonInstances.stream().map(instanceWrapper -> toInstance(instanceWrapper)).collect(Collectors.toList());
+	public List<Instance> convertToInstances(Collection<ModifyGoldRule> modifyGoldRules) {
+		return jsonInstances.stream().map(instanceWrapper -> toInstance(instanceWrapper, modifyGoldRules))
+				.collect(Collectors.toList());
 	}
 
-	private Instance toInstance(JsonInstanceWrapper instanceWrapper) {
+	private Instance toInstance(JsonInstanceWrapper instanceWrapper, Collection<ModifyGoldRule> modifyGoldRules) {
 		Document document = toDocument(instanceWrapper.getDocument());
 		return new Instance(instanceWrapper.getContext(), document,
-				toAnnotations(document, instanceWrapper.getGoldAnnotations()));
+				toAnnotations(document, instanceWrapper.getGoldAnnotations()), modifyGoldRules);
 	}
 
 	private Document toDocument(JsonDocumentWrapper document) {
