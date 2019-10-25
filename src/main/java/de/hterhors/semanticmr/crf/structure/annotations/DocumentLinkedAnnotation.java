@@ -142,21 +142,21 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 	}
 
 	@Override
-	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal) {
+	public Score evaluate(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
 		if (otherVal == null)
 			return Score.FN;
 
-		if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED) {
+		if (evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED) {
 			if (equals(otherVal))
 				return Score.TP;
 			else
 				return Score.FN_FP;
-		} else if (entityType.isLiteral || evaluator.evaluationDetail == EEvaluationDetail.LITERAL
-				|| evaluator.evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
-			return super.evaluate(evaluator, otherVal);
+		} else if (entityType.isLiteral || evaluationDetail == EEvaluationDetail.LITERAL
+				|| evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
+			return super.evaluate(evaluationDetail, otherVal);
 		}
 
-		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationDetail);
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluationDetail);
 	}
 
 }

@@ -17,6 +17,7 @@ import de.hterhors.semanticmr.crf.structure.slots.MultiFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 import de.hterhors.semanticmr.exce.UnkownMultiSlotException;
 import de.hterhors.semanticmr.exce.UnkownSingleSlotException;
@@ -331,7 +332,6 @@ final public class EntityTemplate extends AbstractAnnotation {
 		return true;
 	}
 
-	@Override
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable other) {
 
 		if (other != null && !(other instanceof EntityTemplate)) {
@@ -443,6 +443,11 @@ final public class EntityTemplate extends AbstractAnnotation {
 		this.singleFillerSlots.values().stream().forEach(s -> s.clear());
 		this.multiFillerSlots.values().stream().forEach(s -> s.clear());
 
+	}
+
+	@Override
+	public Score evaluate(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
+		throw new IllegalStateException("Can not evaluate entity templates without evaluator.");
 	}
 
 }

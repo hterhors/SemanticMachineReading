@@ -12,12 +12,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.variables.Instance.ModifyGoldRule;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
-public class Annotations implements IEvaluatable {
+public class Annotations {
 
 	private List<AbstractAnnotation> annotations;
 
@@ -77,8 +79,7 @@ public class Annotations implements IEvaluatable {
 		return annotations;
 	}
 
-	@Override
-	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal) {
+	public Score evaluate(AbstractEvaluator evaluator, Annotations otherVal) {
 
 		if (!(otherVal instanceof Annotations))
 			return Score.ZERO;

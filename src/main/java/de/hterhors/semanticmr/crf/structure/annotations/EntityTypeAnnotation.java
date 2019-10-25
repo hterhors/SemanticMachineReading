@@ -93,14 +93,13 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 	}
 
 	@Override
-	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal) {
+	public Score evaluate(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
 
 		if (otherVal == null)
 			return Score.FN;
 
-		if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED
-				|| evaluator.evaluationDetail == EEvaluationDetail.LITERAL
-				|| evaluator.evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
+		if (evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED || evaluationDetail == EEvaluationDetail.LITERAL
+				|| evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
 
 			if (getClass() == otherVal.getClass()) {
 				if (getClass() != EntityTypeAnnotation.class)
@@ -117,7 +116,7 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 			return Score.FN_FP;
 		}
 
-		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationDetail);
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluationDetail);
 
 	}
 
@@ -130,7 +129,5 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 	public String toString() {
 		return "EntityTypeAnnotation [entityType=" + entityType + "]";
 	}
-
-
 
 }

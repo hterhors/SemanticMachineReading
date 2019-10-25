@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 public interface IEvaluatable {
 
@@ -80,6 +81,28 @@ public interface IEvaluatable {
 			this.fp = setter.fp;
 			this.fn = setter.fn;
 			this.tn = setter.tn;
+		}
+
+		/**
+		 * This works only if the tp and fn were added in a purity inverse purity
+		 * fashion!
+		 * 
+		 * @return
+		 */
+		public double getPurity() {
+			if (fn == 0)
+				return 0;
+//			r= tp / fn;
+//			p = tp /fn;
+//			(2 * tp / fn * tp /fn) / (tp / fn + tp /fn) = tp/fn
+			return ((double) tp) / fn;
+		}
+
+		public double getPurityF() {
+			if (fn == 0)
+				return 0;
+			return ((double) tp) / fn;
+
 		}
 
 		public double getPrecision() {
@@ -199,8 +222,26 @@ public interface IEvaluatable {
 			return true;
 		}
 
+		public int getTp() {
+			return tp;
+		}
+
+		public int getFp() {
+			return fp;
+		}
+
+		public int getFn() {
+			return fn;
+		}
+
+		public int getTn() {
+			return tn;
+		}
+
 	}
 
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal);
+
+	public Score evaluate(EEvaluationDetail evaluationDetail, IEvaluatable otherVal);
 
 }

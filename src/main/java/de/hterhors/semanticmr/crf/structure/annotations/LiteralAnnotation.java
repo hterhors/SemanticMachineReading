@@ -87,12 +87,11 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 	}
 
 	@Override
-	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal) {
+	public Score evaluate(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
 		if (otherVal == null)
 			return Score.FN;
-
-		if (entityType.isLiteral || evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED
-				|| evaluator.evaluationDetail == EEvaluationDetail.LITERAL) {
+		if (entityType.isLiteral || evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED
+				|| evaluationDetail == EEvaluationDetail.LITERAL) {
 			if (getClass() == otherVal.getClass()) {
 				if (getClass() != LiteralAnnotation.class)
 					return equalsEvalLA(otherVal) ? Score.TP : Score.FN_FP;
@@ -112,11 +111,11 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 						return Score.FN_FP;
 			}
 			return Score.FN_FP;
-		} else if (evaluator.evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
-			return super.evaluate(evaluator, otherVal);
+		} else if (evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
+			return super.evaluate(evaluationDetail, otherVal);
 		}
 
-		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluator.evaluationDetail);
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluationDetail);
 	}
 
 	final public String getCleanedSurfaceForm() {

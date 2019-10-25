@@ -3,8 +3,6 @@ package de.hterhors.semanticmr.eval;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.commons.collections.set.SynchronizedSet;
-
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;

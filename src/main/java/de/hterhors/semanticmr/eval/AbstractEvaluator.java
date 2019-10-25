@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
@@ -41,7 +42,6 @@ public abstract class AbstractEvaluator {
 			 * Should never happen!
 			 */
 			throw new IllegalStateException("Illegal state detected during evaluation!");
-//			return Score.FN_FP;
 		}
 	}
 
@@ -52,4 +52,5 @@ public abstract class AbstractEvaluator {
 			Collection<? extends AbstractAnnotation> otherAnnotations) {
 		return scoreMax(annotations, otherAnnotations);
 	}
+
 }
