@@ -81,10 +81,12 @@ public class InstanceProvider {
 		final List<String> notDistributableInstances = new ArrayList<>();
 		notDistributableInstances
 				.addAll(instancesToRedistribute.stream().map(i -> i.getName()).collect(Collectors.toList()));
-		log.info("Could not redistribute following instances: ");
 		notDistributableInstances
 				.removeAll(redistributedInstances.stream().map(i -> i.getName()).collect(Collectors.toList()));
-		notDistributableInstances.forEach(log::warn);
+		if (!notDistributableInstances.isEmpty()) {
+			log.warn("Could not redistribute following instances: ");
+			notDistributableInstances.forEach(log::warn);
+		}
 
 		log.info("Number of trainings instances: " + redistTrainInstances.size());
 		log.info("Number of develop instances: " + redistDevInstances.size());
@@ -222,7 +224,9 @@ public class InstanceProvider {
 
 			if (instance.getGoldAnnotations().getAnnotations().size() >= maxNumberOfAnnotations) {
 				if (verbose)
-					log.warn("WARN: Instance " + instance.getName() + " has to many annotations!");
+					log.warn("WARN: Instance " + instance.getName() + " has to many annotations: "
+							+ instance.getGoldAnnotations().getAnnotations().size() + " max number: "
+							+ maxNumberOfAnnotations + "!");
 				if (removeInstancesWithToManyAnnotations) {
 					iterator.remove();
 					if (verbose)

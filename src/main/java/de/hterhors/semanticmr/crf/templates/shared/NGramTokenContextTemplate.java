@@ -162,9 +162,9 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 		try {
 
 			DocumentToken beginToken = factor.getFactorScope().instance.getDocument()
-					.getTokenByCharOffset(factor.getFactorScope().startOffset);
+					.getTokenByCharStartOffset(factor.getFactorScope().startOffset);
 			DocumentToken endToken = factor.getFactorScope().instance.getDocument()
-					.getTokenByCharOffset(factor.getFactorScope().endOffset);
+					.getTokenByCharEndOffset(factor.getFactorScope().endOffset);
 
 			addContextFeatures(featureVector, factor.getFactorScope().instance.getDocument().tokenList,
 					factor.getFactorScope().entityType, beginToken.getDocTokenIndex(), endToken.getDocTokenIndex());

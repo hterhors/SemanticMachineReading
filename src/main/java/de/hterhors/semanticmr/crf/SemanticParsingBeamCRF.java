@@ -333,7 +333,8 @@ public class SemanticParsingBeamCRF {
 
 					currentStatePairs = new ArrayList<>();
 
-					for (StatePair beamStatePair : proposalStatePairs.subList(0, beamSize)) {
+					for (StatePair beamStatePair : proposalStatePairs.subList(0,
+							Math.min(proposalStatePairs.size(), beamSize))) {
 
 						boolean isAccepted = AcceptStrategies.strictModelAccept()
 								.isAccepted(beamStatePair.candidateState, beamStatePair.currentState);

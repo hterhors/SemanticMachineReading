@@ -5,9 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 
@@ -33,6 +30,13 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 		return bestAssignments.overallSimiliarity;
 	}
 
+	/**
+	 * TODO: make faster by pre calculate all scores and access score[][]
+	 * 
+	 * 
+	 * @param states
+	 * @return
+	 */
 	private List<BeamAssignmentTree> beamExploration(final List<BeamAssignmentTree> states) {
 
 		final List<BeamAssignmentTree> candidates = new ArrayList<>();

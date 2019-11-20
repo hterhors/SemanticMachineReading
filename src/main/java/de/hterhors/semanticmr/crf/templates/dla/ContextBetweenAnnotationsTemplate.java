@@ -192,11 +192,11 @@ public class ContextBetweenAnnotationsTemplate extends AbstractFeatureTemplate<C
 
 			final String fromEntityType = factor.getFactorScope().fromEntity.entityName;
 			final int fromTokenIndex = factor.getFactorScope().instance.getDocument()
-					.getTokenByCharOffset(factor.getFactorScope().fromEntityCharacterOnset).getDocTokenIndex();
+					.getTokenByCharStartOffset(factor.getFactorScope().fromEntityCharacterOnset).getDocTokenIndex();
 
 			final String toEntityType = factor.getFactorScope().toEntity.entityName;
 			final int toTokenIndex = factor.getFactorScope().instance.getDocument()
-					.getTokenByCharOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
+					.getTokenByCharEndOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
 
 			if (toTokenIndex - fromTokenIndex > MAX_TOKEN_DIST)
 				return;

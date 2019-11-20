@@ -132,8 +132,7 @@ public class OriginalCorpusDistributor extends AbstractCorpusDistributor {
 
 				for (Instance instance : l) {
 					final float fraction = (float) testDocuments.size() / instancesToRedistribute.stream()
-							.filter(i -> i.getOriginalContext() == EInstanceContext.DEVELOPMENT).count();
-
+							.filter(i -> i.getOriginalContext() == EInstanceContext.TEST).count();
 					if (fraction >= corpusSizeFraction)
 						break;
 

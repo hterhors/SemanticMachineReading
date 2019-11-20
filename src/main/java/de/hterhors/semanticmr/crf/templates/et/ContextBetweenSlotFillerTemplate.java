@@ -223,10 +223,10 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 			DoubleVector featureVector = factor.getFeatureVector();
 
 			final int fromTokenIndex = factor.getFactorScope().instance.getDocument()
-					.getTokenByCharOffset(factor.getFactorScope().fromEntityCharacterOnset).getDocTokenIndex();
+					.getTokenByCharStartOffset(factor.getFactorScope().fromEntityCharacterOnset).getDocTokenIndex();
 
 			final int toTokenIndex = factor.getFactorScope().instance.getDocument()
-					.getTokenByCharOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
+					.getTokenByCharEndOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
 
 			if (toTokenIndex - fromTokenIndex > MAX_TOKEN_DIST)
 				return;

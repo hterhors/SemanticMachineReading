@@ -238,6 +238,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 				for (int d = 0; d < newDepth; d++) {
 					sb.append("\t");
 				}
+				sb.append(" [").append(slot.getSlotFiller().size()).append("]");
 				sb.append(slot.toPrettyString(newDepth)).append("\n");
 			}
 		}

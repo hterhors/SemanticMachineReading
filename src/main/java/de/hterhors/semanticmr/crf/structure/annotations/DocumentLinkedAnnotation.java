@@ -62,9 +62,11 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 		super(entityType, textualContent);
 		this.document = document;
 		this.documentPosition = documentPosition;
+		
 		this.relatedTokens = this.document.tokenList.subList(
-				this.document.getTokenByCharOffset(getStartDocCharOffset()).getDocTokenIndex(),
-				this.document.getTokenByCharOffset(getEndDocCharOffset()).getDocTokenIndex() + 1);
+				this.document.getTokenByCharStartOffset(getStartDocCharOffset()).getDocTokenIndex(),
+				this.document.getTokenByCharEndOffset(getEndDocCharOffset()).getDocTokenIndex() + 1);
+
 	}
 
 	public int getStartDocCharOffset() {

@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -24,19 +23,24 @@ import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.model.FactorGraph;
 import de.hterhors.semanticmr.crf.model.Model;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
+import de.hterhors.semanticmr.crf.of.SlotFillingObjectiveFunction;
 import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ITrainingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
+import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
-import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
+import de.hterhors.semanticmr.eval.CartesianEvaluator;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
+import de.hterhors.semanticmr.eval.NerlaEvaluator;
 
 public class SemanticParsingCRF {
 	public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.00000");
@@ -109,11 +113,11 @@ public class SemanticParsingCRF {
 
 	}
 
-	public Map<Instance, State> train(final AdvancedLearner learner, final List<Instance> trainingInstances,
-			final int numberOfEpochs, final ITrainingStoppingCriterion[] trainingStoppingCrits) {
-		return train(learner, trainingInstances, numberOfEpochs, trainingStoppingCrits,
-				new ISamplingStoppingCriterion[] {});
-	}
+//	public Map<Instance, State> train(final AdvancedLearner learner, final List<Instance> trainingInstances,
+//			final int numberOfEpochs, final ITrainingStoppingCriterion[] trainingStoppingCrits) {
+//		return train(learner, trainingInstances, numberOfEpochs, trainingStoppingCrits,
+//				new ISamplingStoppingCriterion[] {});
+//	}
 
 	public Map<Instance, State> train(final AdvancedLearner learner, final List<Instance> trainingInstances,
 			final int numberOfEpochs, final ITrainingStoppingCriterion[] trainingStoppingCrits,
@@ -125,6 +129,7 @@ public class SemanticParsingCRF {
 		this.trainingStatistics.startTrainingTime = System.currentTimeMillis();
 
 		final Map<Instance, State> finalStates = new LinkedHashMap<>();
+//		Map<Integer, Double> lastModelWeights = new HashMap<>();
 
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
 
@@ -188,13 +193,119 @@ public class SemanticParsingCRF {
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
 			}
 
+//			Map<Integer, Double> currentModelWeights = model.getFactorTemplates().stream()
+//					.flatMap(t -> t.getWeights().getFeatures().entrySet().stream())
+//					.collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue()));
+//
+//			double modelWeightsDiff = computeThreshold(currentModelWeights, lastModelWeights);
+//			Score a = new Score();
+//			NerlaEvaluator eval = new NerlaEvaluator(EEvaluationDetail.ENTITY_TYPE);
+//			for (Entry<Instance, State> e : finalStates.entrySet()) {
+//
+//				List<EntityTemplate> goldAnnotations = e.getValue().getGoldAnnotations().getAnnotations();
+//				List<EntityTemplate> predictedAnnotations = e.getValue().getCurrentPredictions().getAnnotations();
+//
+//				List<Integer> bestAssignment = ((CartesianEvaluator) predictionObjectiveFunction.getEvaluator())
+//						.getBestAssignment(goldAnnotations, predictedAnnotations);
+//				Score score = simpleEvaluate(false, eval, bestAssignment, goldAnnotations, predictedAnnotations);
+//				a.add(score);
+//
+//			}
+//
+//			Score s = new Score();
+//			for (Entry<Instance, State> e : predict(testInstances, new MaxChainLengthCrit(10)).entrySet()) {
+//
+//				List<EntityTemplate> goldAnnotations = e.getValue().getGoldAnnotations().getAnnotations();
+//				List<EntityTemplate> predictedAnnotations = e.getValue().getCurrentPredictions().getAnnotations();
+//
+//				List<Integer> bestAssignment = ((CartesianEvaluator) predictionObjectiveFunction.getEvaluator())
+//						.getBestAssignment(goldAnnotations, predictedAnnotations);
+//				Score score = simpleEvaluate(false, eval, bestAssignment, goldAnnotations, predictedAnnotations);
+//				s.add(score);
+//
+//			}
+//			log.info("DIFF\t" + modelWeightsDiff + "\t" + s.getF1() + "\t" + s.getPrecision() + "\t" + s.getRecall()
+//					+ "\t" + a.getF1() + "\t" + a.getPrecision() + "\t" + a.getRecall());
+//			if (modelWeightsDiff < 0.01)
+//				break;
+
 			if (meetsTrainingStoppingCriterion(trainingStoppingCrits, finalStates))
 				break;
+
+//			lastModelWeights = currentModelWeights;
 
 		}
 		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 
 		return finalStates;
+	}
+
+	private Score simpleEvaluate(boolean print, NerlaEvaluator evaluator, List<Integer> bestAssignment,
+			List<EntityTemplate> goldAnnotations, List<EntityTemplate> predictedAnnotationsBaseline) {
+		Score simpleScore = new Score();
+
+		for (int goldIndex = 0; goldIndex < bestAssignment.size(); goldIndex++) {
+			final int predictIndex = bestAssignment.get(goldIndex);
+			/*
+			 * Treatments
+			 */
+			List<AbstractAnnotation> goldTreatments = new ArrayList<>(
+					goldAnnotations.get(goldIndex).getMultiFillerSlot("hasTreatmentType").getSlotFiller());
+
+			List<AbstractAnnotation> predictTreatments = new ArrayList<>(predictedAnnotationsBaseline.get(predictIndex)
+					.getMultiFillerSlot("hasTreatmentType").getSlotFiller());
+			Score s;
+			if (goldTreatments.isEmpty() && predictTreatments.isEmpty())
+				s = new Score(1, 0, 0);
+			else
+				s = evaluator.prf1(goldTreatments, predictTreatments);
+
+			simpleScore.add(s);
+			/*
+			 * OrganismModel
+			 */
+			List<AbstractAnnotation> goldOrganismModel = Arrays
+					.asList(goldAnnotations.get(goldIndex).getSingleFillerSlot("hasOrganismModel").getSlotFiller())
+					.stream().filter(a -> a != null).collect(Collectors.toList());
+			List<AbstractAnnotation> predictOrganismModel = Arrays.asList(predictedAnnotationsBaseline.get(predictIndex)
+					.getSingleFillerSlot("hasOrganismModel").getSlotFiller()).stream().filter(a -> a != null)
+					.collect(Collectors.toList());
+
+			simpleScore.add(evaluator.prf1(goldOrganismModel, predictOrganismModel));
+
+			/*
+			 * InjuryModel
+			 */
+			List<AbstractAnnotation> goldInjuryModel = Arrays
+					.asList(goldAnnotations.get(goldIndex).getSingleFillerSlot("hasInjuryModel").getSlotFiller())
+					.stream().filter(a -> a != null).collect(Collectors.toList());
+			List<AbstractAnnotation> predictInjuryModel = Arrays.asList(predictedAnnotationsBaseline.get(predictIndex)
+					.getSingleFillerSlot("hasInjuryModel").getSlotFiller()).stream().filter(a -> a != null)
+					.collect(Collectors.toList());
+
+			simpleScore.add(evaluator.prf1(goldInjuryModel, predictInjuryModel));
+
+		}
+
+		return simpleScore;
+	}
+
+	private double computeThreshold(Map<Integer, Double> currentModelWeights, Map<Integer, Double> lastModelWeights) {
+		double diff = 0;
+		for (Integer currentKey : currentModelWeights.keySet()) {
+			if (lastModelWeights.containsKey(currentKey)) {
+				diff += Math.abs(lastModelWeights.get(currentKey) - currentModelWeights.get(currentKey));
+			} else {
+				diff += currentModelWeights.get(currentKey);
+			}
+		}
+		for (Integer currentKey : lastModelWeights.keySet()) {
+			if (!currentModelWeights.containsKey(currentKey)) {
+				diff += lastModelWeights.get(currentKey);
+			}
+		}
+
+		return diff;
 	}
 
 	private boolean meetsSamplingStoppingCriterion(ISamplingStoppingCriterion[] stoppingCriterion,
@@ -353,6 +464,9 @@ public class SemanticParsingCRF {
 		objectiveFunction.score(s);
 		return s;
 	}
+
+	private final IObjectiveFunction predictionObjectiveFunction = new SlotFillingObjectiveFunction(
+			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
 
 	private void compare(State currentState, State candidateState) {
 

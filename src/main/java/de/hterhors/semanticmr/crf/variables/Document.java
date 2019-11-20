@@ -174,12 +174,24 @@ public class Document {
 		return "Document [documentID=" + documentID + "]";
 	}
 
-	public DocumentToken getTokenByCharOffset(Integer offset) throws DocumentLinkedAnnotationMismatchException {
-		final DocumentToken token = startOffsetCharPositionTokens.getOrDefault(offset,
-				endOffsetCharPositionTokens.get(offset));
+	public DocumentToken getTokenByCharStartOffset(Integer offset) throws DocumentLinkedAnnotationMismatchException {
+
+		final DocumentToken token = startOffsetCharPositionTokens.get(offset);
+
 		if (token == null) {
 			throw new DocumentLinkedAnnotationMismatchException(
-					"Can not map charachter offset: " + offset + " to token in document: " + documentID);
+					"Can not map start charachter offset: " + offset + " to token in document: " + documentID);
+		}
+		return token;
+	}
+
+	public DocumentToken getTokenByCharEndOffset(Integer offset) throws DocumentLinkedAnnotationMismatchException {
+
+		final DocumentToken token = endOffsetCharPositionTokens.get(offset);
+
+		if (token == null) {
+			throw new DocumentLinkedAnnotationMismatchException(
+					"Can not map end charachter offset: " + offset + " to token in document: " + documentID);
 		}
 		return token;
 	}
