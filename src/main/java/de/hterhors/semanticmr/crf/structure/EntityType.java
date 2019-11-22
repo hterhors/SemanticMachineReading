@@ -193,18 +193,19 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 
 	/**
 	 * Returns a set of all entities that are either sub* or super* entities of this
-	 * entity.
+	 * entity. includes this entity itself.
 	 * 
 	 * @return
 	 */
 	public Set<EntityType> getHierarchicalEntityTypes() {
 		if (relatedEntityTypes == null) {
-			relatedEntityTypes = Collections.unmodifiableSet(Stream
+			relatedEntityTypes = Stream
 					.concat(this.transitiveClosureSubEntityTypeNames.stream(),
 							this.transitiveClosureSuperEntityTypeNames.stream())
-					.map(slotTypeName -> EntityType.get(slotTypeName)).sorted().collect(Collectors.toSet()));
+					.map(slotTypeName -> EntityType.get(slotTypeName)).sorted().collect(Collectors.toSet());
+			relatedEntityTypes.add(this);
 		}
-		return relatedEntityTypes;
+		return Collections.unmodifiableSet(relatedEntityTypes);
 	}
 
 	private final static Map<String, EntityType> entityTypeFactory = new HashMap<>();
