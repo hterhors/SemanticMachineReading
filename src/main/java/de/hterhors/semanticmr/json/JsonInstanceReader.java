@@ -54,7 +54,6 @@ final private 	Collection<ModifyGoldRule> modifyGoldRules;
 				log.debug(" - " + count + " - ");
 			}
 			List<JsonInstanceWrapper> jsonInstances = new JsonInstanceIO(true).readInstances(jsonFile);
-
 			trainingInstances.addAll(new JsonInstanceWrapperToInstance(jsonInstances).convertToInstances(modifyGoldRules));
 		}
 		log.info("Read instances... done");

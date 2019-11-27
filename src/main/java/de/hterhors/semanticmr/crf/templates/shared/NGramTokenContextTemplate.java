@@ -170,7 +170,8 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 					factor.getFactorScope().entityType, beginToken.getDocTokenIndex(), endToken.getDocTokenIndex());
 
 		} catch (Exception e) {
-//			System.out.println("WARN! " + e.getMessage());
+			e.printStackTrace();
+			System.out.println("WARN! " + e.getMessage());
 		}
 	}
 

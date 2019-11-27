@@ -2,6 +2,7 @@ package de.hterhors.semanticmr.crf.variables;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 
 import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;

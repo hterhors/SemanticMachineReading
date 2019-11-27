@@ -24,6 +24,10 @@ import de.hterhors.semanticmr.crf.variables.State;
  */
 public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledScope> {
 
+	public SlotIsFilledTemplate() {
+		super(false);
+	}
+
 	static class SlotIsFilledScope extends AbstractFactorScope {
 
 		final EntityType entityTemplateType;
@@ -84,6 +88,12 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 			return false;
 		}
 
+		@Override
+		public String toString() {
+			return "SlotIsFilledScope [entityTemplateType=" + entityTemplateType.entityName + ", slot=" + slot.slotName
+					+ ", numberOfSlotFiller=" + numberOfSlotFiller + "]";
+		}
+
 	}
 
 	private static final String PREFIX = "SIFT\t";
@@ -110,7 +120,7 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 	public void generateFeatureVector(Factor<SlotIsFilledScope> factor) {
 
 		DoubleVector featureVector = factor.getFeatureVector();
-
+		
 		EntityType entity = factor.getFactorScope().entityTemplateType;
 		add(factor, featureVector, entity);
 

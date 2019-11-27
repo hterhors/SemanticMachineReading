@@ -119,7 +119,7 @@ public class SemanticParsingCRF {
 //				new ISamplingStoppingCriterion[] {});
 //	}
 
-	public Map<Instance, State> train(final AdvancedLearner learner, final List<Instance> trainingInstances,
+	public Map<Instance, State> train(final AdvancedLearner learner, List<Instance> trainingInstances,
 			final int numberOfEpochs, final ITrainingStoppingCriterion[] trainingStoppingCrits,
 			final ISamplingStoppingCriterion[] samplingStoppingCrits) {
 
@@ -131,8 +131,10 @@ public class SemanticParsingCRF {
 		final Map<Instance, State> finalStates = new LinkedHashMap<>();
 //		Map<Integer, Double> lastModelWeights = new HashMap<>();
 
-		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
+		trainingInstances = new ArrayList<>(trainingInstances);
 
+//		Collections.sort(trainingInstances);
+		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
 			log.info("############");
 			log.info("# Epoch: " + (epoch + 1) + " #");
 			log.info("############");
@@ -171,7 +173,6 @@ public class SemanticParsingCRF {
 								currentState);
 
 						model.updateWeights(learner, currentState, candidateState);
-
 						if (isAccepted) {
 							currentState = candidateState;
 						}
@@ -233,6 +234,7 @@ public class SemanticParsingCRF {
 				break;
 
 //			lastModelWeights = currentModelWeights;
+//			Collections.shuffle(trainingInstances);
 
 		}
 		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();

@@ -194,6 +194,7 @@ public class SantoRDFConverter {
 			if (slot.isSingleValueSlot()) {
 				if (slotFillers.size() > 1) {
 					System.out.println("WARN! Multiple slot filler detected for single filler slot: " + slot);
+					System.out.println("WARN! Apply strategy: \"Take first.\"" );
 				}
 				final AbstractAnnotation slotFiller = slotFillers.get(0);
 				object.getSingleFillerSlot(slot).set(slotFiller);

@@ -34,7 +34,7 @@ public class DoubleVector {
 
 	}
 
-	private void set(Integer index, Double value) {
+	private void setForceZero(Integer index, Double value) {
 		if (value.doubleValue() != 0.0) {
 			features.put(index, value);
 		} else {
@@ -44,16 +44,14 @@ public class DoubleVector {
 	}
 
 	public void set(String feature, Double value) {
+		if (value == 0.0D)
+			return;
 		final Integer index = Model.getIndexForFeatureName(feature);
-		set(index, value);
+		setForceZero(index, value);
 	}
 
 	public void set(String feature, boolean flag) {
 		set(feature, flag ? DEFAULT_VALUE_ONE : DEFAULT_VALUE_ZERO);
-	}
-
-	public void set(String feature, int value) {
-		set(feature, Double.valueOf(value));
 	}
 
 	/**
@@ -73,7 +71,7 @@ public class DoubleVector {
 
 	private void addToValue(Integer feature, double alpha) {
 		Double featureValue = getValueOfFeature(feature);
-		set(feature, new Double(featureValue.doubleValue() + alpha));
+		setForceZero(feature, new Double(featureValue.doubleValue() + alpha));
 	}
 
 	/*
@@ -109,7 +107,7 @@ public class DoubleVector {
 
 	public void mul(double f) {
 		for (Entry<Integer, Double> feature : features.entrySet()) {
-			set(feature.getKey(), feature.getValue() * f);
+			setForceZero(feature.getKey(), feature.getValue() * f);
 		}
 		this.isDirty = true;
 
@@ -147,7 +145,7 @@ public class DoubleVector {
 		double length = length();
 		if (length > 0) {
 			for (Entry<Integer, Double> feature : features.entrySet()) {
-				set(feature.getKey(), feature.getValue() / length);
+				setForceZero(feature.getKey(), feature.getValue() / length);
 			}
 		}
 	}

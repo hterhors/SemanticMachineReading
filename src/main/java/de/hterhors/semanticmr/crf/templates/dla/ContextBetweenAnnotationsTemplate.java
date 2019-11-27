@@ -210,6 +210,7 @@ public class ContextBetweenAnnotationsTemplate extends AbstractFeatureTemplate<C
 			if (tokens.size() > 2)
 				getTokenNgrams(featureVector, fromEntityType, toEntityType, tokens);
 		} catch (DocumentLinkedAnnotationMismatchException e) {
+			e.printStackTrace();
 			System.out.println("WARN! " + e.getMessage());
 
 		}

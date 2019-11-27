@@ -61,7 +61,7 @@ public class InstanceProvider {
 	final private List<Instance> redistTrainInstances = new ArrayList<>();
 	final private List<Instance> redistDevInstances = new ArrayList<>();
 	final private List<Instance> redistTestInstances = new ArrayList<>();
-	public static boolean verbose = true;
+	public static boolean verbose = false;
 	private IInstanceDistributor distributor;
 
 	/**
@@ -211,29 +211,29 @@ public class InstanceProvider {
 			Instance instance = iterator.next();
 			if (instance.getGoldAnnotations().getAnnotations().isEmpty()) {
 				if (verbose)
-					log.warn("Instance " + instance.getName() + " has no annotations!");
+					log.debug("Instance " + instance.getName() + " has no annotations!");
 				if (removeEmptyInstances) {
 					iterator.remove();
 					if (verbose)
-						log.warn("Remove instance!");
+						log.debug("Remove instance!");
 				} else {
 					if (verbose)
-						log.warn("Keep instance!");
+						log.debug("Keep instance!");
 				}
 			}
 
 			if (instance.getGoldAnnotations().getAnnotations().size() >= maxNumberOfAnnotations) {
 				if (verbose)
-					log.warn("WARN: Instance " + instance.getName() + " has to many annotations: "
+					log.debug("WARN: Instance " + instance.getName() + " has to many annotations: "
 							+ instance.getGoldAnnotations().getAnnotations().size() + " max number: "
 							+ maxNumberOfAnnotations + "!");
 				if (removeInstancesWithToManyAnnotations) {
 					iterator.remove();
 					if (verbose)
-						log.warn("Remove instance!");
+						log.debug("Remove instance!");
 				} else {
 					if (verbose)
-						log.warn("Keep instance!");
+						log.debug("Keep instance!");
 				}
 			}
 

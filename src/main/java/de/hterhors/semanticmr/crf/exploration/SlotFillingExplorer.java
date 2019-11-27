@@ -159,9 +159,12 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 			ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
 			int annotationIndex) {
 
-		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
+		for (SlotType slotType : entityTemplate.getMultiFillerSlots().keySet()) {
 
-			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slot)) {
+			if (slotType.excludeFromExploration)
+				continue;
+
+			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slotType)) {
 
 				/*
 				 * Do no add itself
@@ -169,18 +172,19 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				if (slotFillerCandidate == entityTemplate)
 					continue;
 
-				if (entityTemplate.getMultiFillerSlot(slot).containsSlotFiller(objectiveFunction, slotFillerCandidate))
+				if (entityTemplate.getMultiFillerSlot(slotType).containsSlotFiller(objectiveFunction,
+						slotFillerCandidate))
 					continue;
 
 				if (slotFillerCandidate.getEntityType().hasNoSlots() && slotFillerCandidate instanceof EntityTemplate) {
 					continue;
 				}
 
-				for (AbstractAnnotation slotFiller : entityTemplate.getMultiFillerSlot(slot).getSlotFiller()) {
+				for (AbstractAnnotation slotFiller : entityTemplate.getMultiFillerSlot(slotType).getSlotFiller()) {
 
 					final EntityTemplate deepCopy = entityTemplate.deepCopy();
 
-					deepCopy.updateMultiFillerSlot(objectiveFunction, slot, slotFiller, slotFillerCandidate);
+					deepCopy.updateMultiFillerSlot(objectiveFunction, slotType, slotFiller, slotFillerCandidate);
 
 					if (violatesConstraints(deepCopy))
 						continue;
@@ -196,13 +200,11 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 			int annotationIndex) {
 
 		for (SlotType slot : entityTemplate.getMultiFillerSlots().keySet()) {
-//			if (slot == SlotType.get("hasLocation") && currentState.getInstance().getName().startsWith("N173"))
-//				System.out.println("halt stop");
+
+			if (slot.excludeFromExploration)
+				continue;
 
 			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slot)) {
-//				System.out.println(slotFillerCandidate);
-//				if(slot == SlotType.get("hasLocation") && currentState.getInstance().getName().startsWith("N173") && slotFillerCandidate.getEntityType() == EntityType.get("VeinLocation"))
-//					System.out.println("STOP");
 				/*
 				 * Do not add if maximum number of fillers is reached.
 				 */
@@ -238,17 +240,17 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 	private void deleteSingleFiller(final List<State> entityTemplates, State currentState,
 			EntityTemplate entityTemplate, int annotationIndex) {
-		for (SlotType slot : entityTemplate.getSingleFillerSlots().keySet()) {
+		for (SlotType slotType : entityTemplate.getSingleFillerSlots().keySet()) {
 
-			if (slot.excludeFromExploration)
+			if (slotType.excludeFromExploration)
 				continue;
 
 			final EntityTemplate deepCopy = entityTemplate.deepCopy();
 
-			if (!entityTemplate.getSingleFillerSlot(slot).containsSlotFiller())
+			if (!entityTemplate.getSingleFillerSlot(slotType).containsSlotFiller())
 				continue;
 
-			deepCopy.getSingleFillerSlot(slot).clear();
+			deepCopy.getSingleFillerSlot(slotType).clear();
 			if (violatesConstraints(deepCopy))
 				continue;
 
@@ -261,6 +263,10 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 			int annotationIndex) {
 
 		for (SlotType slotType : entityTemplate.getSingleFillerSlots().keySet()) {
+
+			if (slotType.excludeFromExploration)
+				continue;
+
 			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slotType)) {
 				/*
 				 * Do no add itself

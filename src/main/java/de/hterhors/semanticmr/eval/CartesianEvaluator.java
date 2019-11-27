@@ -46,13 +46,6 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		}
 	}
 
-	public static void main(String[] args) {
-		for (Collection<List<Integer>> string : permutationCache) {
-			string.forEach(System.out::println);
-			System.out.println("--------------");
-		}
-	}
-
 	private static Stream<List<Integer>> getPermutationStream(final int size) {
 
 		if (permutationCache.length <= size)
@@ -82,12 +75,14 @@ public class CartesianEvaluator extends AbstractEvaluator {
 				break;
 			}
 		}
-		for (AbstractAnnotation abstractAnnotation : otherAnnotations) {
-			if (!abstractAnnotation.isInstanceOfDocumentLinkedAnnotation()) {
-				docLinked = false;
-				break;
+		if (docLinked)
+			for (AbstractAnnotation abstractAnnotation : otherAnnotations) {
+				if (!abstractAnnotation.isInstanceOfDocumentLinkedAnnotation()) {
+					docLinked = false;
+					break;
+				}
 			}
-		}
+
 		if (docLinked)
 			bestScore = stdEvalForDocLinked.prf1(annotations, otherAnnotations);
 		else

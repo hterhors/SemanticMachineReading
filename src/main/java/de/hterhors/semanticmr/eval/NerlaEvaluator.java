@@ -21,6 +21,7 @@ public class NerlaEvaluator extends AbstractEvaluator {
 	public Score prf1(EEvaluationDetail evaluationDetail, Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations) {
 //		System.out.println("annotations.size(): " + annotations.size());
+//		System.out.println(annotations);
 //		System.out.println("otherAnnotations.size(): " + otherAnnotations.size());
 //		System.out.println(otherAnnotations);
 		int tp = 0;

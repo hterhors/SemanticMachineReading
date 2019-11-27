@@ -87,7 +87,11 @@ public class FactorGraph {
 
 	public List<Factor> getUnCachedFactors() {
 
-		List<Factor> factors = factorScopes.parallelStream().map(fs -> new Factor(fs)).collect(Collectors.toList());
+		List<Factor> factors = new ArrayList<>();
+
+		for (AbstractFactorScope fs : factorScopes) {
+			factors.add(new Factor(fs));
+		}
 
 		factors.parallelStream().forEach(f -> this.template.generateFeatureVector(f));
 		return factors;

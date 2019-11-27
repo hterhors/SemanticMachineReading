@@ -47,7 +47,7 @@ public class RegularExpressionNerlAnnotator {
 		Map<EntityType, Set<DocumentLinkedAnnotation>> annotationMap = new HashMap<>();
 
 		pattern.keySet().stream().forEach(k -> annotationMap.put(k, new HashSet<>()));
-		
+
 		pattern.keySet().stream().forEach(entityType -> {
 
 			Set<DocumentLinkedAnnotation> annotations = annotationMap.get(entityType);
@@ -76,7 +76,7 @@ public class RegularExpressionNerlAnnotator {
 									entityType.entityName, text, offset);
 							annotations.add(docLinkedAnnotation);
 						} catch (Exception e) {
-							System.out.println("WARN:" + entityType.entityName + "-" + text + "-" + offset + ":"
+							log.warn("WARN:" + entityType.entityName + "-" + text + "-" + offset + ":"
 									+ e.getMessage().substring(e.getMessage().indexOf(':')));
 						}
 
@@ -91,7 +91,7 @@ public class RegularExpressionNerlAnnotator {
 //					+ entityType.entityName);
 		});
 
-		System.out.println(
+		log.info(
 				"Found " + annotationMap.values().stream().flatMap(v -> v.stream()).count() + " annotations in total!");
 
 		return Collections.unmodifiableMap(annotationMap);

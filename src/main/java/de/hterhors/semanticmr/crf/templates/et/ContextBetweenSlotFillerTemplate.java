@@ -226,7 +226,7 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 					.getTokenByCharStartOffset(factor.getFactorScope().fromEntityCharacterOnset).getDocTokenIndex();
 
 			final int toTokenIndex = factor.getFactorScope().instance.getDocument()
-					.getTokenByCharEndOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
+					.getTokenByCharStartOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
 
 			if (toTokenIndex - fromTokenIndex > MAX_TOKEN_DIST)
 				return;
@@ -251,6 +251,7 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 				}
 			}
 		} catch (DocumentLinkedAnnotationMismatchException e) {
+			e.printStackTrace();
 			System.out.println("WARN! " + e.getMessage());
 
 		}

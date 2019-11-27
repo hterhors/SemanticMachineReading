@@ -337,7 +337,7 @@ public class Model {
 	private static Model toModel(SerializableModelWrapper modelWrapper, File modelBaseDir, String modelName) {
 
 		Model model = new Model(
-				modelWrapper.templates.stream().map(t -> toAbstractFeaturetemplate(t)).collect(Collectors.toList()));
+				modelWrapper.templates.stream().map(t -> toAbstractFeatureTemplate(t)).collect(Collectors.toList()));
 		model.isTrained = true;
 
 		return model;
@@ -352,7 +352,7 @@ public class Model {
 		}
 	}
 
-	private static AbstractFeatureTemplate toAbstractFeaturetemplate(final GenericTemplate t) {
+	private static AbstractFeatureTemplate toAbstractFeatureTemplate(final GenericTemplate t) {
 		try {
 			final AbstractFeatureTemplate template = (AbstractFeatureTemplate) Class
 					.forName(t.packageName + "." + t.templateName).newInstance();
