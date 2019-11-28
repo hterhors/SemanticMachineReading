@@ -216,4 +216,29 @@ public class Document {
 		return sentencesByIndex.values();
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((documentID == null) ? 0 : documentID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Document other = (Document) obj;
+		if (documentID == null) {
+			if (other.documentID != null)
+				return false;
+		} else if (!documentID.equals(other.documentID))
+			return false;
+		return true;
+	}
+
 }

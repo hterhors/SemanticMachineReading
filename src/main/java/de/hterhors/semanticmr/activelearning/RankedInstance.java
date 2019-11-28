@@ -4,8 +4,8 @@ import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class RankedInstance implements Comparable<RankedInstance> {
 
-	protected final double value;
-	protected Instance instance;
+	public final double value;
+	public Instance instance;
 
 	public RankedInstance(double value, Instance instance) {
 		this.value = value;

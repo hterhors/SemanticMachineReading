@@ -78,7 +78,7 @@ public class SemanticParsingCRF {
 	private static final String TRAIN_CONTEXT = "===========TRAIN============\n";
 	private static final String TEST_CONTEXT = "===========TEST============\n";
 
-	final List<IExplorationStrategy> explorerList;
+	public final List<IExplorationStrategy> explorerList;
 
 	final Model model;
 
@@ -370,6 +370,11 @@ public class SemanticParsingCRF {
 				.collect(Collectors.toMap(m -> m.getKey(), m -> m.getValue().get(0)));
 	}
 
+	public Map<Instance, List<State>> collectNBestStates(List<Instance> instancesToPredict, final int n,
+			ISamplingStoppingCriterion... stoppingCriterion) {
+		return predictP(this.model, instancesToPredict, n, stoppingCriterion);
+	}
+
 	private Map<Instance, List<State>> predictP(Model model, List<Instance> instancesToPredict, final int n,
 			ISamplingStoppingCriterion... stoppingCriterion) {
 		this.testStatistics = new CRFStatistics("Test");
@@ -626,6 +631,10 @@ public class SemanticParsingCRF {
 
 	public String getModelName() {
 		return model.getName();
+	}
+
+	public void scoreWithModel(List<State> nextStates) {
+		this.model.score(nextStates);
 	}
 
 }

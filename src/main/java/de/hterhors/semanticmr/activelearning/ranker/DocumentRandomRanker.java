@@ -11,13 +11,13 @@ import org.apache.logging.log4j.Logger;
 import de.hterhors.semanticmr.activelearning.IActiveLearningDocumentRanker;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
-public class FullDocumentRandomRanker implements IActiveLearningDocumentRanker {
+public class DocumentRandomRanker implements IActiveLearningDocumentRanker {
 
 	final Logger log = LogManager.getRootLogger();
 
 	final Random random;
 
-	public FullDocumentRandomRanker() {
+	public DocumentRandomRanker() {
 		random = new Random(123456L);
 //		random = ((ActiveLearningDistributor) runner.getParameter().corpusDistributor).random;
 	}

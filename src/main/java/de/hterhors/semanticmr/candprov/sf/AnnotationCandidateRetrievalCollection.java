@@ -39,6 +39,10 @@ public class AnnotationCandidateRetrievalCollection {
 	 */
 	final private List<Instance> instances;
 
+	public List<Instance> getInstances() {
+		return instances;
+	}
+
 	/**
 	 * Initialize this collections with a list of possible instances.
 	 * 
@@ -112,7 +116,6 @@ public class AnnotationCandidateRetrievalCollection {
 	 * @return
 	 */
 	public List<IEntityTypeAnnotationCandidateProvider> getEntityTypeCandidateProvider(Instance relatedInstance) {
-
 		final List<IEntityTypeAnnotationCandidateProvider> list = entityTypeCandidateProvider.get(relatedInstance);
 
 		if (list == null)

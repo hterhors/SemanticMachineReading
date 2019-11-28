@@ -40,6 +40,15 @@ public class State {
 		this.objectiveScore = DEFAULT_OBJECTIVE_SCORE;
 	}
 
+	public State(State value) {
+
+		this.instance = value.instance;
+		this.currentPredictions = value.currentPredictions.deepCopy();
+		this.factorGraphs = value.factorGraphs;
+		this.modelScore = value.modelScore;
+		this.objectiveScore = value.objectiveScore;
+	}
+
 	public State deepAddCopy(AbstractAnnotation newCurrentPrediction) {
 		return new State(this.instance, currentPredictions.deepAddCopy(newCurrentPrediction));
 	}

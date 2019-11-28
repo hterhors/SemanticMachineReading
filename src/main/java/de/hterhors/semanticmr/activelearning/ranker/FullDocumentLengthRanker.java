@@ -9,35 +9,32 @@ import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.obie.ml.run.AbstractOBIERunner;
-import de.hterhors.obie.ml.variables.OBIEInstance;
 import de.hterhors.semanticmr.activelearning.IActiveLearningDocumentRanker;
+import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class FullDocumentLengthRanker implements IActiveLearningDocumentRanker {
 
 	final Logger log = LogManager.getRootLogger();
 
 	final Random random;
-	final AbstractOBIERunner runner;
 
-	public FullDocumentLengthRanker(AbstractOBIERunner runner) {
+	public FullDocumentLengthRanker() {
 		random = new Random();
-//		random = ((ActiveLearningDistributor) runner.getParameter().corpusDistributor).random;
-		this.runner = runner;
 	}
 
-	public static final Comparator<OBIEInstance> COMPARE_BY_LENGTH = new Comparator<OBIEInstance>() {
+	public static final Comparator<Instance> COMPARE_BY_LENGTH = new Comparator<Instance>() {
 		@Override
-		public int compare(OBIEInstance o1, OBIEInstance o2) {
-			return Integer.compare(o1.getContent().length(), o2.getContent().length());
+		public int compare(Instance o1, Instance o2) {
+			return Integer.compare(o1.getDocument().documentContent.length(),
+					o2.getDocument().documentContent.length());
 		}
 	};
 
 	@Override
-	public List<OBIEInstance> rank(List<OBIEInstance> remainingInstances) {
+	public List<Instance> rank(List<Instance> remainingInstances) {
 		log.info("Apply random rank...");
 		log.info("Copy...");
-		List<OBIEInstance> byLength = new ArrayList<>(remainingInstances);
+		List<Instance> byLength = new ArrayList<>(remainingInstances);
 
 //		List<RankedInstance> objectiveInstances = new ArrayList<>();
 //

@@ -135,6 +135,16 @@ public class Annotations {
 		return new Annotations(updatedList);
 	}
 
+	public Annotations deepCopy() {
+
+		final List<AbstractAnnotation> deepCopyList = new ArrayList<>(annotations.size());
+		for (int index = 0; index < annotations.size(); index++) {
+			deepCopyList.add(annotations.get(index).deepCopy());
+		}
+
+		return new Annotations(deepCopyList);
+	}
+
 	@Override
 	public String toString() {
 		return "Annotations [annotations="
