@@ -1,9 +1,12 @@
 package de.hterhors.semanticmr.eval;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Random;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
@@ -11,6 +14,24 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 public class BeamSearchEvaluator extends AbstractEvaluator {
 
 	final public int beamSize;
+
+	public static void main(String[] args) {
+
+		int maxSize = 100;
+		Score[][] scores = new Score[maxSize][maxSize];
+		Random rand = new Random(2);
+
+		for (int i = 0; i < scores.length; i++) {
+			for (int j = 0; j < scores[i].length; j++) {
+				scores[i][j] = new Score(rand.nextInt(5), rand.nextInt(5), rand.nextInt(5));
+				System.out.println(i + "," + j + " = " + scores[i][j]);
+			}
+		}
+
+		BeamSearchEvaluator f = new BeamSearchEvaluator(EEvaluationDetail.ENTITY_TYPE, 1);
+
+		System.out.println(f.beamSearchDecoder(maxSize, scores));
+	}
 
 	public BeamSearchEvaluator(EEvaluationDetail evaluationMode, final int beamSize) {
 		super(evaluationMode);
@@ -20,217 +41,163 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 	@Override
 	public Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations) {
+		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
-		final List<BeamAssignmentTree> assignments = new ArrayList<>();
+		/*
+		 * Init scores
+		 */
+		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
 
-		assignments.add(new BeamAssignmentTree(new ArrayList<>(annotations), new ArrayList<>(otherAnnotations)));
-
-		final BeamAssignmentTree bestAssignments = beamExploration(assignments).get(0);
-
-		return bestAssignments.overallSimiliarity;
+		return beamSearchDecoder(maxSize, scores);
 	}
 
-	/**
-	 * TODO: make faster by pre calculate all scores and access score[][]
-	 * 
-	 * 
-	 * @param states
-	 * @return
-	 */
-	private List<BeamAssignmentTree> beamExploration(final List<BeamAssignmentTree> states) {
+	public Score beamSearchDecoder(final int maxSize, final Score[][] scores) {
+		/*
+		 * Init beam
+		 */
+		List<Assignment> assignments = new ArrayList<>();
 
-		final List<BeamAssignmentTree> candidates = new ArrayList<>();
+		for (int from = 0; from < scores.length; from++) {
+			for (int to = 0; to < scores[from].length; to++) {
+				assignments.add(new Assignment(maxSize, from, to, scores[from][to]));
+			}
+		}
 
-		boolean done = true;
+		Collections.sort(assignments);
 
-		for (BeamAssignmentTree current : states) {
+		Assignment bestAssignment = beamSearchAssignment(scores,
+				assignments.subList(0, Math.min(assignments.size(), beamSize)));
 
-			if (current.checkBreakCondition())
-				continue;
+		return bestAssignment.score;
+	}
 
-			done = false;
+	private Assignment beamSearchAssignment(Score[][] scores, List<Assignment> assignments) {
+		List<Assignment> newAssignment = new ArrayList<>();
 
-			final int maxSize = Math.max(current.remainingGold.size(), current.remainingPrediction.size());
+		for (Assignment assignment : assignments) {
 
-			for (int goldListIndex = 0; goldListIndex < maxSize; goldListIndex++) {
+			for (int from = 0; from < scores.length; from++) {
+				if (assignment.from[from])
+					continue;
+				for (int to = 0; to < scores[from].length; to++) {
+					if (assignment.to[to])
+						continue;
 
-				/*
-				 * Get gold object if any, otherwise empty instance.
-				 */
-				final AbstractAnnotation goldThing;
-				if (current.remainingGold.size() > goldListIndex)
-					goldThing = current.remainingGold.get(goldListIndex);
-				else
-					goldThing = null;
+					Assignment newAssignemnt = new Assignment(assignment);
 
-				for (int predictionListIndex = 0; predictionListIndex < maxSize; predictionListIndex++) {
+					newAssignemnt.addAssignment(from, to, scores[from][to]);
 
-					/*
-					 * Get prediction object if any, otherwise empty instance.
-					 */
-					final AbstractAnnotation predThing;
-
-					if (current.remainingPrediction.size() > predictionListIndex)
-						predThing = current.remainingPrediction.get(predictionListIndex);
-					else
-						predThing = null;
-
-					/*
-					 * Clone
-					 */
-					BeamAssignmentTree candidate = new BeamAssignmentTree(current);
-
-					/*
-					 * Score
-					 */
-					Score similarity;
-					if (goldThing == null) {
-						similarity = scoreSingle(predThing, goldThing).invert();
-					} else {
-						similarity = scoreSingle(goldThing, predThing);
-					}
-
-					/*
-					 * Add assignment to assignment list in tree.
-					 */
-					candidate.addAssignment(new BeamAssignment(goldThing, predThing, similarity));
-
-					/*
-					 * Add candidate to possible successor.
-					 */
-					candidates.add(candidate);
-
+					newAssignment.add(newAssignemnt);
 				}
 			}
 
 		}
 
-		if (done)
-			return states;
-
-		final List<BeamAssignmentTree> successorStates = candidates.stream().sorted().limit(beamSize)
-				.collect(Collectors.toList());
-
-		return beamExploration(successorStates);
-
-	}
-
-	class BeamAssignmentTree implements Comparable<BeamAssignmentTree> {
-
-		final private List<BeamAssignment> assignments;
-		final private List<AbstractAnnotation> remainingGold;
-		final private List<AbstractAnnotation> remainingPrediction;
-		final public Score overallSimiliarity;
-
-		/**
-		 * Initial.
-		 * 
-		 * @param assignments
-		 * @param gold
-		 * @param prediction
-		 */
-		public BeamAssignmentTree(List<AbstractAnnotation> gold, List<AbstractAnnotation> prediction) {
-			this.assignments = new ArrayList<>();
-			this.remainingGold = gold;
-			this.remainingPrediction = prediction;
-			this.overallSimiliarity = new Score();
+		if (newAssignment.isEmpty()) {
+			return assignments.get(0);
 		}
 
-		/**
-		 * Clone.
-		 * 
-		 * @param tree
+		Collections.sort(newAssignment);
+
+		return beamSearchAssignment(scores, newAssignment.subList(0, Math.min(assignments.size(), beamSize)));
+	}
+
+	static class Assignment implements Comparable<Assignment> {
+
+		public final Score score;
+		public final boolean[] from;
+		public final boolean[] to;
+		private final int maxSize;
+
+		/*
+		 * Clone
 		 */
-		public BeamAssignmentTree(BeamAssignmentTree tree) {
-			this.assignments = new ArrayList<>(tree.assignments);
-			this.remainingGold = new ArrayList<>(tree.remainingGold);
-			this.remainingPrediction = new ArrayList<>(tree.remainingPrediction);
-			this.overallSimiliarity = new Score(tree.overallSimiliarity);
+		public Assignment(Assignment assignments) {
+			this.maxSize = assignments.maxSize;
+			this.score = new Score(assignments.score);
+			this.from = Arrays.copyOf(assignments.from, assignments.maxSize);
+			this.to = Arrays.copyOf(assignments.to, assignments.maxSize);
+		}
+
+		/*
+		 * Init
+		 */
+		public Assignment(int maxSize, int from, int to, Score score) {
+			this.maxSize = maxSize;
+			this.score = score;
+			this.from = new boolean[maxSize];
+			this.to = new boolean[maxSize];
+			this.from[from] = true;
+			this.to[to] = true;
+		}
+
+		public void addAssignment(int from, int to, Score score) {
+			this.score.add(score);
+			this.from[from] = true;
+			this.to[to] = true;
 		}
 
 		@Override
-		public int compareTo(BeamAssignmentTree o) {
-			return -Double.compare(overallSimiliarity.getF1(), o.overallSimiliarity.getF1());
-		}
-
-		public void addAssignment(BeamAssignment beamAssignment) {
-			this.assignments.add(beamAssignment);
-			this.remainingGold.remove(beamAssignment.gold);
-			this.remainingPrediction.remove(beamAssignment.pred);
-			this.overallSimiliarity.add(beamAssignment.similiarity);
-		}
-
-		public boolean checkBreakCondition() {
-			return remainingGold.size() == 0 && remainingPrediction.size() == 0;
+		public int compareTo(Assignment o) {
+			/*
+			 * Highest first
+			 */
+			return -Double.compare(this.score.getF1(), o.score.getF1());
 		}
 
 		@Override
 		public String toString() {
-			return "BeamAssignmentTree [assignments=" + assignments + ", remainingGold=" + remainingGold
-					+ ", remainingPrediction=" + remainingPrediction + ", overallSimiliarity=" + overallSimiliarity
-					+ "]";
+			return "Assignment [score=" + score + ", from=" + Arrays.toString(from) + ", to=" + Arrays.toString(to)
+					+ ", maxSize=" + maxSize + "]";
 		}
 
 	}
 
-	class BeamAssignment implements Comparable<BeamAssignment> {
+	protected Score[][] computeScores(final Collection<? extends AbstractAnnotation> slotFiller,
+			final Collection<? extends AbstractAnnotation> otherSlotFiller, final int maxSize) {
 
-		final public AbstractAnnotation gold;
-		final public AbstractAnnotation pred;
-		final public Score similiarity;
+		final Score[][] scores = new Score[maxSize][maxSize];
 
-		public BeamAssignment(AbstractAnnotation gold, AbstractAnnotation pred, Score similiarity) {
-			this.gold = gold;
-			this.pred = pred;
-			this.similiarity = similiarity;
+		final Iterator<? extends AbstractAnnotation> slotFillerIterator = slotFiller.iterator();
+
+		int i = 0;
+
+		while (i != maxSize) {
+
+			final AbstractAnnotation slotFillerVal;
+
+			if (slotFillerIterator.hasNext()) {
+				slotFillerVal = slotFillerIterator.next();
+			} else {
+				slotFillerVal = null;
+			}
+
+			int j = 0;
+
+			final Iterator<? extends AbstractAnnotation> otherSlotFillerIterator = otherSlotFiller.iterator();
+
+			while (j != maxSize) {
+
+				final AbstractAnnotation otherSlotFillerVal;
+
+				if (otherSlotFillerIterator.hasNext()) {
+					otherSlotFillerVal = otherSlotFillerIterator.next();
+				} else {
+					otherSlotFillerVal = null;
+				}
+
+				if (slotFillerVal == null) {
+					scores[i][j] = scoreSingle(otherSlotFillerVal, slotFillerVal).invert();
+				} else {
+					scores[i][j] = scoreSingle(slotFillerVal, otherSlotFillerVal);
+				}
+				j++;
+			}
+			i++;
+
 		}
 
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((gold == null) ? 0 : gold.hashCode());
-			result = prime * result + ((pred == null) ? 0 : pred.hashCode());
-			result = prime * result + ((similiarity == null) ? 0 : similiarity.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			BeamAssignment other = (BeamAssignment) obj;
-			if (gold == null) {
-				if (other.gold != null)
-					return false;
-			} else if (!gold.equals(other.gold))
-				return false;
-			if (pred == null) {
-				if (other.pred != null)
-					return false;
-			} else if (!pred.equals(other.pred))
-				return false;
-			if (similiarity == null) {
-				if (other.similiarity != null)
-					return false;
-			} else if (!similiarity.equals(other.similiarity))
-				return false;
-			return true;
-		}
-
-		@Override
-		public int compareTo(BeamAssignment o) {
-			return -Double.compare(this.similiarity.getF1(), o.similiarity.getF1());
-		}
-
-		@Override
-		public String toString() {
-			return "BeamAssignment [gold=" + gold + ", pred=" + pred + ", similiarity=" + similiarity + "]";
-		}
-
+		return scores;
 	}
+
 }

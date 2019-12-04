@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.crf.helper.log.LogUtils;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -29,10 +28,11 @@ public class AbstractSemReadProject {
 				predictionOF.score(res.getValue());
 
 			mean.add(res.getValue().getScore());
+//			log.info("single sc0re: " + res.getKey().getName() + ": " + res.getValue().getScore());
 
 //			LogUtils.logState(log, "======Final Evaluation======", res.getKey(), res.getValue());
 		}
-		log.info("Mean Score: " + mean);
+		log.info("mean score: " + mean);
 
 	}
 

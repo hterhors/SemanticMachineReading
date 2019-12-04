@@ -100,8 +100,8 @@ public class CartesianEvaluator extends AbstractEvaluator {
 //		System.out.println("Other annotations:");
 //		otherAnnotations.forEach(a -> System.out.println(a.toPrettyString()));
 
-		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
 
+		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
 		final Score bestScore = new Score();
 
 		final List<List<Integer>> permutations = getPermutations(maxSize);
@@ -247,7 +247,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		}
 	}
 
-	public Score[][] singleThreaded(final Collection<? extends AbstractAnnotation> slotFiller,
+	private Score[][] singleThreaded(final Collection<? extends AbstractAnnotation> slotFiller,
 			final Collection<? extends AbstractAnnotation> otherSlotFiller, final int maxSize) {
 		final Score[][] scores = new Score[maxSize][maxSize];
 
@@ -293,7 +293,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		return scores;
 	}
 
-	public Score[][] multiThreaded(final Collection<? extends AbstractAnnotation> slotFiller,
+	private Score[][] multiThreaded(final Collection<? extends AbstractAnnotation> slotFiller,
 			final Collection<? extends AbstractAnnotation> otherSlotFiller, final int maxSize) {
 		final Score[][] scores = new Score[maxSize][maxSize];
 

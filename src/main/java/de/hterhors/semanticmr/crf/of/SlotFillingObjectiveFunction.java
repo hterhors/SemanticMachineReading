@@ -14,6 +14,8 @@ public class SlotFillingObjectiveFunction implements IObjectiveFunction {
 	public SlotFillingObjectiveFunction(AbstractEvaluator evaluator) {
 		if (evaluator instanceof CartesianEvaluator) {
 			SlotFillingExplorer.MAX_NUMBER_OF_ANNOTATIONS = CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE;
+		}else {
+			SlotFillingExplorer.MAX_NUMBER_OF_ANNOTATIONS =100;
 		}
 
 		this.evaluator = evaluator;

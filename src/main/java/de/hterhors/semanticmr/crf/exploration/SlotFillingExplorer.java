@@ -11,7 +11,6 @@ import de.hterhors.semanticmr.candprov.sf.IEntityTypeAnnotationCandidateProvider
 import de.hterhors.semanticmr.candprov.sf.ISlotTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
-import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
@@ -25,7 +24,7 @@ import de.hterhors.semanticmr.crf.variables.State;
 public class SlotFillingExplorer implements IExplorationStrategy {
 	private static Logger log = LogManager.getFormatterLogger(SlotFillingExplorer.class);
 
-	public static int MAX_NUMBER_OF_ANNOTATIONS;
+	public static int MAX_NUMBER_OF_ANNOTATIONS =100;
 	final private AnnotationCandidateRetrievalCollection candidateProvider;
 
 	final private HardConstraintsProvider hardConstraintsProvider;

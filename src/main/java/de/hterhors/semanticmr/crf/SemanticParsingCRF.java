@@ -173,6 +173,7 @@ public class SemanticParsingCRF {
 								currentState);
 
 						model.updateWeights(learner, currentState, candidateState);
+					
 						if (isAccepted) {
 							currentState = candidateState;
 						}
@@ -182,6 +183,7 @@ public class SemanticParsingCRF {
 						finalStates.put(instance, currentState);
 
 					}
+					
 					if (meetsSamplingStoppingCriterion(samplingStoppingCrits, producedStateChain))
 						break;
 

@@ -34,7 +34,7 @@ import de.hterhors.semanticmr.crf.variables.State;
 public class SemanticParsingBeamCRF {
 	public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.00000");
 
-	private static Logger log = LogManager.getFormatterLogger(SemanticParsingCRF.class);
+	private static Logger log = LogManager.getFormatterLogger("SlotFilling");
 
 	private static class CRFStatistics {
 		private final String context;
@@ -61,7 +61,7 @@ public class SemanticParsingBeamCRF {
 	 * The maximum number of sampling steps per instance. This prevents infinite
 	 * loops if no stopping criterion ever matches.
 	 */
-	final static public int MAX_SAMPLING = 100;
+	final static public int MAX_SAMPLING = 1000;
 
 	private static final String TRAIN_CONTEXT = "===========BEAM-TRAIN============\n";
 	private static final String TEST_CONTEXT = "===========BEAM-TEST============\n";
@@ -156,30 +156,32 @@ public class SemanticParsingBeamCRF {
 
 				int samplingStep;
 				for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
-
 					for (IExplorationStrategy explorer : explorerList) {
 
-						final Map<State, List<State>> proposalStates = new HashMap<>();
+						final List<StatePair> proposalStatePairs = new ArrayList<>();
 
 						for (StatePair statePair : currentStatePairs) {
+
 							final List<State> propStates = explorer.explore(statePair.currentState);
 
 							if (propStates.isEmpty()) {
-								proposalStates.put(statePair.currentState, currentStatePairs.stream()
-										.map(p -> p.currentState).collect(Collectors.toList()));
+//								for (State np : currentStatePairs.stream().map(p -> p.currentState)
+//										.collect(Collectors.toList())) {
+//								}
+								proposalStatePairs.add(new StatePair(statePair.currentState, statePair.currentState));
 							} else {
-								proposalStates.put(statePair.currentState, propStates);
-							}
 
-							if (sampleBasedOnObjectiveFunction) {
-								objectiveFunction.score(propStates);
-							} else {
-								model.score(propStates);
-							}
+								if (sampleBasedOnObjectiveFunction) {
+									objectiveFunction.score(propStates);
+								} else {
+									model.score(propStates);
+								}
 
+								for (State np : propStates) {
+									proposalStatePairs.add(new StatePair(statePair.currentState, np));
+								}
+							}
 						}
-
-						final List<StatePair> proposalStatePairs = pair(proposalStates);
 
 						final List<StatePair> candidateStatePairs = sampler.sampleCandidate(proposalStatePairs,
 								beamSize);
@@ -194,10 +196,20 @@ public class SemanticParsingBeamCRF {
 							boolean isAccepted = sampler.getAcceptanceStrategy(epoch)
 									.isAccepted(beamStatePair.candidateState, beamStatePair.currentState);
 
+							/*
+							 * Update model weights
+							 */
+							model.updateWeights(learner, beamStatePair.currentState, beamStatePair.candidateState);
+
 							if (isAccepted) {
-								model.updateWeights(learner, beamStatePair.currentState, beamStatePair.candidateState);
+								/*
+								 * On acceptance chose candidate state as next state
+								 */
 								currentStatePairs.add(new StatePair(beamStatePair.candidateState, null));
 							} else {
+								/*
+								 * Otherwise chose current state as next state.
+								 */
 								currentStatePairs.add(new StatePair(beamStatePair.currentState, null));
 							}
 
@@ -209,6 +221,7 @@ public class SemanticParsingBeamCRF {
 						producedStateChain.add(finalStates.get(instance));
 
 					}
+
 					if (meetsBeamSamplingStoppingCriterion(samplingStoppingCrits, producedStateChain))
 						break;
 
@@ -233,16 +246,6 @@ public class SemanticParsingBeamCRF {
 		return finalStates;
 	}
 
-	public List<StatePair> pair(final Map<State, List<State>> proposalStates) {
-		final List<StatePair> proposalStatePairs = new ArrayList<>();
-		for (Entry<State, List<State>> p : proposalStates.entrySet()) {
-			for (State np : p.getValue()) {
-				proposalStatePairs.add(new StatePair(p.getKey(), np));
-			}
-		}
-		return proposalStatePairs;
-	}
-
 	private boolean meetsBeamSamplingStoppingCriterion(IBeamSamplingStoppingCriterion[] stoppingCriterion,
 			final List<List<State>> producedStateChain) {
 		for (IBeamSamplingStoppingCriterion sc : stoppingCriterion) {
@@ -261,6 +264,14 @@ public class SemanticParsingBeamCRF {
 		return false;
 	}
 
+	/**
+	 * scores the state with the model on objective to add model score and with
+	 * objective if previously was scored with model to add objective.
+	 * 
+	 * @param sampleBasedOnObjectiveFunction
+	 * @param currentState
+	 * @param candidateState
+	 */
 	private void scoreSelectedStates(final boolean sampleBasedOnObjectiveFunction, State currentState,
 			State candidateState) {
 		if (sampleBasedOnObjectiveFunction) {
@@ -310,23 +321,25 @@ public class SemanticParsingBeamCRF {
 
 				for (IExplorationStrategy explorer : explorerList) {
 
-					final Map<State, List<State>> proposalStates = new HashMap<>();
+//					final Map<State, List<State>> proposalStates = new HashMap<>();
+					final List<StatePair> proposalStatePairs = new ArrayList<>(); // pair(proposalStates);
 
 					for (StatePair statePair : currentStatePairs) {
 						final List<State> propStates = explorer.explore(statePair.currentState);
 
 						if (propStates.isEmpty()) {
-							proposalStates.put(statePair.currentState,
-									currentStatePairs.stream().map(p -> p.currentState).collect(Collectors.toList()));
+//							proposalStates.put(statePair.currentState,
+//									currentStatePairs.stream().map(p -> p.currentState).collect(Collectors.toList()));
+							proposalStatePairs.add(new StatePair(statePair.currentState, statePair.currentState));
 						} else {
-							proposalStates.put(statePair.currentState, propStates);
+							model.score(propStates);
+
+							for (State propState : propStates) {
+								proposalStatePairs.add(new StatePair(statePair.currentState, propState));
+							}
 						}
 
-						model.score(propStates);
-
 					}
-
-					final List<StatePair> proposalStatePairs = pair(proposalStates);
 
 					Collections.sort(proposalStatePairs, (s1, s2) -> -Double.compare(s1.candidateState.getModelScore(),
 							s2.candidateState.getModelScore()));
