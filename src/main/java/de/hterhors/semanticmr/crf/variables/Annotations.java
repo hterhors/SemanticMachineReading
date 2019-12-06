@@ -15,7 +15,7 @@ import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
-import de.hterhors.semanticmr.crf.variables.Instance.ModifyGoldRule;
+import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
@@ -47,15 +47,15 @@ public class Annotations {
 		}
 	}
 
-	public Annotations(Annotations goldAnnotations, Collection<ModifyGoldRule> modifyRules) {
+	public Annotations(Annotations goldAnnotations, Collection<GoldModificationRule> modifyRules) {
 		this(applyModifications(goldAnnotations, modifyRules));
 	}
 
 	private static List<AbstractAnnotation> applyModifications(Annotations goldAnnotations,
-			Collection<ModifyGoldRule> modifyRules) {
+			Collection<GoldModificationRule> modifyRules) {
 		final List<AbstractAnnotation> modifiedAnnotations = new ArrayList<>();
 		for (AbstractAnnotation goldAnnotation : goldAnnotations.getAbstractAnnotations()) {
-			for (ModifyGoldRule modifyGoldRule : modifyRules) {
+			for (GoldModificationRule modifyGoldRule : modifyRules) {
 				if (goldAnnotation != null)
 					goldAnnotation = modifyGoldRule.modify(goldAnnotation);
 			}

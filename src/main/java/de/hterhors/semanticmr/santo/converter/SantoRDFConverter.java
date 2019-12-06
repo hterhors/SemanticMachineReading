@@ -398,7 +398,7 @@ public class SantoRDFConverter {
 		 * any ( in this case the first) entity type from the slots possible entity
 		 * types.
 		 */
-		final String entityTypeName = slot.getSlotFillerEntityTypes().iterator().next().entityName;
+		final String entityTypeName = slot.getSlotFillerEntityTypes().iterator().next().name;
 
 		if (annotations.containsKey(linkedID)) {
 			return AnnotationBuilder.toAnnotation(document, entityTypeName, linkedID.object,
@@ -435,11 +435,11 @@ public class SantoRDFConverter {
 		this.rootDataPoints = new HashSet<>();
 
 		final Set<String> subEntities = new HashSet<>();
-		final Set<String> rootEntityNames = rootEntityTypes.stream().map(r -> r.entityName).collect(Collectors.toSet());
+		final Set<String> rootEntityNames = rootEntityTypes.stream().map(r -> r.name).collect(Collectors.toSet());
 
 		for (EntityType rootEntityType : rootEntityTypes) {
 			for (EntityType string : rootEntityType.getTransitiveClosureSubEntityTypes()) {
-				subEntities.add(string.entityName);
+				subEntities.add(string.name);
 			}
 		}
 

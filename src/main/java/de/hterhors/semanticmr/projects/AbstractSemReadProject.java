@@ -19,7 +19,7 @@ public class AbstractSemReadProject {
 		this.scope = scope;
 	}
 
-	public static void evaluate(Logger log, Map<Instance, State> testResults, IObjectiveFunction predictionOF) {
+	public static Score evaluate(Logger log, Map<Instance, State> testResults, IObjectiveFunction predictionOF) {
 
 		Score mean = new Score();
 
@@ -33,6 +33,7 @@ public class AbstractSemReadProject {
 //			LogUtils.logState(log, "======Final Evaluation======", res.getKey(), res.getValue());
 		}
 		log.info("mean score: " + mean);
+		return mean;
 
 	}
 

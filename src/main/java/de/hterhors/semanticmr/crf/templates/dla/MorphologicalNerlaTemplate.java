@@ -98,7 +98,7 @@ public class MorphologicalNerlaTemplate extends AbstractFeatureTemplate<Morpholo
 			return;
 
 		factor.getFeatureVector().set("STARTS_WITH_CAPITAL", Character.isUpperCase(sf.charAt(0)));
-		factor.getFeatureVector().set("STARTS_WITH_CAPITAL_FOR_TYPE_" + type.entityName,
+		factor.getFeatureVector().set("STARTS_WITH_CAPITAL_FOR_TYPE_" + type.name,
 				Character.isUpperCase(sf.charAt(0)));
 
 	}

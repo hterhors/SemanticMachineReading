@@ -190,11 +190,11 @@ public class ContextBetweenAnnotationsTemplate extends AbstractFeatureTemplate<C
 
 			DoubleVector featureVector = factor.getFeatureVector();
 
-			final String fromEntityType = factor.getFactorScope().fromEntity.entityName;
+			final String fromEntityType = factor.getFactorScope().fromEntity.name;
 			final int fromTokenIndex = factor.getFactorScope().instance.getDocument()
 					.getTokenByCharStartOffset(factor.getFactorScope().fromEntityCharacterOnset).getDocTokenIndex();
 
-			final String toEntityType = factor.getFactorScope().toEntity.entityName;
+			final String toEntityType = factor.getFactorScope().toEntity.name;
 			final int toTokenIndex = factor.getFactorScope().instance.getDocument()
 					.getTokenByCharEndOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
 

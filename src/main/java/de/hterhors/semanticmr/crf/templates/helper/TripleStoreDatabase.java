@@ -81,15 +81,15 @@ public class TripleStoreDatabase {
 	public void delete(AbstractAnnotation thing, SlotType slot, AbstractAnnotation filler) {
 		try {
 
-			Resource subject = model.createResource("http://dbpedia.org/resource/" + thing.getEntityType().entityName);
-			Property property = model.createProperty("http://dbpedia.org/ontology/" + slot.slotName);
+			Resource subject = model.createResource("http://dbpedia.org/resource/" + thing.getEntityType().name);
+			Property property = model.createProperty("http://dbpedia.org/ontology/" + slot.name);
 
 			RDFNode object;
 
 			if (filler.getEntityType().isLiteral) {
 				object = model.createLiteral(filler.asInstanceOfLiteralAnnotation().getSurfaceForm());
 			} else {
-				object = model.createResource("http://dbpedia.org/resource/" + filler.getEntityType().entityName);
+				object = model.createResource("http://dbpedia.org/resource/" + filler.getEntityType().name);
 			}
 
 			model.removeAll(subject, property, object);

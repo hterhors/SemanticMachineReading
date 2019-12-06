@@ -131,7 +131,7 @@ public abstract class BasicRegExPattern implements Serializable {
 
 		final List<String> names = new ArrayList<>();
 
-		for (String w : entityType.entityName.split(CAMEL_CASE_SPLIT_PATTERN)) {
+		for (String w : entityType.name.split(CAMEL_CASE_SPLIT_PATTERN)) {
 
 			w = w.replaceAll(SPECIAL_CHARS, "");
 			if (STOP_WORDS.contains(w.toLowerCase()) || getStopWords().contains(w.toLowerCase()))

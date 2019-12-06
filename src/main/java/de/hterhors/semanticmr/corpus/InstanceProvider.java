@@ -20,7 +20,7 @@ import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.crf.variables.Instance.ModifyGoldRule;
+import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.exce.DuplicateDocumentException;
 import de.hterhors.semanticmr.json.JsonInstanceReader;
@@ -99,7 +99,7 @@ public class InstanceProvider {
 	 * 
 	 * @param jsonInstancesDirectory the data set directory.
 	 */
-	public InstanceProvider(final File jsonInstancesDirectory, Collection<ModifyGoldRule> modifyGoldRules) {
+	public InstanceProvider(final File jsonInstancesDirectory, Collection<GoldModificationRule> modifyGoldRules) {
 		this(jsonInstancesDirectory, null, Integer.MAX_VALUE, modifyGoldRules);
 	}
 
@@ -113,7 +113,7 @@ public class InstanceProvider {
 	 * @param distributor            the distributor.
 	 */
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
-			Collection<ModifyGoldRule> modifyGoldRules) {
+			Collection<GoldModificationRule> modifyGoldRules) {
 		this(jsonInstancesDirectory, distributor, Integer.MAX_VALUE, modifyGoldRules);
 	}
 
@@ -124,7 +124,7 @@ public class InstanceProvider {
 	 * @param numToRead              number to read.
 	 */
 	public InstanceProvider(final File jsonInstancesDirectory, final int numToRead,
-			Collection<ModifyGoldRule> modifyGoldRules) {
+			Collection<GoldModificationRule> modifyGoldRules) {
 		this(jsonInstancesDirectory, new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build(),
 				numToRead, modifyGoldRules);
 	}
@@ -168,7 +168,7 @@ public class InstanceProvider {
 	}
 
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
-			final int numToRead, Collection<ModifyGoldRule> modifyGoldRules) {
+			final int numToRead, Collection<GoldModificationRule> modifyGoldRules) {
 		try {
 			this.jsonInstancesDirectory = jsonInstancesDirectory;
 

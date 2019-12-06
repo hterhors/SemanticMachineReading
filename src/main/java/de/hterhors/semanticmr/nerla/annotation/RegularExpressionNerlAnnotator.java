@@ -73,10 +73,10 @@ public class RegularExpressionNerlAnnotator {
 
 						try {
 							DocumentLinkedAnnotation docLinkedAnnotation = AnnotationBuilder.toAnnotation(document,
-									entityType.entityName, text, offset);
+									entityType.name, text, offset);
 							annotations.add(docLinkedAnnotation);
 						} catch (Exception e) {
-							log.warn("WARN:" + entityType.entityName + "-" + text + "-" + offset + ":"
+							log.warn("WARN:" + entityType.name + "-" + text + "-" + offset + ":"
 									+ e.getMessage().substring(e.getMessage().indexOf(':')));
 						}
 

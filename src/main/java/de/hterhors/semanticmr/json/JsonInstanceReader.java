@@ -14,7 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.crf.variables.Instance.ModifyGoldRule;
+import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.json.converter.JsonInstanceWrapperToInstance;
 import de.hterhors.semanticmr.json.wrapper.JsonInstanceWrapper;
 
@@ -23,8 +23,8 @@ public class JsonInstanceReader {
 
 	private final File corpusDirectory;
 	
-final private 	Collection<ModifyGoldRule> modifyGoldRules;
-	public JsonInstanceReader(final File corpusDirectory, Collection<ModifyGoldRule> modifyGoldRules) {
+final private 	Collection<GoldModificationRule> modifyGoldRules;
+	public JsonInstanceReader(final File corpusDirectory, Collection<GoldModificationRule> modifyGoldRules) {
 		this.corpusDirectory = corpusDirectory;
 		this.modifyGoldRules = modifyGoldRules;
 	}

@@ -182,10 +182,10 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 
 		final String[] rightContext = extractRightContext(tokens, endTokenIndex);
 
-		getContextFeatures(featureVector, entity.entityName, leftContext, rightContext);
+		getContextFeatures(featureVector, entity.name, leftContext, rightContext);
 
 		for (EntityType e : entity.getDirectSuperEntityTypes()) {
-			getContextFeatures(featureVector, e.entityName, leftContext, rightContext);
+			getContextFeatures(featureVector, e.name, leftContext, rightContext);
 		}
 	}
 

@@ -35,12 +35,12 @@ public class Instance implements Comparable<Instance> {
 	private final EInstanceContext originalContext;
 	private EInstanceContext redistributedContext = EInstanceContext.UNSPECIFIED;
 
-	public static interface ModifyGoldRule {
+	public static interface GoldModificationRule {
 		public AbstractAnnotation modify(AbstractAnnotation goldAnnotation);
 	}
 
 	public Instance(EInstanceContext context, Document document, Annotations goldAnnotations,
-			Collection<ModifyGoldRule> modifyRules) {
+			Collection<GoldModificationRule> modifyRules) {
 		this.originalContext = context == null ? EInstanceContext.UNSPECIFIED : context;
 		this.document = document;
 

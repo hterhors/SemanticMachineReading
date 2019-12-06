@@ -24,7 +24,7 @@ public class JsonEntityAnnotationWrapper {
 
 	public JsonEntityAnnotationWrapper(DocumentLinkedAnnotation d) {
 		this.documentID = d.document.documentID;
-		this.entityType = d.getEntityType().entityName;
+		this.entityType = d.getEntityType().name;
 		this.offset = d.getStartDocCharOffset();
 		this.surfaceForm = d.getSurfaceForm();
 	}

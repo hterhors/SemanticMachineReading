@@ -141,11 +141,11 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 	@Override
 	public void generateFeatureVector(Factor<IntraTokenScope> factor) {
 
-		getTokenNgrams(factor.getFeatureVector(), factor.getFactorScope().entityType.entityName,
+		getTokenNgrams(factor.getFeatureVector(), factor.getFactorScope().entityType.name,
 				factor.getFactorScope().surfaceForm);
 		for (EntityType e : factor.getFactorScope().entityType.getDirectSuperEntityTypes()) {
 
-			getTokenNgrams(factor.getFeatureVector(), e.entityName, factor.getFactorScope().surfaceForm);
+			getTokenNgrams(factor.getFeatureVector(), e.name, factor.getFactorScope().surfaceForm);
 		}
 
 	}

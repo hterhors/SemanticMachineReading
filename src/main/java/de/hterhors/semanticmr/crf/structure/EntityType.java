@@ -26,7 +26,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	/**
 	 * The name of this entity type.
 	 */
-	final public String entityName;
+	final public String name;
 
 	/**
 	 * Whether this entity type is of type literal.
@@ -86,7 +86,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	private Set<String> slotFillerOfSlotTypeNames;
 
 	private EntityType() {
-		this.entityName = null;
+		this.name = null;
 		this.slots = Collections.emptySet();
 		this.singleAnnotationSlotTypes = Collections.emptyList();
 		this.multiAnnotationSlotTypes = Collections.emptyList();
@@ -99,20 +99,20 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	}
 
 	private EntityType(final String internalizedEntityTypeName, Specifications specifications) {
-		this.entityName = internalizedEntityTypeName;
+		this.name = internalizedEntityTypeName;
 		this.isLiteral = specifications.isLiteralEntityType(internalizedEntityTypeName);
 		this.slotNames = Collections.unmodifiableList(
-				specifications.getSlotsForEntityType(this.entityName).stream().sorted().collect(Collectors.toList()));
+				specifications.getSlotsForEntityType(this.name).stream().sorted().collect(Collectors.toList()));
 		this.transitiveClosureSuperEntityTypeNames = Collections
-				.unmodifiableSet(specifications.getTransitiveClosureSuperEntityTypeNames(this.entityName).stream()
+				.unmodifiableSet(specifications.getTransitiveClosureSuperEntityTypeNames(this.name).stream()
 						.sorted().collect(Collectors.toSet()));
 		this.transitiveClosureSubEntityTypeNames = Collections.unmodifiableSet(specifications
-				.getTransitveClosureSubEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
+				.getTransitveClosureSubEntityTypeNames(this.name).stream().sorted().collect(Collectors.toSet()));
 
 		this.directSuperEntityTypeNames = Collections.unmodifiableSet(specifications
-				.getDirectSuperEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
+				.getDirectSuperEntityTypeNames(this.name).stream().sorted().collect(Collectors.toSet()));
 		this.directSubEntityTypeNames = Collections.unmodifiableSet(specifications
-				.getDirectSubEntityTypeNames(this.entityName).stream().sorted().collect(Collectors.toSet()));
+				.getDirectSubEntityTypeNames(this.name).stream().sorted().collect(Collectors.toSet()));
 
 		this.slotFillerOfSlotTypeNames = specifications
 				.getSlotTypeNames().stream().filter(slotType -> specifications
@@ -311,19 +311,19 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 
 	@Override
 	public int compareTo(EntityType o) {
-		return o.entityName.compareTo(this.entityName);
+		return o.name.compareTo(this.name);
 	}
 
 	@Override
 	public String toString() {
-		return "EntityType [entityTypeName=" + entityName + "]";
+		return "EntityType [entityTypeName=" + name + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((entityName == null) ? 0 : entityName.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
 

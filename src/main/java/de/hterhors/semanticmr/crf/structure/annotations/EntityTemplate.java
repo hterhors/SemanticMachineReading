@@ -111,7 +111,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 			return slot;
 
 		throw new UnkownSlotException(
-				"The requested  slot is unkown: " + slotType + " for entity type: " + getEntityType().entityName);
+				"The requested  slot is unkown: " + slotType + " for entity type: " + getEntityType().name);
 
 	}
 
@@ -120,7 +120,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 		if (slot == null)
 			throw new UnkownSingleSlotException("The requested single filler slot is unkown: " + slotType
-					+ " for entity type: " + getEntityType().entityName);
+					+ " for entity type: " + getEntityType().name);
 
 		return slot;
 	}
@@ -200,8 +200,8 @@ final public class EntityTemplate extends AbstractAnnotation {
 		final MultiFillerSlot slot = multiFillerSlots.get(slotType);
 
 		if (slot == null)
-			throw new UnkownMultiSlotException("The requested multi filler slot is unkown: " + slotType
-					+ " for entity: " + getEntityType().entityName);
+			throw new UnkownMultiSlotException(
+					"The requested multi filler slot is unkown: " + slotType + " for entity: " + getEntityType().name);
 
 		return slot;
 	}
@@ -440,10 +440,10 @@ final public class EntityTemplate extends AbstractAnnotation {
 	 * Clears all properties from this entity temple. Note that the root annotation
 	 * remains.
 	 */
-	public void clearProperties() {
+	public EntityTemplate clearProperties() {
 		this.singleFillerSlots.values().stream().forEach(s -> s.clear());
 		this.multiFillerSlots.values().stream().forEach(s -> s.clear());
-
+		return this;
 	}
 
 	@Override

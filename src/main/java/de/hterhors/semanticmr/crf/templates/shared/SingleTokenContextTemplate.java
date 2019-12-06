@@ -158,15 +158,15 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 				.getDocTokenIndex(); i++) {
 
 			if (i < 0)
-				featureVector.set(PREFIX + BOF + " " + factor.getFactorScope().entityType.entityName, true);
+				featureVector.set(PREFIX + BOF + " " + factor.getFactorScope().entityType.name, true);
 			else {
 				final String text = factor.getFactorScope().instance.getDocument().tokenList.get(i).getText();
 				if (Document.getStopWords().contains(text))
 					continue;
-				featureVector.set(PREFIX + text + " " + factor.getFactorScope().entityType.entityName, true);
-				featureVector.set(PREFIX + text + "... " + factor.getFactorScope().entityType.entityName, true);
+				featureVector.set(PREFIX + text + " " + factor.getFactorScope().entityType.name, true);
+				featureVector.set(PREFIX + text + "... " + factor.getFactorScope().entityType.name, true);
 				featureVector.set(
-						PREFIX + text + "... -" + distance + "... " + factor.getFactorScope().entityType.entityName,
+						PREFIX + text + "... -" + distance + "... " + factor.getFactorScope().entityType.name,
 						true);
 			}
 			distance++;
@@ -177,15 +177,15 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 				endToken.getDocTokenIndex() + DEFAULT_MAX_TOKEN_CONTEXT_RIGHT); i++) {
 
 			if (i == factor.getFactorScope().instance.getDocument().tokenList.size())
-				featureVector.set(PREFIX + EOF + " " + factor.getFactorScope().entityType.entityName, true);
+				featureVector.set(PREFIX + EOF + " " + factor.getFactorScope().entityType.name, true);
 			else {
 				final String text = factor.getFactorScope().instance.getDocument().tokenList.get(i).getText();
 				if (Document.getStopWords().contains(text))
 					continue;
-				featureVector.set(PREFIX + text + " " + factor.getFactorScope().entityType.entityName, true);
-				featureVector.set(PREFIX + factor.getFactorScope().entityType.entityName + "... " + text, true);
+				featureVector.set(PREFIX + text + " " + factor.getFactorScope().entityType.name, true);
+				featureVector.set(PREFIX + factor.getFactorScope().entityType.name + "... " + text, true);
 				featureVector.set(
-						PREFIX + factor.getFactorScope().entityType.entityName + "... +" + distance + "... " + text,
+						PREFIX + factor.getFactorScope().entityType.name + "... +" + distance + "... " + text,
 						true);
 			}
 			distance++;

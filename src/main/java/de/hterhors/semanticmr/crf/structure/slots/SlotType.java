@@ -16,7 +16,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
 	public boolean excludeFromExploration = false;
 
-	final public String slotName;
+	final public String name;
 
 	/**
 	 * Maximum size as specified in the specifications.
@@ -30,13 +30,13 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 	private final HashMap<EntityType, Boolean> matchesCache = new HashMap<>();
 
 	private SlotType(String internalizedSlotTypeName, Specifications specifications) {
-		this.slotName = internalizedSlotTypeName;
+		this.name = internalizedSlotTypeName;
 		this.slotMaxCapacity = specifications.getMultiAnnotationSlotMaxSize(internalizedSlotTypeName);
 		this.slotFillerEntityTypeNames = specifications.getSlotFillerEntityTypeNames(internalizedSlotTypeName);
 	}
 
 	private SlotType() {
-		this.slotName = null;
+		this.name = null;
 		this.slotMaxCapacity = -1;
 		this.slotFillerEntityTypeNames = Collections.emptySet();
 	}
@@ -102,7 +102,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((slotName == null) ? 0 : slotName.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
 
@@ -115,22 +115,22 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 		if (getClass() != obj.getClass())
 			return false;
 		SlotType other = (SlotType) obj;
-		if (slotName == null) {
-			if (other.slotName != null)
+		if (name == null) {
+			if (other.name != null)
 				return false;
-		} else if (slotName != other.slotName)
+		} else if (name != other.name)
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "SlotType [slotTypeName=" + slotName + "]";
+		return "SlotType [slotTypeName=" + name + "]";
 	}
 
 	@Override
 	public int compareTo(SlotType o) {
-		return o.slotName.compareTo(this.slotName);
+		return o.name.compareTo(this.name);
 	}
 
 	public boolean matchesEntityType(EntityType entityType) {
@@ -156,7 +156,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 	}
 
 	public String toPrettyString(int depth) {
-		return slotName;
+		return name;
 	}
 
 	public boolean isSingleValueSlot() {

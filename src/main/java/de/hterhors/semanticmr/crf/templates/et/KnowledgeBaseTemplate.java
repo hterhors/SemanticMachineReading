@@ -124,7 +124,7 @@ public class KnowledgeBaseTemplate extends AbstractFeatureTemplate<KnowledgeBase
 
 				List<Map<String, RDFObject>> invertQ2Result1 = db
 						.select("SELECT DISTINCT * WHERE { <http://dbpedia.org/resource/"
-								+ thing.getEntityType().entityName + "> ?p ?o }").queryData;
+								+ thing.getEntityType().name + "> ?p ?o }").queryData;
 				invertQ2Result1.forEach(System.out::println);
 
 				Map<SlotType, Set<AbstractAnnotation>> annotations = thing.filter().rootAnnotation()
@@ -142,7 +142,7 @@ public class KnowledgeBaseTemplate extends AbstractFeatureTemplate<KnowledgeBase
 
 				List<Map<String, RDFObject>> invertQ2Result2 = db
 						.select("SELECT DISTINCT * WHERE { <http://dbpedia.org/resource/"
-								+ thing.getEntityType().entityName + "> ?p ?o }").queryData;
+								+ thing.getEntityType().name + "> ?p ?o }").queryData;
 				invertQ2Result2.forEach(System.out::println);
 
 			}
@@ -430,11 +430,11 @@ public class KnowledgeBaseTemplate extends AbstractFeatureTemplate<KnowledgeBase
 
 			KnowledgeBaseScope objectScope = (KnowledgeBaseScope) factor.getFactorScope();
 
-			final String parentOrFirst = "http://dbpedia.org/resource/" + objectScope.parentOrFirst.entityName;
-			final String childOrSecond = "http://dbpedia.org/resource/" + objectScope.childOrSecond.entityName;
+			final String parentOrFirst = "http://dbpedia.org/resource/" + objectScope.parentOrFirst.name;
+			final String childOrSecond = "http://dbpedia.org/resource/" + objectScope.childOrSecond.name;
 
-			final String slot1Name = objectScope.slot1 == null ? "null" : objectScope.slot1.slotName;
-			final String slot2Name = objectScope.slot2 == null ? "null" : objectScope.slot2.slotName;
+			final String slot1Name = objectScope.slot1 == null ? "null" : objectScope.slot1.name;
+			final String slot2Name = objectScope.slot2 == null ? "null" : objectScope.slot2.name;
 
 			if (useQuery3) {
 
@@ -636,14 +636,14 @@ public class KnowledgeBaseTemplate extends AbstractFeatureTemplate<KnowledgeBase
 			String value1Filler, String value2Filler, final boolean interSlotComparison) {
 		List<Map<String, RDFObject>> q2Result = db.select(String.format(query, value1Filler, value2Filler)).queryData;
 		for (Map<String, RDFObject> r : q2Result) {
-			vector.set(context + ": " + factor.slot1.slotName + "->" + r.get(propertyName1).value + "->"
+			vector.set(context + ": " + factor.slot1.name + "->" + r.get(propertyName1).value + "->"
 					+ r.get(propertyName2).value + "-interSlot =" + interSlotComparison, true);
 		}
 
 		List<Map<String, RDFObject>> invertQ2Result = db
 				.select(String.format(query, value2Filler, value1Filler)).queryData;
 		for (Map<String, RDFObject> r : invertQ2Result) {
-			vector.set("Invert-" + context + ": " + factor.slot1.slotName + "->" + r.get(propertyName1).value + "->"
+			vector.set("Invert-" + context + ": " + factor.slot1.name + "->" + r.get(propertyName1).value + "->"
 					+ r.get(propertyName2).value + (interSlotComparison ? " interSlot" : " intraSlot"), true);
 		}
 	}
@@ -652,14 +652,14 @@ public class KnowledgeBaseTemplate extends AbstractFeatureTemplate<KnowledgeBase
 			final String value1Filler, final String value2Filler, final boolean interSlotComparison) {
 		List<Map<String, RDFObject>> q1Result = db.select(String.format(query, value1Filler, value2Filler)).queryData;
 		for (Map<String, RDFObject> r : q1Result) {
-			vector.set(context + ": " + factor.slot1.slotName + "->" + r.get(propertyName1).value + "-interSlot ="
+			vector.set(context + ": " + factor.slot1.name + "->" + r.get(propertyName1).value + "-interSlot ="
 					+ interSlotComparison, true);
 		}
 
 		List<Map<String, RDFObject>> invertQ1Result = db
 				.select(String.format(query, value2Filler, value1Filler)).queryData;
 		for (Map<String, RDFObject> r : invertQ1Result) {
-			vector.set("Invert-" + context + ": " + factor.slot1.slotName + "->" + r.get(propertyName1).value
+			vector.set("Invert-" + context + ": " + factor.slot1.name + "->" + r.get(propertyName1).value
 					+ (interSlotComparison ? " interSlot" : " intraSlot"), true);
 		}
 	}
@@ -668,13 +668,13 @@ public class KnowledgeBaseTemplate extends AbstractFeatureTemplate<KnowledgeBase
 			final String value1Filler, final String value2Filler, final boolean interSlotComparison) {
 		List<Map<String, RDFObject>> q1Result = db.select(String.format(query, value1Filler)).queryData;
 		for (Map<String, RDFObject> r : q1Result) {
-			vector.set(context + ": " + factor.slot1.slotName + "->" + r.get(propertyName1).value + "-interSlot ="
+			vector.set(context + ": " + factor.slot1.name + "->" + r.get(propertyName1).value + "-interSlot ="
 					+ interSlotComparison, true);
 		}
 
 		List<Map<String, RDFObject>> invertQ1Result = db.select(String.format(query, value2Filler)).queryData;
 		for (Map<String, RDFObject> r : invertQ1Result) {
-			vector.set("Invert-" + context + ": " + factor.slot1.slotName + "->" + r.get(propertyName1).value
+			vector.set("Invert-" + context + ": " + factor.slot1.name + "->" + r.get(propertyName1).value
 					+ (interSlotComparison ? " interSlot" : " intraSlot"), true);
 		}
 	}

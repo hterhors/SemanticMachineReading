@@ -90,7 +90,7 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 
 		@Override
 		public String toString() {
-			return "SlotIsFilledScope [entityTemplateType=" + entityTemplateType.entityName + ", slot=" + slot.slotName
+			return "SlotIsFilledScope [entityTemplateType=" + entityTemplateType.name + ", slot=" + slot.name
 					+ ", numberOfSlotFiller=" + numberOfSlotFiller + "]";
 		}
 
@@ -131,10 +131,10 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 	}
 
 	public void add(Factor<SlotIsFilledScope> factor, DoubleVector featureVector, EntityType entity) {
-		final String parentClassName = entity.entityName;
+		final String parentClassName = entity.name;
 		final boolean slotIsFilled = factor.getFactorScope().numberOfSlotFiller > 0;
 
-		final String slotName = factor.getFactorScope().slot.slotName;
+		final String slotName = factor.getFactorScope().slot.name;
 
 		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains >2 element",
 				factor.getFactorScope().numberOfSlotFiller >= 2);

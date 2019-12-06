@@ -115,58 +115,58 @@ public class LevenshteinTemplate extends AbstractFeatureTemplate<LevenshteinScop
 		LevenshteinScope scope = factor.getFactorScope();
 
 		final double levenDist = LevenShteinSimilarities.levenshteinSimilarity(
-				factor.getFactorScope().entityType.entityName, factor.getFactorScope().surfaceForm, 100);
+				factor.getFactorScope().entityType.name, factor.getFactorScope().surfaceForm, 100);
 		x: {
 			if (levenDist > 0.1) {
-				factor.getFeatureVector().set("<" + scope.entityType.entityName + "> leven sim > 0.1 " + levenDist,
+				factor.getFeatureVector().set("<" + scope.entityType.name + "> leven sim > 0.1 " + levenDist,
 						true);
 				factor.getFeatureVector().set("leven sim > 0.1 " + levenDist, true);
 				break x;
 			}
 			if (levenDist > 0.2) {
-				factor.getFeatureVector().set("<" + scope.entityType.entityName + "> leven sim > 0.2 " + levenDist,
+				factor.getFeatureVector().set("<" + scope.entityType.name + "> leven sim > 0.2 " + levenDist,
 						true);
 				factor.getFeatureVector().set("leven sim > 0.2 " + levenDist, true);
 				break x;
 			}
 			if (levenDist > 0.3) {
-				factor.getFeatureVector().set("<" + scope.entityType.entityName + "> leven sim > 0.3 " + levenDist,
+				factor.getFeatureVector().set("<" + scope.entityType.name + "> leven sim > 0.3 " + levenDist,
 						true);
 				factor.getFeatureVector().set("leven sim > 0.3 " + levenDist, true);
 				break x;
 			}
 			if (levenDist > 0.4) {
-				factor.getFeatureVector().set("<" + scope.entityType.entityName + "> leven sim > 0.4 " + levenDist,
+				factor.getFeatureVector().set("<" + scope.entityType.name + "> leven sim > 0.4 " + levenDist,
 						true);
 				factor.getFeatureVector().set("leven sim > 0.4 " + levenDist, true);
 				break x;
 			}
 			if (levenDist > 0.5) {
-				factor.getFeatureVector().set("<" + scope.entityType.entityName + "> leven sim > 0.5 " + levenDist,
+				factor.getFeatureVector().set("<" + scope.entityType.name + "> leven sim > 0.5 " + levenDist,
 						true);
 				factor.getFeatureVector().set("leven sim > 0.5 " + levenDist, true);
 				break x;
 			}
 			if (levenDist > 0.6) {
-				factor.getFeatureVector().set("<" + scope.entityType.entityName + "> leven sim > 0.6 " + levenDist,
+				factor.getFeatureVector().set("<" + scope.entityType.name + "> leven sim > 0.6 " + levenDist,
 						true);
 				factor.getFeatureVector().set("leven sim > 0.6 " + levenDist, true);
 				break x;
 			}
 			if (levenDist > 0.7) {
-				factor.getFeatureVector().set("<" + scope.entityType.entityName + "> leven sim > 0.7 " + levenDist,
+				factor.getFeatureVector().set("<" + scope.entityType.name + "> leven sim > 0.7 " + levenDist,
 						true);
 				factor.getFeatureVector().set("leven sim > 0.7 " + levenDist, true);
 				break x;
 			}
 			if (levenDist > 0.8) {
-				factor.getFeatureVector().set("<" + scope.entityType.entityName + "> leven sim > 0.8 " + levenDist,
+				factor.getFeatureVector().set("<" + scope.entityType.name + "> leven sim > 0.8 " + levenDist,
 						true);
 				factor.getFeatureVector().set("leven sim > 0.8 " + levenDist, true);
 				break x;
 			}
 			if (levenDist > 0.9) {
-				factor.getFeatureVector().set("<" + scope.entityType.entityName + "> leven sim > 0.9 " + levenDist,
+				factor.getFeatureVector().set("<" + scope.entityType.name + "> leven sim > 0.9 " + levenDist,
 						true);
 				factor.getFeatureVector().set("leven sim > 0.9 " + levenDist, true);
 				break x;

@@ -119,7 +119,7 @@ public class SlotPriorTemplate extends AbstractFeatureTemplate<Scope> {
 		if (dla.entityType.isLiteral) {
 			values.add(dla.textualContent.surfaceForm);
 		} else {
-			values.add(dla.entityType.entityName);
+			values.add(dla.entityType.name);
 		}
 	}
 
@@ -132,7 +132,7 @@ public class SlotPriorTemplate extends AbstractFeatureTemplate<Scope> {
 		 * be very sparse.
 		 */
 		if (factor.getFactorScope().values.size() > 1)
-			factor.getFeatureVector().set("Prior towards: " + factor.getFactorScope().slotType.slotName + "->"
+			factor.getFeatureVector().set("Prior towards: " + factor.getFactorScope().slotType.name + "->"
 					+ factor.getFactorScope().values, true);
 
 		for (String assignedClassesNamesOrValue : factor.getFactorScope().values) {
@@ -142,7 +142,7 @@ public class SlotPriorTemplate extends AbstractFeatureTemplate<Scope> {
 			 * feature.
 			 */
 			factor.getFeatureVector().set(
-					"Prior: " + factor.getFactorScope().slotType.slotName + "->" + assignedClassesNamesOrValue, true);
+					"Prior: " + factor.getFactorScope().slotType.name + "->" + assignedClassesNamesOrValue, true);
 		}
 	}
 

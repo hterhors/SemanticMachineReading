@@ -28,7 +28,7 @@ public class SystemScope {
 		if (verbose)
 			EntityType.getEntityTypes().stream().forEach(et -> {
 				if (et.isLiteral && et.getNormalizationFunction() == IdentityNormalization.getInstance()) {
-					log.info("No normalization function for literal entity type \"" + et.entityName
+					log.info("No normalization function for literal entity type \"" + et.name
 							+ "\" was specified. Set default to \"" + IdentityNormalization.class.getSimpleName()
 							+ "\"");
 				}
@@ -181,7 +181,7 @@ public class SystemScope {
 		public NormalizationFunctionHandler registerNormalizationFunction(
 				AbstractNormalizationFunction normalizationFunction) {
 			log.info("Register normalization function  \"" + normalizationFunction.getClass().getSimpleName()
-					+ "\" for entity type \"" + normalizationFunction.entityType.entityName + "\"");
+					+ "\" for entity type \"" + normalizationFunction.entityType.name + "\"");
 			normalizationFunction.entityType.setNormalizationFunction(normalizationFunction);
 			for (EntityType subEntity : normalizationFunction.entityType.getTransitiveClosureSubEntityTypes()) {
 				subEntity.setNormalizationFunction(normalizationFunction);

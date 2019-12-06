@@ -162,21 +162,21 @@ public class LocalityTemplate extends AbstractFeatureTemplate<LocalityScope> {
 
 			for (EntityType ce : factor.getFactorScope().secondEntity.getDirectSuperEntityTypes()) {
 
-				factor.getFeatureVector().set(PREFIX + pe.entityName + "->" + ce.entityName + " sentence dist = "
+				factor.getFeatureVector().set(PREFIX + pe.name + "->" + ce.name + " sentence dist = "
 						+ factor.getFactorScope().sentenceDistance, true);
-				factor.getFeatureVector().set(PREFIX + pe.entityName + "->" + ce.entityName + " sentence dist >= 4",
+				factor.getFeatureVector().set(PREFIX + pe.name + "->" + ce.name + " sentence dist >= 4",
 						factor.getFactorScope().sentenceDistance >= 4);
 			}
 
 		}
 
 		factor.getFeatureVector()
-				.set(PREFIX + factor.getFactorScope().firstEntity.entityName + "->"
-						+ factor.getFactorScope().secondEntity.entityName + " sentence dist = "
+				.set(PREFIX + factor.getFactorScope().firstEntity.name + "->"
+						+ factor.getFactorScope().secondEntity.name + " sentence dist = "
 						+ factor.getFactorScope().sentenceDistance, true);
 		factor.getFeatureVector()
-				.set(PREFIX + factor.getFactorScope().firstEntity.entityName + "->"
-						+ factor.getFactorScope().secondEntity.entityName + " sentence dist >= 4",
+				.set(PREFIX + factor.getFactorScope().firstEntity.name + "->"
+						+ factor.getFactorScope().secondEntity.name + " sentence dist >= 4",
 						factor.getFactorScope().sentenceDistance >= 4);
 	}
 

@@ -32,11 +32,11 @@ public class DictionaryFromInstanceHelper {
 				while (m.find()) {
 					try {
 						if (e.getKey().hasNoSlots())
-							annotations.add(AnnotationBuilder.toAnnotation(instance.getDocument(),
-									e.getKey().entityName, m.group(), m.start()));
+							annotations.add(AnnotationBuilder.toAnnotation(instance.getDocument(), e.getKey().name,
+									m.group(), m.start()));
 						else
 							annotations.add(new EntityTemplate(AnnotationBuilder.toAnnotation(instance.getDocument(),
-									e.getKey().entityName, m.group(), m.start())));
+									e.getKey().name, m.group(), m.start())));
 					} catch (RuntimeException e2) {
 					}
 
@@ -45,7 +45,6 @@ public class DictionaryFromInstanceHelper {
 			}
 
 		}
-
 		return annotations;
 	}
 
