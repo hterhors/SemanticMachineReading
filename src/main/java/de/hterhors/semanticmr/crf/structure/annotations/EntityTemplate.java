@@ -1,6 +1,7 @@
 package de.hterhors.semanticmr.crf.structure.annotations;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -254,11 +255,29 @@ final public class EntityTemplate extends AbstractAnnotation {
 	@SuppressWarnings("unchecked")
 	@Override
 	public EntityTemplate deepCopy() {
-		return new EntityTemplate(rootAnnotation,
-				this.singleFillerSlots.entrySet().stream()
-						.collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue().deepCopy())),
-				this.multiFillerSlots.entrySet().stream()
-						.collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue().deepCopy())));
+
+		/**
+		 * An unmodifiable map of slots to fill.
+		 */
+		final Map<SlotType, SingleFillerSlot> singleFillerSlots = new HashMap<>();
+		for (Entry<SlotType, SingleFillerSlot> e : this.singleFillerSlots.entrySet()) {
+			singleFillerSlots.put(e.getKey(), e.getValue().deepCopy());
+		}
+		final Map<SlotType, MultiFillerSlot> multiFillerSlots = new HashMap<>();
+		for (Entry<SlotType, MultiFillerSlot> e : this.multiFillerSlots.entrySet()) {
+			multiFillerSlots.put(e.getKey(), e.getValue().deepCopy());
+		}
+
+		/**
+		 * An unmodifiable map of slots to fill.
+		 */
+		return new EntityTemplate(rootAnnotation, Collections.unmodifiableMap(singleFillerSlots),
+				Collections.unmodifiableMap(multiFillerSlots));
+//		return new EntityTemplate(rootAnnotation,
+//				this.singleFillerSlots.entrySet().stream()
+//				.collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue().deepCopy())),
+//				this.multiFillerSlots.entrySet().stream()
+//				.collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue().deepCopy())));
 	}
 
 	/**

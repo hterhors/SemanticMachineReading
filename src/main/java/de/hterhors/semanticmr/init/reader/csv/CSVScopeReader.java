@@ -2,6 +2,7 @@ package de.hterhors.semanticmr.init.reader.csv;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,10 +87,17 @@ public class CSVScopeReader implements ISpecificationsReader {
 			Map<String, Set<String>> slotFillerEntityTypes = new HashMap<>();
 
 			for (String[] line : structures) {
+				try {
+					
 				slotsForEntity.putIfAbsent(line[0], new HashSet<>());
 				slotsForEntity.get(line[0]).add(line[1]);
 				slotFillerEntityTypes.putIfAbsent(line[1], new HashSet<>());
 				slotFillerEntityTypes.get(line[1]).add(line[2]);
+				}catch(Exception e)
+				{
+					System.out.println(Arrays.toString(line));
+					e.printStackTrace();
+				}
 			}
 
 			Set<String> sa = new HashSet<>();

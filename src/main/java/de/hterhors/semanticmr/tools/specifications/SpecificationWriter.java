@@ -113,13 +113,13 @@ public class SpecificationWriter {
 
 		for (SlotType slotType : entity.getSlots()) {
 			for (EntityType entityType : slotType.getSlotFillerEntityTypes()) {
-//	System.out.println("S-> "+entity +"\t"+entityType);
+//				System.out.println(slotType.name + "-> " + entity.name + "\t" + entityType.name);
 				addRecursive(entityType, relatedEntities);
 			}
 		}
 
 		for (EntityType relatedEntityType : entity.getTransitiveClosureSubEntityTypes()) {
-//			System.out.println("R-> "+entity +"\t"+relatedEntityType);
+//			System.out.println("R-> " + entity.name + "\t" + relatedEntityType.name);
 			addRecursive(relatedEntityType, relatedEntities);
 		}
 

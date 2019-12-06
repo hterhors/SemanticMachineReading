@@ -13,6 +13,7 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class DictionaryFromInstanceHelper {
@@ -79,6 +80,26 @@ public class DictionaryFromInstanceHelper {
 								map.putIfAbsent(rootS.getEntityType(), new HashSet<>());
 								String e = rootS.asInstanceOfLiteralAnnotation().getSurfaceForm();
 								map.get(rootS.getEntityType()).add(e);
+
+							}
+							/**
+							 * special for compound treatments...
+							 */
+							if (slotFillerValue.getEntityType() == EntityType.get("CompoundTreatment")) {
+								SingleFillerSlot s = slotFillerValue.asInstanceOfEntityTemplate()
+										.getSingleFillerSlot("hasCompound");
+
+								if (s.containsSlotFiller()) {
+									AbstractAnnotation compound = s.getSlotFiller().asInstanceOfEntityTemplate()
+											.getRootAnnotation();
+									if (compound.isInstanceOfLiteralAnnotation()) {
+
+										map.putIfAbsent(compound.getEntityType(), new HashSet<>());
+										String e = compound.asInstanceOfLiteralAnnotation().getSurfaceForm();
+										map.get(compound.getEntityType()).add(e);
+
+									}
+								}
 
 							}
 						}
