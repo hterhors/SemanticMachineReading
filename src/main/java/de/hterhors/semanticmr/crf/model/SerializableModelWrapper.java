@@ -33,8 +33,9 @@ public class SerializableModelWrapper implements Serializable {
 //	}
 	private GenericTemplate convert(AbstractFeatureTemplate t) {
 		final Map<String, Double> features = new HashMap<>();
-		for (Entry<Integer, Double> e : t.getWeights().getFeatures().entrySet()) {
-			features.put(Model.getFeatureForIndex(e.getKey()), e.getValue());
+		for (Entry<String, Double> e : t.getWeights().getFeatures().entrySet()) {
+			features.put(e.getKey(), e.getValue());
+//			features.put(Model.getFeatureForIndex(e.getKey()), e.getValue());
 		}
 		return new GenericTemplate(features, t.getClass().getPackage().getName(), t.getClass().getSimpleName());
 

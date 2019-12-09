@@ -22,19 +22,22 @@ public class DoubleVector {
 	private static final Double DEFAULT_VALUE_ZERO = new Double(0.0);
 	private static final Double DEFAULT_VALUE_ONE = new Double(1.0);
 
-	private Map<Integer, Double> features;
+	private Map<String, Double> features;
+//	private Map<Integer, Double> features;
 
 	private double length = 0D;
 	private boolean isDirty = true;
-
+//
 	public DoubleVector() {
-		this.features = new HashMap<Integer, Double>();
+		this.features = new HashMap<String, Double>();
+//		this.features = new HashMap<Integer, Double>();
 		this.isDirty = true;
 		this.length = 0;
 
 	}
 
-	private void setForceZero(Integer index, Double value) {
+	private void setForceZero(String index, Double value) {
+		index = index.intern();
 		if (value.doubleValue() != 0.0) {
 			features.put(index, value);
 		} else {
@@ -46,8 +49,8 @@ public class DoubleVector {
 	public void set(String feature, Double value) {
 		if (value == 0.0D)
 			return;
-		final Integer index = Model.getIndexForFeatureName(feature);
-		setForceZero(index, value);
+//		final Integer index = Model.getIndexForFeatureName(feature);
+		setForceZero(feature, value);
 	}
 
 	public void set(String feature, boolean flag) {
@@ -61,15 +64,15 @@ public class DoubleVector {
 	 * @param feature
 	 * @return
 	 */
-	public Double getValueOfFeature(Integer feature) {
+	public Double getValueOfFeature(String feature) {
 		return features.getOrDefault(feature, DEFAULT_VALUE_ZERO);
 	}
 
-	public Map<Integer, Double> getFeatures() {
+	public Map<String, Double> getFeatures() {
 		return features;
 	}
 
-	private void addToValue(Integer feature, double alpha) {
+	private void addToValue(String feature, double alpha) {
 		Double featureValue = getValueOfFeature(feature);
 		setForceZero(feature, new Double(featureValue.doubleValue() + alpha));
 	}
@@ -99,14 +102,14 @@ public class DoubleVector {
 
 	private double computeDot(DoubleVector smaller, DoubleVector bigger) {
 		double result = 0;
-		for (Entry<Integer, Double> e : smaller.getFeatures().entrySet()) {
+		for (Entry<String, Double> e : smaller.getFeatures().entrySet()) {
 			result += e.getValue() * bigger.getValueOfFeature(e.getKey());
 		}
 		return result;
 	}
 
 	public void mul(double f) {
-		for (Entry<Integer, Double> feature : features.entrySet()) {
+		for (Entry<String, Double> feature : features.entrySet()) {
 			setForceZero(feature.getKey(), feature.getValue() * f);
 		}
 		this.isDirty = true;
@@ -114,28 +117,28 @@ public class DoubleVector {
 	}
 
 	public void add(DoubleVector v) {
-		for (Entry<Integer, Double> feature : v.getFeatures().entrySet()) {
+		for (Entry<String, Double> feature : v.getFeatures().entrySet()) {
 			addToValue(feature.getKey(), feature.getValue());
 		}
 		this.isDirty = true;
 	}
 
 	public void mulAndAdd(DoubleVector v, double mul) {
-		for (Entry<Integer, Double> feature : v.getFeatures().entrySet()) {
+		for (Entry<String, Double> feature : v.getFeatures().entrySet()) {
 			addToValue(feature.getKey(), feature.getValue() * mul);
 		}
 		this.isDirty = true;
 	}
 
 	public void sub(DoubleVector v) {
-		for (Entry<Integer, Double> feature : v.getFeatures().entrySet()) {
+		for (Entry<String, Double> feature : v.getFeatures().entrySet()) {
 			addToValue(feature.getKey(), -feature.getValue());
 		}
 		this.isDirty = true;
 	}
 
 	public void mulAndSub(DoubleVector v, double mul) {
-		for (Entry<Integer, Double> feature : v.getFeatures().entrySet()) {
+		for (Entry<String, Double> feature : v.getFeatures().entrySet()) {
 			addToValue(feature.getKey(), -(feature.getValue() * mul));
 		}
 		this.isDirty = true;
@@ -144,7 +147,7 @@ public class DoubleVector {
 	public void normalize() {
 		double length = length();
 		if (length > 0) {
-			for (Entry<Integer, Double> feature : features.entrySet()) {
+			for (Entry<String, Double> feature : features.entrySet()) {
 				setForceZero(feature.getKey(), feature.getValue() / length);
 			}
 		}
@@ -156,7 +159,7 @@ public class DoubleVector {
 			return length;
 
 		double length = 0;
-		for (Entry<Integer, Double> feature : features.entrySet()) {
+		for (Entry<String, Double> feature : features.entrySet()) {
 			length += Math.pow(feature.getValue(), 2);
 		}
 		length = Math.sqrt(length);

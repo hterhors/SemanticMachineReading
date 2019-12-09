@@ -474,81 +474,78 @@ public class SemanticParsingCRF {
 		return s;
 	}
 
-	private final IObjectiveFunction predictionObjectiveFunction = new SlotFillingObjectiveFunction(
-			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
+//	private void compare(State currentState, State candidateState) {
+//
+//		Map<String, Double> differences = getDifferences(collectFeatures(currentState),
+//				collectFeatures(candidateState));
+//		if (differences.isEmpty())
+//			return;
+//
+//		List<Entry<String, Double>> sortedWeightsPrevState = new ArrayList<>(collectFeatures(currentState).entrySet());
+//		List<Entry<String, Double>> sortedWeightsCandState = new ArrayList<>(
+//				collectFeatures(candidateState).entrySet());
+//
+//		Collections.sort(sortedWeightsPrevState, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
+//		Collections.sort(sortedWeightsCandState, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
+//
+//		log.info(currentState.getInstance().getName());
+//		log.info("_____________GoldAnnotations:_____________");
+//		log.info(currentState.getGoldAnnotations());
+//		log.info("_____________PrevState:_____________");
+//		sortedWeightsPrevState.stream().filter(k -> differences.containsKey(k.getKey())).forEach(log::info);
+//		log.info("ModelScore: " + currentState.getModelScore() + ": " + currentState.getCurrentPredictions());
+//		log.info("_____________CandState:_____________");
+//		sortedWeightsCandState.stream().filter(k -> differences.containsKey(k.getKey())).forEach(log::info);
+//		log.info("ModelScore: " + candidateState.getModelScore() + ": " + candidateState.getCurrentPredictions());
+//		log.info("------------------");
+//	}
 
-	private void compare(State currentState, State candidateState) {
+//	private static Map<String, Double> getDifferences(Map<String, Double> currentFeatures,
+//			Map<String, Double> candidateFeatures) {
+//		Map<String, Double> differences = new HashMap<>();
+//
+//		Set<String> keys = new HashSet<>();
+//
+//		keys.addAll(candidateFeatures.keySet());
+//		keys.addAll(currentFeatures.keySet());
+//
+//		for (String key : keys) {
+//
+//			if (candidateFeatures.containsKey(key) && currentFeatures.containsKey(key)) {
+//				double diff = 0;
+//				if ((diff = Math.abs(currentFeatures.get(key) - candidateFeatures.get(key))) != 0.0D) {
+//					// This should or can not happen as feature weights are shared throughout states
+//					differences.put(key, diff);
+//				}
+//			} else if (currentFeatures.containsKey(key)) {
+//				differences.put(key, currentFeatures.get(key));
+//			} else {
+//				differences.put(key, candidateFeatures.get(key));
+//			}
+//
+//		}
+//		return differences;
+//	}
 
-		Map<String, Double> differences = getDifferences(collectFeatures(currentState),
-				collectFeatures(candidateState));
-		if (differences.isEmpty())
-			return;
-
-		List<Entry<String, Double>> sortedWeightsPrevState = new ArrayList<>(collectFeatures(currentState).entrySet());
-		List<Entry<String, Double>> sortedWeightsCandState = new ArrayList<>(
-				collectFeatures(candidateState).entrySet());
-
-		Collections.sort(sortedWeightsPrevState, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
-		Collections.sort(sortedWeightsCandState, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
-
-		log.info(currentState.getInstance().getName());
-		log.info("_____________GoldAnnotations:_____________");
-		log.info(currentState.getGoldAnnotations());
-		log.info("_____________PrevState:_____________");
-		sortedWeightsPrevState.stream().filter(k -> differences.containsKey(k.getKey())).forEach(log::info);
-		log.info("ModelScore: " + currentState.getModelScore() + ": " + currentState.getCurrentPredictions());
-		log.info("_____________CandState:_____________");
-		sortedWeightsCandState.stream().filter(k -> differences.containsKey(k.getKey())).forEach(log::info);
-		log.info("ModelScore: " + candidateState.getModelScore() + ": " + candidateState.getCurrentPredictions());
-		log.info("------------------");
-	}
-
-	private static Map<String, Double> getDifferences(Map<String, Double> currentFeatures,
-			Map<String, Double> candidateFeatures) {
-		Map<String, Double> differences = new HashMap<>();
-
-		Set<String> keys = new HashSet<>();
-
-		keys.addAll(candidateFeatures.keySet());
-		keys.addAll(currentFeatures.keySet());
-
-		for (String key : keys) {
-
-			if (candidateFeatures.containsKey(key) && currentFeatures.containsKey(key)) {
-				double diff = 0;
-				if ((diff = Math.abs(currentFeatures.get(key) - candidateFeatures.get(key))) != 0.0D) {
-					// This should or can not happen as feature weights are shared throughout states
-					differences.put(key, diff);
-				}
-			} else if (currentFeatures.containsKey(key)) {
-				differences.put(key, currentFeatures.get(key));
-			} else {
-				differences.put(key, candidateFeatures.get(key));
-			}
-
-		}
-		return differences;
-	}
-
-	private static Map<String, Double> collectFeatures(State currentState) {
-		Map<String, Double> features = new HashMap<>();
-
-		for (FactorGraph fg : currentState.getFactorGraphs()) {
-			for (Factor f : fg.getFactors()) {
-
-				for (Entry<Integer, Double> feature : f.getFeatureVector().getFeatures().entrySet()) {
-					if (f.getFactorScope().getTemplate().getWeights().getFeatures().containsKey(feature.getKey()))
-						features.put(
-								f.getFactorScope().getTemplate().getClass().getSimpleName() + ":"
-										+ Model.getFeatureForIndex(feature.getKey()),
-								feature.getValue() * f.getFactorScope().getTemplate().getWeights().getFeatures()
-										.get(feature.getKey()));
-
-				}
-			}
-		}
-		return features;
-	}
+//	private static Map<String, Double> collectFeatures(State currentState) {
+//		Map<String, Double> features = new HashMap<>();
+//
+//		for (FactorGraph fg : currentState.getFactorGraphs()) {
+//			for (Factor f : fg.getFactors()) {
+//
+//				for (Entry<Integer, Double> feature : f.getFeatureVector().getFeatures().entrySet()) {
+//					if (f.getFactorScope().getTemplate().getWeights().getFeatures().containsKey(feature.getKey()))
+//						features.put(
+//								f.getFactorScope().getTemplate().getClass().getSimpleName() + ":"
+//										+ Model.getFeatureForIndex(feature.getKey()),
+//								feature.getValue() * f.getFactorScope().getTemplate().getWeights().getFeatures()
+//										.get(feature.getKey()));
+//
+//				}
+//			}
+//		}
+//		return features;
+//	}
 
 	/**
 	 * 

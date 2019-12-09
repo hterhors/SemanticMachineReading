@@ -52,29 +52,29 @@ public class Model {
 	private final File modelBaseDir;
 	private final String modelName;
 
-	/**
-	 * Synchronized method
-	 * 
-	 * @param feature
-	 * @return
-	 */
-	public static synchronized Integer getIndexForFeatureName(String feature) {
-		Integer index;
-
-		if ((index = featureNameIndex.get(feature)) != null) {
-			return index;
-		}
-
-		index = new Integer(featureNameIndex.size());
-		featureNameIndex.put(feature, index);
-		indexFeatureName.put(index, feature);
-
-		return index;
-	}
-
-	public static synchronized String getFeatureForIndex(Integer feature) {
-		return indexFeatureName.get(feature);
-	}
+//	/**
+//	 * Synchronized method
+//	 * 
+//	 * @param feature
+//	 * @return
+//	 */
+//	public static synchronized Integer getIndexForFeatureName(String feature) {
+//		Integer index;
+//
+//		if ((index = featureNameIndex.get(feature)) != null) {
+//			return index;
+//		}
+//
+//		index = new Integer(featureNameIndex.size());
+//		featureNameIndex.put(feature, index);
+//		indexFeatureName.put(index, feature);
+//
+//		return index;
+//	}
+//
+//	public static synchronized String getFeatureForIndex(Integer feature) {
+//		return indexFeatureName.get(feature);
+//	}
 
 	/**
 	 * A comparator implementation that allows to sort states in descending order
@@ -246,14 +246,15 @@ public class Model {
 
 				PrintStream ps = new PrintStream(f);
 				log.info("Print template to " + f.getAbsolutePath());
-				List<Entry<Integer, Double>> sortedWeights = new ArrayList<>(
+				List<Entry<String, Double>> sortedWeights = new ArrayList<>(
 						template.getWeights().getFeatures().entrySet());
-
 				if (sortedWeights.size() == 0)
+					
 					log.warn("No features found for template: " + template.getClass().getSimpleName());
 				Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
-				for (Entry<Integer, Double> feature : sortedWeights) {
-					ps.println(indexFeatureName.get(feature.getKey()) + "\t" + feature.getValue());
+				for (Entry<String, Double> feature : sortedWeights) {
+					ps.println(feature.getKey() + "\t" + feature.getValue());
+//					ps.println(indexFeatureName.get(feature.getKey()) + "\t" + feature.getValue());
 				}
 				ps.close();
 
