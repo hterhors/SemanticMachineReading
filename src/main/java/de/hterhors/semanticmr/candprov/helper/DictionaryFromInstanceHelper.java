@@ -14,6 +14,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class DictionaryFromInstanceHelper {
@@ -85,9 +86,9 @@ public class DictionaryFromInstanceHelper {
 							/**
 							 * special for compound treatments...
 							 */
-							if (slotFillerValue.getEntityType() == EntityType.get("CompoundTreatment")) {
+							if (slotFillerValue.getEntityType().name.equals("CompoundTreatment")) {
 								SingleFillerSlot s = slotFillerValue.asInstanceOfEntityTemplate()
-										.getSingleFillerSlot("hasCompound");
+										.getSingleFillerSlot(SlotType.get("hasCompound"));
 
 								if (s.containsSlotFiller()) {
 									AbstractAnnotation compound = s.getSlotFiller().asInstanceOfEntityTemplate()

@@ -24,6 +24,20 @@ public class AnnotationBuilder {
 		}
 	}
 
+	public static DocumentLinkedAnnotation toAnnotation(final Document document, final EntityType entityType,
+			final String textualContent, final int offset) {
+		try {
+
+			Objects.requireNonNull(document);
+			Objects.requireNonNull(entityType);
+			Objects.requireNonNull(textualContent);
+			return new DocumentLinkedAnnotation(document, entityType, new TextualContent(textualContent),
+					new DocumentPosition(offset));
+		} catch (DocumentLinkedAnnotationMismatchException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static LiteralAnnotation toAnnotation(final String entityTypeName, final String literal) {
 		Objects.requireNonNull(entityTypeName);
 		Objects.requireNonNull(literal);

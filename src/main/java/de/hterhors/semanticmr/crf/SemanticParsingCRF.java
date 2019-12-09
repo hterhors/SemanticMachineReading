@@ -30,10 +30,10 @@ import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ITrainingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
-import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -173,7 +173,7 @@ public class SemanticParsingCRF {
 								currentState);
 
 						model.updateWeights(learner, currentState, candidateState);
-					
+
 						if (isAccepted) {
 							currentState = candidateState;
 						}
@@ -183,7 +183,7 @@ public class SemanticParsingCRF {
 						finalStates.put(instance, currentState);
 
 					}
-					
+
 					if (meetsSamplingStoppingCriterion(samplingStoppingCrits, producedStateChain))
 						break;
 
@@ -253,11 +253,11 @@ public class SemanticParsingCRF {
 			/*
 			 * Treatments
 			 */
-			List<AbstractAnnotation> goldTreatments = new ArrayList<>(
-					goldAnnotations.get(goldIndex).getMultiFillerSlot("hasTreatmentType").getSlotFiller());
+			List<AbstractAnnotation> goldTreatments = new ArrayList<>(goldAnnotations.get(goldIndex)
+					.getMultiFillerSlot(SlotType.get("hasTreatmentType")).getSlotFiller());
 
 			List<AbstractAnnotation> predictTreatments = new ArrayList<>(predictedAnnotationsBaseline.get(predictIndex)
-					.getMultiFillerSlot("hasTreatmentType").getSlotFiller());
+					.getMultiFillerSlot(SlotType.get("hasTreatmentType")).getSlotFiller());
 			Score s;
 			if (goldTreatments.isEmpty() && predictTreatments.isEmpty())
 				s = new Score(1, 0, 0);
