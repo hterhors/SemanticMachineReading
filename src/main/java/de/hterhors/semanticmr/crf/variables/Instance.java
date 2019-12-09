@@ -46,7 +46,7 @@ public class Instance implements Comparable<Instance> {
 
 		this.goldAnnotations = new Annotations(goldAnnotations, modifyRules).unmodifiable();
 
-		for (AbstractAnnotation a : goldAnnotations.getAnnotations()) {
+		for (AbstractAnnotation a : this.goldAnnotations.getAnnotations()) {
 			if (a instanceof DocumentLinkedAnnotation) {
 				if (!a.asInstanceOfDocumentLinkedAnnotation().document.equals(document))
 					throw new MismatchingDocumentsException("Not all " + DocumentLinkedAnnotation.class.getSimpleName()

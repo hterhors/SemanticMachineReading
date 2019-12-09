@@ -41,8 +41,8 @@ import de.hterhors.semanticmr.json.JsonInstanceReader;
 public class InstanceProvider {
 	private static Logger log = LogManager.getFormatterLogger(InstanceProvider.class);
 
-	public static boolean removeEmptyInstances = false;
-	public static boolean removeInstancesWithToManyAnnotations = false;
+	public static boolean removeEmptyInstances = true;
+	public static boolean removeInstancesWithToManyAnnotations = true;
 	public static int maxNumberOfAnnotations = CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE;
 
 	final private File jsonInstancesDirectory;
