@@ -8,13 +8,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
-import de.hterhors.semanticmr.crf.structure.slots.SlotType;
+import de.hterhors.semanticmr.crf.structure.annotations.SingleFillerSlot;
+import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class DictionaryFromInstanceHelper {
@@ -69,8 +71,10 @@ public class DictionaryFromInstanceHelper {
 
 					}
 
-					for (AbstractAnnotation slotFillerValue : aa.asInstanceOfEntityTemplate()
-							.getAllSlotFillerValues()) {
+					for (AbstractAnnotation slotFillerValue : Stream
+							.concat(aa.asInstanceOfEntityTemplate().streamSingleFillerSlotValues(),
+									aa.asInstanceOfEntityTemplate().flatStreamMultiFillerSlotValues())
+							.collect(Collectors.toSet())) {
 
 						if (slotFillerValue.isInstanceOfEntityTemplate()) {
 

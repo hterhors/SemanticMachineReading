@@ -1,6 +1,7 @@
 package de.hterhors.semanticmr.crf.templates.shared;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -11,8 +12,8 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
-import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.NGramTokenContextTemplate.NGramTokenContextScope;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
@@ -182,11 +183,13 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 
 		final String[] rightContext = extractRightContext(tokens, endTokenIndex);
 
-		getContextFeatures(featureVector, entity.name, leftContext, rightContext);
+		Set<EntityType> entityTypes = new HashSet<>();
 
-		for (EntityType e : entity.getDirectSuperEntityTypes()) {
-			getContextFeatures(featureVector, e.name, leftContext, rightContext);
-		}
+		entityTypes.add(entity);
+		entityTypes.addAll(entity.getTransitiveClosureSuperEntityTypes());
+
+		getContextFeatures(featureVector, entityTypes, leftContext, rightContext);
+
 	}
 
 	private String[] extractLeftContext(List<DocumentToken> tokens, int beginTokenIndex) {
@@ -216,8 +219,8 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 
 	}
 
-	private void getContextFeatures(DoubleVector featureVector, final String entityName, final String[] leftContext,
-			final String[] rightContext) {
+	private void getContextFeatures(DoubleVector featureVector, final Set<EntityType> entityTypes,
+			final String[] leftContext, final String[] rightContext) {
 
 		final StringBuffer lCs = new StringBuffer();
 		final StringBuffer rCs = new StringBuffer();
@@ -233,9 +236,11 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 
 			rCs.setLength(0);
 			lCs.insert(0, context + SPLITTER);
-			featureVector.set(PREFIX
-					+ new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs).toString().trim(),
-					true);
+
+			for (EntityType entityType : entityTypes) {
+				featureVector.set(PREFIX + new StringBuffer(lCs).append(LEFT).append(entityType.name).append(RIGHT)
+						.append(rCs).toString().trim(), true);
+			}
 
 			for (int j = 0; j < rightContext.length; j++) {
 				eof = rightContext[j] == null;
@@ -244,9 +249,10 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 				else
 					context = rightContext[j];
 				rCs.append(SPLITTER).append(context);
-				featureVector.set(PREFIX + new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT)
-						.append(rCs).toString().trim(), true);
-
+				for (EntityType entityType : entityTypes) {
+					featureVector.set(PREFIX + new StringBuffer(lCs).append(LEFT).append(entityType.name).append(RIGHT)
+							.append(rCs).toString().trim(), true);
+				}
 			}
 			if (bof)
 				break;
@@ -263,9 +269,10 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 				context = rightContext[i];
 			lCs.setLength(0);
 			rCs.append(SPLITTER).append(context);
-			featureVector.set(PREFIX
-					+ new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT).append(rCs).toString().trim(),
-					true);
+			for (EntityType entityType : entityTypes) {
+				featureVector.set(PREFIX + new StringBuffer(lCs).append(LEFT).append(entityType.name).append(RIGHT)
+						.append(rCs).toString().trim(), true);
+			}
 
 			for (int j = 0; j < leftContext.length; j++) {
 				bof = leftContext[j] == null;
@@ -274,9 +281,10 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 				else
 					context = leftContext[j];
 				lCs.insert(0, context + SPLITTER);
-				featureVector.set(PREFIX + new StringBuffer(lCs).append(LEFT).append(entityName).append(RIGHT)
-						.append(rCs).toString().trim(), true);
-
+				for (EntityType entityType : entityTypes) {
+					featureVector.set(PREFIX + new StringBuffer(lCs).append(LEFT).append(entityType.name).append(RIGHT)
+							.append(rCs).toString().trim(), true);
+				}
 				if (bof)
 					break;
 			}

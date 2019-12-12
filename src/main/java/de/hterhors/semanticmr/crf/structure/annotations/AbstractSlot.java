@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.structure.slots;
+package de.hterhors.semanticmr.crf.structure.annotations;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IDeepCopyable;

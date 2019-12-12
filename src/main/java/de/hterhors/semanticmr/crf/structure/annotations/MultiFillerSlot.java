@@ -1,12 +1,12 @@
-package de.hterhors.semanticmr.crf.structure.slots;
+package de.hterhors.semanticmr.crf.structure.annotations;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
-import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.exce.ExceedsMaxSlotFillerException;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 
@@ -30,8 +30,8 @@ public class MultiFillerSlot extends AbstractSlot {
 		this.slotFiller = slotFiller;
 	}
 
-	public LinkedHashSet<AbstractAnnotation> getSlotFiller() {
-		return slotFiller;
+	public Set<AbstractAnnotation> getSlotFiller() {
+		return Collections.unmodifiableSet(slotFiller);
 	}
 
 	public int getMaxExplorationCapacity() {
@@ -61,7 +61,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		return !slotFiller.isEmpty();
 	}
 
-	public void add(AbstractAnnotation slotFiller) throws ExceedsMaxSlotFillerException {
+	protected MultiFillerSlot add(AbstractAnnotation slotFiller) throws ExceedsMaxSlotFillerException {
 
 		if (containsMaximumFiller())
 			throw new ExceedsMaxSlotFillerException(
@@ -73,9 +73,10 @@ public class MultiFillerSlot extends AbstractSlot {
 							+ " is not suitable for this slot of type " + slotType.toPrettyString());
 
 		this.slotFiller.add(slotFiller);
+		return this;
 	}
 
-	public void removeSlotFiller(AbstractAnnotation slotFiller) {
+	protected void removeSlotFiller(AbstractAnnotation slotFiller) {
 		this.slotFiller.remove(slotFiller);
 	}
 
@@ -165,18 +166,16 @@ public class MultiFillerSlot extends AbstractSlot {
 	 * 
 	 * @param slotFiller          the old filler to remove
 	 * @param slotFillerCandidate the new filler to add
+	 * @return
 	 */
-	public void replace(AbstractAnnotation slotFiller, AbstractAnnotation slotFillerCandidate) {
+	public MultiFillerSlot replace(AbstractAnnotation slotFiller, AbstractAnnotation slotFillerCandidate) {
 
 		if (slotFiller == slotFillerCandidate)
-			return;
+			return this;
 
 		this.slotFiller.remove(slotFiller);
 		this.slotFiller.add(slotFillerCandidate);
-	}
-
-	public void clear() {
-		this.slotFiller.clear();
+		return this;
 	}
 
 }

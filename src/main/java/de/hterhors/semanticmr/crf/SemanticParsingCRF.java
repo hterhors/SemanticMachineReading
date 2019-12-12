@@ -33,7 +33,7 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.crf.structure.slots.SlotType;
+import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
@@ -269,10 +269,10 @@ public class SemanticParsingCRF {
 			 * OrganismModel
 			 */
 			List<AbstractAnnotation> goldOrganismModel = Arrays
-					.asList(goldAnnotations.get(goldIndex).getSingleFillerSlot("hasOrganismModel").getSlotFiller())
+					.asList(goldAnnotations.get(goldIndex).getSingleFillerSlotOfName("hasOrganismModel").getSlotFiller())
 					.stream().filter(a -> a != null).collect(Collectors.toList());
 			List<AbstractAnnotation> predictOrganismModel = Arrays.asList(predictedAnnotationsBaseline.get(predictIndex)
-					.getSingleFillerSlot("hasOrganismModel").getSlotFiller()).stream().filter(a -> a != null)
+					.getSingleFillerSlotOfName("hasOrganismModel").getSlotFiller()).stream().filter(a -> a != null)
 					.collect(Collectors.toList());
 
 			simpleScore.add(evaluator.prf1(goldOrganismModel, predictOrganismModel));
@@ -281,10 +281,10 @@ public class SemanticParsingCRF {
 			 * InjuryModel
 			 */
 			List<AbstractAnnotation> goldInjuryModel = Arrays
-					.asList(goldAnnotations.get(goldIndex).getSingleFillerSlot("hasInjuryModel").getSlotFiller())
+					.asList(goldAnnotations.get(goldIndex).getSingleFillerSlotOfName("hasInjuryModel").getSlotFiller())
 					.stream().filter(a -> a != null).collect(Collectors.toList());
 			List<AbstractAnnotation> predictInjuryModel = Arrays.asList(predictedAnnotationsBaseline.get(predictIndex)
-					.getSingleFillerSlot("hasInjuryModel").getSlotFiller()).stream().filter(a -> a != null)
+					.getSingleFillerSlotOfName("hasInjuryModel").getSlotFiller()).stream().filter(a -> a != null)
 					.collect(Collectors.toList());
 
 			simpleScore.add(evaluator.prf1(goldInjuryModel, predictInjuryModel));

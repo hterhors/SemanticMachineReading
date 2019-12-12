@@ -1,14 +1,15 @@
 package de.hterhors.semanticmr.crf.templates.et;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
-import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -164,8 +165,10 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 			 */
 			Integer rootOffset = null;
 			if (annotation.asInstanceOfEntityTemplate().getRootAnnotation().isInstanceOfDocumentLinkedAnnotation()) {
-				rootOffset = annotation.getRootAnnotation().asInstanceOfDocumentLinkedAnnotation()
-						.getStartDocCharOffset();
+				rootOffset = annotation.getRootAnnotation().asInstanceOfDocumentLinkedAnnotation().relatedTokens.get(0)
+						.getDocTokenIndex();
+//				rootOffset = annotation.getRootAnnotation().asInstanceOfDocumentLinkedAnnotation()
+//						.getStartDocCharOffset();
 			}
 
 			final EntityTemplateAnnotationFilter filter = annotation.filter().singleSlots().multiSlots().merge()
@@ -177,11 +180,18 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 			for (int i = 0; i < slotFillers.size(); i++) {
 				final AbstractAnnotation fromSlotFiller = slotFillers.get(i);
 
-				final Integer fromOffset = fromSlotFiller.asInstanceOfDocumentLinkedAnnotation()
-						.getStartDocCharOffset();
+				final Integer fromOffset = fromSlotFiller.asInstanceOfDocumentLinkedAnnotation().relatedTokens.get(0)
+						.getDocTokenIndex();
+//				final Integer fromOffset = fromSlotFiller.asInstanceOfDocumentLinkedAnnotation()
+//						.getStartDocCharOffset();
 
 				if (annotation.asInstanceOfEntityTemplate().getRootAnnotation()
 						.isInstanceOfDocumentLinkedAnnotation()) {
+					if (Math.abs(rootOffset - fromOffset) > MAX_TOKEN_DIST)
+						continue;
+
+					if (Math.abs(rootOffset - fromOffset) < MIN_TOKEN_DIST)
+						continue;
 					if (rootOffset.intValue() > fromOffset.intValue()) {
 						factors.add(new ContextBetweenScope(this, state.getInstance(), fromSlotFiller.getEntityType(),
 								fromOffset, annotation.getEntityType(), rootOffset));
@@ -194,10 +204,19 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 				for (int j = i + 1; j < slotFillers.size(); j++) {
 					final AbstractAnnotation toSlotFiller = slotFillers.get(j);
 
-					final Integer toOffset = toSlotFiller.asInstanceOfDocumentLinkedAnnotation()
-							.getStartDocCharOffset();
+					final Integer toOffset = toSlotFiller.asInstanceOfDocumentLinkedAnnotation().relatedTokens.get(0)
+							.getDocTokenIndex();
+//					final Integer toOffset = toSlotFiller.asInstanceOfDocumentLinkedAnnotation()
+//							.getStartDocCharOffset();
+
+					if (Math.abs(toOffset - fromOffset) > MAX_TOKEN_DIST)
+						continue;
+
+					if (Math.abs(toOffset - fromOffset) < MIN_TOKEN_DIST)
+						continue;
 
 					if (fromOffset.intValue() > toOffset.intValue()) {
+
 						factors.add(new ContextBetweenScope(this, state.getInstance(), toSlotFiller.getEntityType(),
 								toOffset, fromSlotFiller.getEntityType(), fromOffset));
 					} else if (fromOffset.intValue() < toOffset.intValue()) {
@@ -218,47 +237,43 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 
 		EntityType fromEntity = factor.getFactorScope().fromEntity;
 		EntityType toEntity = factor.getFactorScope().toEntity;
-		try {
+//		try {
 
-			DoubleVector featureVector = factor.getFeatureVector();
+		DoubleVector featureVector = factor.getFeatureVector();
 
-			final int fromTokenIndex = factor.getFactorScope().instance.getDocument()
-					.getTokenByCharStartOffset(factor.getFactorScope().fromEntityCharacterOnset).getDocTokenIndex();
+		final int fromTokenIndex = factor.getFactorScope().fromEntityCharacterOnset;
+//			final int fromTokenIndex = factor.getFactorScope().instance.getDocument()
+//					.getTokenByCharStartOffset(factor.getFactorScope().fromEntityCharacterOnset).getDocTokenIndex();
 
-			final int toTokenIndex = factor.getFactorScope().instance.getDocument()
-					.getTokenByCharStartOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
+//			final int toTokenIndex = factor.getFactorScope().instance.getDocument()
+//					.getTokenByCharStartOffset(factor.getFactorScope().toEntityCharacterOnset).getDocTokenIndex();
+		final int toTokenIndex = factor.getFactorScope().toEntityCharacterOnset;
 
-			if (toTokenIndex - fromTokenIndex > MAX_TOKEN_DIST)
-				return;
+		final List<DocumentToken> tokens = factor.getFactorScope().instance.getDocument().tokenList
+				.subList(fromTokenIndex + 1, toTokenIndex); // exclude start token.
 
-			if (toTokenIndex - fromTokenIndex < MIN_TOKEN_DIST)
-				return;
+		if (tokens.size() > 2) {
 
-			final List<DocumentToken> tokens = factor.getFactorScope().instance.getDocument().tokenList
-					.subList(fromTokenIndex + 1, toTokenIndex); // exclude start token.
+			Set<EntityType> fromEntityTypes = new HashSet<>();
+			fromEntityTypes.add(fromEntity);
+			fromEntityTypes.addAll(fromEntity.getTransitiveClosureSuperEntityTypes());
 
-			if (tokens.size() > 2) {
+			Set<EntityType> toEntityTypes = new HashSet<>();
+			toEntityTypes.add(toEntity);
+			toEntityTypes.addAll(toEntity.getTransitiveClosureSuperEntityTypes());
 
-				getTokenNgrams(featureVector, fromEntity.name, toEntity.name, tokens);
-
-				for (EntityType fe : fromEntity.getTransitiveClosureSuperEntityTypes()) {
-					for (EntityType te : toEntity.getTransitiveClosureSuperEntityTypes()) {
-
-						if (tokens.size() > 2)
-							getTokenNgrams(featureVector, fe.name, te.name, tokens);
-					}
-
-				}
-			}
-		} catch (DocumentLinkedAnnotationMismatchException e) {
-			e.printStackTrace();
-			System.out.println("WARN! " + e.getMessage());
+			getTokenNgrams(featureVector, fromEntityTypes, toEntityTypes, tokens);
 
 		}
+//		} catch (DocumentLinkedAnnotationMismatchException e) {
+//			e.printStackTrace();
+//			System.out.println("WARN! " + e.getMessage());
+//
+//		}
 	}
 
-	private void getTokenNgrams(DoubleVector featureVector, String fromClassName, String toClassName,
-			List<DocumentToken> tokens) {
+	private void getTokenNgrams(DoubleVector featureVector, Set<EntityType> fromEntityTypes,
+			Set<EntityType> toEntityTypes, List<DocumentToken> tokens) {
 
 		final int maxNgramSize = tokens.size() + 2;
 		for (int ngram = 1; ngram < maxNgramSize; ngram++) {
@@ -302,9 +317,12 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 
 				if (featureName.isEmpty())
 					continue;
-
-				featureVector.set(PREFIX + LEFT + fromClassName + RIGHT + Document.TOKEN_SPLITTER + featureName
-						+ Document.TOKEN_SPLITTER + LEFT + toClassName + RIGHT, true);
+				for (EntityType fromEntityType : fromEntityTypes) {
+					for (EntityType toEntityType : toEntityTypes) {
+						featureVector.set(PREFIX + LEFT + fromEntityType.name + RIGHT + Document.TOKEN_SPLITTER
+								+ featureName + Document.TOKEN_SPLITTER + LEFT + toEntityType.name + RIGHT, true);
+					}
+				}
 
 			}
 		}

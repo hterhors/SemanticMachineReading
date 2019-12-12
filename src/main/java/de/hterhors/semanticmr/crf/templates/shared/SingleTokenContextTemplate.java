@@ -1,11 +1,9 @@
 package de.hterhors.semanticmr.crf.templates.shared;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-
-import org.apache.commons.lang3.math.Fraction;
-
 import java.util.Set;
 
 import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
@@ -13,9 +11,8 @@ import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
-import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
-import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.SingleTokenContextTemplate.SingleTokenContextScope;
 import de.hterhors.semanticmr.crf.variables.Document;
@@ -153,21 +150,27 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 		DocumentToken beginToken = factor.getFactorScope().firstToken;
 		DocumentToken endToken = factor.getFactorScope().lastToken;
 
+		Set<EntityType> entityTypes = new HashSet<>();
+		entityTypes.add(factor.getFactorScope().entityType);
+		entityTypes.addAll(factor.getFactorScope().entityType.getTransitiveClosureSuperEntityTypes());
+
 		int distance = 0;
 		for (int i = Math.max(0, beginToken.getDocTokenIndex() - DEFAULT_MAX_TOKEN_CONTEXT_LEFT) - 1; i < beginToken
 				.getDocTokenIndex(); i++) {
 
 			if (i < 0)
-				featureVector.set(PREFIX + BOF + " " + factor.getFactorScope().entityType.name, true);
+				for (EntityType entityType : entityTypes) {
+					featureVector.set(PREFIX + BOF + " " + entityType.name, true);
+				}
 			else {
 				final String text = factor.getFactorScope().instance.getDocument().tokenList.get(i).getText();
 				if (Document.getStopWords().contains(text))
 					continue;
-				featureVector.set(PREFIX + text + " " + factor.getFactorScope().entityType.name, true);
-				featureVector.set(PREFIX + text + "... " + factor.getFactorScope().entityType.name, true);
-				featureVector.set(
-						PREFIX + text + "... -" + distance + "... " + factor.getFactorScope().entityType.name,
-						true);
+				for (EntityType entityType : entityTypes) {
+					featureVector.set(PREFIX + text + " " + entityType.name, true);
+					featureVector.set(PREFIX + text + "... " + entityType.name, true);
+					featureVector.set(PREFIX + text + "... -" + distance + "... " + entityType.name, true);
+				}
 			}
 			distance++;
 		}
@@ -177,16 +180,18 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 				endToken.getDocTokenIndex() + DEFAULT_MAX_TOKEN_CONTEXT_RIGHT); i++) {
 
 			if (i == factor.getFactorScope().instance.getDocument().tokenList.size())
-				featureVector.set(PREFIX + EOF + " " + factor.getFactorScope().entityType.name, true);
+				for (EntityType entityType : entityTypes) {
+					featureVector.set(PREFIX + EOF + " " + entityType.name, true);
+				}
 			else {
 				final String text = factor.getFactorScope().instance.getDocument().tokenList.get(i).getText();
 				if (Document.getStopWords().contains(text))
 					continue;
-				featureVector.set(PREFIX + text + " " + factor.getFactorScope().entityType.name, true);
-				featureVector.set(PREFIX + factor.getFactorScope().entityType.name + "... " + text, true);
-				featureVector.set(
-						PREFIX + factor.getFactorScope().entityType.name + "... +" + distance + "... " + text,
-						true);
+				for (EntityType entityType : entityTypes) {
+					featureVector.set(PREFIX + text + " " + entityType.name, true);
+					featureVector.set(PREFIX + entityType.name + "... " + text, true);
+					featureVector.set(PREFIX + entityType.name + "... +" + distance + "... " + text, true);
+				}
 			}
 			distance++;
 		}

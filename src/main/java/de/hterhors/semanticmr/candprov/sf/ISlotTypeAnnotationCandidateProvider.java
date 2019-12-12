@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
-import de.hterhors.semanticmr.crf.structure.slots.SlotType;
+import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 
 public interface ISlotTypeAnnotationCandidateProvider extends ICandidateProvider {
 

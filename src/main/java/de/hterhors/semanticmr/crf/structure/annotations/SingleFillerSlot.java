@@ -1,7 +1,6 @@
-package de.hterhors.semanticmr.crf.structure.slots;
+package de.hterhors.semanticmr.crf.structure.annotations;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 
 public class SingleFillerSlot extends AbstractSlot {
@@ -39,18 +38,19 @@ public class SingleFillerSlot extends AbstractSlot {
 	 * Updates the annotation and returns the old annotation.
 	 * 
 	 * @param slotFiller
-	 * @return the old annotation.
+	 * @return return this
 	 */
-	public void set(final AbstractAnnotation slotFiller) {
+	protected SingleFillerSlot set(final AbstractAnnotation slotFiller) {
 
 		if (this.slotFiller == slotFiller)
-			return;
+			return this;
 
 		if (!slotType.matchesEntityType(slotFiller.getEntityType()))
 			throw new IllegalSlotFillerException("The provided slot filler annotation type "
 					+ slotFiller.getEntityType() + "is not suitable for this slot of type " + slotType);
 
 		this.slotFiller = slotFiller;
+		return this;
 	}
 
 	@Override
@@ -99,10 +99,6 @@ public class SingleFillerSlot extends AbstractSlot {
 		} else if (!slotFiller.equals(other.slotFiller))
 			return false;
 		return true;
-	}
-
-	public void clear() {
-		slotFiller = null;
 	}
 
 }

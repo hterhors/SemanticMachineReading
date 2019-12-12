@@ -20,7 +20,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
-import de.hterhors.semanticmr.crf.structure.slots.SlotType;
+import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
@@ -155,11 +155,11 @@ public class SantoRDFConverter {
 //	System.out.println();
 //}
 			if (subject.contains("Investigation_")) {
-				
+
 				String id = subject.split("_")[1];
 				id = id.substring(0, id.length() - 1);
 				object.setSingleSlotFiller(SlotType.get("hasID"), AnnotationBuilder.toAnnotation("ID", id));
-				
+
 			}
 
 			if (skipProperties.contains(props.getKey()))
@@ -180,7 +180,6 @@ public class SantoRDFConverter {
 
 //			System.out.println(slot);
 
-
 			/*
 			 * Get all values.
 			 */
@@ -194,13 +193,13 @@ public class SantoRDFConverter {
 			if (slot.isSingleValueSlot()) {
 				if (slotFillers.size() > 1) {
 					System.out.println("WARN! Multiple slot filler detected for single filler slot: " + slot);
-					System.out.println("WARN! Apply strategy: \"Take first.\"" );
+					System.out.println("WARN! Apply strategy: \"Take first.\"");
 				}
 				final AbstractAnnotation slotFiller = slotFillers.get(0);
-				object.getSingleFillerSlot(slot).set(slotFiller);
+				object.setSingleSlotFiller(slot, slotFiller);
 			} else {
 				for (AbstractAnnotation slotFiller : slotFillers) {
-					object.getMultiFillerSlot(slot).add(slotFiller);
+					object.addMultiSlotFiller(slot, slotFiller);
 				}
 			}
 		}

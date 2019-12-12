@@ -11,8 +11,8 @@ import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
-import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.et.LocalityTemplate.LocalityScope;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -158,9 +158,9 @@ public class LocalityTemplate extends AbstractFeatureTemplate<LocalityScope> {
 	@Override
 	public void generateFeatureVector(Factor<LocalityScope> factor) {
 
-		for (EntityType pe : factor.getFactorScope().firstEntity.getDirectSuperEntityTypes()) {
+		for (EntityType pe : factor.getFactorScope().firstEntity.getTransitiveClosureSuperEntityTypes()) {
 
-			for (EntityType ce : factor.getFactorScope().secondEntity.getDirectSuperEntityTypes()) {
+			for (EntityType ce : factor.getFactorScope().secondEntity.getTransitiveClosureSuperEntityTypes()) {
 
 				factor.getFeatureVector().set(PREFIX + pe.name + "->" + ce.name + " sentence dist = "
 						+ factor.getFactorScope().sentenceDistance, true);

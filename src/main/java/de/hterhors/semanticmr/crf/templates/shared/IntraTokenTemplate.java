@@ -1,6 +1,7 @@
 package de.hterhors.semanticmr.crf.templates.shared;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -10,8 +11,8 @@ import de.hterhors.semanticmr.crf.model.Factor;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
-import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.templates.shared.IntraTokenTemplate.IntraTokenScope;
 import de.hterhors.semanticmr.crf.variables.Document;
@@ -141,16 +142,16 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 	@Override
 	public void generateFeatureVector(Factor<IntraTokenScope> factor) {
 
-		getTokenNgrams(factor.getFeatureVector(), factor.getFactorScope().entityType.name,
-				factor.getFactorScope().surfaceForm);
-		for (EntityType e : factor.getFactorScope().entityType.getDirectSuperEntityTypes()) {
+		Set<EntityType> entityTypes = new HashSet<>();
 
-			getTokenNgrams(factor.getFeatureVector(), e.name, factor.getFactorScope().surfaceForm);
-		}
+		entityTypes.add(factor.getFactorScope().entityType);
+		entityTypes.addAll(factor.getFactorScope().entityType.getTransitiveClosureSuperEntityTypes());
+
+		getTokenNgrams(factor.getFeatureVector(), entityTypes, factor.getFactorScope().surfaceForm);
 
 	}
 
-	private void getTokenNgrams(DoubleVector featureVector, String name, String surfaceForm) {
+	private void getTokenNgrams(DoubleVector featureVector, Set<EntityType> entityTypes, String surfaceForm) {
 
 		final String cM = START_SIGN + TOKEN_SPLITTER_SPACE + surfaceForm + TOKEN_SPLITTER_SPACE + END_SIGN;
 
@@ -158,7 +159,9 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 
 		final int maxNgramSize = tokens.length;
 
-		featureVector.set(PREFIX + LEFT + name + RIGHT + TOKEN_SPLITTER_SPACE + cM, true);
+		for (EntityType entityType : entityTypes) {
+			featureVector.set(PREFIX + LEFT + entityType.name + RIGHT + TOKEN_SPLITTER_SPACE + cM, true);
+		}
 
 		for (int ngram = 1; ngram < maxNgramSize; ngram++) {
 			for (int i = 0; i < maxNgramSize - 1; i++) {
@@ -195,8 +198,10 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 
 				if (featureName.isEmpty())
 					continue;
-
-				featureVector.set(PREFIX + LEFT + name + RIGHT + TOKEN_SPLITTER_SPACE + featureName, true);
+				for (EntityType entityType : entityTypes) {
+					featureVector.set(PREFIX + LEFT + entityType.name + RIGHT + TOKEN_SPLITTER_SPACE + featureName,
+							true);
+				}
 
 			}
 		}

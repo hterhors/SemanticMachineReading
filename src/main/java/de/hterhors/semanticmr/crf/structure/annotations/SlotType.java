@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.crf.structure.slots;
+package de.hterhors.semanticmr.crf.structure.annotations;
 
 import java.util.Collections;
 import java.util.HashMap;

@@ -11,9 +11,9 @@ import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
-import de.hterhors.semanticmr.crf.structure.slots.MultiFillerSlot;
-import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
-import de.hterhors.semanticmr.crf.structure.slots.SlotType;
+import de.hterhors.semanticmr.crf.structure.annotations.MultiFillerSlot;
+import de.hterhors.semanticmr.crf.structure.annotations.SingleFillerSlot;
+import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 
 public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 
@@ -118,7 +118,7 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 			if (multiSlots) {
 				multiAnnotations = new HashMap<>();
 
-				for (SlotType slotType : entityTemplate.getMultiFillerSlots().keySet()) {
+				for (SlotType slotType : entityTemplate.getMultiFillerSlotTypes()) {
 
 					final MultiFillerSlot slot = entityTemplate.getMultiFillerSlot(slotType);
 
@@ -201,7 +201,7 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 
 			if (singleSlots) {
 				singleAnnotations = new HashMap<>();
-				for (SlotType slotType : entityTemplate.getSingleFillerSlots().keySet()) {
+				for (SlotType slotType : entityTemplate.getSingleFillerSlotTypes()) {
 
 					final SingleFillerSlot slot = entityTemplate.getSingleFillerSlot(slotType);
 

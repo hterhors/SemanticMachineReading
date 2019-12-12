@@ -2,27 +2,20 @@ package de.hterhors.semanticmr.crf.structure.annotations;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
-
-import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
-import de.hterhors.semanticmr.crf.structure.slots.AbstractSlot;
-import de.hterhors.semanticmr.crf.structure.slots.MultiFillerSlot;
-import de.hterhors.semanticmr.crf.structure.slots.SingleFillerSlot;
-import de.hterhors.semanticmr.crf.structure.slots.SlotType;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.exce.IllegalSlotFillerException;
 import de.hterhors.semanticmr.exce.UnkownMultiSlotException;
 import de.hterhors.semanticmr.exce.UnkownSingleSlotException;
-import de.hterhors.semanticmr.exce.UnkownSlotException;
 
 /**
  * The information extraction template that needs to be filled.
@@ -38,12 +31,12 @@ final public class EntityTemplate extends AbstractAnnotation {
 	private EntityTypeAnnotation rootAnnotation;
 
 	/**
-	 * An unmodifiable map of slots to fill.
+	 * A map of slots to fill.
 	 */
 	final private Map<SlotType, SingleFillerSlot> singleFillerSlots;
 
 	/**
-	 * An unmodifiable map of slots to fill.
+	 * A map of multi filler slots to fill.
 	 */
 	final private Map<SlotType, MultiFillerSlot> multiFillerSlots;
 
@@ -54,14 +47,8 @@ final public class EntityTemplate extends AbstractAnnotation {
 	 */
 	public EntityTemplate(EntityTypeAnnotation entityType) {
 		this.rootAnnotation = entityType;
-		this.singleFillerSlots = Collections.unmodifiableMap(this.rootAnnotation.entityType.getSingleFillerSlotTypes()
-				.stream().map(slotType -> new SingleFillerSlot(slotType))
-				.collect(Collectors.toMap(s -> s.slotType, s -> s)));
-
-		this.multiFillerSlots = Collections.unmodifiableMap(this.rootAnnotation.entityType.getMultiFillerSlotTypes()
-				.stream().map(slotType -> new MultiFillerSlot(slotType))
-				.collect(Collectors.toMap(s -> s.slotType, s -> s)));
-
+		this.singleFillerSlots = new HashMap<>();
+		this.multiFillerSlots = new HashMap<>();
 	}
 
 	/**
@@ -78,55 +65,28 @@ final public class EntityTemplate extends AbstractAnnotation {
 		this.multiFillerSlots = multiFillerSlots;
 	}
 
-	/**
-	 * Returns a set over all slot filler values for single- and multi-slot values.
-	 * 
-	 * @return a list of all direct slot filler values.
-	 */
-	public Set<AbstractAnnotation> getAllSlotFillerValues() {
-		return Streams.concat(
-				this.singleFillerSlots.values().stream().filter(s -> s.containsSlotFiller())
-						.map(s -> s.getSlotFiller()),
-				this.multiFillerSlots.values().stream().filter(l -> l.containsSlotFiller())
-						.flatMap(l -> l.getSlotFiller().stream()))
-				.collect(Collectors.toSet());
+	public Stream<AbstractAnnotation> streamSingleFillerSlotValues() {
+		return this.singleFillerSlots.values().stream().map(s -> s.getSlotFiller());
 	}
 
-	public boolean containsSingleFillerSlot(SlotType slotType) {
-		return singleFillerSlots.containsKey(slotType);
+	public Stream<AbstractAnnotation> flatStreamMultiFillerSlotValues() {
+		return this.multiFillerSlots.values().stream().flatMap(s -> s.getSlotFiller().stream());
 	}
 
-	public boolean containsMultiFillerSlot(SlotType slotType) {
-		return multiFillerSlots.containsKey(slotType);
-	}
-
-	public AbstractSlot getSlot(SlotType slotType) {
-		AbstractSlot slot = singleFillerSlots.get(slotType);
-
-		if (slot != null)
-			return slot;
-
-		slot = multiFillerSlots.get(slotType);
-
-		if (slot != null)
-			return slot;
-
-		throw new UnkownSlotException(
-				"The requested  slot is unkown: " + slotType + " for entity type: " + getEntityType().name);
-
+	public boolean hasSlotOfType(SlotType slotType) {
+		return getEntityType().containsSlotType(slotType);
 	}
 
 	public SingleFillerSlot getSingleFillerSlot(SlotType slotType) {
-		final SingleFillerSlot slot = singleFillerSlots.get(slotType);
 
-		if (slot == null)
+		if (!getEntityType().containsSlotType(slotType))
 			throw new UnkownSingleSlotException("The requested single filler slot is unkown: " + slotType
 					+ " for entity type: " + getEntityType().name);
 
-		return slot;
+		return singleFillerSlots.getOrDefault(slotType, new SingleFillerSlot(slotType));
 	}
 
-	public SingleFillerSlot getSingleFillerSlot(String slotType) {
+	public SingleFillerSlot getSingleFillerSlotOfName(String slotType) {
 		return getSingleFillerSlot(SlotType.get(slotType));
 	}
 
@@ -142,24 +102,28 @@ final public class EntityTemplate extends AbstractAnnotation {
 			throw new IllegalSlotFillerException("Can not update slot \"" + slotType.toPrettyString()
 					+ "\" with slot filler: \"" + slotFiller.toPrettyString() + "\"");
 
-		getSingleFillerSlot(slotType).set(slotFiller);
+		this.singleFillerSlots.put(slotType, new SingleFillerSlot(slotType).set(slotFiller));
 
 		return this;
 	}
 
-	public void updateMultiFillerSlot(IObjectiveFunction objectiveFunction, SlotType slotType,
-			AbstractAnnotation slotFiller, AbstractAnnotation slotFillerCandidate) {
+	public void updateMultiFillerSlot(SlotType slotType, AbstractAnnotation slotFiller,
+			AbstractAnnotation slotFillerCandidate) {
 
 		if (slotFillerCandidate == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
 
-		if (getMultiFillerSlot(slotType).containsSlotFiller(objectiveFunction, slotFillerCandidate)) {
-			System.out.println("WARN: can not add same object twice: " + slotFiller.toPrettyString());
-			throw new IllegalSlotFillerException("Can not update slot \"" + slotType.toPrettyString()
-					+ "\" with slot filler: \"" + slotFiller.toPrettyString() + "\"");
+		if (!getEntityType().containsSlotType(slotType))
+			throw new UnkownMultiSlotException(
+					"The requested multi filler slot is unkown: " + slotType + " for entity: " + getEntityType().name);
+
+		MultiFillerSlot mfs;
+		if ((mfs = multiFillerSlots.get(slotType)) != null) {
+			mfs.replace(slotFiller, slotFillerCandidate);
+		} else {
+			multiFillerSlots.put(slotType, new MultiFillerSlot(slotType).add(slotFillerCandidate));
 		}
 
-		getMultiFillerSlot(slotType).replace(slotFiller, slotFillerCandidate);
 	}
 
 	/**
@@ -170,53 +134,42 @@ final public class EntityTemplate extends AbstractAnnotation {
 	 * @param slotFiller
 	 */
 	public void addMultiSlotFiller(SlotType slotType, final AbstractAnnotation slotFiller) {
-		addMultiSlotFiller(null, slotType, slotFiller);
-	}
-
-	/**
-	 * Adds the given value to the set of values, iff the value is not contained in
-	 * the set, based on the objective function return value equals 1 or not.
-	 * 
-	 * @param objectiveFunction
-	 * @param slotType
-	 * @param slotFiller
-	 */
-	public void addMultiSlotFiller(IObjectiveFunction objectiveFunction, SlotType slotType,
-			final AbstractAnnotation slotFiller) {
 
 		if (slotFiller == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
 
-		if (getMultiFillerSlot(slotType).containsSlotFiller(objectiveFunction, slotFiller)) {
-			System.out.println("WARN: can not add same object twice: " + slotFiller.toPrettyString());
-			throw new IllegalSlotFillerException("Can not add same object twice: \"" + slotType.toPrettyString()
-					+ "\" with slot filler: \"" + slotFiller.toPrettyString() + "\"");
-		}
-
-		getMultiFillerSlot(slotType).add(slotFiller);
-	}
-
-	public MultiFillerSlot getMultiFillerSlot(SlotType slotType) {
-
-		final MultiFillerSlot slot = multiFillerSlots.get(slotType);
-
-		if (slot == null)
+		if (!getEntityType().containsSlotType(slotType))
 			throw new UnkownMultiSlotException(
 					"The requested multi filler slot is unkown: " + slotType + " for entity: " + getEntityType().name);
 
-		return slot;
+		MultiFillerSlot mfs;
+
+		if ((mfs = multiFillerSlots.get(slotType)) != null) {
+			mfs.add(slotFiller);
+		} else {
+			multiFillerSlots.put(slotType, new MultiFillerSlot(slotType).add(slotFiller));
+		}
+
 	}
 
-	public MultiFillerSlot getMultiFillerSlot(String slotTypeName) {
+	public MultiFillerSlot getMultiFillerSlot(SlotType slotType) {
+		if (!getEntityType().containsSlotType(slotType))
+			throw new UnkownMultiSlotException(
+					"The requested multi filler slot is unkown: " + slotType + " for entity: " + getEntityType().name);
+
+		return multiFillerSlots.getOrDefault(slotType, new MultiFillerSlot(slotType));
+	}
+
+	public MultiFillerSlot getMultiFillerSlotByName(String slotTypeName) {
 		return getMultiFillerSlot(SlotType.get(slotTypeName));
 	}
 
 	public Map<SlotType, SingleFillerSlot> getSingleFillerSlots() {
-		return singleFillerSlots;
+		return Collections.unmodifiableMap(singleFillerSlots);
 	}
 
 	public Map<SlotType, MultiFillerSlot> getMultiFillerSlots() {
-		return multiFillerSlots;
+		return Collections.unmodifiableMap(multiFillerSlots);
 	}
 
 	@Override
@@ -257,7 +210,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 	public EntityTemplate deepCopy() {
 
 		/**
-		 * An unmodifiable map of slots to fill.
+		 * An map of slots to fill.
 		 */
 		final Map<SlotType, SingleFillerSlot> singleFillerSlots = new HashMap<>();
 		for (Entry<SlotType, SingleFillerSlot> e : this.singleFillerSlots.entrySet()) {
@@ -271,35 +224,22 @@ final public class EntityTemplate extends AbstractAnnotation {
 		/**
 		 * An unmodifiable map of slots to fill.
 		 */
-		return new EntityTemplate(rootAnnotation, Collections.unmodifiableMap(singleFillerSlots),
-				Collections.unmodifiableMap(multiFillerSlots));
-//		return new EntityTemplate(rootAnnotation,
-//				this.singleFillerSlots.entrySet().stream()
-//				.collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue().deepCopy())),
-//				this.multiFillerSlots.entrySet().stream()
-//				.collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue().deepCopy())));
+		return new EntityTemplate(rootAnnotation.deepCopy(), singleFillerSlots, multiFillerSlots);
 	}
 
 	/**
 	 * Creates a deep copy of this entity template but changes the template root
-	 * annotation. Overlapping slots are deep copied. New slots are empty. Vanishing
-	 * slots are removed.
+	 * annotation. Overlapping slots are deeply copied. New slots are empty.
+	 * Vanishing slots are removed.
 	 * 
 	 * @param newTemplateType
 	 * @return
 	 */
 	public EntityTemplate deepMergeCopy(EntityTypeAnnotation newTemplateType) {
 
-		/*
-		 * Init new template with empty
-		 */
-		final Map<SlotType, SingleFillerSlot> singleFillerSlots = newTemplateType.entityType.getSingleFillerSlotTypes()
-				.stream().map(slotType -> new SingleFillerSlot(slotType))
-				.collect(Collectors.toMap(s -> s.slotType, s -> s));
+		final Map<SlotType, SingleFillerSlot> singleFillerSlots = new HashMap<>();
 
-		final Map<SlotType, MultiFillerSlot> multiFillerSlots = newTemplateType.entityType.getMultiFillerSlotTypes()
-				.stream().map(slotType -> new MultiFillerSlot(slotType))
-				.collect(Collectors.toMap(s -> s.slotType, s -> s));
+		final Map<SlotType, MultiFillerSlot> multiFillerSlots = new HashMap<>();
 
 		/*
 		 * Deep copy of existing and matching slots.
@@ -310,8 +250,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 		this.multiFillerSlots.entrySet().stream().filter(s -> newTemplateType.entityType.containsSlotType(s.getKey()))
 				.forEach(s -> multiFillerSlots.put(s.getKey(), s.getValue().deepCopy()));
 
-		return new EntityTemplate(newTemplateType.deepCopy(), Collections.unmodifiableMap(singleFillerSlots),
-				Collections.unmodifiableMap(multiFillerSlots));
+		return new EntityTemplate(newTemplateType.deepCopy(), singleFillerSlots, multiFillerSlots);
 
 	}
 
@@ -358,11 +297,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 			final Score score = new Score();
 
-			if (other == null) {
-				score.increaseFalseNegative();
-			} else {
-				score.add(this.rootAnnotation.evaluate(evaluator, other));
-			}
+			score.add(this.rootAnnotation.evaluate(evaluator, other));
 
 			addScoresForSingleFillerSlots(evaluator, null, score);
 
@@ -390,18 +325,17 @@ final public class EntityTemplate extends AbstractAnnotation {
 	}
 
 	private void addScoresForSingleFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, final Score score) {
-		for (SlotType singleSlotType : this.singleFillerSlots.keySet()) {
-
-			final SingleFillerSlot singleSlotFiller = this.getSingleFillerSlot(singleSlotType);
+		for (SlotType singleSlotType : getSingleFillerSlotTypes()) {
 
 			final SingleFillerSlot otherSingleSlotFiller;
 
-			if (other != null && other.containsSingleFillerSlot(singleSlotType))
+			if (other != null && other.hasSlotOfType(singleSlotType))
 				otherSingleSlotFiller = other.getSingleFillerSlot(singleSlotType);
 			else
 				otherSingleSlotFiller = null;
 
-			if (singleSlotFiller.containsSlotFiller()) {
+			final SingleFillerSlot singleSlotFiller;
+			if ((singleSlotFiller = this.singleFillerSlots.get(singleSlotType)) != null) {
 				final AbstractAnnotation val = singleSlotFiller.getSlotFiller();
 				final AbstractAnnotation otherVal = otherSingleSlotFiller == null ? null
 						: otherSingleSlotFiller.getSlotFiller();
@@ -416,17 +350,25 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 	private void addScoresForMultiFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, final Score score) {
 
-		for (SlotType multiSlotType : this.multiFillerSlots.keySet()) {
-			final Set<AbstractAnnotation> slotFiller = this.getMultiFillerSlot(multiSlotType).getSlotFiller();
+		for (SlotType multiSlotType : getMultiFillerSlotTypes()) {
 			final Set<AbstractAnnotation> otherSlotFiller;
 
-			if (other != null && other.containsMultiFillerSlot(multiSlotType))
+			if (other != null && other.hasSlotOfType(multiSlotType))
 				otherSlotFiller = other.getMultiFillerSlot(multiSlotType).getSlotFiller();
 			else
 				otherSlotFiller = Collections.emptySet();
 
-			if (slotFiller.isEmpty() && (otherSlotFiller == null || otherSlotFiller.isEmpty()))
-				continue;
+			final Set<AbstractAnnotation> slotFiller;
+			MultiFillerSlot mfs;
+			if ((mfs = this.multiFillerSlots.get(multiSlotType)) != null) {
+				slotFiller = mfs.getSlotFiller();
+			} else {
+				slotFiller = Collections.emptySet();
+
+				if (otherSlotFiller == null || otherSlotFiller.isEmpty())
+					continue;
+
+			}
 
 			final Score bestScore = evaluator.scoreMultiValues(slotFiller, otherSlotFiller);
 
@@ -456,18 +398,63 @@ final public class EntityTemplate extends AbstractAnnotation {
 	}
 
 	/**
-	 * Clears all properties from this entity temple. Note that the root annotation
+	 * Clears all slots from this entity temple. Note that the root annotation
 	 * remains.
 	 */
-	public EntityTemplate clearProperties() {
-		this.singleFillerSlots.values().stream().forEach(s -> s.clear());
-		this.multiFillerSlots.values().stream().forEach(s -> s.clear());
+	public EntityTemplate clearAllSlots() {
+		this.singleFillerSlots.clear();// .values().stream().forEach(s -> s.clear());
+		this.multiFillerSlots.clear();// .values().stream().forEach(s -> s.clear());
 		return this;
 	}
 
 	@Override
 	public Score evaluate(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
 		throw new IllegalStateException("Can not evaluate entity templates without evaluator.");
+	}
+
+	/**
+	 * Returns true if this template has no slot filler for any slot.
+	 * 
+	 * @return true if there no slot is filled with any value.
+	 */
+	public boolean isEmpty() {
+		return this.singleFillerSlots.isEmpty() && this.multiFillerSlots.isEmpty();
+	}
+
+	public List<SlotType> getSingleFillerSlotTypes() {
+		return getEntityType().getSingleFillerSlotTypes();
+	}
+
+	public List<SlotType> getMultiFillerSlotTypes() {
+		return getEntityType().getMultiFillerSlotTypes();
+	}
+
+	/**
+	 * Removes the slot filler or all slot filler values from this template for the
+	 * given slot type.
+	 * 
+	 * @param slotTypeName
+	 */
+	public void clearSlot(SlotType slotType) {
+		if (!getEntityType().containsSlotType(slotType))
+			throw new UnkownMultiSlotException(
+					"The requested slot is unkown: " + slotType + " for entity: " + getEntityType().name);
+		this.singleFillerSlots.remove(slotType);
+		this.multiFillerSlots.remove(slotType);
+	}
+
+	/**
+	 * Removes the slot filler or all slot filler values from this template for the
+	 * given slot type.
+	 * 
+	 * @param slotTypeName
+	 */
+	public void clearSlotOfName(String slotTypeName) {
+		clearSlot(SlotType.get(slotTypeName));
+	}
+
+	public void removeMultiFillerSlotFiller(SlotType slotType, AbstractAnnotation slotFiller) {
+		this.multiFillerSlots.get(slotType).removeSlotFiller(slotFiller);
 	}
 
 }
