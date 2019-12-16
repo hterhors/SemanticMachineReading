@@ -147,7 +147,7 @@ public class Document {
 
 	private static void updateStopWords(Document doc) {
 		for (DocumentToken token : doc.tokenList) {
-			token.setStopWord(Document.stopWords.contains(token.getText()));
+			token.setStopWord(Document.stopWords.contains(token.getText().toLowerCase()));
 		}
 	}
 

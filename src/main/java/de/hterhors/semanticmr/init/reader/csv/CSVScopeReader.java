@@ -58,7 +58,6 @@ public class CSVScopeReader implements ISpecificationsReader {
 
 			Set<String> slotTypeNames = slots.stream().map(l -> l[0]).collect(Collectors.toSet());
 			Set<String> entityTypeNames = entities.stream().map(l -> l[0]).collect(Collectors.toSet());
-
 			/*
 			 * super-entity, set of sub-entities
 			 */
@@ -115,7 +114,7 @@ public class CSVScopeReader implements ISpecificationsReader {
 				sa2.add(string[0]);
 				
 			}
-
+	
 			Map<String, Boolean> isLiteralValueSlotTypes = entities.stream()
 					.collect(Collectors.toMap(s -> s[0], s -> new Boolean(s[1].equals("true"))));
 

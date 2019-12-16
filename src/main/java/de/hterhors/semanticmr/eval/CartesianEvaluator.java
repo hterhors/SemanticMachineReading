@@ -100,11 +100,21 @@ public class CartesianEvaluator extends AbstractEvaluator {
 //		System.out.println("Other annotations:");
 //		otherAnnotations.forEach(a -> System.out.println(a.toPrettyString()));
 
-
 		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
 		final Score bestScore = new Score();
+		final List<List<Integer>> permutations;
+		try {
 
-		final List<List<Integer>> permutations = getPermutations(maxSize);
+			permutations = getPermutations(maxSize);
+
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			log.info(annotations.size());
+			log.info(otherAnnotations.size());
+			log.info(annotations);
+			log.info(otherAnnotations);
+			return bestScore;
+		}
 
 		for (List<Integer> indexPermutation : permutations) {
 

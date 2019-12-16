@@ -137,7 +137,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 			int annotationIndex) {
 		for (SlotType slot : entityTemplate.getMultiFillerSlotTypes()) {
 
-			if (slot.excludeFromExploration)
+			if (slot.isExcluded())
 				continue;
 
 			for (AbstractAnnotation slotFiller : entityTemplate.getMultiFillerSlot(slot).getSlotFiller()) {
@@ -160,7 +160,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 		for (SlotType slotType : entityTemplate.getMultiFillerSlotTypes()) {
 
-			if (slotType.excludeFromExploration)
+			if (slotType.isExcluded())
 				continue;
 
 			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slotType)) {
@@ -199,7 +199,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 		for (SlotType slot : entityTemplate.getMultiFillerSlotTypes()) {
 
-			if (slot.excludeFromExploration)
+			if (slot.isExcluded())
 				continue;
 
 			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slot)) {
@@ -240,7 +240,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 			EntityTemplate entityTemplate, int annotationIndex) {
 		for (SlotType slotType : entityTemplate.getSingleFillerSlotTypes()) {
 
-			if (slotType.excludeFromExploration)
+			if (slotType.isExcluded())
 				continue;
 
 			final EntityTemplate deepCopy = entityTemplate.deepCopy();
@@ -263,7 +263,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 		for (SlotType slotType : entityTemplate.getSingleFillerSlotTypes()) {
 
-			if (slotType.excludeFromExploration)
+			if (slotType.isExcluded())
 				continue;
 
 			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slotType)) {

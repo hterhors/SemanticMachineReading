@@ -1,5 +1,6 @@
 package de.hterhors.semanticmr.crf.structure;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -103,16 +104,15 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		this.isLiteral = specifications.isLiteralEntityType(internalizedEntityTypeName);
 		this.slotNames = Collections.unmodifiableList(
 				specifications.getSlotsForEntityType(this.name).stream().sorted().collect(Collectors.toList()));
-		this.transitiveClosureSuperEntityTypeNames = Collections
-				.unmodifiableSet(specifications.getTransitiveClosureSuperEntityTypeNames(this.name).stream()
-						.sorted().collect(Collectors.toSet()));
+		this.transitiveClosureSuperEntityTypeNames = Collections.unmodifiableSet(specifications
+				.getTransitiveClosureSuperEntityTypeNames(this.name).stream().sorted().collect(Collectors.toSet()));
 		this.transitiveClosureSubEntityTypeNames = Collections.unmodifiableSet(specifications
 				.getTransitveClosureSubEntityTypeNames(this.name).stream().sorted().collect(Collectors.toSet()));
 
-		this.directSuperEntityTypeNames = Collections.unmodifiableSet(specifications
-				.getDirectSuperEntityTypeNames(this.name).stream().sorted().collect(Collectors.toSet()));
-		this.directSubEntityTypeNames = Collections.unmodifiableSet(specifications
-				.getDirectSubEntityTypeNames(this.name).stream().sorted().collect(Collectors.toSet()));
+		this.directSuperEntityTypeNames = Collections.unmodifiableSet(
+				specifications.getDirectSuperEntityTypeNames(this.name).stream().sorted().collect(Collectors.toSet()));
+		this.directSubEntityTypeNames = Collections.unmodifiableSet(
+				specifications.getDirectSubEntityTypeNames(this.name).stream().sorted().collect(Collectors.toSet()));
 
 		this.slotFillerOfSlotTypeNames = specifications
 				.getSlotTypeNames().stream().filter(slotType -> specifications
@@ -209,6 +209,10 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	}
 
 	private final static Map<String, EntityType> entityTypeFactory = new HashMap<>();
+
+	public static Collection<EntityType> getAllEntityTypes() {
+		return Collections.unmodifiableCollection(entityTypeFactory.values());
+	}
 
 	public static EntityType get(final String entityTypeName) {
 

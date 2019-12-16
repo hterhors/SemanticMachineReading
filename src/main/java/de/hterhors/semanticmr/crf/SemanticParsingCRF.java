@@ -92,6 +92,9 @@ public class SemanticParsingCRF {
 
 	private CRFStatistics testStatistics;
 
+	private IObjectiveFunction coverageObjectiveFunction = new SlotFillingObjectiveFunction(
+			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
+
 	public SemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
 			IStateInitializer initializer, IObjectiveFunction objectiveFunction) {
 		this(model, Arrays.asList(explorer), sampler, initializer, objectiveFunction);
@@ -268,8 +271,8 @@ public class SemanticParsingCRF {
 			/*
 			 * OrganismModel
 			 */
-			List<AbstractAnnotation> goldOrganismModel = Arrays
-					.asList(goldAnnotations.get(goldIndex).getSingleFillerSlotOfName("hasOrganismModel").getSlotFiller())
+			List<AbstractAnnotation> goldOrganismModel = Arrays.asList(
+					goldAnnotations.get(goldIndex).getSingleFillerSlotOfName("hasOrganismModel").getSlotFiller())
 					.stream().filter(a -> a != null).collect(Collectors.toList());
 			List<AbstractAnnotation> predictOrganismModel = Arrays.asList(predictedAnnotationsBaseline.get(predictIndex)
 					.getSingleFillerSlotOfName("hasOrganismModel").getSlotFiller()).stream().filter(a -> a != null)
@@ -442,6 +445,9 @@ public class SemanticParsingCRF {
 			LogUtils.logState(log,
 					TEST_CONTEXT + "[" + ++instanceIndex + "/" + instancesToPredict.size() + "] [" + samplingStep + "]",
 					instance, currentState);
+//			computeCoverage(true, coverageObjectiveFunction, Arrays.asList(instance));
+			log.info("***********************************************************");
+			log.info("\n");
 			log.info("Time: " + this.testStatistics.getTotalDuration());
 
 		}

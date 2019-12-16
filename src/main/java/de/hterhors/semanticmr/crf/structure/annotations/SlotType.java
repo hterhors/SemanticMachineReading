@@ -1,5 +1,6 @@
 package de.hterhors.semanticmr.crf.structure.annotations;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,31 @@ import de.hterhors.semanticmr.init.specifications.Specifications;
 
 public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
-	public boolean excludeFromExploration = false;
+	private boolean exclude = false;
+
+	public static void excludeAllSlotTypes() {
+		for (SlotType st : getAllSlotTypes()) {
+			st.exclude();
+		}
+	}
+
+	public static void includeAllSlotTypes() {
+		for (SlotType st : getAllSlotTypes()) {
+			st.exclude();
+		}
+	}
+
+	public void exclude() {
+		this.exclude = true;
+	}
+
+	public void include() {
+		this.exclude = false;
+	}
+
+	public boolean isExcluded() {
+		return exclude;
+	}
 
 	final public String name;
 
@@ -52,6 +77,10 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 	}
 
 	private final static Map<String, SlotType> slotTypeFactory = new HashMap<>();
+
+	public static Collection<SlotType> getAllSlotTypes() {
+		return Collections.unmodifiableCollection(slotTypeFactory.values());
+	}
 
 	public static SlotType get(final String slotTypeName) {
 

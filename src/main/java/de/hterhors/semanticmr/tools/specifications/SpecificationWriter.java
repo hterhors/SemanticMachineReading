@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
@@ -12,9 +14,10 @@ import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 
 public class SpecificationWriter {
+	SystemScope scope;
 
 	public SpecificationWriter(SystemScope scope) {
-
+		this.scope = scope;
 	}
 
 	public void writeEntitySpecificationFile(File file, EntityType rootEntity) throws IOException {
@@ -66,41 +69,32 @@ public class SpecificationWriter {
 		ps.close();
 	}
 
-	public void writeStructuresSpecificationFile(File file, EntityType rootEntity) {
+	public void writeStructuresSpecificationFile(File input, File output, EntityType rootEntity) throws IOException {
 
 		Set<EntityType> relatedEntities = new HashSet<>();
 		addRecursive(rootEntity, relatedEntities);
-
-		Set<EntityType> rootEntities = new HashSet<>();
-		for (EntityType entityType : relatedEntities) {
-			if (entityType.getDirectSuperEntityTypes().isEmpty()) {
-				rootEntities.add(entityType);
-			} else {
-
-				for (EntityType superEntity : entityType.getDirectSuperEntityTypes()) {
-					if (!relatedEntities.contains(superEntity)) {
-						rootEntities.add(entityType);
-					}
-				}
-			}
+		Set<SlotType> slotTypes = new HashSet<>();
+		for (EntityType et : relatedEntities) {
+			slotTypes.addAll(et.getSlots());
 		}
 
-		System.out.println("#Entity\tSlot\tSlotSuperEntityType");
+		List<String> inputLines = Files.readAllLines(input.toPath());
+		PrintStream ps = new PrintStream(output);
 
-		for (EntityType root : rootEntities) {
-			for (SlotType slotType : root.getSlots()) {
+		ps.println("#Entity\tSlot\tSlotSuperEntityType");
 
-				for (EntityType slotFiller : slotType.getSlotFillerEntityTypes()) {
-					if (rootEntities.contains(slotFiller)) {
-
-						System.out.println(root.name + "\t" + slotType.name + "\t" + slotFiller.name);
-					} else {
-						System.out.println("Fail");
-					}
-				}
-
+		for (String inLine : inputLines) {
+			if (inLine.startsWith("#"))
+				continue;
+			String[] data = inLine.split("\t");
+			if (relatedEntities.contains(EntityType.get(data[0])) && slotTypes.contains(SlotType.get(data[1]))
+					&& relatedEntities.contains(EntityType.get(data[2]))) {
+				ps.println(inLine);
 			}
+
 		}
+
+		ps.close();
 
 	}
 

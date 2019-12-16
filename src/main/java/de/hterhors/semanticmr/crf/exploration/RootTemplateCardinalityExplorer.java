@@ -44,20 +44,24 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 
 		EntityTypeAnnotation init = initAnnotation.deepCopy();
 
-		proposalStates.add(currentState.deepAddCopy(new EntityTemplate((init))));
 
-		for (IEntityTypeAnnotationCandidateProvider slotFillerCandidateProvider : candidateProvider
-				.getEntityTypeCandidateProvider(currentState.getInstance())) {
+		if (currentState.getCurrentPredictions().getAnnotations().size() < MAX_NUMBER_OF_ANNOTATIONS) {
+			
+			proposalStates.add(currentState.deepAddCopy(new EntityTemplate((init))));
 
-			for (EntityTypeAnnotation templateTypeCandidate : slotFillerCandidateProvider
-					.getCandidates(init.getEntityType())) {
+			for (IEntityTypeAnnotationCandidateProvider slotFillerCandidateProvider : candidateProvider
+					.getEntityTypeCandidateProvider(currentState.getInstance())) {
 
-				if (templateTypeCandidate.equals(init))
-					continue;
+				for (EntityTypeAnnotation templateTypeCandidate : slotFillerCandidateProvider
+						.getCandidates(init.getEntityType())) {
 
-				proposalStates.add(currentState.deepAddCopy(new EntityTemplate((templateTypeCandidate))));
+					if (templateTypeCandidate.equals(init))
+						continue;
+
+					proposalStates.add(currentState.deepAddCopy(new EntityTemplate((templateTypeCandidate))));
+				}
+
 			}
-
 		}
 
 		for (int annotationIndex = 0; annotationIndex < currentState.getCurrentPredictions().getAnnotations()
@@ -70,7 +74,6 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 		if (proposalStates.isEmpty()) {
 			log.warn("No states were generated for instance: " + currentState.getInstance().getName());
 		}
-
 		updateAverage(proposalStates);
 		return proposalStates;
 

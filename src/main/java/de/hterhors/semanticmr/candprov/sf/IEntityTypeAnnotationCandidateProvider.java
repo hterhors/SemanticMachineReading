@@ -7,6 +7,6 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 
 public interface IEntityTypeAnnotationCandidateProvider extends ICandidateProvider {
 
-	public Set<EntityTypeAnnotation> getCandidates(EntityType templateType);
+	public Set<? extends EntityTypeAnnotation> getCandidates(EntityType templateType);
 
 }

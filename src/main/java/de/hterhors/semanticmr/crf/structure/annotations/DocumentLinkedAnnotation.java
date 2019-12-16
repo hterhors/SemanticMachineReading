@@ -36,6 +36,10 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	public final List<DocumentToken> relatedTokens;
 
+	public int getSentenceIndex() {
+		return relatedTokens.get(0).getSentenceIndex();
+	}
+
 	public List<DocumentToken> getTokenizedSentenceOfAnnotation() {
 		return document.getSentenceByIndex(relatedTokens.get(0).getSentenceIndex());
 	}
@@ -62,7 +66,7 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 		super(entityType, textualContent);
 		this.document = document;
 		this.documentPosition = documentPosition;
-		
+
 		this.relatedTokens = this.document.tokenList.subList(
 				this.document.getTokenByCharStartOffset(getStartDocCharOffset()).getDocTokenIndex(),
 				this.document.getTokenByCharEndOffset(getEndDocCharOffset()).getDocTokenIndex() + 1);

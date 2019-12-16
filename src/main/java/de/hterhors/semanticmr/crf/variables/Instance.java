@@ -41,7 +41,9 @@ public class Instance implements Comparable<Instance> {
 
 	public Instance(EInstanceContext context, Document document, Annotations goldAnnotations,
 			Collection<GoldModificationRule> modifyRules) {
+		
 		this.originalContext = context == null ? EInstanceContext.UNSPECIFIED : context;
+		
 		this.document = document;
 
 		this.goldAnnotations = new Annotations(goldAnnotations, modifyRules).unmodifiable();

@@ -140,8 +140,13 @@ public class JsonInstanceWrapperToInstance {
 
 		for (Entry<JsonSlotTypeWrapper, JsonSingleFillerSlotWrapper> singleSlotWrapper : wrapper.getSingleFillerSlots()
 				.entrySet()) {
-			entityTemplate.setSingleSlotFiller(toSlotType(singleSlotWrapper.getKey()),
-					toSlotFiller(document, singleSlotWrapper.getValue()));
+			SlotType slotType = toSlotType(singleSlotWrapper.getKey());
+			boolean tmp = slotType.isExcluded();
+			slotType.include();
+			entityTemplate.setSingleSlotFiller(slotType, toSlotFiller(document, singleSlotWrapper.getValue()));
+
+			if (tmp)
+				slotType.exclude();
 		}
 
 		for (Entry<JsonSlotTypeWrapper, JsonMultiFillerSlotWrapper> multiSlotWrapper : wrapper.getMultiFillerSlots()
@@ -154,7 +159,13 @@ public class JsonInstanceWrapperToInstance {
 					multiSlotWrapper.getValue().getEntityTemplateAnnotations());
 
 			for (AbstractAnnotation abstractSlotFiller : annotations) {
-				entityTemplate.addMultiSlotFiller(toSlotType(multiSlotWrapper.getKey()), abstractSlotFiller);
+
+				SlotType slotType = toSlotType(multiSlotWrapper.getKey());
+				boolean tmp = slotType.isExcluded();
+				slotType.include();
+				entityTemplate.addMultiSlotFiller(slotType, abstractSlotFiller);
+				if (tmp)
+					slotType.exclude();
 			}
 
 		}

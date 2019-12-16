@@ -120,6 +120,9 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 
 				for (SlotType slotType : entityTemplate.getMultiFillerSlotTypes()) {
 
+					if (slotType.isExcluded())
+						continue;
+
 					final MultiFillerSlot slot = entityTemplate.getMultiFillerSlot(slotType);
 
 					if (!slot.containsSlotFiller()) {
@@ -202,7 +205,8 @@ public class EntityTemplateAnnotationFilter implements IAnnotationFilter {
 			if (singleSlots) {
 				singleAnnotations = new HashMap<>();
 				for (SlotType slotType : entityTemplate.getSingleFillerSlotTypes()) {
-
+					if (slotType.isExcluded())
+						continue;
 					final SingleFillerSlot slot = entityTemplate.getSingleFillerSlot(slotType);
 
 					if (!slot.containsSlotFiller()) {
