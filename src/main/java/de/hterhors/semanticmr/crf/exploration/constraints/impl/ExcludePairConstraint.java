@@ -5,6 +5,7 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlot;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
+import de.hterhors.semanticmr.crf.variables.State;
 
 /**
  * Implements a constraint on a pair of slot-entity pair.
@@ -79,7 +80,7 @@ public class ExcludePairConstraint extends AbstractHardConstraint {
 	}
 
 	@Override
-	public boolean violatesConstraint(EntityTemplate entityTemplate) {
+	public boolean violatesConstraint(State state, EntityTemplate entityTemplate) {
 
 		if (onTemplateType != null && onTemplateType != entityTemplate.getEntityType())
 			return false;

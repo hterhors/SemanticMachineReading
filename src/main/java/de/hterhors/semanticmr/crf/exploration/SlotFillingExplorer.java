@@ -126,7 +126,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 			final EntityTemplate deepCopy = entityTemplate.deepMergeCopy(templateTypeCandidate);
 
-			if (violatesConstraints(deepCopy))
+			if (violatesConstraints(currentState, deepCopy))
 				continue;
 
 			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -145,7 +145,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				final EntityTemplate deepCopy = entityTemplate.deepCopy();
 				deepCopy.removeMultiFillerSlotFiller(slot, slotFiller);
 
-				if (violatesConstraints(deepCopy))
+				if (violatesConstraints(currentState, deepCopy))
 					continue;
 
 				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -184,7 +184,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 					deepCopy.updateMultiFillerSlot(slotType, slotFiller, slotFillerCandidate);
 
-					if (violatesConstraints(deepCopy))
+					if (violatesConstraints(currentState, deepCopy))
 						continue;
 
 					proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -203,6 +203,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				continue;
 
 			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slot)) {
+
 				/*
 				 * Do not add if maximum number of fillers is reached.
 				 */
@@ -228,7 +229,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				final EntityTemplate deepCopy = entityTemplate.deepCopy();
 				deepCopy.addMultiSlotFiller(slot, slotFillerCandidate);
 
-				if (violatesConstraints(deepCopy))
+				if (violatesConstraints(currentState, deepCopy))
 					continue;
 
 				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -250,7 +251,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 			deepCopy.clearSlot(slotType);
 
-			if (violatesConstraints(deepCopy))
+			if (violatesConstraints(currentState, deepCopy))
 				continue;
 
 			entityTemplates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -267,6 +268,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				continue;
 
 			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slotType)) {
+
 				/*
 				 * Do no add itself
 				 */
@@ -291,7 +293,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 				deepCopy.setSingleSlotFiller(slotType, slotFillerCandidate);
 
-				if (violatesConstraints(deepCopy))
+				if (violatesConstraints(currentState, deepCopy))
 					continue;
 
 				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
@@ -311,11 +313,11 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	 * 
 	 * @return false if the template does NOT violates any constraints, else true.
 	 */
-	private boolean violatesConstraints(EntityTemplate deepCopy) {
+	private boolean violatesConstraints(State state, EntityTemplate deepCopy) {
 		if (hardConstraintsProvider == null)
 			return false;
 		else
-			return hardConstraintsProvider.violatesConstraints(deepCopy);
+			return hardConstraintsProvider.violatesConstraints(state, deepCopy);
 
 	}
 

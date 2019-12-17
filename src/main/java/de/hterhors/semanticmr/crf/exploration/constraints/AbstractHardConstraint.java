@@ -1,6 +1,7 @@
 package de.hterhors.semanticmr.crf.exploration.constraints;
 
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
+import de.hterhors.semanticmr.crf.variables.State;
 
 public abstract class AbstractHardConstraint {
 
@@ -10,6 +11,6 @@ public abstract class AbstractHardConstraint {
 	 * @param entityTemplate
 	 * @return true if the implemented constraint is violated, else false.
 	 */
-	public abstract boolean violatesConstraint(EntityTemplate entityTemplate);
+	public abstract boolean violatesConstraint(State currentState, EntityTemplate entityTemplate);
 
 }

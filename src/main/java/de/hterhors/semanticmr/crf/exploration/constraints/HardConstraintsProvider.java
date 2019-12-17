@@ -13,14 +13,15 @@ import de.hterhors.semanticmr.crf.exploration.constraints.impl.ExcludePairConstr
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
+import de.hterhors.semanticmr.crf.variables.State;
 
 public class HardConstraintsProvider {
 
 	final List<AbstractHardConstraint> hardConstraints = new ArrayList<>();
 
-	public boolean violatesConstraints(EntityTemplate template) {
+	public boolean violatesConstraints(State state, EntityTemplate template) {
 		for (AbstractHardConstraint hardConstraint : hardConstraints) {
-			if (hardConstraint.violatesConstraint(template))
+			if (hardConstraint.violatesConstraint(state, template))
 				return true;
 		}
 		return false;

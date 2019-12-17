@@ -2,6 +2,7 @@ package de.hterhors.semanticmr.crf.of;
 
 import java.util.List;
 
+import de.hterhors.semanticmr.crf.exploration.RootTemplateCardinalityExplorer;
 import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
@@ -14,8 +15,10 @@ public class SlotFillingObjectiveFunction implements IObjectiveFunction {
 	public SlotFillingObjectiveFunction(AbstractEvaluator evaluator) {
 		if (evaluator instanceof CartesianEvaluator) {
 			SlotFillingExplorer.MAX_NUMBER_OF_ANNOTATIONS = CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE;
-		}else {
-			SlotFillingExplorer.MAX_NUMBER_OF_ANNOTATIONS =100;
+			RootTemplateCardinalityExplorer.MAX_NUMBER_OF_ANNOTATIONS = CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE;
+		} else {
+			SlotFillingExplorer.MAX_NUMBER_OF_ANNOTATIONS = 100;
+			RootTemplateCardinalityExplorer.MAX_NUMBER_OF_ANNOTATIONS = 100;
 		}
 
 		this.evaluator = evaluator;
