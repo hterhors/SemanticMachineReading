@@ -6,9 +6,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.candprov.nerla.ExhaustiveCandidateRetrieval;
-import de.hterhors.semanticmr.candprov.nerla.INerlaCandidateProvider;
-import de.hterhors.semanticmr.candprov.nerla.NerlaCandidateProviderCollection;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
@@ -23,23 +20,13 @@ import de.hterhors.semanticmr.crf.variables.State;
 public class EntityRecLinkExplorer implements IExplorationStrategy {
 	private static Logger log = LogManager.getFormatterLogger(EntityRecLinkExplorer.class);
 
-	final private NerlaCandidateProviderCollection candidateProvider;
-
 	final private HardConstraintsProvider hardConstraintsProvider;
 
-	public EntityRecLinkExplorer(NerlaCandidateProviderCollection candidateProvider,
-			HardConstraintsProvider hardConstraintsProvder) {
-		this.candidateProvider = candidateProvider;
+	public EntityRecLinkExplorer(HardConstraintsProvider hardConstraintsProvder) {
 		this.hardConstraintsProvider = hardConstraintsProvder;
 	}
 
-	public EntityRecLinkExplorer(NerlaCandidateProviderCollection candidateProvider) {
-		this.candidateProvider = candidateProvider;
-		this.hardConstraintsProvider = null;
-	}
-
 	public EntityRecLinkExplorer() {
-		this.candidateProvider = new NerlaCandidateProviderCollection(ExhaustiveCandidateRetrieval.getInstance());
 		this.hardConstraintsProvider = null;
 	}
 
@@ -114,20 +101,17 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 
 				final String text = currentState.getInstance().getDocument().getContent(fromToken, toToken);
 
-				for (INerlaCandidateProvider cp : candidateProvider.getCandidateProvider()) {
+				for (EntityType entityType : currentState.getInstance().getEntityTypeCandidates(text)) {
 
-					for (EntityType entityType : cp.getEntityTypeCandidates(text)) {
-
-						try {
-							AbstractAnnotation newCurrentPrediction = AnnotationBuilder.toAnnotation(
-									currentState.getInstance().getDocument(), entityType.name, text,
-									fromToken.getDocCharOffset());
-							proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));
-						} catch (RuntimeException e) {
-							e.printStackTrace();
-						}
-
+					try {
+						AbstractAnnotation newCurrentPrediction = AnnotationBuilder.toAnnotation(
+								currentState.getInstance().getDocument(), entityType.name, text,
+								fromToken.getDocCharOffset());
+						proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));
+					} catch (RuntimeException e) {
+						e.printStackTrace();
 					}
+
 				}
 			}
 		}

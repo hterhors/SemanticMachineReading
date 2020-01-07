@@ -10,8 +10,7 @@ import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.candprov.nerla.InMEMDictionaryBasedCandidateProvider;
-import de.hterhors.semanticmr.candprov.nerla.NerlaCandidateProviderCollection;
+import de.hterhors.semanticmr.candidateretrieval.nerla.NerlCandidateRetrieval;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;
@@ -20,7 +19,6 @@ import de.hterhors.semanticmr.crf.exploration.EntityRecLinkExplorer;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.learner.optimizer.SGD;
 import de.hterhors.semanticmr.crf.learner.regularizer.L2;
-import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.model.Model;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.of.NerlaObjectiveFunction;
@@ -147,15 +145,17 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * performed! @see ExhaustiveCandidateRetrieval
 		 * 
 		 */
-		NerlaCandidateProviderCollection candidateRetrieval = new NerlaCandidateProviderCollection(
-				new InMEMDictionaryBasedCandidateProvider(dictionaryFile));
+
+		for (Instance instance : instanceProvider.getInstances()) {
+			instance.addCandidates(dictionaryFile);
+		}
 
 		/**
 		 * For the entity recognition and linking problem, the EntityRecLinkExplorer is
 		 * added to perform changes during the exploration. This explorer is especially
 		 * designed for NERLA and is parameterized with a candidate retrieval.
 		 */
-		EntityRecLinkExplorer explorer = new EntityRecLinkExplorer(candidateRetrieval);
+		EntityRecLinkExplorer explorer = new EntityRecLinkExplorer();
 
 		/**
 		 * 4. STEP

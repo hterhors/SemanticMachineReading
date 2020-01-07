@@ -210,7 +210,8 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * 
 		 */
 		JSONNerlaReader nerlaReader = new JSONNerlaReader(externalNerlaAnnotations);
-
+		
+		
 		for (Instance instance : instanceProvider.getInstances()) {
 			instance.addCandidateAnnotations(nerlaReader.getForInstance(instance));
 		}

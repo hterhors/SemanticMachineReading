@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.candprov.helper;
+package de.hterhors.semanticmr.candidateretrieval.helper;
 
 import java.util.HashMap;
 import java.util.HashSet;

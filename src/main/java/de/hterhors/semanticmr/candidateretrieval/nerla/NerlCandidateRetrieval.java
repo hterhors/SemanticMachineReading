@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.candprov.nerla;
+package de.hterhors.semanticmr.candidateretrieval.nerla;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,9 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
  * @author hterhors
  *
  */
-public class InMEMDictionaryBasedCandidateProvider implements INerlaCandidateProvider {
+public class NerlCandidateRetrieval {
+
+	private Set<EntityType> types;
 
 	/**
 	 * The dictionary.
@@ -44,11 +46,16 @@ public class InMEMDictionaryBasedCandidateProvider implements INerlaCandidatePro
 	 * @param dictionaryFile the dictionary file.
 	 * @throws IOException
 	 */
-	public InMEMDictionaryBasedCandidateProvider(final File dictionaryFile) {
 
-		/**
-		 * TODO: check file contents format.
-		 */
+	public NerlCandidateRetrieval() {
+	}
+
+	/**
+	 * TODO: inefficient
+	 * 
+	 * @param dictionaryFile
+	 */
+	public void addCandidates(final File dictionaryFile) {
 		try {
 			for (String dictLine : Files.readAllLines(dictionaryFile.toPath())) {
 
@@ -68,21 +75,46 @@ public class InMEMDictionaryBasedCandidateProvider implements INerlaCandidatePro
 		}
 	}
 
-	public InMEMDictionaryBasedCandidateProvider(Map<EntityType, Set<String>> dictionary) {
+	public void addCandidates(Map<EntityType, Set<String>> dictionary) {
+		for (Entry<EntityType, Set<String>> entityType : dictionary.entrySet()) {
+			addCandidate(entityType.getKey(), entityType.getValue());
+		}
+	}
 
-		this.dictionary.putAll(dictionary);
+	public void addCandidate(EntityType entityType, Set<String> words) {
 
-		for (Entry<EntityType, Set<String>> e : dictionary.entrySet()) {
-			for (String s : e.getValue()) {
-				this.reverseDictionary.putIfAbsent(s, new HashSet<>());
-				this.reverseDictionary.get(s).add(e.getKey());
-			}
+		this.dictionary.putIfAbsent(entityType, new HashSet<>());
+		this.dictionary.get(entityType).addAll(words);
+
+		for (String s : words) {
+			this.reverseDictionary.putIfAbsent(s, new HashSet<>());
+			this.reverseDictionary.get(s).add(entityType);
 		}
 
 	}
 
-	@Override
+	public void addCandidate(EntityType entityType) {
+		this.types.add(entityType);
+	}
+
+	public void addCandidates(Set<EntityType> entityTypes) {
+		this.types.addAll(entityTypes);
+	}
+
+	/**
+	 * TODO: Inefficient
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public Set<EntityType> getEntityTypeCandidates(String text) {
-		return reverseDictionary.getOrDefault(text, Collections.emptySet());
+		if (types.isEmpty())
+			return reverseDictionary.getOrDefault(text, Collections.emptySet());
+		else {
+			final Set<EntityType> types = new HashSet<>();
+			types.addAll(types);
+			types.addAll(reverseDictionary.getOrDefault(text, Collections.emptySet()));
+			return types;
+		}
 	}
 }

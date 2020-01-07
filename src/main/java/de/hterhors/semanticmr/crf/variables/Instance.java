@@ -1,19 +1,21 @@
 package de.hterhors.semanticmr.crf.variables;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
+import de.hterhors.semanticmr.candidateretrieval.nerla.NerlCandidateRetrieval;
+import de.hterhors.semanticmr.candidateretrieval.sf.SlotFillingCandidateRetrieval;
 import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
-import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.exce.MismatchingDocumentsException;
@@ -38,49 +40,49 @@ public class Instance implements Comparable<Instance> {
 	 */
 	private final Annotations groundTruth;
 
-	public Set<EntityTypeAnnotation> getEntityTypeCandidates(EntityType entityType) {
-		return entityTypeCandidates.getOrDefault(entityType,Collections.emptySet());
-	}
-
-	public Set<AbstractAnnotation> getSlotTypeCandidates(SlotType slotType) {
-		return slotTypeCandidates.getOrDefault(slotType,Collections.emptySet());
-	}
+	private final SlotFillingCandidateRetrieval slotFillingCandidateRetrieval = new SlotFillingCandidateRetrieval();
 
 	public void addCandidateAnnotations(Collection<? extends AbstractAnnotation> candidates) {
-		for (AbstractAnnotation candidate : candidates) {
-			addCandidateAnnotation(candidate);
-		}
+		slotFillingCandidateRetrieval.addCandidateAnnotations(candidates);
 	}
 
 	public void addCandidateAnnotation(AbstractAnnotation candidate) {
-
-		if (!candidate.isInstanceOfEntityTemplate()) {
-			candidate = candidate.getEntityType().hasNoSlots() ? candidate
-					: new EntityTemplate(candidate.asInstanceOfEntityTypeAnnotation());
-		}
-
-		for (SlotType slotType : candidate.getEntityType().getSlotFillerOfSlotTypes()) {
-			slotTypeCandidates.putIfAbsent(slotType, new HashSet<>());
-			if (slotType.matchesEntityType(candidate.getEntityType())) {
-				slotTypeCandidates.get(slotType).add(candidate);
-			}
-		}
-
-		for (EntityType relatedEntitytype : candidate.getEntityType().getHierarchicalEntityTypes()) {
-			if (candidate.isInstanceOfEntityTypeAnnotation()) {
-				entityTypeCandidates.putIfAbsent(relatedEntitytype, new HashSet<>());
-				entityTypeCandidates.get(relatedEntitytype).add((EntityTypeAnnotation) candidate);
-			} else {
-				entityTypeCandidates.putIfAbsent(relatedEntitytype, new HashSet<>());
-				entityTypeCandidates.get(relatedEntitytype).add(((EntityTemplate) candidate).getRootAnnotation());
-			}
-		}
-
+		slotFillingCandidateRetrieval.addCandidateAnnotation(candidate);
 	}
 
-	private final Map<EntityType, Set<EntityTypeAnnotation>> entityTypeCandidates = new HashMap<>();
+	private final NerlCandidateRetrieval nerlaCandidateRetrieval = new NerlCandidateRetrieval();
 
-	private final Map<SlotType, Set<AbstractAnnotation>> slotTypeCandidates = new HashMap<>();
+	public Set<EntityTypeAnnotation> getEntityTypeCandidates(EntityType entityType) {
+		return slotFillingCandidateRetrieval.getEntityTypeCandidates(entityType);
+	}
+
+	public Set<AbstractAnnotation> getSlotTypeCandidates(SlotType slotType) {
+		return slotFillingCandidateRetrieval.getSlotTypeCandidates(slotType);
+	}
+
+	public void addCandidates(final File dictionaryFile) {
+		nerlaCandidateRetrieval.addCandidates(dictionaryFile);
+	}
+
+	public void addCandidates(Map<EntityType, Set<String>> dictionary) {
+		nerlaCandidateRetrieval.addCandidates(dictionary);
+	}
+
+	public void addCandidate(EntityType entityType, Set<String> words) {
+		nerlaCandidateRetrieval.addCandidate(entityType, words);
+	}
+
+	public void addCandidate(EntityType entityType) {
+		nerlaCandidateRetrieval.addCandidate(entityType);
+	}
+
+	public void addCandidates(Set<EntityType> entityTypes) {
+		nerlaCandidateRetrieval.addCandidates(entityTypes);
+	}
+
+	public Set<EntityType> getEntityTypeCandidates(String text) {
+		return nerlaCandidateRetrieval.getEntityTypeCandidates(text);
+	}
 
 	/**
 	 * The context of this instance, whether it belongs to train dev or test set.
