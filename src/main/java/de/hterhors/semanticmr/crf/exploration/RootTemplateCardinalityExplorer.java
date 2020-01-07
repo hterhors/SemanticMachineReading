@@ -6,8 +6,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection;
-import de.hterhors.semanticmr.candprov.sf.IEntityTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -21,13 +19,9 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 
 	public static int MAX_NUMBER_OF_ANNOTATIONS;
 
-	final private AnnotationCandidateRetrievalCollection candidateProvider;
-
 	final private EntityTypeAnnotation initAnnotation;
 
-	public RootTemplateCardinalityExplorer(AnnotationCandidateRetrievalCollection candidateProvider,
-			EntityTypeAnnotation initAnnotation) {
-		this.candidateProvider = candidateProvider;
+	public RootTemplateCardinalityExplorer(EntityTypeAnnotation initAnnotation) {
 		this.initAnnotation = initAnnotation;
 	}
 
@@ -44,22 +38,17 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 
 		EntityTypeAnnotation init = initAnnotation.deepCopy();
 
-
 		if (currentState.getCurrentPredictions().getAnnotations().size() < MAX_NUMBER_OF_ANNOTATIONS) {
-			
+
 			proposalStates.add(currentState.deepAddCopy(new EntityTemplate((init))));
 
-			for (IEntityTypeAnnotationCandidateProvider slotFillerCandidateProvider : candidateProvider
-					.getEntityTypeCandidateProvider(currentState.getInstance())) {
+			for (EntityTypeAnnotation templateTypeCandidate : currentState.getInstance()
+					.getEntityTypeCandidates(init.getEntityType())) {
 
-				for (EntityTypeAnnotation templateTypeCandidate : slotFillerCandidateProvider
-						.getCandidates(init.getEntityType())) {
+				if (templateTypeCandidate.equals(init))
+					continue;
 
-					if (templateTypeCandidate.equals(init))
-						continue;
-
-					proposalStates.add(currentState.deepAddCopy(new EntityTemplate((templateTypeCandidate))));
-				}
+				proposalStates.add(currentState.deepAddCopy(new EntityTemplate((templateTypeCandidate))));
 
 			}
 		}

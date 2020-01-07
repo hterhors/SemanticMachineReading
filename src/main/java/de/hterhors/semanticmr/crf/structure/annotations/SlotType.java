@@ -17,7 +17,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
 	private boolean exclude = false;
 
-	public static void excludeAllSlotTypes() {
+	public static void excludeAll() {
 		for (SlotType st : getAllSlotTypes()) {
 			st.exclude();
 		}

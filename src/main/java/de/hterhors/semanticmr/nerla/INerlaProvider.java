@@ -15,6 +15,7 @@ import de.hterhors.semanticmr.crf.variables.Instance;
  * @author hterhors
  *
  */
+@Deprecated
 public interface INerlaProvider {
 
 	/**

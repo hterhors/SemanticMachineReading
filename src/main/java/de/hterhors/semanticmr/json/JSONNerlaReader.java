@@ -22,22 +22,19 @@ import de.hterhors.semanticmr.json.nerla.JsonNerlaIO;
 import de.hterhors.semanticmr.json.nerla.wrapper.JsonEntityAnnotationWrapper;
 import de.hterhors.semanticmr.nerla.INerlaProvider;
 
-public class JsonNerlaProvider implements INerlaProvider {
-	private static Logger log = LogManager.getFormatterLogger(JsonNerlaProvider.class);
+public class JSONNerlaReader {
+	private static Logger log = LogManager.getFormatterLogger(JSONNerlaReader.class);
 
 	private final File nerlaFileOrDir;
+	private List<JsonEntityAnnotationWrapper> jsonNerla;
 
-	public JsonNerlaProvider(final File nerlaFileOrDir) {
+	public JSONNerlaReader(final File nerlaFileOrDir) {
 		this.nerlaFileOrDir = nerlaFileOrDir;
 
 		this.validateFiles();
-	}
-
-	@Override
-	public Map<Instance, List<DocumentLinkedAnnotation>> getForInstances(List<Instance> instances) {
 		log.info("Read named entity recognition and linking annotations...");
 
-		List<JsonEntityAnnotationWrapper> jsonNerla = new ArrayList<>();
+		jsonNerla = new ArrayList<>();
 
 		if (nerlaFileOrDir.isDirectory()) {
 			jsonNerla = new ArrayList<>();
@@ -57,32 +54,31 @@ public class JsonNerlaProvider implements INerlaProvider {
 				e.printStackTrace();
 			}
 		}
+	}
 
-		final Map<String, Instance> map = new HashMap<>();
+	public List<DocumentLinkedAnnotation> getForInstance(Instance instance) {
 
-		for (Instance instance : instances) {
-			map.put(instance.getDocument().documentID, instance);
-		}
-
-		final Map<Instance, List<DocumentLinkedAnnotation>> nerla = new HashMap<>();
+		final List<DocumentLinkedAnnotation> nerlas = new ArrayList<>();
 
 		int count = 0;
 		List<String> exceptions = new ArrayList<>();
 
 		for (JsonEntityAnnotationWrapper jsonEntityAnnotationWrapper : jsonNerla) {
+
+			if (!jsonEntityAnnotationWrapper.getDocumentID().equals(instance.getName()))
+				continue;
+
 			if (count++ % 5000 == 0)
 				log.debug(" - " + count + " - ");
-
-			Instance instance = map.get(jsonEntityAnnotationWrapper.getDocumentID());
 
 			if (instance == null)
 				continue;
 
-			nerla.putIfAbsent(instance, new ArrayList<>());
-
 			try {
-				nerla.get(instance)
-						.add(toDocumentLinkedAnnotation(instance.getDocument(), jsonEntityAnnotationWrapper));
+				nerlas.add(new DocumentLinkedAnnotation(instance.getDocument(),
+						EntityType.get(jsonEntityAnnotationWrapper.getEntityType()),
+						new TextualContent(jsonEntityAnnotationWrapper.getSurfaceForm()),
+						new DocumentPosition(jsonEntityAnnotationWrapper.getOffset())));
 			} catch (DocumentLinkedAnnotationMismatchException e) {
 				exceptions.add(e.getMessage());
 			}
@@ -94,13 +90,7 @@ public class JsonNerlaProvider implements INerlaProvider {
 		}
 		log.info("Read annotations... done");
 		log.info("Total number of annotations loaded: " + (count - exceptions.size()) + " / " + count);
-		return nerla;
-	}
-
-	private DocumentLinkedAnnotation toDocumentLinkedAnnotation(Document document, JsonEntityAnnotationWrapper s)
-			throws DocumentLinkedAnnotationMismatchException {
-		return new DocumentLinkedAnnotation(document, EntityType.get(s.getEntityType()),
-				new TextualContent(s.getSurfaceForm()), new DocumentPosition(s.getOffset()));
+		return nerlas;
 	}
 
 	private void validateFiles() {

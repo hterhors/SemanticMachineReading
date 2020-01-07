@@ -6,9 +6,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection;
-import de.hterhors.semanticmr.candprov.sf.IEntityTypeAnnotationCandidateProvider;
-import de.hterhors.semanticmr.candprov.sf.ISlotTypeAnnotationCandidateProvider;
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
@@ -25,21 +22,17 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	private static Logger log = LogManager.getFormatterLogger(SlotFillingExplorer.class);
 
 	public static int MAX_NUMBER_OF_ANNOTATIONS = 100;
-	final private AnnotationCandidateRetrievalCollection candidateProvider;
+//	final private AnnotationCandidateRetrievalCollection candidateProvider;
 
 	final private HardConstraintsProvider hardConstraintsProvider;
 	final private IObjectiveFunction objectiveFunction;
 
-	public SlotFillingExplorer(IObjectiveFunction objectiveFunction,
-			AnnotationCandidateRetrievalCollection candidateProvider, HardConstraintsProvider hardConstraintsProvder) {
-		this.candidateProvider = candidateProvider;
+	public SlotFillingExplorer(IObjectiveFunction objectiveFunction, HardConstraintsProvider hardConstraintsProvder) {
 		this.hardConstraintsProvider = hardConstraintsProvder;
 		this.objectiveFunction = objectiveFunction;
 	}
 
-	public SlotFillingExplorer(IObjectiveFunction objectiveFunction,
-			AnnotationCandidateRetrievalCollection candidateProvider) {
-		this.candidateProvider = candidateProvider;
+	public SlotFillingExplorer(IObjectiveFunction objectiveFunction) {
 		this.hardConstraintsProvider = null;
 		this.objectiveFunction = objectiveFunction;
 	}
@@ -64,37 +57,42 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 					.get(annotationIndex)) instanceof EntityTemplate))
 				throw new IllegalStateException("Can not handle non-EntityTemplate annotations in this explorer!");
 
-			final EntityTemplate entitytemplateAnnotation = (EntityTemplate) annotation;
+			final EntityTemplate entityTemplateAnnotation = (EntityTemplate) annotation;
 
 			/*
 			 * Change root
 			 */
-			for (IEntityTypeAnnotationCandidateProvider slotFillerCandidateProvider : candidateProvider
-					.getEntityTypeCandidateProvider(currentState.getInstance())) {
+			for (EntityTypeAnnotation entityTypeCandidate : currentState.getInstance()
+					.getEntityTypeCandidates(entityTemplateAnnotation.getEntityType())) {
 
-				changeTemplateType(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
+				changeTemplateType(proposalStates, currentState, entityTypeCandidate, entityTemplateAnnotation,
 						annotationIndex);
 			}
 
 			/*
 			 * Change props
 			 */
-			for (ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider : candidateProvider
-					.getSlotTypeCandidateProvider(currentState.getInstance())) {
+			for (SlotType slotType : entityTemplateAnnotation.getSingleFillerSlotTypes()) {
 
-				changeSingleFiller(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
-						annotationIndex);
+				if (slotType.isExcluded())
+					continue;
 
-				addMultiFiller(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
-						annotationIndex);
+				for (AbstractAnnotation slotFillerCandidate : currentState.getInstance()
+						.getSlotTypeCandidates(slotType)) {
 
-				changeMultiFiller(proposalStates, currentState, slotFillerCandidateProvider, entitytemplateAnnotation,
-						annotationIndex);
+					changeSingleFiller(proposalStates, currentState, slotType, slotFillerCandidate,
+							entityTemplateAnnotation, annotationIndex);
+
+					addMultiFiller(proposalStates, currentState, slotType, slotFillerCandidate,
+							entityTemplateAnnotation, annotationIndex);
+
+					changeMultiFiller(proposalStates, currentState, slotType, slotFillerCandidate,
+							entityTemplateAnnotation, annotationIndex);
+				}
+
+				deleteSingleFiller(proposalStates, currentState, slotType, entityTemplateAnnotation, annotationIndex);
+				deleteMultiFiller(proposalStates, currentState, slotType, entityTemplateAnnotation, annotationIndex);
 			}
-
-			deleteSingleFiller(proposalStates, currentState, entitytemplateAnnotation, annotationIndex);
-			deleteMultiFiller(proposalStates, currentState, entitytemplateAnnotation, annotationIndex);
-
 		}
 
 		if (proposalStates.isEmpty()) {
@@ -115,191 +113,143 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	}
 
 	private void changeTemplateType(final List<State> proposalStates, State currentState,
-			IEntityTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
-			int annotationIndex) {
+			EntityTypeAnnotation templateTypeCandidate, EntityTemplate entityTemplate, int annotationIndex) {
 
-		for (EntityTypeAnnotation templateTypeCandidate : slotFillerCandidateProvider
-				.getCandidates(entityTemplate.getEntityType())) {
+		if (templateTypeCandidate.equals(entityTemplate.getRootAnnotation()))
+			return;
 
-			if (templateTypeCandidate.equals(entityTemplate.getRootAnnotation()))
-				continue;
+		final EntityTemplate deepCopy = entityTemplate.deepMergeCopy(templateTypeCandidate);
 
-			final EntityTemplate deepCopy = entityTemplate.deepMergeCopy(templateTypeCandidate);
+		if (violatesConstraints(currentState, deepCopy))
+			return;
+
+		proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
+	}
+
+	private void deleteMultiFiller(final List<State> proposalStates, State currentState, SlotType slotType,
+			EntityTemplate entityTemplate, int annotationIndex) {
+
+		for (AbstractAnnotation slotFiller : entityTemplate.getMultiFillerSlot(slotType).getSlotFiller()) {
+
+			final EntityTemplate deepCopy = entityTemplate.deepCopy();
+			deepCopy.removeMultiFillerSlotFiller(slotType, slotFiller);
 
 			if (violatesConstraints(currentState, deepCopy))
 				continue;
 
 			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
 		}
-	}
-
-	private void deleteMultiFiller(final List<State> proposalStates, State currentState, EntityTemplate entityTemplate,
-			int annotationIndex) {
-		for (SlotType slot : entityTemplate.getMultiFillerSlotTypes()) {
-
-			if (slot.isExcluded())
-				continue;
-
-			for (AbstractAnnotation slotFiller : entityTemplate.getMultiFillerSlot(slot).getSlotFiller()) {
-
-				final EntityTemplate deepCopy = entityTemplate.deepCopy();
-				deepCopy.removeMultiFillerSlotFiller(slot, slotFiller);
-
-				if (violatesConstraints(currentState, deepCopy))
-					continue;
-
-				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
-			}
-		}
 
 	}
 
-	private void changeMultiFiller(final List<State> proposalStates, State currentState,
-			ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
-			int annotationIndex) {
+	private void changeMultiFiller(final List<State> proposalStates, State currentState, SlotType slotType,
+			AbstractAnnotation slotFillerCandidate, EntityTemplate entityTemplate, int annotationIndex) {
 
-		for (SlotType slotType : entityTemplate.getMultiFillerSlotTypes()) {
+		/*
+		 * Do no add itself
+		 */
+		if (slotFillerCandidate == entityTemplate)
+			return;
 
-			if (slotType.isExcluded())
-				continue;
+		if (slotFillerCandidate.getEntityType().hasNoSlots() && slotFillerCandidate instanceof EntityTemplate)
+			return;
 
-			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slotType)) {
+		if (entityTemplate.getMultiFillerSlot(slotType).containsSlotFiller(objectiveFunction, slotFillerCandidate))
+			return;
 
-				/*
-				 * Do no add itself
-				 */
-				if (slotFillerCandidate == entityTemplate)
-					continue;
-
-				if (slotFillerCandidate.getEntityType().hasNoSlots() && slotFillerCandidate instanceof EntityTemplate)
-					continue;
-
-				if (entityTemplate.getMultiFillerSlot(slotType).containsSlotFiller(objectiveFunction,
-						slotFillerCandidate))
-					continue;
-
-				for (AbstractAnnotation slotFiller : entityTemplate.getMultiFillerSlot(slotType).getSlotFiller()) {
-
-					final EntityTemplate deepCopy = entityTemplate.deepCopy();
-
-					deepCopy.updateMultiFillerSlot(slotType, slotFiller, slotFillerCandidate);
-
-					if (violatesConstraints(currentState, deepCopy))
-						continue;
-
-					proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
-				}
-			}
-		}
-	}
-
-	private void addMultiFiller(final List<State> proposalStates, State currentState,
-			ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
-			int annotationIndex) {
-
-		for (SlotType slot : entityTemplate.getMultiFillerSlotTypes()) {
-
-			if (slot.isExcluded())
-				continue;
-
-			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slot)) {
-
-				/*
-				 * Do not add if maximum number of fillers is reached.
-				 */
-				if (entityTemplate.getMultiFillerSlot(slot).containsMaximumFiller())
-					continue;
-
-				if (entityTemplate.getMultiFillerSlot(slot).size() == MAX_NUMBER_OF_ANNOTATIONS)
-					continue;
-
-				/*
-				 * Do no add itself
-				 */
-				if (slotFillerCandidate == entityTemplate)
-					continue;
-
-				if (entityTemplate.getMultiFillerSlot(slot).containsSlotFiller(objectiveFunction, slotFillerCandidate))
-					continue;
-
-				if (slotFillerCandidate.getEntityType().hasNoSlots() && slotFillerCandidate instanceof EntityTemplate) {
-					continue;
-				}
-
-				final EntityTemplate deepCopy = entityTemplate.deepCopy();
-				deepCopy.addMultiSlotFiller(slot, slotFillerCandidate);
-
-				if (violatesConstraints(currentState, deepCopy))
-					continue;
-
-				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
-			}
-		}
-	}
-
-	private void deleteSingleFiller(final List<State> entityTemplates, State currentState,
-			EntityTemplate entityTemplate, int annotationIndex) {
-		for (SlotType slotType : entityTemplate.getSingleFillerSlotTypes()) {
-
-			if (slotType.isExcluded())
-				continue;
+		for (AbstractAnnotation slotFiller : entityTemplate.getMultiFillerSlot(slotType).getSlotFiller()) {
 
 			final EntityTemplate deepCopy = entityTemplate.deepCopy();
 
-			if (!entityTemplate.getSingleFillerSlot(slotType).containsSlotFiller())
-				continue;
-
-			deepCopy.clearSlot(slotType);
+			deepCopy.updateMultiFillerSlot(slotType, slotFiller, slotFillerCandidate);
 
 			if (violatesConstraints(currentState, deepCopy))
-				continue;
+				return;
 
-			entityTemplates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
+			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
 		}
 	}
 
-	private void changeSingleFiller(final List<State> proposalStates, State currentState,
-			ISlotTypeAnnotationCandidateProvider slotFillerCandidateProvider, EntityTemplate entityTemplate,
-			int annotationIndex) {
+	private void addMultiFiller(final List<State> proposalStates, State currentState, SlotType slotType,
+			AbstractAnnotation slotFillerCandidate, EntityTemplate entityTemplate, int annotationIndex) {
 
-		for (SlotType slotType : entityTemplate.getSingleFillerSlotTypes()) {
+		/*
+		 * Do not add if maximum number of fillers is reached.
+		 */
+		if (entityTemplate.getMultiFillerSlot(slotType).containsMaximumFiller())
+			return;
 
-			if (slotType.isExcluded())
-				continue;
+		if (entityTemplate.getMultiFillerSlot(slotType).size() == MAX_NUMBER_OF_ANNOTATIONS)
+			return;
 
-			for (AbstractAnnotation slotFillerCandidate : slotFillerCandidateProvider.getCandidates(slotType)) {
+		/*
+		 * Do no add itself
+		 */
+		if (slotFillerCandidate == entityTemplate)
+			return;
 
-				/*
-				 * Do no add itself
-				 */
-				if (slotFillerCandidate == entityTemplate)
-					continue;
+		if (entityTemplate.getMultiFillerSlot(slotType).containsSlotFiller(objectiveFunction, slotFillerCandidate))
+			return;
 
-				/*
-				 * Continue if the entity has slots but is no instance of entity template.
-				 */
-				if (!(slotFillerCandidate.getEntityType().hasNoSlots())
-						&& !(slotFillerCandidate instanceof EntityTemplate)) {
-					continue;
-				}
-
-				/*
-				 * Do not add the same value again.
-				 */
-				if (slotFillerCandidate.equals(entityTemplate.getSingleFillerSlot(slotType).getSlotFiller()))
-					continue;
-
-				final EntityTemplate deepCopy = entityTemplate.deepCopy();
-
-				deepCopy.setSingleSlotFiller(slotType, slotFillerCandidate);
-
-				if (violatesConstraints(currentState, deepCopy))
-					continue;
-
-				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
-
-			}
+		if (slotFillerCandidate.getEntityType().hasNoSlots() && slotFillerCandidate instanceof EntityTemplate) {
+			return;
 		}
+
+		final EntityTemplate deepCopy = entityTemplate.deepCopy();
+		deepCopy.addMultiSlotFiller(slotType, slotFillerCandidate);
+
+		if (violatesConstraints(currentState, deepCopy))
+			return;
+
+		proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
+	}
+
+	private void deleteSingleFiller(final List<State> entityTemplates, State currentState, SlotType slotType,
+			EntityTemplate entityTemplate, int annotationIndex) {
+
+		final EntityTemplate deepCopy = entityTemplate.deepCopy();
+
+		if (!entityTemplate.getSingleFillerSlot(slotType).containsSlotFiller())
+			return;
+
+		deepCopy.clearSlot(slotType);
+
+		if (violatesConstraints(currentState, deepCopy))
+			return;
+
+		entityTemplates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
+	}
+
+	private void changeSingleFiller(final List<State> proposalStates, State currentState, SlotType slotType,
+			AbstractAnnotation slotFillerCandidate, EntityTemplate entityTemplate, int annotationIndex) {
+
+		/*
+		 * Do no add itself
+		 */
+		if (slotFillerCandidate == entityTemplate)
+			return;
+
+		/*
+		 * Continue if the entity has slots but is no instance of entity template.
+		 */
+		if (!(slotFillerCandidate.getEntityType().hasNoSlots()) && !(slotFillerCandidate instanceof EntityTemplate)) {
+			return;
+		}
+
+		/*
+		 * Do not add the same value again.
+		 */
+		if (slotFillerCandidate.equals(entityTemplate.getSingleFillerSlot(slotType).getSlotFiller()))
+			return;
+
+		final EntityTemplate deepCopy = entityTemplate.deepCopy();
+
+		deepCopy.setSingleSlotFiller(slotType, slotFillerCandidate);
+
+		if (violatesConstraints(currentState, deepCopy))
+			return;
+
+		proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
 
 	}
 

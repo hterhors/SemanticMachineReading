@@ -10,7 +10,6 @@ import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.candprov.sf.AnnotationCandidateRetrievalCollection;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;
@@ -43,8 +42,7 @@ import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
-import de.hterhors.semanticmr.json.JsonNerlaProvider;
-import de.hterhors.semanticmr.nerla.NerlaCollector;
+import de.hterhors.semanticmr.json.JSONNerlaReader;
 import de.hterhors.semanticmr.projects.AbstractSemReadProject;
 import de.hterhors.semanticmr.projects.examples.WeightNormalization;
 import de.hterhors.semanticmr.projects.examples.slotfilling.specs.SFSpecs;
@@ -211,23 +209,11 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * defines the upper bound!
 		 * 
 		 */
-		NerlaCollector nerlaProvider = new NerlaCollector(instanceProvider.getInstances());
-		nerlaProvider.addNerlaProvider(new JsonNerlaProvider(externalNerlaAnnotations));
+		JSONNerlaReader nerlaReader = new JSONNerlaReader(externalNerlaAnnotations);
 
-		/**
-		 * We can add more candidate provider if necessary.
-		 * 
-		 * If no external candidate retrieval is available one can also guide the
-		 * exploration based on the hierarchical and structural specifications. When
-		 * setting
-		 * 
-		 * candidateProvider.setEntityTypeCandidateProvider();
-		 *
-		 * All possible (based on the specifications) entity types are retrieved for
-		 * each slot.
-		 *
-		 */
-		AnnotationCandidateRetrievalCollection candidateRetrieval = nerlaProvider.collect();
+		for (Instance instance : instanceProvider.getInstances()) {
+			instance.addCandidateAnnotations(nerlaReader.getForInstance(instance));
+		}
 
 		/**
 		 * To further increase the systems performance, we can specify a set of hard
@@ -247,8 +233,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * filling and is parameterized with a candidate retrieval and the
 		 * constraintsProvider.
 		 */
-		SlotFillingExplorer explorer = new SlotFillingExplorer(objectiveFunction, candidateRetrieval,
-				constraintsProvider);
+		SlotFillingExplorer explorer = new SlotFillingExplorer(objectiveFunction, constraintsProvider);
 
 		/**
 		 * The learner defines the update strategy of learned weights. parameters are
