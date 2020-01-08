@@ -185,7 +185,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * 
 		 * TODO: find best alpha value in combination with L2-regularization.
 		 */
-		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001));
+		AdvancedLearner learner = new AdvancedLearner(new SGD(0.01, 0), new L2(0.0001F));
 
 		/**
 		 * Next, we need to specify the actual feature templates. In this example we
