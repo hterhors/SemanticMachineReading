@@ -112,6 +112,8 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(super.toPrettyString(depth));
 		sb.append("\t");
+		sb.append(getSentenceIndex());
+		sb.append("\t");
 		sb.append(documentPosition.toPrettyString());
 		return sb.toString().trim();
 	}

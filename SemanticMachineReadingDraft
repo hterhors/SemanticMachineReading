@@ -1,0 +1,85 @@
+Semantic Machine Reading (beyond text)
+
+Specify language for slot-filling problem description.
+
+
+Language Requirements: 
+
+Problem Description using Templates:
+
+	Entity-Type: Slot(*), Entity-SubType(*), Entity-SuperType(*)
+
+	Slot: Cardinality(1), Annotation(*), Evaluation-Function (1) 
+
+	Annotation: Entity-Type(1), Char-Offset(?), Surfaceform(?)
+	
+	Evaluation-Function: 
+			Entity-Type Evaluation
+			Value Evaluation: Normalization-Function
+	
+	Normalization-Function:
+			Identity (default)  
+			Normalization
+	
+	Cardinality: 
+		SingleValue
+		MultiValue
+			List: Min (int +) , Max (int + && > min)
+			Set: Min (int +) , Max (int + && > min)
+Domain-Description:
+
+	Entity-Type: Entity-SubType, Entity-SuperType
+	Entity-SubType: Entity-SubType, Entity-SuperType
+	Entity-SuperType: Entity-SubType, Entity-SuperType
+
+	Domain-constraints: Constraint
+
+Document-Description:
+
+	Document-specific constraints: Constraint
+
+		Hard-Constraint_Exclude_Slot_Type (Includes other):
+			Exclude: (Slot, Type)
+			
+		Hard-Constraint_Include_Slot_Type (Excludes other):
+			Include: (Slot, Type)
+
+		Hard-Constraint_Exclude_Slot_Type_Pair (Includes other):
+			With: (Slot, Type)
+			Exclude: (Slot, Type)
+			
+		Hard-Constraint_Include_Slot_Type_Pair (Excludes other):
+			With: (Slot, Type)
+			Include: (Slot, Type)
+
+		Hard-Constraint_Include_Type (Excludes other):
+			Include: Type
+
+		Hard-Constraint_Excludes_Type (Includes other):
+			Exclude: Type
+
+		Hard-Constaint_Include_Value_Range (Excludes other):
+			Include: Type, From, To
+
+		Hard-Constaint_Excludes_Value_Range (Includes other):
+			Excludes: Type, From, To
+
+		Hard-Constaint_Include_Value_Range_Slot_Pair (Excludes other):
+			With: (Slot, Type)			
+			Include: Slot(optional), Type, From, To
+
+		Hard-Constaint_Excludes_Value_Range_Slot_Pair (Includes other):
+			With: (Slot, Type)			
+			Excludes: Slot(optional), Type, From, To
+
+
+Entity-Type Lexicalization:
+
+Lexical Entry:
+	Entity-Type, Text
+
+Regular-Expression Entry:
+	Enitty-Type, Regular-Expression
+	
+ 
+

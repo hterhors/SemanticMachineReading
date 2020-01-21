@@ -115,7 +115,7 @@ public class Document {
 			return "";
 
 		if (tokenList.size() == 1)
-			return tokenList.get(1).getText();
+			return tokenList.get(0).getText();
 
 		final StringBuilder documentContentBuilder = new StringBuilder();
 
@@ -202,6 +202,10 @@ public class Document {
 
 		return this.documentContent.substring(fromToken.getDocCharOffset(),
 				toToken.getDocCharOffset() + toToken.getText().length());
+	}
+
+	public String getContentOfSentence(Integer sentenceIndex) {
+		return builderDocumentContent(getSentenceByIndex(sentenceIndex));
 	}
 
 	public List<DocumentToken> getSentenceByIndex(int sentenceIndex) {

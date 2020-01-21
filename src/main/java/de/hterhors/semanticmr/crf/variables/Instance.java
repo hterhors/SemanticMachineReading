@@ -1,17 +1,14 @@
 package de.hterhors.semanticmr.crf.variables;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import de.hterhors.semanticmr.candidateretrieval.nerla.NerlCandidateRetrieval;
 import de.hterhors.semanticmr.candidateretrieval.sf.SlotFillingCandidateRetrieval;
+import de.hterhors.semanticmr.candidateretrieval.sf.SlotFillingCandidateRetrieval.IFilter;
 import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
@@ -41,6 +38,10 @@ public class Instance implements Comparable<Instance> {
 	private final Annotations groundTruth;
 
 	private final SlotFillingCandidateRetrieval slotFillingCandidateRetrieval = new SlotFillingCandidateRetrieval();
+
+	public void removeCandidateAnnotation(IFilter filter) {
+		slotFillingCandidateRetrieval.removeCandidateAnnotations(filter);
+	}
 
 	public void addCandidateAnnotations(Collection<? extends AbstractAnnotation> candidates) {
 		slotFillingCandidateRetrieval.addCandidateAnnotations(candidates);

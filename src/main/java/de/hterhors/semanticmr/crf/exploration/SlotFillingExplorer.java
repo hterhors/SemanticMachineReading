@@ -22,7 +22,6 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	private static Logger log = LogManager.getFormatterLogger(SlotFillingExplorer.class);
 
 	public static int MAX_NUMBER_OF_ANNOTATIONS = 100;
-//	final private AnnotationCandidateRetrievalCollection candidateProvider;
 
 	final private HardConstraintsProvider hardConstraintsProvider;
 	final private IObjectiveFunction objectiveFunction;
@@ -41,7 +40,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	 * Average number of new explored proposal states. This variable is used as
 	 * initial size of the next new proposal state list.
 	 */
-	int averageNumberOfNewProposalStates = 16;
+static public	int averageNumberOfNewProposalStates = 16;
 
 	@Override
 	public List<State> explore(State currentState) {

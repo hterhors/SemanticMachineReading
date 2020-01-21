@@ -145,7 +145,7 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 		Set<EntityType> entityTypes = new HashSet<>();
 
 		entityTypes.add(factor.getFactorScope().entityType);
-		entityTypes.addAll(factor.getFactorScope().entityType.getTransitiveClosureSuperEntityTypes());
+//		entityTypes.addAll(factor.getFactorScope().entityType.getTransitiveClosureSuperEntityTypes());
 
 		getTokenNgrams(factor.getFeatureVector(), entityTypes, factor.getFactorScope().surfaceForm);
 

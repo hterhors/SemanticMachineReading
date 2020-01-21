@@ -23,7 +23,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 		}
 	}
 
-	public static void includeAllSlotTypes() {
+	public static void includeAll() {
 		for (SlotType st : getAllSlotTypes()) {
 			st.exclude();
 		}
