@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
+import de.hterhors.semanticmr.crf.variables.DoubleVectorARRAY;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.exce.ModelLoadException;
 import de.hterhors.semanticmr.exce.ModelSaveException;
@@ -43,7 +44,7 @@ public class Model {
 	/**
 	 * Converts an index to its feature name.
 	 */
-	private final static Map<Integer, String> indexFeatureName = new HashMap<>();
+	public final static Map<Integer, String> indexFeatureName = new HashMap<>();
 
 	private static final String DEFAULT_READABLE_DIR = "/readable/";
 
@@ -52,29 +53,74 @@ public class Model {
 	private final File modelBaseDir;
 	private final String modelName;
 
-//	/**
-//	 * Synchronized method
-//	 * 
-//	 * @param feature
-//	 * @return
-//	 */
-//	public static synchronized Integer getIndexForFeatureName(String feature) {
-//		Integer index;
-//
-//		if ((index = featureNameIndex.get(feature)) != null) {
-//			return index;
-//		}
-//
-//		index = new Integer(featureNameIndex.size());
-//		featureNameIndex.put(feature, index);
-//		indexFeatureName.put(index, feature);
-//
-//		return index;
-//	}
-//
-//	public static synchronized String getFeatureForIndex(Integer feature) {
-//		return indexFeatureName.get(feature);
-//	}
+	private static void COMPARE_VECTORS() {
+		DoubleVector av1[] = new DoubleVector[300];
+		DoubleVector av2[] = new DoubleVector[av1.length];
+		DoubleVectorARRAY bv1[] = new DoubleVectorARRAY[av1.length];
+		DoubleVectorARRAY bv2[] = new DoubleVectorARRAY[av1.length];
+
+		for (int j = 0; j < av1.length; j++) {
+			DoubleVector avec = new DoubleVector();
+			DoubleVector avec2 = new DoubleVector();
+			DoubleVectorARRAY bvec = new DoubleVectorARRAY();
+			DoubleVectorARRAY bvec2 = new DoubleVectorARRAY();
+			for (int i = 0; i < 200000; i++) {
+				String r = i + "feature";
+				float a = (float) Math.random();
+				float b = (float) Math.random();
+				float c = (float) Math.random();
+				float d = (float) Math.random();
+				avec.set(r, a < 0.5 ? b : 0D);
+				avec2.set(r, c < 0.5 ? d : 0D);
+				bvec.set(r, a < 0.5 ? b : 0F);
+				bvec2.set(r, c < 0.5 ? d : 0F);
+			}
+			av1[j] = avec;
+			av2[j] = avec2;
+			bv1[j] = bvec;
+			bv2[j] = bvec2;
+			System.out.println(j);
+		}
+		long t = System.nanoTime();
+		System.out.println("done");
+		double x = 0;
+		for (int i = 0; i < av1.length; i++) {
+			x += av1[i].dotProduct(av2[i]);
+		}
+		System.out.println(x);
+		System.out.println(System.nanoTime() - t);
+
+		t = System.nanoTime();
+		System.out.println("done");
+		x = 0;
+		for (int i = 0; i < bv1.length; i++) {
+			x += bv1[i].dotProduct(bv2[i]);
+		}
+		System.out.println(x);
+		System.out.println(System.nanoTime() - t);
+	}
+
+	/**
+	 * Synchronized method
+	 * 
+	 * @param feature
+	 * @return
+	 */
+	public static synchronized Integer getIndexForFeatureName(String feature) {
+		Integer index;
+		if ((index = featureNameIndex.get(feature)) != null) {
+			return index;
+		}
+
+		index = new Integer(featureNameIndex.size());
+		featureNameIndex.put(feature, index);
+		indexFeatureName.put(index, feature);
+		return index;
+	}
+
+	public static synchronized String getFeatureForIndex(Integer feature) {
+		return indexFeatureName.get(feature);
+	}
 
 	/**
 	 * A comparator implementation that allows to sort states in descending order
@@ -235,6 +281,49 @@ public class Model {
 		printReadable(this.modelBaseDir, this.modelName);
 	}
 
+	static class Pair {
+		final public Integer index;
+		final public double value;
+
+		public Pair(Integer index, double value) {
+			super();
+			this.index = index;
+			this.value = value;
+		}
+
+	}
+
+//	public void printReadable(File modelDir, String modelName) {
+//		log.info("Print model in readable format...");
+//		try {
+//			for (AbstractFeatureTemplate template : this.factorTemplates) {
+//				File parentDir = new File(modelDir, modelName + DEFAULT_READABLE_DIR);
+//				parentDir.mkdirs();
+//
+//				final File f = new File(parentDir, template.getClass().getSimpleName());
+//
+//				PrintStream ps = new PrintStream(f);
+//				log.info("Print template to " + f.getAbsolutePath());
+//
+//				List<Pair> sortedWeights = new ArrayList<>();
+//				for (int i = 0; i < template.getWeights().getFeatures().length; i++) {
+//					sortedWeights.add(new Pair(i, template.getWeights().getFeatures()[i]));
+//				}
+//
+//				if (sortedWeights.size() == 0)
+//
+//					log.warn("No features found for template: " + template.getClass().getSimpleName());
+//				Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.value, o2.value));
+//				for (Pair feature : sortedWeights) {
+//					ps.println(indexFeatureName.get(feature.index) + "\t" + feature.value);
+//				}
+//				ps.close();
+//
+//			}
+//		} catch (IOException ex) {
+//			throw new RuntimeException("The model could not be printed. Failed with error: " + ex.getMessage());
+//		}
+//	}
 	public void printReadable(File modelDir, String modelName) {
 		log.info("Print model in readable format...");
 		try {
@@ -249,7 +338,7 @@ public class Model {
 				List<Entry<String, Double>> sortedWeights = new ArrayList<>(
 						template.getWeights().getFeatures().entrySet());
 				if (sortedWeights.size() == 0)
-					
+
 					log.warn("No features found for template: " + template.getClass().getSimpleName());
 				Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
 				for (Entry<String, Double> feature : sortedWeights) {

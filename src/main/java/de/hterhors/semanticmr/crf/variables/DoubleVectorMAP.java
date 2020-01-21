@@ -17,7 +17,7 @@ import de.hterhors.semanticmr.crf.model.Model;
  * @author hterhors
  *
  */
-public class DoubleVector {
+public class DoubleVectorMAP {
 
 	private static final Double DEFAULT_VALUE_ZERO = new Double(0.0);
 	private static final Double DEFAULT_VALUE_ONE = new Double(1.0);
@@ -27,9 +27,8 @@ public class DoubleVector {
 
 	private double length = 0D;
 	private boolean isDirty = true;
-
 //
-	public DoubleVector() {
+	public DoubleVectorMAP() {
 		this.features = new HashMap<String, Double>();
 //		this.features = new HashMap<Integer, Double>();
 		this.isDirty = true;
@@ -50,6 +49,7 @@ public class DoubleVector {
 	public void set(String feature, Double value) {
 		if (value == 0.0D)
 			return;
+		final Integer index = Model.getIndexForFeatureName(feature);
 		setForceZero(feature, value);
 	}
 
@@ -84,9 +84,9 @@ public class DoubleVector {
 	 * 
 	 * *********************
 	 */
-	public double dotProduct(DoubleVector weights) {
-		DoubleVector smaller = null;
-		DoubleVector bigger = null;
+	public double dotProduct(DoubleVectorMAP weights) {
+		DoubleVectorMAP smaller = null;
+		DoubleVectorMAP bigger = null;
 		if (features.size() <= weights.features.size()) {
 			smaller = this;
 			bigger = weights;
@@ -100,7 +100,7 @@ public class DoubleVector {
 			return 0;
 	}
 
-	private double computeDot(DoubleVector smaller, DoubleVector bigger) {
+	private double computeDot(DoubleVectorMAP smaller, DoubleVectorMAP bigger) {
 		double result = 0;
 		for (Entry<String, Double> e : smaller.getFeatures().entrySet()) {
 			result += e.getValue() * bigger.getValueOfFeature(e.getKey());
@@ -116,28 +116,28 @@ public class DoubleVector {
 
 	}
 
-	public void add(DoubleVector v) {
+	public void add(DoubleVectorMAP v) {
 		for (Entry<String, Double> feature : v.getFeatures().entrySet()) {
 			addToValue(feature.getKey(), feature.getValue());
 		}
 		this.isDirty = true;
 	}
 
-	public void mulAndAdd(DoubleVector v, double mul) {
+	public void mulAndAdd(DoubleVectorMAP v, double mul) {
 		for (Entry<String, Double> feature : v.getFeatures().entrySet()) {
 			addToValue(feature.getKey(), feature.getValue() * mul);
 		}
 		this.isDirty = true;
 	}
 
-	public void sub(DoubleVector v) {
+	public void sub(DoubleVectorMAP v) {
 		for (Entry<String, Double> feature : v.getFeatures().entrySet()) {
 			addToValue(feature.getKey(), -feature.getValue());
 		}
 		this.isDirty = true;
 	}
 
-	public void mulAndSub(DoubleVector v, double mul) {
+	public void mulAndSub(DoubleVectorMAP v, double mul) {
 		for (Entry<String, Double> feature : v.getFeatures().entrySet()) {
 			addToValue(feature.getKey(), -(feature.getValue() * mul));
 		}

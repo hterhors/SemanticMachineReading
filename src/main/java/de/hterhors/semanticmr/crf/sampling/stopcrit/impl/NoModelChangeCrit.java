@@ -38,6 +38,12 @@ public class NoModelChangeCrit implements ITrainingStoppingCriterion {
 //				countWeights++;
 //			}
 //		}
+//		for (AbstractFeatureTemplate template : model.getFactorTemplates()) {
+//			for (double weight : template.getWeights().getFeatures()) {
+//				meanWeight += weight;
+//				countWeights++;
+//			}
+//		}
 		for (AbstractFeatureTemplate template : model.getFactorTemplates()) {
 			for (Double weight : template.getWeights().getFeatures().values()) {
 				meanWeight += weight.doubleValue();

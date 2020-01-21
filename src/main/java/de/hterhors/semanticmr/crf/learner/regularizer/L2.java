@@ -4,7 +4,7 @@ import de.hterhors.semanticmr.crf.variables.DoubleVector;
 
 public class L2 implements Regularizer {
 
-	private double l2 = 0.0001;
+	private double l2 = 0.0001F;
 
 	public L2() {
 	}

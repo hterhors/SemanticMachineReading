@@ -164,7 +164,9 @@ public class SemanticParsingCRF {
 							model.score(proposalStates);
 						}
 						final State candidateState = sampler.sampleCandidate(proposalStates);
-
+						
+						proposalStates.clear();
+						
 						scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
 
 						boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState,
