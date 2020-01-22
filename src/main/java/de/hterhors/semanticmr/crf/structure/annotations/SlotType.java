@@ -224,6 +224,9 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 	}
 
 	public String toPrettyString(int depth) {
+		if (isFrozen())
+			return name + "(frozen)";
+
 		return name;
 	}
 
