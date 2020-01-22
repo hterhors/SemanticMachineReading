@@ -15,6 +15,17 @@ import de.hterhors.semanticmr.init.specifications.Specifications;
 
 public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
+	/**
+	 * Excludes this slot type from sampling. However frozen slot types are still
+	 * accessible for feature generation if, e.g. this slot contains values by
+	 * default.
+	 */
+	private boolean frozen = false;
+
+	/**
+	 * Excludes this slot type from everything. Makes this slot type basically not
+	 * existent.
+	 */
 	private boolean exclude = false;
 
 	public static void excludeAll() {
@@ -24,6 +35,18 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 	}
 
 	public static void includeAll() {
+		for (SlotType st : getAllSlotTypes()) {
+			st.exclude();
+		}
+	}
+
+	public static void freezeAll() {
+		for (SlotType st : getAllSlotTypes()) {
+			st.exclude();
+		}
+	}
+
+	public static void unfreezeAll() {
 		for (SlotType st : getAllSlotTypes()) {
 			st.exclude();
 		}
@@ -39,6 +62,22 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
 	public boolean isExcluded() {
 		return exclude;
+	}
+
+	public boolean isIncluded() {
+		return !exclude;
+	}
+
+	public void freeze() {
+		this.frozen = true;
+	}
+
+	public void unfreeze() {
+		this.frozen = false;
+	}
+
+	public boolean isFrozen() {
+		return frozen;
 	}
 
 	final public String name;

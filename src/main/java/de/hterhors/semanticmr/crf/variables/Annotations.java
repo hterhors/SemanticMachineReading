@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
@@ -86,6 +87,14 @@ public class Annotations {
 
 		final Annotations otherAnnotations = (Annotations) otherVal;
 
+//		if (this.predictions.isEmpty() && otherAnnotations.predictions.size() == 1) {
+//			AbstractAnnotation e = otherAnnotations.predictions.iterator().next();
+//			if (e.getEntityType() == EntityType.get("VertebralArea") && e.asInstanceOfEntityTemplate().isEmpty())
+//				return Score.TP;
+//		}
+
+
+		
 		if (this.predictions.size() == 0 || otherAnnotations.predictions.size() == 0 || otherVal == null)
 			return Score.ZERO;
 

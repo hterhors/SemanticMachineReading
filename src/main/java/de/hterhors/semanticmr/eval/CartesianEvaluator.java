@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import org.apache.jena.ext.com.google.common.collect.Collections2;
 
+import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 
@@ -67,6 +68,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 	@Override
 	protected Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations) {
+
 		final Score bestScore;
 		boolean docLinked = true;
 		for (AbstractAnnotation abstractAnnotation : annotations) {

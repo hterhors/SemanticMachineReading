@@ -40,7 +40,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	 * Average number of new explored proposal states. This variable is used as
 	 * initial size of the next new proposal state list.
 	 */
-static public	int averageNumberOfNewProposalStates = 16;
+	static public int averageNumberOfNewProposalStates = 16;
 
 	@Override
 	public List<State> explore(State currentState) {
@@ -73,7 +73,7 @@ static public	int averageNumberOfNewProposalStates = 16;
 			 */
 			for (SlotType slotType : entityTemplateAnnotation.getSingleFillerSlotTypes()) {
 
-				if (slotType.isExcluded())
+				if (slotType.isFrozen() || slotType.isExcluded())
 					continue;
 
 				for (AbstractAnnotation slotFillerCandidate : currentState.getInstance()
@@ -82,6 +82,19 @@ static public	int averageNumberOfNewProposalStates = 16;
 					changeSingleFiller(proposalStates, currentState, slotType, slotFillerCandidate,
 							entityTemplateAnnotation, annotationIndex);
 
+				}
+
+				deleteSingleFiller(proposalStates, currentState, slotType, entityTemplateAnnotation, annotationIndex);
+			}
+
+			for (SlotType slotType : entityTemplateAnnotation.getMultiFillerSlotTypes()) {
+
+				if (slotType.isFrozen() || slotType.isExcluded())
+					continue;
+
+				for (AbstractAnnotation slotFillerCandidate : currentState.getInstance()
+						.getSlotTypeCandidates(slotType)) {
+
 					addMultiFiller(proposalStates, currentState, slotType, slotFillerCandidate,
 							entityTemplateAnnotation, annotationIndex);
 
@@ -89,7 +102,6 @@ static public	int averageNumberOfNewProposalStates = 16;
 							entityTemplateAnnotation, annotationIndex);
 				}
 
-				deleteSingleFiller(proposalStates, currentState, slotType, entityTemplateAnnotation, annotationIndex);
 				deleteMultiFiller(proposalStates, currentState, slotType, entityTemplateAnnotation, annotationIndex);
 			}
 		}
