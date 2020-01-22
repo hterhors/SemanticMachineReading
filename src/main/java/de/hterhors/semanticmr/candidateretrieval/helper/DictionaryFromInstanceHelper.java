@@ -52,77 +52,84 @@ public class DictionaryFromInstanceHelper {
 		return annotations;
 	}
 
+	/**
+	 * Creates a full recursive property dictionary of all available slots.
+	 * 
+	 * @param trainingInstances
+	 * @return
+	 */
 	public static Map<EntityType, Set<String>> toDictionary(List<Instance> trainingInstances) {
 		Map<EntityType, Set<String>> map = new HashMap<>();
 
 		for (Instance instance : trainingInstances) {
-
 			for (AbstractAnnotation aa : instance.getGoldAnnotations().getAnnotations()) {
-
-				if (aa.isInstanceOfEntityTemplate()) {
-
-					AbstractAnnotation rootA = aa.asInstanceOfEntityTemplate().getRootAnnotation();
-
-					if (rootA.isInstanceOfLiteralAnnotation()) {
-
-						map.putIfAbsent(rootA.getEntityType(), new HashSet<>());
-						String e = rootA.asInstanceOfLiteralAnnotation().getSurfaceForm();
-						map.get(rootA.getEntityType()).add(e);
-
-					}
-
-					for (AbstractAnnotation slotFillerValue : Stream
-							.concat(aa.asInstanceOfEntityTemplate().streamSingleFillerSlotValues(),
-									aa.asInstanceOfEntityTemplate().flatStreamMultiFillerSlotValues())
-							.collect(Collectors.toSet())) {
-
-						if (slotFillerValue.isInstanceOfEntityTemplate()) {
-
-							AbstractAnnotation rootS = slotFillerValue.asInstanceOfEntityTemplate().getRootAnnotation();
-
-							if (rootS.isInstanceOfLiteralAnnotation()) {
-
-								map.putIfAbsent(rootS.getEntityType(), new HashSet<>());
-								String e = rootS.asInstanceOfLiteralAnnotation().getSurfaceForm();
-								map.get(rootS.getEntityType()).add(e);
-
-							}
-							/**
-							 * special for compound treatments...
-							 */
-							if (slotFillerValue.getEntityType().name.equals("CompoundTreatment")) {
-								SingleFillerSlot s = slotFillerValue.asInstanceOfEntityTemplate()
-										.getSingleFillerSlot(SlotType.get("hasCompound"));
-
-								if (s.containsSlotFiller()) {
-									AbstractAnnotation compound = s.getSlotFiller().asInstanceOfEntityTemplate()
-											.getRootAnnotation();
-									if (compound.isInstanceOfLiteralAnnotation()) {
-
-										map.putIfAbsent(compound.getEntityType(), new HashSet<>());
-										String e = compound.asInstanceOfLiteralAnnotation().getSurfaceForm();
-										map.get(compound.getEntityType()).add(e);
-
-									}
-								}
-
-							}
-						}
-
-						if (slotFillerValue.isInstanceOfLiteralAnnotation()) {
-							map.putIfAbsent(slotFillerValue.getEntityType(), new HashSet<>());
-							String e = slotFillerValue.asInstanceOfLiteralAnnotation().getSurfaceForm();
-							map.get(slotFillerValue.getEntityType()).add(e);
-						}
-
-					}
-				}
-
+				recursive(map, aa);
 			}
-
 		}
 
 		return map;
+	}
+
+	public static void recursive(Map<EntityType, Set<String>> map, AbstractAnnotation aa) {
+		if (aa.isInstanceOfEntityTemplate()) {
+
+			AbstractAnnotation rootA = aa.asInstanceOfEntityTemplate().getRootAnnotation();
+
+			if (rootA.isInstanceOfLiteralAnnotation()) {
+
+				map.putIfAbsent(rootA.getEntityType(), new HashSet<>());
+				String e = rootA.asInstanceOfLiteralAnnotation().getSurfaceForm();
+				map.get(rootA.getEntityType()).add(e);
+
+			}
+
+			for (AbstractAnnotation slotFillerValue : Stream
+					.concat(aa.asInstanceOfEntityTemplate().streamSingleFillerSlotValues(),
+							aa.asInstanceOfEntityTemplate().flatStreamMultiFillerSlotValues())
+					.collect(Collectors.toSet())) {
+
+				if (slotFillerValue.isInstanceOfEntityTemplate()) {
+
+					AbstractAnnotation rootS = slotFillerValue.asInstanceOfEntityTemplate().getRootAnnotation();
+
+					if (rootS.isInstanceOfLiteralAnnotation()) {
+
+						map.putIfAbsent(rootS.getEntityType(), new HashSet<>());
+						String e = rootS.asInstanceOfLiteralAnnotation().getSurfaceForm();
+						map.get(rootS.getEntityType()).add(e);
+
+					}
+
+//					/**
+//					 * special for compound treatments... go deeper than 1 hop in properties.
+//					 */
+//					if (slotFillerValue.getEntityType().name.equals("CompoundTreatment")) {
+//						SingleFillerSlot s = slotFillerValue.asInstanceOfEntityTemplate()
+//								.getSingleFillerSlot(SlotType.get("hasCompound"));
+//
+//						if (s.containsSlotFiller()) {
+//							AbstractAnnotation compound = s.getSlotFiller().asInstanceOfEntityTemplate()
+//									.getRootAnnotation();
+//							if (compound.isInstanceOfLiteralAnnotation()) {
+//
+//								map.putIfAbsent(compound.getEntityType(), new HashSet<>());
+//								String e = compound.asInstanceOfLiteralAnnotation().getSurfaceForm();
+//								map.get(compound.getEntityType()).add(e);
+//
+//							}
+//						}
+//
+//					}
+				}
+
+				recursive(map, slotFillerValue);
+
+			}
+		} else if (aa.isInstanceOfLiteralAnnotation()) {
+			map.putIfAbsent(aa.getEntityType(), new HashSet<>());
+			String e = aa.asInstanceOfLiteralAnnotation().getSurfaceForm();
+			map.get(aa.getEntityType()).add(e);
+		}
 	}
 
 }

@@ -24,7 +24,7 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
  */
 public class NerlCandidateRetrieval {
 
-	private Set<EntityType> types;
+	private Set<EntityType> types = new HashSet<>();
 
 	/**
 	 * The dictionary.
