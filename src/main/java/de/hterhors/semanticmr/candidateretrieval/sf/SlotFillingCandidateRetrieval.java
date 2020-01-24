@@ -6,45 +6,64 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer.ESamplingMode;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 
 public class SlotFillingCandidateRetrieval {
+
 	public static interface IFilter {
 		public boolean remove(AbstractAnnotation candidate);
 	}
 
-	public void removeCandidateAnnotations(IFilter filter) {
-		for (EntityType key : entityTypeCandidates.keySet()) {
-			for (Iterator<EntityTypeAnnotation> iterator = entityTypeCandidates.get(key).iterator(); iterator
+	public void filterOutAnnotationCandidates(IFilter filter) {
+		for (EntityType key : entityTypeAnnotationCandidates.keySet()) {
+			for (Iterator<EntityTypeAnnotation> iterator = entityTypeAnnotationCandidates.get(key).iterator(); iterator
 					.hasNext();) {
 				if (filter.remove(iterator.next()))
 					iterator.remove();
 			}
 		}
-		for (SlotType key : slotTypeCandidates.keySet()) {
-			for (Iterator<AbstractAnnotation> iterator = slotTypeCandidates.get(key).iterator(); iterator.hasNext();) {
+		for (SlotType key : slotTypeAnnotationCandidates.keySet()) {
+			for (Iterator<AbstractAnnotation> iterator = slotTypeAnnotationCandidates.get(key).iterator(); iterator
+					.hasNext();) {
 				if (filter.remove(iterator.next()))
 					iterator.remove();
 			}
 		}
 	}
 
+	private final Map<EntityType, Set<EntityTypeAnnotation>> entityTypeAnnotationCandidates = new HashMap<>();
+
+	private final Map<SlotType, Set<AbstractAnnotation>> slotTypeAnnotationCandidates = new HashMap<>();
+
 	private final Map<EntityType, Set<EntityTypeAnnotation>> entityTypeCandidates = new HashMap<>();
 
 	private final Map<SlotType, Set<AbstractAnnotation>> slotTypeCandidates = new HashMap<>();
 
-	public Set<EntityTypeAnnotation> getEntityTypeCandidates(EntityType entityType) {
-		return entityTypeCandidates.getOrDefault(entityType, Collections.emptySet());
+	public Set<EntityTypeAnnotation> getEntityTypeCandidates(ESamplingMode samplingMode, EntityType entityType) {
+		if (samplingMode == ESamplingMode.ANNOTATION_BASED)
+			return entityTypeAnnotationCandidates.getOrDefault(entityType, Collections.emptySet());
+		if (samplingMode == ESamplingMode.TYPE_BASED)
+			return entityTypeCandidates.getOrDefault(entityType, Collections.emptySet());
+		else
+			throw new IllegalArgumentException("Unkown sampling mode: " + samplingMode);
 	}
 
-	public Set<AbstractAnnotation> getSlotTypeCandidates(SlotType slotType) {
-		return slotTypeCandidates.getOrDefault(slotType, Collections.emptySet());
+	public Set<AbstractAnnotation> getSlotTypeCandidates(ESamplingMode samplingMode, SlotType slotType) {
+		if (samplingMode == ESamplingMode.ANNOTATION_BASED)
+			return slotTypeAnnotationCandidates.getOrDefault(slotType, Collections.emptySet());
+		if (samplingMode == ESamplingMode.TYPE_BASED)
+			return slotTypeCandidates.getOrDefault(slotType, Collections.emptySet());
+		else
+			throw new IllegalArgumentException("Unkown sampling mode: " + samplingMode);
 	}
 
 	public void addCandidateAnnotations(Collection<? extends AbstractAnnotation> candidates) {
@@ -55,7 +74,8 @@ public class SlotFillingCandidateRetrieval {
 
 	public void addCandidateAnnotation(AbstractAnnotation candidate) {
 
-		if (!candidate.getEntityType().getTransitiveClosureSubEntityTypes().isEmpty())
+		if (!candidate.isInstanceOfEntityTemplate()
+				&& !candidate.getEntityType().getTransitiveClosureSubEntityTypes().isEmpty())
 			return;
 
 		if (!candidate.isInstanceOfEntityTemplate()) {
@@ -65,22 +85,85 @@ public class SlotFillingCandidateRetrieval {
 
 		for (SlotType slotType : candidate.getEntityType().getSlotFillerOfSlotTypes()) {
 
+			if (slotType.isExcluded() || slotType.isFrozen())
+				continue;
+
+			slotTypeAnnotationCandidates.putIfAbsent(slotType, new HashSet<>());
+			if (slotType.matchesEntityType(candidate.getEntityType())) {
+				slotTypeAnnotationCandidates.get(slotType).add(candidate);
+			}
+
 			slotTypeCandidates.putIfAbsent(slotType, new HashSet<>());
 			if (slotType.matchesEntityType(candidate.getEntityType())) {
-				slotTypeCandidates.get(slotType).add(candidate);
+				slotTypeCandidates.get(slotType).add(reduceToEntityType(candidate));
 			}
+
 		}
 
 		for (EntityType relatedEntityType : candidate.getEntityType().getHierarchicalEntityTypes()) {
 
-			entityTypeCandidates.putIfAbsent(relatedEntityType, new HashSet<>());
+			entityTypeAnnotationCandidates.putIfAbsent(relatedEntityType, new HashSet<>());
 			if (candidate.isInstanceOfEntityTypeAnnotation()) {
-				entityTypeCandidates.get(relatedEntityType).add((EntityTypeAnnotation) candidate);
+				entityTypeAnnotationCandidates.get(relatedEntityType).add((EntityTypeAnnotation) candidate);
 			} else {
-				entityTypeCandidates.get(relatedEntityType).add(((EntityTemplate) candidate).getRootAnnotation());
+				entityTypeAnnotationCandidates.get(relatedEntityType)
+						.add(((EntityTemplate) candidate).getRootAnnotation());
+			}
+
+			entityTypeCandidates.putIfAbsent(relatedEntityType, new HashSet<>());
+			Set<EntityTypeAnnotation> annotations = entityTypeCandidates.get(relatedEntityType);
+			final EntityTypeAnnotation annotation;
+			if (candidate.isInstanceOfEntityTypeAnnotation()) {
+				annotation = (EntityTypeAnnotation) candidate;
+			} else {
+				annotation = ((EntityTemplate) candidate).getRootAnnotation();
+			}
+
+			if (candidate.getEntityType().isLiteral) {
+				annotations.add(annotation);
+
+			} else {
+				/**
+				 * Reduce to entity type if annotation would be subclass of entity type
+				 * annotation.
+				 */
+				annotations.add(AnnotationBuilder.toAnnotation(annotation.getEntityType()));
+
+			}
+
+		}
+
+	}
+
+	private AbstractAnnotation reduceToEntityType(AbstractAnnotation candidate) {
+
+		if (candidate.getEntityType().isLiteral)
+			return candidate;
+
+		if (candidate.isInstanceOfEntityTypeAnnotation())
+			return AnnotationBuilder.toAnnotation(candidate.getEntityType());
+
+		final EntityTemplate redAnn = new EntityTemplate(AnnotationBuilder.toAnnotation(candidate.getEntityType()));
+
+		Map<SlotType, AbstractAnnotation> singleSlots = candidate.asInstanceOfEntityTemplate().filter()
+				.docLinkedAnnoation().entityTypeAnnoation().literalAnnoation().entityTemplateAnnoation().singleSlots()
+				.nonEmpty().build().getSingleAnnotations();
+
+		for (Entry<SlotType, AbstractAnnotation> singleSlot : singleSlots.entrySet()) {
+			redAnn.setSingleSlotFiller(singleSlot.getKey(), reduceToEntityType(singleSlot.getValue()));
+		}
+
+		Map<SlotType, Set<AbstractAnnotation>> multiSlots = candidate.asInstanceOfEntityTemplate().filter()
+				.docLinkedAnnoation().entityTypeAnnoation().literalAnnoation().entityTemplateAnnoation().multiSlots()
+				.nonEmpty().build().getMultiAnnotations();
+
+		for (Entry<SlotType, Set<AbstractAnnotation>> multiSlot : multiSlots.entrySet()) {
+			for (AbstractAnnotation multiFiller : multiSlot.getValue()) {
+				redAnn.addMultiSlotFiller(multiSlot.getKey(), reduceToEntityType(multiFiller));
 			}
 		}
 
+		return redAnn;
 	}
 
 }

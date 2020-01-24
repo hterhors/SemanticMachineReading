@@ -79,7 +79,8 @@ public class JSONNerlaReader {
 						EntityType.get(jsonEntityAnnotationWrapper.getEntityType()),
 						new TextualContent(jsonEntityAnnotationWrapper.getSurfaceForm()),
 						new DocumentPosition(jsonEntityAnnotationWrapper.getOffset())));
-			} catch (DocumentLinkedAnnotationMismatchException e) {
+			} catch (Exception e) {
+//			} catch (DocumentLinkedAnnotationMismatchException e) {
 				exceptions.add(e.getMessage());
 			}
 		}

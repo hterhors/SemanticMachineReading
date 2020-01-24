@@ -210,8 +210,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * 
 		 */
 		JSONNerlaReader nerlaReader = new JSONNerlaReader(externalNerlaAnnotations);
-		
-		
+
 		for (Instance instance : instanceProvider.getInstances()) {
 			instance.addCandidateAnnotations(nerlaReader.getForInstance(instance));
 		}
@@ -344,7 +343,9 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		/**
 		 * Create a new semantic parsing CRF and initialize with needed parameter.
 		 */
-		SemanticParsingCRF crf = new SemanticParsingCRF(model, explorer, sampler, stateInitializer, objectiveFunction);
+		SemanticParsingCRF crf = new SemanticParsingCRF(model, explorer, sampler, objectiveFunction);
+
+		crf.setInitializer(stateInitializer);
 
 		/**
 		 * If the model was loaded from the file system, we do not need to train it.

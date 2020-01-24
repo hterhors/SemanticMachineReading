@@ -290,8 +290,9 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		/**
 		 * Create a new semantic parsing CRF and initialize with needed parameter.
 		 */
-		SemanticParsingCRF crf = new SemanticParsingCRF(model, explorer, sampler, stateInitializer, objectiveFunction);
+		SemanticParsingCRF crf = new SemanticParsingCRF(model, explorer, sampler, objectiveFunction);
 
+		crf.setInitializer(stateInitializer);
 		/**
 		 * If the model was loaded from the file system, we do not need to train it.
 		 */

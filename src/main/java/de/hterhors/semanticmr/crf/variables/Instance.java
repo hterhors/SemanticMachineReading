@@ -10,6 +10,7 @@ import de.hterhors.semanticmr.candidateretrieval.nerla.NerlCandidateRetrieval;
 import de.hterhors.semanticmr.candidateretrieval.sf.SlotFillingCandidateRetrieval;
 import de.hterhors.semanticmr.candidateretrieval.sf.SlotFillingCandidateRetrieval.IFilter;
 import de.hterhors.semanticmr.corpus.EInstanceContext;
+import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer.ESamplingMode;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
@@ -40,7 +41,7 @@ public class Instance implements Comparable<Instance> {
 	private final SlotFillingCandidateRetrieval slotFillingCandidateRetrieval = new SlotFillingCandidateRetrieval();
 
 	public void removeCandidateAnnotation(IFilter filter) {
-		slotFillingCandidateRetrieval.removeCandidateAnnotations(filter);
+		slotFillingCandidateRetrieval.filterOutAnnotationCandidates(filter);
 	}
 
 	public void addCandidateAnnotations(Collection<? extends AbstractAnnotation> candidates) {
@@ -53,12 +54,12 @@ public class Instance implements Comparable<Instance> {
 
 	private final NerlCandidateRetrieval nerlaCandidateRetrieval = new NerlCandidateRetrieval();
 
-	public Set<EntityTypeAnnotation> getEntityTypeCandidates(EntityType entityType) {
-		return slotFillingCandidateRetrieval.getEntityTypeCandidates(entityType);
+	public Set<EntityTypeAnnotation> getEntityTypeCandidates(ESamplingMode samplingMode, EntityType entityType) {
+		return slotFillingCandidateRetrieval.getEntityTypeCandidates(samplingMode,entityType);
 	}
 
-	public Set<AbstractAnnotation> getSlotTypeCandidates(SlotType slotType) {
-		return slotFillingCandidateRetrieval.getSlotTypeCandidates(slotType);
+	public Set<AbstractAnnotation> getSlotTypeCandidates(ESamplingMode samplingMode, SlotType slotType) {
+		return slotFillingCandidateRetrieval.getSlotTypeCandidates(samplingMode,slotType);
 	}
 
 	public void addCandidates(final File dictionaryFile) {

@@ -210,10 +210,6 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 
 	private final static Map<String, EntityType> entityTypeFactory = new HashMap<>();
 
-	public static Collection<EntityType> getAllEntityTypes() {
-		return Collections.unmodifiableCollection(entityTypeFactory.values());
-	}
-
 	public static EntityType get(final String entityTypeName) {
 
 		final String internalized = entityTypeName.intern();
@@ -310,7 +306,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	 * @return
 	 */
 	public static Set<EntityType> getEntityTypes() {
-		return entityTypes;
+		return Collections.unmodifiableSet(entityTypes);
 	}
 
 	@Override

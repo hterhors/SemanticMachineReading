@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer.ESamplingMode;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -20,9 +21,11 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 	public static int MAX_NUMBER_OF_ANNOTATIONS;
 
 	final private EntityTypeAnnotation initAnnotation;
+	final private ESamplingMode samplingMode;
 
-	public RootTemplateCardinalityExplorer(EntityTypeAnnotation initAnnotation) {
+	public RootTemplateCardinalityExplorer(ESamplingMode samplingMode, EntityTypeAnnotation initAnnotation) {
 		this.initAnnotation = initAnnotation;
+		this.samplingMode = samplingMode;
 	}
 
 	/**
@@ -43,7 +46,7 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 			proposalStates.add(currentState.deepAddCopy(new EntityTemplate((init))));
 
 			for (EntityTypeAnnotation templateTypeCandidate : currentState.getInstance()
-					.getEntityTypeCandidates(init.getEntityType())) {
+					.getEntityTypeCandidates(samplingMode, init.getEntityType())) {
 
 				if (templateTypeCandidate.equals(init))
 					continue;

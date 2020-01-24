@@ -5,24 +5,29 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import de.hterhors.semanticmr.crf.structure.EntityType;
-import de.hterhors.semanticmr.crf.structure.IEvaluatable;
+import org.apache.http.annotation.Experimental;
+
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
+import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 public class Annotations {
 
-	private List<AbstractAnnotation> predictions;
+	public static boolean removeDuplicates = false;
+
+	private List<AbstractAnnotation> annotations;
 
 	private Set<DocumentToken> tokensWithAnnotations = new HashSet<>();
 
@@ -40,8 +45,8 @@ public class Annotations {
 
 	public Annotations(List<AbstractAnnotation> annotations) {
 		Objects.requireNonNull(annotations);
-		this.predictions = annotations;
-		for (AbstractAnnotation abstractSlotFiller : this.predictions) {
+		this.annotations = annotations;
+		for (AbstractAnnotation abstractSlotFiller : this.annotations) {
 			if (abstractSlotFiller instanceof DocumentLinkedAnnotation) {
 				tokensWithAnnotations.addAll(((DocumentLinkedAnnotation) abstractSlotFiller).relatedTokens);
 			}
@@ -54,6 +59,7 @@ public class Annotations {
 
 	private static List<AbstractAnnotation> applyModifications(Annotations goldAnnotations,
 			Collection<GoldModificationRule> modifyRules) {
+
 		final List<AbstractAnnotation> modifiedAnnotations = new ArrayList<>();
 		for (AbstractAnnotation goldAnnotation : goldAnnotations.getAbstractAnnotations()) {
 			for (GoldModificationRule modifyGoldRule : modifyRules) {
@@ -63,21 +69,40 @@ public class Annotations {
 			if (goldAnnotation != null)
 				modifiedAnnotations.add(goldAnnotation);
 		}
-		return modifiedAnnotations;
+
+		List<AbstractAnnotation> distinctAnnotations = new ArrayList<>();
+
+		l_1: for (AbstractAnnotation abstractAnnotation : modifiedAnnotations) {
+
+			if (removeDuplicates)
+				for (AbstractAnnotation abstractAnnotation2 : distinctAnnotations) {
+
+					if (abstractAnnotation2.evaluate(evaluator, abstractAnnotation).getF1() == 1.0D) {
+						continue l_1;
+					}
+
+				}
+
+			distinctAnnotations.add(abstractAnnotation);
+		}
+
+		return distinctAnnotations;
 	}
 
+	public final static CartesianEvaluator evaluator = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
+
 	public Annotations unmodifiable() {
-		predictions = Collections.unmodifiableList(predictions);
+		annotations = Collections.unmodifiableList(annotations);
 		return this;
 	}
 
 	@SuppressWarnings("unchecked")
 	public <Annotation extends AbstractAnnotation> List<Annotation> getAnnotations() {
-		return (List<Annotation>) predictions;
+		return (List<Annotation>) annotations;
 	}
 
 	public List<AbstractAnnotation> getAbstractAnnotations() {
-		return predictions;
+		return annotations;
 	}
 
 	public Score evaluate(AbstractEvaluator evaluator, Annotations otherVal) {
@@ -93,41 +118,39 @@ public class Annotations {
 //				return Score.TP;
 //		}
 
-
-		
-		if (this.predictions.size() == 0 || otherAnnotations.predictions.size() == 0 || otherVal == null)
+		if (this.annotations.size() == 0 || otherAnnotations.annotations.size() == 0 || otherVal == null)
 			return Score.ZERO;
 
-		if (this.predictions.size() == 1 && otherAnnotations.predictions.size() == 1)
-			return evaluator.scoreSingle(this.predictions.get(0), otherAnnotations.predictions.get(0));
+		if (this.annotations.size() == 1 && otherAnnotations.annotations.size() == 1)
+			return evaluator.scoreSingle(this.annotations.get(0), otherAnnotations.annotations.get(0));
 
-		return evaluator.scoreMultiValues(this.predictions, otherAnnotations.predictions);
+		return evaluator.scoreMultiValues(this.annotations, otherAnnotations.annotations);
 
 	}
 
 	public Annotations deepUpdateCopy(int annotationIndex, AbstractAnnotation newCurrentPrediction) {
 
-		final List<AbstractAnnotation> updatedList = new ArrayList<>(predictions.size());
-		for (int index = 0; index < predictions.size(); index++) {
+		final List<AbstractAnnotation> updatedList = new ArrayList<>(annotations.size());
+		for (int index = 0; index < annotations.size(); index++) {
 
 			if (index == annotationIndex) {
 				updatedList.add(newCurrentPrediction);
 				continue;
 			}
-			updatedList.add(predictions.get(index).deepCopy());
+			updatedList.add(annotations.get(index).deepCopy());
 		}
 
 		return new Annotations(updatedList);
 	}
 
 	public Annotations deepRemoveCopy(int annotationIndex) {
-		final List<AbstractAnnotation> updatedList = new ArrayList<>(predictions.size());
-		for (int index = 0; index < predictions.size(); index++) {
+		final List<AbstractAnnotation> updatedList = new ArrayList<>(annotations.size());
+		for (int index = 0; index < annotations.size(); index++) {
 
 			if (index == annotationIndex)
 				continue;
 
-			updatedList.add(predictions.get(index).deepCopy());
+			updatedList.add(annotations.get(index).deepCopy());
 		}
 
 		return new Annotations(updatedList);
@@ -135,9 +158,9 @@ public class Annotations {
 
 	public Annotations deepAddCopy(AbstractAnnotation newCurrentPrediction) {
 
-		final List<AbstractAnnotation> updatedList = new ArrayList<>(predictions.size());
-		for (int index = 0; index < predictions.size(); index++) {
-			updatedList.add(predictions.get(index).deepCopy());
+		final List<AbstractAnnotation> updatedList = new ArrayList<>(annotations.size());
+		for (int index = 0; index < annotations.size(); index++) {
+			updatedList.add(annotations.get(index).deepCopy());
 		}
 		updatedList.add(newCurrentPrediction);
 
@@ -146,9 +169,9 @@ public class Annotations {
 
 	public Annotations deepCopy() {
 
-		final List<AbstractAnnotation> deepCopyList = new ArrayList<>(predictions.size());
-		for (int index = 0; index < predictions.size(); index++) {
-			deepCopyList.add(predictions.get(index).deepCopy());
+		final List<AbstractAnnotation> deepCopyList = new ArrayList<>(annotations.size());
+		for (int index = 0; index < annotations.size(); index++) {
+			deepCopyList.add(annotations.get(index).deepCopy());
 		}
 
 		return new Annotations(deepCopyList);
@@ -157,7 +180,7 @@ public class Annotations {
 	@Override
 	public String toString() {
 		return "Annotations [annotations="
-				+ predictions.stream().map(p -> "\n" + p.toPrettyString()).reduce("", String::concat) + "]";
+				+ annotations.stream().map(p -> "\n" + p.toPrettyString()).reduce("", String::concat) + "]";
 	}
 
 	public boolean containsAnnotationOnTokens(DocumentToken... tokens) {
@@ -174,7 +197,7 @@ public class Annotations {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((predictions == null) ? 0 : predictions.hashCode());
+		result = prime * result + ((annotations == null) ? 0 : annotations.hashCode());
 		result = prime * result + ((tokensWithAnnotations == null) ? 0 : tokensWithAnnotations.hashCode());
 		return result;
 	}
@@ -188,10 +211,10 @@ public class Annotations {
 		if (getClass() != obj.getClass())
 			return false;
 		Annotations other = (Annotations) obj;
-		if (predictions == null) {
-			if (other.predictions != null)
+		if (annotations == null) {
+			if (other.annotations != null)
 				return false;
-		} else if (!predictions.equals(other.predictions))
+		} else if (!annotations.equals(other.annotations))
 			return false;
 		if (tokensWithAnnotations == null) {
 			if (other.tokensWithAnnotations != null)

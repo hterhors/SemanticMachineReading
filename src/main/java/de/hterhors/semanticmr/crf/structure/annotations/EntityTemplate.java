@@ -103,6 +103,10 @@ final public class EntityTemplate extends AbstractAnnotation {
 		if (slotType.isExcluded())
 			throw new UnkownSingleSlotException("The requested single filler slot was excluded: " + slotType);
 
+		if (!slotType.isSingleValueSlot())
+			throw new UnkownMultiSlotException("The requested single filler slot is actually a multi filler slot: "
+					+ slotType + " for entity: " + getEntityType().name);
+
 		if (slotFiller == null)
 			return this;
 
@@ -122,6 +126,10 @@ final public class EntityTemplate extends AbstractAnnotation {
 			AbstractAnnotation slotFillerCandidate) {
 		if (slotType.isExcluded())
 			throw new UnkownSingleSlotException("The requested single filler slot was excluded: " + slotType);
+
+		if (slotType.isSingleValueSlot())
+			throw new UnkownMultiSlotException("The requested multi filler slot is actually a single filler slot: "
+					+ slotType + " for entity: " + getEntityType().name);
 
 		if (slotFillerCandidate == this)
 			throw new IllegalSlotFillerException("Can not put itself as slot filler of itself.");
@@ -147,6 +155,11 @@ final public class EntityTemplate extends AbstractAnnotation {
 	 * @param slotFiller
 	 */
 	public void addMultiSlotFiller(SlotType slotType, final AbstractAnnotation slotFiller) {
+
+		if (slotType.isSingleValueSlot())
+			throw new UnkownMultiSlotException("The requested multi filler slot is actually a single filler slot: "
+					+ slotType + " for entity: " + getEntityType().name);
+
 		if (slotType.isExcluded())
 			throw new UnkownSingleSlotException("The requested single filler slot was excluded: " + slotType);
 
@@ -169,7 +182,11 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 	public MultiFillerSlot getMultiFillerSlot(SlotType slotType) {
 		if (slotType.isExcluded())
-			throw new UnkownSingleSlotException("The requested single filler slot was excluded: " + slotType);
+			throw new UnkownSingleSlotException("The requested multi filler slot was excluded: " + slotType);
+
+		if (slotType.isSingleValueSlot())
+			throw new UnkownMultiSlotException("The requested multi filler slot is actually a single filler slot: "
+					+ slotType + " for entity: " + getEntityType().name);
 
 		if (!getEntityType().containsSlotType(slotType))
 			throw new UnkownMultiSlotException(
@@ -344,7 +361,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 	private void addScoresForSingleFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, final Score score) {
 		for (SlotType singleSlotType : getSingleFillerSlotTypes()) {
 
-			if (singleSlotType.isExcluded())
+			if (singleSlotType.isExcluded() || singleSlotType.isFrozen())
 				continue;
 
 			final SingleFillerSlot otherSingleSlotFiller;
@@ -372,7 +389,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 		for (SlotType multiSlotType : getMultiFillerSlotTypes()) {
 
-			if (multiSlotType.isExcluded())
+			if (multiSlotType.isExcluded() || multiSlotType.isFrozen())
 				continue;
 
 			final Set<AbstractAnnotation> otherSlotFiller;

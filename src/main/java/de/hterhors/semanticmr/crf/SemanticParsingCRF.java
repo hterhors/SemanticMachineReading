@@ -81,7 +81,15 @@ public class SemanticParsingCRF {
 
 	final AbstractSampler sampler;
 
-	private final IStateInitializer initializer;
+	private IStateInitializer initializer;
+
+	public void setInitializer(IStateInitializer initializer) {
+		this.initializer = initializer;
+	}
+
+	public IStateInitializer getInitializer() {
+		return initializer;
+	}
 
 	private CRFStatistics trainingStatistics;
 
@@ -91,17 +99,25 @@ public class SemanticParsingCRF {
 			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
 
 	public SemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
-			IStateInitializer initializer, IObjectiveFunction objectiveFunction) {
-		this(model, Arrays.asList(explorer), sampler, initializer, objectiveFunction);
+			IObjectiveFunction objectiveFunction) {
+		this(model, Arrays.asList(explorer), sampler, objectiveFunction);
 	}
 
 	public SemanticParsingCRF(Model model, List<IExplorationStrategy> explorer, AbstractSampler sampler,
-			IStateInitializer initializer, IObjectiveFunction objectiveFunction) {
+			IObjectiveFunction objectiveFunction) {
 		this.model = model;
 		this.explorerList = explorer;
 		this.objectiveFunction = objectiveFunction;
 		this.sampler = sampler;
-		this.initializer = initializer;
+	}
+
+	public SemanticParsingCRF(Model model, List<IExplorationStrategy> explorerList, AbstractSampler sampler,
+			IStateInitializer stateInitializer, IObjectiveFunction trainingObjectiveFunction) {
+		this.model = model;
+		this.explorerList = explorerList;
+		this.objectiveFunction = trainingObjectiveFunction;
+		this.sampler = sampler;
+		this.initializer = stateInitializer;
 	}
 
 	public Map<Instance, State> train(final AdvancedLearner learner, final List<Instance> trainingInstances,
@@ -164,9 +180,9 @@ public class SemanticParsingCRF {
 							model.score(proposalStates);
 						}
 						final State candidateState = sampler.sampleCandidate(proposalStates);
-						
+
 						proposalStates.clear();
-						
+
 						scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
 
 						boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState,
@@ -392,6 +408,7 @@ public class SemanticParsingCRF {
 			List<State> currentStates = new ArrayList<>();
 
 			State currentState = initializer.getInitState(instance);
+
 			finalStates.put(instance, Arrays.asList(currentState));
 			objectiveFunction.score(currentState);
 
