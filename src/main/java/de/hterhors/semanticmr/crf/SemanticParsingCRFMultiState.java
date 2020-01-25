@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
 import de.hterhors.semanticmr.crf.model.Model;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.of.SlotFillingObjectiveFunction;
-import de.hterhors.semanticmr.crf.sampling.AbstractSampler;
+import de.hterhors.semanticmr.crf.sampling.AbstractBeamSampler;
 import de.hterhors.semanticmr.crf.sampling.impl.AcceptStrategies;
 import de.hterhors.semanticmr.crf.sampling.impl.SamplerCollection;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
@@ -37,10 +38,10 @@ import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.NerlaEvaluator;
 
-public class SemanticParsingCRF {
+public class SemanticParsingCRFMultiState {
 	public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.00000");
 
-	private static Logger log = LogManager.getFormatterLogger(SemanticParsingCRF.class);
+	private static Logger log = LogManager.getFormatterLogger("SlotFilling");
 
 	private static class CRFStatistics {
 		private final String context;
@@ -79,7 +80,7 @@ public class SemanticParsingCRF {
 
 	final IObjectiveFunction objectiveFunction;
 
-	final AbstractSampler sampler;
+	final AbstractBeamSampler sampler;
 
 	private IStateInitializer initializer;
 
@@ -98,12 +99,12 @@ public class SemanticParsingCRF {
 	private IObjectiveFunction coverageObjectiveFunction = new SlotFillingObjectiveFunction(
 			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
 
-	public SemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
+	public SemanticParsingCRFMultiState(Model model, IExplorationStrategy explorer, AbstractBeamSampler sampler,
 			IObjectiveFunction objectiveFunction) {
 		this(model, Arrays.asList(explorer), sampler, objectiveFunction);
 	}
 
-	public SemanticParsingCRF(Model model, List<IExplorationStrategy> explorer, AbstractSampler sampler,
+	public SemanticParsingCRFMultiState(Model model, List<IExplorationStrategy> explorer, AbstractBeamSampler sampler,
 			IObjectiveFunction objectiveFunction) {
 		this.model = model;
 		this.explorerList = explorer;
@@ -111,8 +112,9 @@ public class SemanticParsingCRF {
 		this.sampler = sampler;
 	}
 
-	public SemanticParsingCRF(Model model, List<IExplorationStrategy> explorerList, AbstractSampler sampler,
-			IStateInitializer stateInitializer, IObjectiveFunction trainingObjectiveFunction) {
+	public SemanticParsingCRFMultiState(Model model, List<IExplorationStrategy> explorerList,
+			AbstractBeamSampler sampler, IStateInitializer stateInitializer,
+			IObjectiveFunction trainingObjectiveFunction) {
 		this.model = model;
 		this.explorerList = explorerList;
 		this.objectiveFunction = trainingObjectiveFunction;
@@ -142,12 +144,11 @@ public class SemanticParsingCRF {
 
 		this.trainingStatistics.startTrainingTime = System.currentTimeMillis();
 
-		final Map<Instance, State> finalStates = new LinkedHashMap<>();
-//		Map<Integer, Double> lastModelWeights = new HashMap<>();
+		final Map<Instance, Map<Integer, State>> finalStates = new LinkedHashMap<>();
 
 		trainingInstances = new ArrayList<>(trainingInstances);
+		Map<Instance, State> selectedbestStates = new HashMap<>();
 
-//		Collections.sort(trainingInstances);
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
 			log.info("############");
 			log.info("# Epoch: " + (epoch + 1) + " #");
@@ -158,46 +159,114 @@ public class SemanticParsingCRF {
 			int instanceIndex = 0;
 
 			for (Instance instance : trainingInstances) {
+
 				final List<State> producedStateChain = new ArrayList<>();
 
-				State currentState = initializer.getInitState(instance);
-				objectiveFunction.score(currentState);
-				finalStates.put(instance, currentState);
-				producedStateChain.add(currentState);
+				Map<Integer, StatePair> currentStatePairs = new HashMap<>();
+
+				for (State state : initializer.getInitMultiStates(instance)) {
+					currentStatePairs.put(state.getCurrentPredictions().getAnnotations().size(),
+							new StatePair(state, null));
+				}
+				
+				finalStates.put(instance, new HashMap<>());
+
+				for (Entry<Integer, StatePair> statePairMap : currentStatePairs.entrySet()) {
+					objectiveFunction.score(statePairMap.getValue().currentState);
+					finalStates.get(instance).put(statePairMap.getKey(), statePairMap.getValue().currentState);
+
+					/*
+					 * add random / first
+					 */
+					if (producedStateChain.isEmpty())
+						producedStateChain.add(statePairMap.getValue().currentState);
+				}
+
 				int samplingStep;
 				for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
-
 					for (IExplorationStrategy explorer : explorerList) {
 
-						final List<State> proposalStates = explorer.explore(currentState);
+						State bestState = null;
 
-						if (proposalStates.isEmpty())
-							proposalStates.add(currentState);
+						for (Entry<Integer, StatePair> statePair : currentStatePairs.entrySet()) {
 
-						if (sampleBasedOnObjectiveFunction) {
-							objectiveFunction.score(proposalStates);
-						} else {
-							model.score(proposalStates);
+							final List<StatePair> proposalStatePairs;
+
+							final List<State> propStates = explorer.explore(statePair.getValue().currentState);
+
+							if (propStates.isEmpty()) {
+								proposalStatePairs = Arrays.asList(new StatePair(statePair.getValue().currentState,
+										statePair.getValue().currentState));
+							} else {
+								proposalStatePairs = new ArrayList<>();
+
+								if (sampleBasedOnObjectiveFunction) {
+									objectiveFunction.score(propStates);
+								} else {
+									model.score(propStates);
+								}
+
+								for (State np : propStates) {
+									proposalStatePairs.add(new StatePair(statePair.getValue().currentState, np));
+								}
+							}
+
+							final StatePair candidateState = sampler.sampleCandidate(proposalStatePairs, 1).get(0);
+
+							scoreSelectedStates(sampleBasedOnObjectiveFunction, candidateState.currentState,
+									candidateState.candidateState);
+
+							boolean isAccepted = sampler.getAcceptanceStrategy(epoch)
+									.isAccepted(candidateState.candidateState, candidateState.currentState);
+
+							/*
+							 * Update model weights
+							 */
+							model.updateWeights(learner, candidateState.currentState, candidateState.candidateState);
+
+							if (isAccepted) {
+								/*
+								 * On acceptance chose candidate state as next state
+								 */
+								currentStatePairs.put(statePair.getKey(),
+										new StatePair(candidateState.candidateState, null));
+							} else {
+								/*
+								 * Otherwise chose current state as next state.
+								 */
+								currentStatePairs.put(statePair.getKey(),
+										new StatePair(candidateState.currentState, null));
+							}
+
+							finalStates.get(instance).put(statePair.getKey(),
+									currentStatePairs.get(statePair.getKey()).currentState);
+
+							/*
+							 * Select best following state.
+							 */
+							if (bestState == null || bestState
+									.getModelScore() < currentStatePairs.get(statePair.getKey()).currentState
+											.getModelScore())
+								bestState = currentStatePairs.get(statePair.getKey()).currentState;
+
 						}
-						final State candidateState = sampler.sampleCandidate(proposalStates);
 
-//						proposalStates.clear();
+						/*
+						 * Update learner based on pairwise multi states
+						 */
+						List<Integer> is = new ArrayList<>(currentStatePairs.keySet());
 
-						scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
-
-						boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState,
-								currentState);
-
-						model.updateWeights(learner, currentState, candidateState);
-
-						if (isAccepted) {
-							currentState = candidateState;
+						for (int i = 0; i < is.size(); i++) {
+							for (int j = i + 1; j < is.size(); j++) {
+								model.updateWeights(learner, currentStatePairs.get(is.get(i)).currentState,
+										currentStatePairs.get(is.get(j)).currentState);
+							}
 						}
 
-						producedStateChain.add(currentState);
-
-						finalStates.put(instance, currentState);
-
+						/*
+						 * Add best state of the multi states
+						 */
+						producedStateChain.add(bestState);
 					}
 
 					if (meetsSamplingStoppingCriterion(samplingStoppingCrits, producedStateChain))
@@ -205,10 +274,10 @@ public class SemanticParsingCRF {
 
 				}
 				this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
-				LogUtils.logState(log,
+				LogUtils.logBeamState(log,
 						TRAIN_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + ++instanceIndex + "/"
 								+ trainingInstances.size() + "]" + "[" + (samplingStep + 1) + "]",
-						instance, currentState);
+						instance, currentStatePairs.values());
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
 			}
 
@@ -248,16 +317,30 @@ public class SemanticParsingCRF {
 //			if (modelWeightsDiff < 0.01)
 //				break;
 
-			if (meetsTrainingStoppingCriterion(trainingStoppingCrits, finalStates))
+			for (Entry<Instance, Map<Integer, State>> i : finalStates.entrySet()) {
+
+				State bestState = null;
+				for (State s : i.getValue().values()) {
+
+					if (bestState == null || bestState.getModelScore() < s.getModelScore())
+						bestState = s;
+
+				}
+
+				selectedbestStates.put(i.getKey(), bestState);
+			}
+
+			if (meetsTrainingStoppingCriterion(trainingStoppingCrits, selectedbestStates))
 				break;
 
 //			lastModelWeights = currentModelWeights;
 //			Collections.shuffle(trainingInstances);
 
 		}
+
 		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 
-		return finalStates;
+		return selectedbestStates;
 	}
 
 	private Score simpleEvaluate(boolean print, NerlaEvaluator evaluator, List<Integer> bestAssignment,

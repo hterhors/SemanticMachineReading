@@ -95,7 +95,7 @@ public class SlotFillingCandidateRetrieval {
 
 			slotTypeCandidates.putIfAbsent(slotType, new HashSet<>());
 			if (slotType.matchesEntityType(candidate.getEntityType())) {
-				slotTypeCandidates.get(slotType).add(reduceToEntityType(candidate));
+				slotTypeCandidates.get(slotType).add(candidate.reduceToEntityType());
 			}
 
 		}
@@ -133,37 +133,6 @@ public class SlotFillingCandidateRetrieval {
 
 		}
 
-	}
-
-	private AbstractAnnotation reduceToEntityType(AbstractAnnotation candidate) {
-
-		if (candidate.getEntityType().isLiteral)
-			return candidate;
-
-		if (candidate.isInstanceOfEntityTypeAnnotation())
-			return AnnotationBuilder.toAnnotation(candidate.getEntityType());
-
-		final EntityTemplate redAnn = new EntityTemplate(AnnotationBuilder.toAnnotation(candidate.getEntityType()));
-
-		Map<SlotType, AbstractAnnotation> singleSlots = candidate.asInstanceOfEntityTemplate().filter()
-				.docLinkedAnnoation().entityTypeAnnoation().literalAnnoation().entityTemplateAnnoation().singleSlots()
-				.nonEmpty().build().getSingleAnnotations();
-
-		for (Entry<SlotType, AbstractAnnotation> singleSlot : singleSlots.entrySet()) {
-			redAnn.setSingleSlotFiller(singleSlot.getKey(), reduceToEntityType(singleSlot.getValue()));
-		}
-
-		Map<SlotType, Set<AbstractAnnotation>> multiSlots = candidate.asInstanceOfEntityTemplate().filter()
-				.docLinkedAnnoation().entityTypeAnnoation().literalAnnoation().entityTemplateAnnoation().multiSlots()
-				.nonEmpty().build().getMultiAnnotations();
-
-		for (Entry<SlotType, Set<AbstractAnnotation>> multiSlot : multiSlots.entrySet()) {
-			for (AbstractAnnotation multiFiller : multiSlot.getValue()) {
-				redAnn.addMultiSlotFiller(multiSlot.getKey(), reduceToEntityType(multiFiller));
-			}
-		}
-
-		return redAnn;
 	}
 
 }

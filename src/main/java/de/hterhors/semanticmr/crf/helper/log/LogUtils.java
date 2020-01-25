@@ -1,7 +1,7 @@
 package de.hterhors.semanticmr.crf.helper.log;
 
 import java.text.DecimalFormat;
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +35,7 @@ public class LogUtils {
 	}
 
 	public static void logBeamState(Logger logger, String context, Instance instance,
-			List<StatePair> currentStatePairs) {
+			Collection<StatePair> currentStatePairs) {
 		logger.info("***********************************************************");
 		int count = 1;
 		for (StatePair statePair : currentStatePairs) {

@@ -1,5 +1,8 @@
 package de.hterhors.semanticmr.crf.variables;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Interface or state initialization.
  * 
@@ -15,5 +18,9 @@ public interface IStateInitializer {
 	 * @return initial (empty) state
 	 */
 	public State getInitState(final Instance instance);
+
+	default public List<State> getInitMultiStates(final Instance instance) {
+		return Arrays.asList(getInitState(instance));
+	}
 
 }

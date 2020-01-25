@@ -1,5 +1,9 @@
 package de.hterhors.semanticmr.crf.structure.annotations;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IDeepCopyable;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
@@ -106,4 +110,34 @@ public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable 
 		return evaluate(evaluator.evaluationDetail, otherVal);
 	}
 
+	public AbstractAnnotation reduceToEntityType() {
+
+		if (getEntityType().isLiteral)
+			return this;
+
+		if (isInstanceOfEntityTypeAnnotation())
+			return AnnotationBuilder.toAnnotation(getEntityType());
+
+		final EntityTemplate redAnn = new EntityTemplate(AnnotationBuilder.toAnnotation(getEntityType()));
+
+		Map<SlotType, AbstractAnnotation> singleSlots = asInstanceOfEntityTemplate().filter().docLinkedAnnoation()
+				.entityTypeAnnoation().literalAnnoation().entityTemplateAnnoation().singleSlots().nonEmpty().build()
+				.getSingleAnnotations();
+
+		for (Entry<SlotType, AbstractAnnotation> singleSlot : singleSlots.entrySet()) {
+			redAnn.setSingleSlotFiller(singleSlot.getKey(), singleSlot.getValue().reduceToEntityType());
+		}
+
+		Map<SlotType, Set<AbstractAnnotation>> multiSlots = asInstanceOfEntityTemplate().filter().docLinkedAnnoation()
+				.entityTypeAnnoation().literalAnnoation().entityTemplateAnnoation().multiSlots().nonEmpty().build()
+				.getMultiAnnotations();
+
+		for (Entry<SlotType, Set<AbstractAnnotation>> multiSlot : multiSlots.entrySet()) {
+			for (AbstractAnnotation multiFiller : multiSlot.getValue()) {
+				redAnn.addMultiSlotFiller(multiSlot.getKey(), multiFiller.reduceToEntityType());
+			}
+		}
+
+		return redAnn;
+	}
 }
