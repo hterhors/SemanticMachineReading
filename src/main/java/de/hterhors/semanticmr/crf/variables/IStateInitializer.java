@@ -20,6 +20,9 @@ public interface IStateInitializer {
 	public State getInitState(final Instance instance);
 
 	default public List<State> getInitMultiStates(final Instance instance) {
+		/**
+		 * Add
+		 */
 		return Arrays.asList(getInitState(instance));
 	}
 
