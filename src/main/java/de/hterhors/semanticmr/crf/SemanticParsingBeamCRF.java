@@ -225,7 +225,7 @@ public class SemanticParsingBeamCRF {
 
 				this.trainingStatistics.endTime = System.currentTimeMillis();
 
-				LogUtils.logBeamState(log,
+				LogUtils.logMultipleStates(log,
 						TRAIN_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + ++instanceIndex + "/"
 								+ trainingInstances.size() + "]" + "[" + (samplingStep + 1) + "]",
 						instance, currentStatePairs);
@@ -370,7 +370,7 @@ public class SemanticParsingBeamCRF {
 
 			this.predictStatistics.endTime = System.currentTimeMillis();
 
-			LogUtils.logBeamState(log,
+			LogUtils.logMultipleStates(log,
 					TEST_CONTEXT + "[" + ++instanceIndex + "/" + instancesToPredict.size() + "] [" + samplingStep + "]",
 					instance, currentStatePairs);
 			log.info("Time: " + this.predictStatistics.getTotalDuration());

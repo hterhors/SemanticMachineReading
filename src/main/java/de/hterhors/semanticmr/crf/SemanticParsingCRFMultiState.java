@@ -168,7 +168,7 @@ public class SemanticParsingCRFMultiState {
 					currentStatePairs.put(state.getCurrentPredictions().getAnnotations().size(),
 							new StatePair(state, null));
 				}
-				
+
 				finalStates.put(instance, new HashMap<>());
 
 				for (Entry<Integer, StatePair> statePairMap : currentStatePairs.entrySet()) {
@@ -274,48 +274,12 @@ public class SemanticParsingCRFMultiState {
 
 				}
 				this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
-				LogUtils.logBeamState(log,
+				LogUtils.logMultipleStates(log,
 						TRAIN_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + ++instanceIndex + "/"
 								+ trainingInstances.size() + "]" + "[" + (samplingStep + 1) + "]",
 						instance, currentStatePairs.values());
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
 			}
-
-//			Map<Integer, Double> currentModelWeights = model.getFactorTemplates().stream()
-//					.flatMap(t -> t.getWeights().getFeatures().entrySet().stream())
-//					.collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue()));
-//
-//			double modelWeightsDiff = computeThreshold(currentModelWeights, lastModelWeights);
-//			Score a = new Score();
-//			NerlaEvaluator eval = new NerlaEvaluator(EEvaluationDetail.ENTITY_TYPE);
-//			for (Entry<Instance, State> e : finalStates.entrySet()) {
-//
-//				List<EntityTemplate> goldAnnotations = e.getValue().getGoldAnnotations().getAnnotations();
-//				List<EntityTemplate> predictedAnnotations = e.getValue().getCurrentPredictions().getAnnotations();
-//
-//				List<Integer> bestAssignment = ((CartesianEvaluator) predictionObjectiveFunction.getEvaluator())
-//						.getBestAssignment(goldAnnotations, predictedAnnotations);
-//				Score score = simpleEvaluate(false, eval, bestAssignment, goldAnnotations, predictedAnnotations);
-//				a.add(score);
-//
-//			}
-//
-//			Score s = new Score();
-//			for (Entry<Instance, State> e : predict(testInstances, new MaxChainLengthCrit(10)).entrySet()) {
-//
-//				List<EntityTemplate> goldAnnotations = e.getValue().getGoldAnnotations().getAnnotations();
-//				List<EntityTemplate> predictedAnnotations = e.getValue().getCurrentPredictions().getAnnotations();
-//
-//				List<Integer> bestAssignment = ((CartesianEvaluator) predictionObjectiveFunction.getEvaluator())
-//						.getBestAssignment(goldAnnotations, predictedAnnotations);
-//				Score score = simpleEvaluate(false, eval, bestAssignment, goldAnnotations, predictedAnnotations);
-//				s.add(score);
-//
-//			}
-//			log.info("DIFF\t" + modelWeightsDiff + "\t" + s.getF1() + "\t" + s.getPrecision() + "\t" + s.getRecall()
-//					+ "\t" + a.getF1() + "\t" + a.getPrecision() + "\t" + a.getRecall());
-//			if (modelWeightsDiff < 0.01)
-//				break;
 
 			for (Entry<Instance, Map<Integer, State>> i : finalStates.entrySet()) {
 
@@ -333,82 +297,11 @@ public class SemanticParsingCRFMultiState {
 			if (meetsTrainingStoppingCriterion(trainingStoppingCrits, selectedbestStates))
 				break;
 
-//			lastModelWeights = currentModelWeights;
-//			Collections.shuffle(trainingInstances);
-
 		}
 
 		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 
 		return selectedbestStates;
-	}
-
-	private Score simpleEvaluate(boolean print, NerlaEvaluator evaluator, List<Integer> bestAssignment,
-			List<EntityTemplate> goldAnnotations, List<EntityTemplate> predictedAnnotationsBaseline) {
-		Score simpleScore = new Score();
-
-		for (int goldIndex = 0; goldIndex < bestAssignment.size(); goldIndex++) {
-			final int predictIndex = bestAssignment.get(goldIndex);
-			/*
-			 * Treatments
-			 */
-			List<AbstractAnnotation> goldTreatments = new ArrayList<>(goldAnnotations.get(goldIndex)
-					.getMultiFillerSlot(SlotType.get("hasTreatmentType")).getSlotFiller());
-
-			List<AbstractAnnotation> predictTreatments = new ArrayList<>(predictedAnnotationsBaseline.get(predictIndex)
-					.getMultiFillerSlot(SlotType.get("hasTreatmentType")).getSlotFiller());
-			Score s;
-			if (goldTreatments.isEmpty() && predictTreatments.isEmpty())
-				s = new Score(1, 0, 0);
-			else
-				s = evaluator.prf1(goldTreatments, predictTreatments);
-
-			simpleScore.add(s);
-			/*
-			 * OrganismModel
-			 */
-			List<AbstractAnnotation> goldOrganismModel = Arrays.asList(
-					goldAnnotations.get(goldIndex).getSingleFillerSlotOfName("hasOrganismModel").getSlotFiller())
-					.stream().filter(a -> a != null).collect(Collectors.toList());
-			List<AbstractAnnotation> predictOrganismModel = Arrays.asList(predictedAnnotationsBaseline.get(predictIndex)
-					.getSingleFillerSlotOfName("hasOrganismModel").getSlotFiller()).stream().filter(a -> a != null)
-					.collect(Collectors.toList());
-
-			simpleScore.add(evaluator.prf1(goldOrganismModel, predictOrganismModel));
-
-			/*
-			 * InjuryModel
-			 */
-			List<AbstractAnnotation> goldInjuryModel = Arrays
-					.asList(goldAnnotations.get(goldIndex).getSingleFillerSlotOfName("hasInjuryModel").getSlotFiller())
-					.stream().filter(a -> a != null).collect(Collectors.toList());
-			List<AbstractAnnotation> predictInjuryModel = Arrays.asList(predictedAnnotationsBaseline.get(predictIndex)
-					.getSingleFillerSlotOfName("hasInjuryModel").getSlotFiller()).stream().filter(a -> a != null)
-					.collect(Collectors.toList());
-
-			simpleScore.add(evaluator.prf1(goldInjuryModel, predictInjuryModel));
-
-		}
-
-		return simpleScore;
-	}
-
-	private double computeThreshold(Map<Integer, Double> currentModelWeights, Map<Integer, Double> lastModelWeights) {
-		double diff = 0;
-		for (Integer currentKey : currentModelWeights.keySet()) {
-			if (lastModelWeights.containsKey(currentKey)) {
-				diff += Math.abs(lastModelWeights.get(currentKey) - currentModelWeights.get(currentKey));
-			} else {
-				diff += currentModelWeights.get(currentKey);
-			}
-		}
-		for (Integer currentKey : lastModelWeights.keySet()) {
-			if (!currentModelWeights.containsKey(currentKey)) {
-				diff += lastModelWeights.get(currentKey);
-			}
-		}
-
-		return diff;
 	}
 
 	private boolean meetsSamplingStoppingCriterion(ISamplingStoppingCriterion[] stoppingCriterion,
@@ -478,58 +371,120 @@ public class SemanticParsingCRFMultiState {
 
 	private Map<Instance, List<State>> predictP(Model model, List<Instance> instancesToPredict, final int n,
 			ISamplingStoppingCriterion... stoppingCriterion) {
+
+		if (n != 1)
+			throw new IllegalStateException("This prediction does not support values for (n != 1). value of n = " + n);
+
 		this.testStatistics = new CRFStatistics("Test");
 		this.testStatistics.startTrainingTime = System.currentTimeMillis();
 
-		final Map<Instance, List<State>> finalStates = new LinkedHashMap<>();
+		final Map<Instance, Map<Integer, List<State>>> finalStates = new LinkedHashMap<>();
 
+		Map<Instance, List<State>> selectedbestStates = new HashMap<>();
 		int instanceIndex = 0;
 		for (Instance instance : instancesToPredict) {
 
 			final List<State> producedStateChain = new ArrayList<>();
 
-			List<State> currentStates = new ArrayList<>();
+			Map<Integer, StatePair> currentStatePairs = new HashMap<>();
 
-			State currentState = initializer.getInitState(instance);
+			for (State state : initializer.getInitMultiStates(instance)) {
+				currentStatePairs.put(state.getCurrentPredictions().getAnnotations().size(),
+						new StatePair(state, null));
+			}
 
-			finalStates.put(instance, Arrays.asList(currentState));
-			objectiveFunction.score(currentState);
+			finalStates.put(instance, new HashMap<>());
 
-			producedStateChain.add(currentState);
+			for (Entry<Integer, StatePair> statePairMap : currentStatePairs.entrySet()) {
+				objectiveFunction.score(statePairMap.getValue().currentState);
+				finalStates.get(instance).put(statePairMap.getKey(),
+						Arrays.asList(statePairMap.getValue().currentState));
+
+				/*
+				 * add random / first
+				 */
+				if (producedStateChain.isEmpty())
+					producedStateChain.add(statePairMap.getValue().currentState);
+			}
+//			List<State> currentStates = new ArrayList<>();
 
 			int samplingStep;
 			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
 
 				for (IExplorationStrategy explorer : explorerList) {
 
-					final List<State> proposalStates = explorer.explore(currentState);
+					State bestStateOfAllCardinalities = null;
 
-					if (proposalStates.isEmpty())
-						proposalStates.add(currentState);
+					for (Entry<Integer, StatePair> statePair : currentStatePairs.entrySet()) {
 
-					model.score(proposalStates);
+						final List<StatePair> proposalStatePairs;
 
-					Collections.sort(proposalStates,
-							(s1, s2) -> -Double.compare(s1.getModelScore(), s2.getModelScore()));
+						final List<State> propStates = explorer.explore(statePair.getValue().currentState);
 
-					final State candidateState = proposalStates.get(0);
+						if (propStates.isEmpty()) {
+							proposalStatePairs = Arrays.asList(new StatePair(statePair.getValue().currentState,
+									statePair.getValue().currentState));
+						} else {
+							proposalStatePairs = new ArrayList<>();
 
-					boolean accepted = AcceptStrategies.strictModelAccept().isAccepted(candidateState, currentState);
+							model.score(propStates);
 
-					if (accepted) {
-						currentState = candidateState;
-						objectiveFunction.score(currentState);
+							for (State np : propStates) {
+								proposalStatePairs.add(new StatePair(statePair.getValue().currentState, np));
+							}
+						}
 
-						currentStates = new ArrayList<>(proposalStates.subList(0, Math.min(proposalStates.size(), n)));
-						objectiveFunction.score(currentStates);
+						Collections.sort(proposalStatePairs, (s1, s2) -> -Double
+								.compare(s1.candidateState.getModelScore(), s2.candidateState.getModelScore()));
+
+						final StatePair candidateState = proposalStatePairs.get(0);
+
+						boolean isAccepted = AcceptStrategies.strictModelAccept()
+								.isAccepted(candidateState.candidateState, candidateState.currentState);
+
+						if (isAccepted) {
+							/*
+							 * Score for comparison. for new docs this does not work.
+							 */
+							objectiveFunction.score(candidateState.candidateState);
+							/*
+							 * On acceptance chose candidate state as next state
+							 */
+							currentStatePairs.put(statePair.getKey(),
+									new StatePair(candidateState.candidateState, null));
+
+//							currentStates = 
+//									proposalStatePairs.subList(0, Math.min(proposalStatePairs.size(), n)).stream().map(sp->sp.currentState);
+//							objectiveFunction.score(currentStates);
+
+						} else {
+							/*
+							 * Otherwise chose current state as next state.
+							 */
+							currentStatePairs.put(statePair.getKey(), new StatePair(candidateState.currentState, null));
+						}
+
+						/*
+						 * Best state for specific cardinality
+						 */
+
+//						if (n == 1)
+						finalStates.get(instance).put(statePair.getKey(),
+								Arrays.asList(currentStatePairs.get(statePair.getKey()).currentState));
+//						else
+//							finalStates.put(instance, currentStates);
+
+						/*
+						 * Select best following state.
+						 */
+						if (bestStateOfAllCardinalities == null || bestStateOfAllCardinalities
+								.getModelScore() < currentStatePairs.get(statePair.getKey()).currentState
+										.getModelScore())
+							bestStateOfAllCardinalities = currentStatePairs.get(statePair.getKey()).currentState;
+
 					}
 
-					producedStateChain.add(currentState);
-
-					if (n == 1)
-						finalStates.put(instance, Arrays.asList(currentState));
-					else
-						finalStates.put(instance, currentStates);
+					producedStateChain.add(bestStateOfAllCardinalities);
 
 				}
 				if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain)) {
@@ -539,17 +494,31 @@ public class SemanticParsingCRFMultiState {
 
 			this.testStatistics.endTrainingTime = System.currentTimeMillis();
 
-			LogUtils.logState(log,
+			LogUtils.logMultipleStates(log,
 					TEST_CONTEXT + "[" + ++instanceIndex + "/" + instancesToPredict.size() + "] [" + samplingStep + "]",
-					instance, currentState);
+					instance, currentStatePairs.values());
 //			computeCoverage(true, coverageObjectiveFunction, Arrays.asList(instance));
 			log.info("***********************************************************");
 			log.info("\n");
 			log.info("Time: " + this.testStatistics.getTotalDuration());
 
 		}
+
+		for (Entry<Instance, Map<Integer, List<State>>> i : finalStates.entrySet()) {
+
+			State bestState = null;
+			for (List<State> s : i.getValue().values()) {
+
+				if (bestState == null || bestState.getModelScore() < s.get(0).getModelScore())
+					bestState = s.get(0);
+
+			}
+
+			selectedbestStates.put(i.getKey(), Arrays.asList(bestState));
+		}
+
 		this.testStatistics.endTrainingTime = System.currentTimeMillis();
-		return finalStates;
+		return selectedbestStates;
 	}
 
 	/**
@@ -576,79 +545,6 @@ public class SemanticParsingCRFMultiState {
 		objectiveFunction.score(s);
 		return s;
 	}
-
-//	private void compare(State currentState, State candidateState) {
-//
-//		Map<String, Double> differences = getDifferences(collectFeatures(currentState),
-//				collectFeatures(candidateState));
-//		if (differences.isEmpty())
-//			return;
-//
-//		List<Entry<String, Double>> sortedWeightsPrevState = new ArrayList<>(collectFeatures(currentState).entrySet());
-//		List<Entry<String, Double>> sortedWeightsCandState = new ArrayList<>(
-//				collectFeatures(candidateState).entrySet());
-//
-//		Collections.sort(sortedWeightsPrevState, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
-//		Collections.sort(sortedWeightsCandState, (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue()));
-//
-//		log.info(currentState.getInstance().getName());
-//		log.info("_____________GoldAnnotations:_____________");
-//		log.info(currentState.getGoldAnnotations());
-//		log.info("_____________PrevState:_____________");
-//		sortedWeightsPrevState.stream().filter(k -> differences.containsKey(k.getKey())).forEach(log::info);
-//		log.info("ModelScore: " + currentState.getModelScore() + ": " + currentState.getCurrentPredictions());
-//		log.info("_____________CandState:_____________");
-//		sortedWeightsCandState.stream().filter(k -> differences.containsKey(k.getKey())).forEach(log::info);
-//		log.info("ModelScore: " + candidateState.getModelScore() + ": " + candidateState.getCurrentPredictions());
-//		log.info("------------------");
-//	}
-
-//	private static Map<String, Double> getDifferences(Map<String, Double> currentFeatures,
-//			Map<String, Double> candidateFeatures) {
-//		Map<String, Double> differences = new HashMap<>();
-//
-//		Set<String> keys = new HashSet<>();
-//
-//		keys.addAll(candidateFeatures.keySet());
-//		keys.addAll(currentFeatures.keySet());
-//
-//		for (String key : keys) {
-//
-//			if (candidateFeatures.containsKey(key) && currentFeatures.containsKey(key)) {
-//				double diff = 0;
-//				if ((diff = Math.abs(currentFeatures.get(key) - candidateFeatures.get(key))) != 0.0D) {
-//					// This should or can not happen as feature weights are shared throughout states
-//					differences.put(key, diff);
-//				}
-//			} else if (currentFeatures.containsKey(key)) {
-//				differences.put(key, currentFeatures.get(key));
-//			} else {
-//				differences.put(key, candidateFeatures.get(key));
-//			}
-//
-//		}
-//		return differences;
-//	}
-
-//	private static Map<String, Double> collectFeatures(State currentState) {
-//		Map<String, Double> features = new HashMap<>();
-//
-//		for (FactorGraph fg : currentState.getFactorGraphs()) {
-//			for (Factor f : fg.getFactors()) {
-//
-//				for (Entry<Integer, Double> feature : f.getFeatureVector().getFeatures().entrySet()) {
-//					if (f.getFactorScope().getTemplate().getWeights().getFeatures().containsKey(feature.getKey()))
-//						features.put(
-//								f.getFactorScope().getTemplate().getClass().getSimpleName() + ":"
-//										+ Model.getFeatureForIndex(feature.getKey()),
-//								feature.getValue() * f.getFactorScope().getTemplate().getWeights().getFeatures()
-//										.get(feature.getKey()));
-//
-//				}
-//			}
-//		}
-//		return features;
-//	}
 
 	/**
 	 * 

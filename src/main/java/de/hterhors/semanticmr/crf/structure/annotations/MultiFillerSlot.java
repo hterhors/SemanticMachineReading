@@ -127,12 +127,21 @@ public class MultiFillerSlot extends AbstractSlot {
 		final StringBuilder sb = new StringBuilder(slotType.toPrettyString(depth));
 		sb.append("\t[\n");
 		final int newDepth = depth + 1;
+		int c = 0;
 		for (AbstractAnnotation slotFiller : this.slotFiller) {
 			for (int d = 0; d < newDepth; d++) {
 				sb.append("\t");
 			}
 			sb.append(slotFiller.toPrettyString(newDepth));
 			sb.append("\n");
+			if (c > 10) {
+				for (int d = 0; d < newDepth; d++) {
+					sb.append("\t");
+				}
+				sb.append("[omit rest...]\n");
+				break;
+			}
+			c++;
 		}
 		for (int d = 0; d < newDepth; d++) {
 			sb.append("\t");

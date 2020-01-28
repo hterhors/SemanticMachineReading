@@ -85,7 +85,7 @@ public class SlotFillingCandidateRetrieval {
 
 		for (SlotType slotType : candidate.getEntityType().getSlotFillerOfSlotTypes()) {
 
-			if (slotType.isExcluded() || slotType.isFrozen())
+			if (slotType.isExcluded())
 				continue;
 
 			slotTypeAnnotationCandidates.putIfAbsent(slotType, new HashSet<>());
