@@ -189,7 +189,7 @@ public class Model {
 
 	public void score(List<State> states) {
 
-		for (AbstractFeatureTemplate template : this.factorTemplates) {
+		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
 
 			/*
 			 * Collect all factor scopes of all states to that this template can be applied

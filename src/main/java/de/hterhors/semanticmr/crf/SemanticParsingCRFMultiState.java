@@ -631,8 +631,4 @@ public class SemanticParsingCRFMultiState {
 		return model.getName();
 	}
 
-	public void scoreWithModel(List<State> nextStates) {
-		this.model.score(nextStates);
-	}
-
 }
