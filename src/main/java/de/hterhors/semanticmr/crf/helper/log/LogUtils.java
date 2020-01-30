@@ -34,7 +34,7 @@ public class LogUtils {
 		logger.info("\n");
 	}
 
-	public static void logBeamState(Logger logger, String context, Instance instance,
+	public static void logMultipleStates(Logger logger, String context, Instance instance,
 			Collection<StatePair> currentStatePairs) {
 		logger.info("***********************************************************");
 		int count = 1;

@@ -436,17 +436,35 @@ public class SemanticParsingCRF {
 					if (accepted) {
 						currentState = candidateState;
 						objectiveFunction.score(currentState);
-
-						currentStates = new ArrayList<>(proposalStates.subList(0, Math.min(proposalStates.size(), n)));
-						objectiveFunction.score(currentStates);
 					}
 
 					producedStateChain.add(currentState);
 
-					if (n == 1)
+					if (n == 1) {
 						finalStates.put(instance, Arrays.asList(currentState));
-					else
+					} else {
+
+						currentStates = new ArrayList<>();
+
+						for (int i = 0; i < Math.min(proposalStates.size(), n); i++) {
+
+							accepted = AcceptStrategies.strictModelAccept().isAccepted(proposalStates.get(i),
+									currentState);
+
+							if (accepted) {
+								objectiveFunction.score(proposalStates.get(i));
+								currentStates.add(proposalStates.get(i));
+							} else {
+								/*
+								 * Quick break cause monotone decreasing model score distribution and strict
+								 * evaluation.
+								 */
+								break;
+							}
+						}
+
 						finalStates.put(instance, currentStates);
+					}
 
 				}
 				if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain)) {
