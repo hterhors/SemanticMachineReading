@@ -1,5 +1,6 @@
 package de.hterhors.semanticmr.crf.structure.annotations;
 
+import java.util.Comparator;
 import java.util.List;
 
 import javax.print.Doc;
@@ -23,6 +24,14 @@ import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
  *
  */
 final public class DocumentLinkedAnnotation extends LiteralAnnotation {
+
+	public static final Comparator<DocumentLinkedAnnotation> COMPARE_BY_SURFACEFORM = new Comparator<DocumentLinkedAnnotation>() {
+
+		@Override
+		public int compare(DocumentLinkedAnnotation o1, DocumentLinkedAnnotation o2) {
+			return o1.getSurfaceForm().compareTo(o2.getSurfaceForm());
+		}
+	};
 
 	/**
 	 * Contains the document position of this annotation.
