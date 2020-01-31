@@ -47,6 +47,15 @@ final public class EntityTemplate extends AbstractAnnotation {
 	 * 
 	 * @param entityType
 	 */
+	public EntityTemplate(EntityType entityType) {
+		this(AnnotationBuilder.toAnnotation(entityType));
+	}
+
+	/**
+	 * Creates a new template entity of the given entity type.
+	 * 
+	 * @param entityType
+	 */
 	public EntityTemplate(EntityTypeAnnotation entityType) {
 		this.rootAnnotation = entityType;
 		this.singleFillerSlots = new HashMap<>();
