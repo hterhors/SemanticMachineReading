@@ -3,7 +3,7 @@ package de.hterhors.semanticmr.projects.examples.nerl.specs;
 import java.io.File;
 
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
-import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
+import de.hterhors.semanticmr.init.reader.csv.CSVDataStructureReader;
 
 public class NERLASpecs {
 
@@ -34,6 +34,6 @@ public class NERLASpecs {
 	 */
 	private final static File hierarchies = new File("src/main/resources/examples/nerla/specs/csv/hierarchies.csv");
 
-	public static final ISpecificationsReader csvSpecsReader = new CSVScopeReader(NERLASpecs.entities,
+	public static final ISpecificationsReader csvSpecsReader = new CSVDataStructureReader(NERLASpecs.entities,
 			NERLASpecs.hierarchies, NERLASpecs.slots, NERLASpecs.structures);
 }

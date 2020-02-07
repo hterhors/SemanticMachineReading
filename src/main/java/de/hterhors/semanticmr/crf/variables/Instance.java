@@ -10,7 +10,7 @@ import de.hterhors.semanticmr.candidateretrieval.nerla.NerlCandidateRetrieval;
 import de.hterhors.semanticmr.candidateretrieval.sf.SlotFillingCandidateRetrieval;
 import de.hterhors.semanticmr.candidateretrieval.sf.SlotFillingCandidateRetrieval.IFilter;
 import de.hterhors.semanticmr.corpus.EInstanceContext;
-import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer.ESamplingMode;
+import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer.EExplorationMode;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
@@ -54,11 +54,11 @@ public class Instance implements Comparable<Instance> {
 
 	private final NerlCandidateRetrieval nerlaCandidateRetrieval = new NerlCandidateRetrieval();
 
-	public Set<EntityTypeAnnotation> getEntityTypeCandidates(ESamplingMode samplingMode, EntityType entityType) {
+	public Set<EntityTypeAnnotation> getEntityTypeCandidates(EExplorationMode samplingMode, EntityType entityType) {
 		return slotFillingCandidateRetrieval.getEntityTypeCandidates(samplingMode,entityType);
 	}
 
-	public Set<AbstractAnnotation> getSlotTypeCandidates(ESamplingMode samplingMode, SlotType slotType) {
+	public Set<AbstractAnnotation> getSlotTypeCandidates(EExplorationMode samplingMode, SlotType slotType) {
 		return slotFillingCandidateRetrieval.getSlotTypeCandidates(samplingMode,slotType);
 	}
 

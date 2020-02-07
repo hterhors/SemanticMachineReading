@@ -23,7 +23,6 @@ import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
-import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
 import de.hterhors.semanticmr.santo.container.Triple;
 import de.hterhors.semanticmr.santo.helper.PatternCollection;
@@ -32,8 +31,6 @@ import de.hterhors.semanticmr.santo.helper.SantoHelper;
 public class SantoRDFConverter {
 
 	public static final String RDF_TYPE_NAMESPACE = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>";
-
-	final private SystemScope systemScope;
 
 	private Map<String, Map<String, Set<String>>> rdfData;
 
@@ -54,13 +51,12 @@ public class SantoRDFConverter {
 	 */
 	private Set<SlotType> filterSlotTypes;
 
-	public SantoRDFConverter(Set<SlotType> filterSlotTypes, boolean onlyLeafEntities, SystemScope systemScope,
+	public SantoRDFConverter(Set<SlotType> filterSlotTypes, boolean onlyLeafEntities,
 			Map<Triple, RDFRelatedAnnotation> annotations, File rdfAnnotationsFile, final String ontologyNameSpace,
 			final String dataNameSpace) throws IOException {
 
 		this.filterSlotTypes = filterSlotTypes == null ? Collections.emptySet() : filterSlotTypes;
 		this.onlyLeafEntities = onlyLeafEntities;
-		this.systemScope = systemScope;
 		this.annotations = annotations;
 		this.rdfAnnotationsFile = rdfAnnotationsFile;
 		this.dataNameSpace = dataNameSpace;
@@ -108,41 +104,6 @@ public class SantoRDFConverter {
 
 	}
 
-	/**
-	 * TODO QUICK FIX adding organismModel root type annotations.
-	 */
-//	private final Set<EntityType> ratModels = new HashSet<>(Arrays.asList(EntityType.get("RatSpecies"),
-//			EntityType.get("WistarRat"), EntityType.get("SpragueDawleyRat"), EntityType.get("ListerHoodedRat"),
-//			EntityType.get("FischerRat"), EntityType.get("LongEvansRat"), EntityType.get("LewisRat")));
-//	private final Set<EntityType> mouseModels = new HashSet<>(
-//			Arrays.asList(EntityType.get("C57_BL6_Mouse"), EntityType.get("MouseSpecies")));
-//	private final Set<EntityType> catModels = new HashSet<>(Arrays.asList(EntityType.get("CatSpecies")));
-//	private final Set<EntityType> dogModels = new HashSet<>(Arrays.asList(EntityType.get("DogSpecies")));
-
-//	private EntityTypeAnnotation fix(SingleFillerSlot slot) {
-//
-//		EntityType speciesType = slot.getSlotFiller().getEntityType();
-//		System.out.println("Fix annotation: " + speciesType);
-//		if (ratModels.contains(speciesType))
-//			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
-//					"RatModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
-//					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
-//		if (mouseModels.contains(speciesType))
-//			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
-//					"MouseModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
-//					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
-//		if (catModels.contains(speciesType))
-//			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
-//					"CatModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
-//					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
-//		if (dogModels.contains(speciesType))
-//			return AnnotationBuilder.toAnnotation(slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().document,
-//					"DogModel", slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().getSurfaceForm(),
-//					slot.getSlotFiller().asInstanceOfDocumentLinkedAnnotation().documentPosition.docCharOffset);
-//
-//		return null;
-//	}
-
 	private void fillRec(Document document, final EntityTemplate object, String subject, boolean deepRec) {
 		/*
 		 * Read rdf type separately to create new instance.
@@ -154,13 +115,13 @@ public class SantoRDFConverter {
 //{
 //	System.out.println();
 //}
-			if (subject.contains("Investigation_")) {
-
-				String id = subject.split("_")[1];
-				id = id.substring(0, id.length() - 1);
-				object.setSingleSlotFiller(SlotType.get("hasID"), AnnotationBuilder.toAnnotation("ID", id));
-
-			}
+//			if (subject.contains("Investigation_")) {
+//
+//				String id = subject.split("_")[1];
+//				id = id.substring(0, id.length() - 1);
+//				object.setSingleSlotFiller(SlotType.get("hasID"), AnnotationBuilder.toAnnotation("ID", id));
+//
+//			}
 
 			if (skipProperties.contains(props.getKey()))
 				continue;
@@ -172,7 +133,9 @@ public class SantoRDFConverter {
 				continue;
 
 			final String slotName = SantoHelper.getResource(props.getKey());
-
+			if (slotName.endsWith("Deprecated"))
+				continue;
+			
 			final SlotType slot = SlotType.get(slotName);
 
 			if (!filterSlotTypes.isEmpty() && !filterSlotTypes.contains(slot))
@@ -351,7 +314,7 @@ public class SantoRDFConverter {
 			et = new EntityTemplate(AnnotationBuilder.toAnnotation(document, SantoHelper.getResource(objectType),
 					annotations.get(linkedID).textMention, annotations.get(linkedID).onset));
 		} else if ((FAKE_QUICK_FIX = QUICK_FIX(linkedID)) != null) {
-			System.err.println("APPLY QUICK FIX!: SantoRDFConverter.toEntityTemplate()");
+//			System.err.println("APPLY QUICK FIX!: SantoRDFConverter.toEntityTemplate()");
 			et = new EntityTemplate(AnnotationBuilder.toAnnotation(document, SantoHelper.getResource(objectType),
 					FAKE_QUICK_FIX.textMention, FAKE_QUICK_FIX.onset));
 		}

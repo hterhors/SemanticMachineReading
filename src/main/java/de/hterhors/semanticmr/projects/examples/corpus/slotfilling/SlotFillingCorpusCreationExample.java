@@ -27,7 +27,7 @@ import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
-import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
+import de.hterhors.semanticmr.init.reader.csv.CSVDataStructureReader;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 
 /**
@@ -88,7 +88,7 @@ public class SlotFillingCorpusCreationExample {
 		 * The csv specification file reader. For nerl, we can use the single parameter
 		 * constructor passing only the entity file.
 		 */
-		ISpecificationsReader specsReader = new CSVScopeReader(entitiesFile, hierarchiesFile, slotsFile, structureFile);
+		ISpecificationsReader specsReader = new CSVDataStructureReader(entitiesFile, hierarchiesFile, slotsFile, structureFile);
 
 		/**
 		 * We initialize the system.

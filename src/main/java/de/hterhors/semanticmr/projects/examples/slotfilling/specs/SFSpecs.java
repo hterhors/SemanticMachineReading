@@ -2,7 +2,7 @@ package de.hterhors.semanticmr.projects.examples.slotfilling.specs;
 
 import java.io.File;
 
-import de.hterhors.semanticmr.init.reader.csv.CSVScopeReader;
+import de.hterhors.semanticmr.init.reader.csv.CSVDataStructureReader;
 
 public class SFSpecs {
 	/**
@@ -27,6 +27,6 @@ public class SFSpecs {
 	private static final File hierarchies = new File(
 			"src/main/resources/examples/slotfilling/specifications/csv/hierarchies.csv");
 
-	public final static CSVScopeReader systemsScopeReader = new CSVScopeReader(entities, hierarchies, slots,
+	public final static CSVDataStructureReader systemsScopeReader = new CSVDataStructureReader(entities, hierarchies, slots,
 			structures);
 }

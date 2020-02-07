@@ -27,7 +27,6 @@ public class NerlaEvaluator extends AbstractEvaluator {
 		int tp = 0;
 		int fp = 0;
 		int fn = 0;
-
 		outer: for (AbstractAnnotation a : annotations) {
 			for (AbstractAnnotation oa : otherAnnotations) {
 				if (oa.evaluate(this, a).getF1() == 1.0) {

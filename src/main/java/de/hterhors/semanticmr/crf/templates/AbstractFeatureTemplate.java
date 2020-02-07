@@ -1,6 +1,8 @@
 package de.hterhors.semanticmr.crf.templates;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -17,6 +19,27 @@ import de.hterhors.semanticmr.crf.variables.State;
  *
  */
 public abstract class AbstractFeatureTemplate<Scope extends AbstractFactorScope> {
+
+	public static Set<TemplateParamter> templateParameters = new HashSet<>();
+
+	public static class TemplateParamter {
+		final public AbstractFeatureTemplate<?> template;
+		final public String name;
+		final public boolean value;
+
+		public static TemplateParamter build(AbstractFeatureTemplate<?> template, String name, boolean value) {
+			TemplateParamter p = new TemplateParamter(template, name, value);
+			AbstractFeatureTemplate.templateParameters.add(p);
+			return p;
+		}
+
+		private TemplateParamter(AbstractFeatureTemplate<?> template, String name, boolean value) {
+			this.template = template;
+			this.name = name;
+			this.value = value;
+		}
+
+	}
 
 	/**
 	 * Weights for the computation of factor scores. These weights are shared across

@@ -70,7 +70,7 @@ public class DictionaryFromInstanceHelper {
 		return map;
 	}
 
-	public static void recursive(Map<EntityType, Set<String>> map, AbstractAnnotation aa) {
+	private static void recursive(Map<EntityType, Set<String>> map, AbstractAnnotation aa) {
 		if (aa.isInstanceOfEntityTemplate()) {
 
 			AbstractAnnotation rootA = aa.asInstanceOfEntityTemplate().getRootAnnotation();
@@ -100,26 +100,6 @@ public class DictionaryFromInstanceHelper {
 
 					}
 
-//					/**
-//					 * special for compound treatments... go deeper than 1 hop in properties.
-//					 */
-//					if (slotFillerValue.getEntityType().name.equals("CompoundTreatment")) {
-//						SingleFillerSlot s = slotFillerValue.asInstanceOfEntityTemplate()
-//								.getSingleFillerSlot(SlotType.get("hasCompound"));
-//
-//						if (s.containsSlotFiller()) {
-//							AbstractAnnotation compound = s.getSlotFiller().asInstanceOfEntityTemplate()
-//									.getRootAnnotation();
-//							if (compound.isInstanceOfLiteralAnnotation()) {
-//
-//								map.putIfAbsent(compound.getEntityType(), new HashSet<>());
-//								String e = compound.asInstanceOfLiteralAnnotation().getSurfaceForm();
-//								map.get(compound.getEntityType()).add(e);
-//
-//							}
-//						}
-//
-//					}
 				}
 
 				recursive(map, slotFillerValue);

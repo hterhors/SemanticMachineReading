@@ -14,16 +14,10 @@ import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 
 public class SpecificationWriter {
-	SystemScope scope;
 
-	public SpecificationWriter(SystemScope scope) {
-		this.scope = scope;
-	}
+	public static void writeEntityDataStructureFile(File file, EntityType rootEntity) throws IOException {
 
-	public void writeEntitySpecificationFile(File file, EntityType rootEntity) throws IOException {
-
-		Set<EntityType> relatedEntities = new HashSet<>();
-		addRecursive(rootEntity, relatedEntities);
+		Set<EntityType> relatedEntities = rootEntity.getRelatedEntityTypes();
 		PrintStream ps = new PrintStream(file);
 		ps.println("#class\tisLiteral");
 		for (EntityType entityType : relatedEntities) {
@@ -34,10 +28,10 @@ public class SpecificationWriter {
 
 	}
 
-	public void writeHierarchiesSpecificationFile(File file, EntityType rootEntity) throws FileNotFoundException {
+	public static void writeHierarchiesDataStructureFile(File file, EntityType rootEntity)
+			throws FileNotFoundException {
 
-		Set<EntityType> relatedEntities = new HashSet<>();
-		addRecursive(rootEntity, relatedEntities);
+		Set<EntityType> relatedEntities = rootEntity.getRelatedEntityTypes();
 		PrintStream ps = new PrintStream(file);
 		ps.println("#superClass\tsubClass");
 		for (EntityType subET : relatedEntities) {
@@ -50,10 +44,9 @@ public class SpecificationWriter {
 
 	}
 
-	public void writeSlotsSpecificationFile(File file, EntityType rootEntity) throws IOException {
+	public static void writeSlotsDataStructureFile(File file, EntityType rootEntity) throws IOException {
 
-		Set<EntityType> relatedEntities = new HashSet<>();
-		addRecursive(rootEntity, relatedEntities);
+		Set<EntityType> relatedEntities = rootEntity.getRelatedEntityTypes();
 		Set<SlotType> slotTypes = new HashSet<>();
 		for (EntityType et : relatedEntities) {
 			slotTypes.addAll(et.getSlots());
@@ -69,10 +62,10 @@ public class SpecificationWriter {
 		ps.close();
 	}
 
-	public void writeStructuresSpecificationFile(File input, File output, EntityType rootEntity) throws IOException {
+	public static void writeStructuresDataStructureFile(File input, File output, EntityType rootEntity)
+			throws IOException {
 
-		Set<EntityType> relatedEntities = new HashSet<>();
-		addRecursive(rootEntity, relatedEntities);
+		Set<EntityType> relatedEntities = rootEntity.getRelatedEntityTypes();
 		Set<SlotType> slotTypes = new HashSet<>();
 		for (EntityType et : relatedEntities) {
 			slotTypes.addAll(et.getSlots());
@@ -95,29 +88,6 @@ public class SpecificationWriter {
 		}
 
 		ps.close();
-
-	}
-
-	private void addRecursive(EntityType entity, Set<EntityType> relatedEntities) {
-
-		if (relatedEntities.contains(entity))
-			return;
-
-		relatedEntities.add(entity);
-
-		for (SlotType slotType : entity.getSlots()) {
-			for (EntityType entityType : slotType.getSlotFillerEntityTypes()) {
-//				System.out.println(slotType.name + "-> " + entity.name + "\t" + entityType.name);
-				addRecursive(entityType, relatedEntities);
-			}
-		}
-
-		for (EntityType relatedEntityType : entity.getTransitiveClosureSubEntityTypes()) {
-//			System.out.println("R-> " + entity.name + "\t" + relatedEntityType.name);
-			addRecursive(relatedEntityType, relatedEntities);
-		}
-
-		return;
 
 	}
 

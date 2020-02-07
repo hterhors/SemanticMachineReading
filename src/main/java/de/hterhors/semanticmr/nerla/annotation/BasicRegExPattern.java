@@ -32,11 +32,20 @@ public abstract class BasicRegExPattern implements Serializable {
 //			"how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not",
 //			"only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should",
 //			"now"));
-	
+
 	public static final Set<String> STOP_WORDS = new HashSet<>(
 			Arrays.asList("a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it",
 					"no", "not", "of", "on", "or", "such", "that", "the", "their", "then", "there", "these", "they",
 					"this", "to", "was", "will", "with", "his", "her", "from", "who", "whom"));
+	private final EntityType rootEntityType;
+
+	public EntityType getRootEntityType() {
+		return rootEntityType;
+	}
+
+	public BasicRegExPattern(EntityType rootEntityType) {
+		this.rootEntityType = rootEntityType;
+	}
 
 	public abstract Set<String> getStopWords();
 
@@ -51,7 +60,6 @@ public abstract class BasicRegExPattern implements Serializable {
 
 	public static final int PATTERN_BITMASK = Pattern.CASE_INSENSITIVE + Pattern.DOTALL;
 
-	
 	protected static String buildQuotedRegExpr(final String param1, final String[] param2, final String param3) {
 
 		StringBuffer param2Builer = new StringBuffer();

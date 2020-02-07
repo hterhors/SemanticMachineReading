@@ -28,51 +28,23 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.ITrainingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
-import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
-import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
-import de.hterhors.semanticmr.eval.NerlaEvaluator;
 
-public class SemanticParsingCRFMultiState {
+public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 	public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.00000");
 
 	private static Logger log = LogManager.getFormatterLogger("SlotFilling");
-
-	private static class CRFStatistics {
-		private final String context;
-
-		private long startTrainingTime;
-		private long endTrainingTime;
-
-		public CRFStatistics(String context) {
-			this.context = context;
-		}
-
-		private long getTotalDuration() {
-			return endTrainingTime - startTrainingTime;
-		}
-
-		@Override
-		public String toString() {
-			return "CRFStatistics [context=" + context + ", getTotalDuration()=" + getTotalDuration() + "]";
-		}
-
-	}
 
 	/**
 	 * The maximum number of sampling steps per instance. This prevents infinite
 	 * loops if no stopping criterion ever matches.
 	 */
 	final static public int MAX_SAMPLING = 100;
-
-	private static final String COVERAGE_CONTEXT = "===========COVERAGE============\n";
-	private static final String TRAIN_CONTEXT = "===========TRAIN============\n";
-	private static final String TEST_CONTEXT = "===========TEST============\n";
 
 	public final List<IExplorationStrategy> explorerList;
 

@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer.ESamplingMode;
+import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer.EExplorationMode;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -21,9 +21,9 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 	public static int MAX_NUMBER_OF_ANNOTATIONS;
 
 	final private EntityTypeAnnotation initAnnotation;
-	final private ESamplingMode samplingMode;
+	final private EExplorationMode samplingMode;
 
-	public RootTemplateCardinalityExplorer(ESamplingMode samplingMode, EntityTypeAnnotation initAnnotation) {
+	public RootTemplateCardinalityExplorer(EExplorationMode samplingMode, EntityTypeAnnotation initAnnotation) {
 		this.initAnnotation = initAnnotation;
 		this.samplingMode = samplingMode;
 	}

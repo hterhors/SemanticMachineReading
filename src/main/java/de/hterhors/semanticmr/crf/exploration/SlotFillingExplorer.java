@@ -23,7 +23,7 @@ import de.hterhors.semanticmr.crf.variables.State;
 public class SlotFillingExplorer implements IExplorationStrategy {
 	private static Logger log = LogManager.getFormatterLogger("SlotFilling");
 
-	public enum ESamplingMode {
+	public enum EExplorationMode {
 		ANNOTATION_BASED, TYPE_BASED;
 	}
 
@@ -31,16 +31,16 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 	final private HardConstraintsProvider hardConstraintsProvider;
 	final private IObjectiveFunction objectiveFunction;
-	final private ESamplingMode samplingMode;
+	final private EExplorationMode samplingMode;
 
-	public SlotFillingExplorer(ESamplingMode samplingMode, IObjectiveFunction objectiveFunction,
+	public SlotFillingExplorer(EExplorationMode samplingMode, IObjectiveFunction objectiveFunction,
 			HardConstraintsProvider hardConstraintsProvder) {
 		this.hardConstraintsProvider = hardConstraintsProvder;
 		this.objectiveFunction = objectiveFunction;
 		this.samplingMode = samplingMode;
 	}
 
-	public SlotFillingExplorer(ESamplingMode samplingMode, IObjectiveFunction objectiveFunction) {
+	public SlotFillingExplorer(EExplorationMode samplingMode, IObjectiveFunction objectiveFunction) {
 		this.hardConstraintsProvider = null;
 		this.objectiveFunction = objectiveFunction;
 		this.samplingMode = samplingMode;
@@ -49,14 +49,14 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	public SlotFillingExplorer(IObjectiveFunction objectiveFunction) {
 		this.hardConstraintsProvider = null;
 		this.objectiveFunction = objectiveFunction;
-		this.samplingMode = ESamplingMode.ANNOTATION_BASED;
+		this.samplingMode = EExplorationMode.ANNOTATION_BASED;
 	}
 
 	public SlotFillingExplorer(IObjectiveFunction predictionObjectiveFunction,
 			HardConstraintsProvider hardConstraintsProvder) {
 		this.hardConstraintsProvider = hardConstraintsProvder;
 		this.objectiveFunction = predictionObjectiveFunction;
-		this.samplingMode = ESamplingMode.ANNOTATION_BASED;
+		this.samplingMode = EExplorationMode.ANNOTATION_BASED;
 	}
 
 	/**

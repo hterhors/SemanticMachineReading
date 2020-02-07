@@ -5,7 +5,7 @@ import java.util.List;
 import de.hterhors.semanticmr.crf.sampling.impl.DefaultSamplingStrategy;
 import de.hterhors.semanticmr.crf.variables.State;
 
-public abstract class AbstractSampler {
+public abstract class AbstractSampler implements ISampler{
 
 	final protected ISamplingStrategy samplingStrategy;
 

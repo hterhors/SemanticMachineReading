@@ -19,7 +19,6 @@ import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.init.specifications.SystemScope;
 import de.hterhors.semanticmr.json.JsonInstanceIO;
 import de.hterhors.semanticmr.json.converter.InstancesToJsonInstanceWrapper;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
@@ -47,15 +46,15 @@ public class Santo2JsonConverter {
 
 	private final String documentID;
 
-	public Santo2JsonConverter(SystemScope systemScope, final String documentID, File documentFile,
-			File textualAnnotationsFile, File rdfAnnotationsFile, final String ontologyNameSpace,
-			final String resourceNameSpace) throws IOException {
-		this(systemScope, Collections.emptySet(), documentID, documentFile, textualAnnotationsFile, rdfAnnotationsFile,
+	public Santo2JsonConverter(final String documentID, File documentFile, File textualAnnotationsFile,
+			File rdfAnnotationsFile, final String ontologyNameSpace, final String resourceNameSpace)
+			throws IOException {
+		this(Collections.emptySet(), documentID, documentFile, textualAnnotationsFile, rdfAnnotationsFile,
 				ontologyNameSpace, resourceNameSpace);
 	}
 
-	public Santo2JsonConverter(SystemScope systemScope, Set<SlotType> slotTypes, final String documentID,
-			File documentFile, File textualAnnotationsFile, File rdfAnnotationsFile, final String ontologyNameSpace,
+	public Santo2JsonConverter(Set<SlotType> slotTypes, final String documentID, File documentFile,
+			File textualAnnotationsFile, File rdfAnnotationsFile, final String ontologyNameSpace,
 			final String resourceNameSpace) throws IOException {
 		this.documentFile = documentFile;
 		this.textualAnnotationsFile = textualAnnotationsFile;
@@ -72,9 +71,9 @@ public class Santo2JsonConverter {
 		this.annotations = new TextualAnnotationsReader(this.document, textualAnnotationsFile).getAnnotations();
 
 		boolean onlyLeafEntities = false;
-		
-		this.rdfConverter = new SantoRDFConverter(slotTypes, onlyLeafEntities, systemScope, annotations,
-				rdfAnnotationsFile, ontologyNameSpace, resourceNameSpace);
+
+		this.rdfConverter = new SantoRDFConverter(slotTypes, onlyLeafEntities, annotations, rdfAnnotationsFile,
+				ontologyNameSpace, resourceNameSpace);
 	}
 
 	public void convert(EInstanceContext instanceContext, final File writeToFile, EntityType rootEntityTypes,
@@ -90,7 +89,7 @@ public class Santo2JsonConverter {
 				includeSubEntities, deepRec);
 
 		List<Instance> instances = new ArrayList<>();
-		
+
 		Annotations goldAnnotations = new Annotations(new ArrayList<>(new HashSet<>(rdfAnnotations)));
 
 		instances.add(new Instance(instanceContext, document, goldAnnotations));

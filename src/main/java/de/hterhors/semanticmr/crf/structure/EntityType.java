@@ -362,4 +362,30 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 		return getTransitiveClosureSubEntityTypes().isEmpty();
 	}
 
+	private Set<EntityType> allRealtedEntityTypes = null;
+
+	/**
+	 * Returns a set of entity types that are in any relation to this entity type.
+	 * This is basically all super and sub entities and for each recursively
+	 * reachable slot all entity filler types.
+	 * 
+	 * @return
+	 */
+	public Set<EntityType> getRelatedEntityTypes() {
+
+		if (this.allRealtedEntityTypes == null) {
+			this.allRealtedEntityTypes = new HashSet<>();
+			for (EntityType relatedET : getHierarchicalEntityTypes()) {
+				this.allRealtedEntityTypes.add(relatedET);
+				for (SlotType slotType : relatedET.getSlots()) {
+					for (EntityType entityType : slotType.getSlotFillerEntityTypes()) {
+						allRealtedEntityTypes.addAll(entityType.getRelatedEntityTypes());
+					}
+				}
+			}
+		}
+
+		return Collections.unmodifiableSet(this.allRealtedEntityTypes);
+	}
+
 }

@@ -28,6 +28,21 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 	 */
 	private boolean exclude = false;
 
+	private static Map<SlotType, Boolean> storeExclude = new HashMap<>();
+
+	public static Map<SlotType, Boolean> storeExcludance() {
+		for (SlotType st : getAllSlotTypes()) {
+			storeExclude.put(st, st.exclude);
+		}
+		return Collections.unmodifiableMap(storeExclude);
+	}
+
+	public static void restoreExcludance() {
+		for (SlotType st : getAllSlotTypes()) {
+			st.exclude = storeExclude.get(st);
+		}
+	}
+
 	public static void excludeAll() {
 		for (SlotType st : getAllSlotTypes()) {
 			st.exclude();

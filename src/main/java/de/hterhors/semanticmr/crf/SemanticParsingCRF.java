@@ -37,31 +37,10 @@ import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.NerlaEvaluator;
 
-public class SemanticParsingCRF {
+public class SemanticParsingCRF implements ISemanticParsingCRF {
 	public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.00000");
 
 	private static Logger log = LogManager.getFormatterLogger(SemanticParsingCRF.class);
-
-	private static class CRFStatistics {
-		private final String context;
-
-		private long startTrainingTime;
-		private long endTrainingTime;
-
-		public CRFStatistics(String context) {
-			this.context = context;
-		}
-
-		private long getTotalDuration() {
-			return endTrainingTime - startTrainingTime;
-		}
-
-		@Override
-		public String toString() {
-			return "CRFStatistics [context=" + context + ", getTotalDuration()=" + getTotalDuration() + "]";
-		}
-
-	}
 
 	/**
 	 * The maximum number of sampling steps per instance. This prevents infinite
@@ -71,6 +50,7 @@ public class SemanticParsingCRF {
 
 	private static final String COVERAGE_CONTEXT = "===========COVERAGE============\n";
 	private static final String TRAIN_CONTEXT = "===========TRAIN============\n";
+	private static final String INTERMEDIATE_CONTEXT = "===========INTERMEDIATE============\n";
 	private static final String TEST_CONTEXT = "===========TEST============\n";
 
 	public final List<IExplorationStrategy> explorerList;
@@ -192,6 +172,11 @@ public class SemanticParsingCRF {
 
 						if (isAccepted) {
 							currentState = candidateState;
+//							LogUtils.logState(log,
+//									INTERMEDIATE_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "["
+//											+ ++instanceIndex + "/" + trainingInstances.size() + "]" + "["
+//											+ (samplingStep + 1) + "]",
+//									instance, currentState);
 						}
 
 						producedStateChain.add(currentState);

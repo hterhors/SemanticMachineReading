@@ -28,7 +28,7 @@ public class Document {
 	final static private Map<String, Document> documents = new HashMap<>();
 
 	static private Set<String> punctuationWords = Collections.unmodifiableSet(
-			new HashSet<>(Arrays.asList(",", ".", "-", "_", ";", ":", "#", "'", "+", "*", "~", "!", "\"", "§", "$", "%",
+			new HashSet<>(Arrays.asList("±",",", ".", "-", "_", ";", ":", "#", "'", "+", "*", "~", "!", "\"", "§", "$", "%",
 					"&", "/", "(", ")", "{", "}", "[", "]", "=", "?", "\\", "´", "`", "^", "°", "<", ">", "|")));
 
 	static private Set<String> stopWords = Collections.unmodifiableSet(

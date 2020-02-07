@@ -16,7 +16,6 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.variables.Document;
-import de.hterhors.semanticmr.init.specifications.SystemScope;
 
 public class RegularExpressionNerlAnnotator {
 
@@ -26,12 +25,12 @@ public class RegularExpressionNerlAnnotator {
 
 	final Map<EntityType, Set<Pattern>> pattern = new HashMap<>();
 
-	public RegularExpressionNerlAnnotator(SystemScope scope, BasicRegExPattern patternFactory) {
+	public RegularExpressionNerlAnnotator(BasicRegExPattern patternFactory) {
 
 		/**
 		 * Initialize for all existing entity types.
 		 */
-		EntityType.getEntityTypes().forEach(e -> pattern.put(e, new HashSet<>()));
+		patternFactory.getRootEntityType().getRelatedEntityTypes().forEach(e -> pattern.put(e, new HashSet<>()));
 
 		for (EntityType et : pattern.keySet()) {
 			pattern.get(et).add(patternFactory.toPattern(et));

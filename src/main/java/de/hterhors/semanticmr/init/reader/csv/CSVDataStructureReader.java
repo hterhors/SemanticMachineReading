@@ -18,22 +18,22 @@ import de.hterhors.semanticmr.exce.InvalidSpecificationFileFormatException;
 import de.hterhors.semanticmr.init.reader.ISpecificationsReader;
 import de.hterhors.semanticmr.init.specifications.Specifications;
 
-public class CSVScopeReader implements ISpecificationsReader {
-	private static Logger log = LogManager.getFormatterLogger(CSVScopeReader.class);
+public class CSVDataStructureReader implements ISpecificationsReader {
+	private static Logger log = LogManager.getFormatterLogger(CSVDataStructureReader.class);
 
 	private final File entitiesFile;
 	private final File hierarchiesFile;
 	private final File slotsFile;
 	private final File structuresFile;
 
-	public CSVScopeReader(File entitiesFile) {
+	public CSVDataStructureReader(File entitiesFile) {
 		this.entitiesFile = entitiesFile;
 		this.hierarchiesFile = null;
 		this.slotsFile = null;
 		this.structuresFile = null;
 	}
 
-	public CSVScopeReader(File entitiesFile, File hierarchiesFile, File slotsFile, File structuresFile) {
+	public CSVDataStructureReader(File entitiesFile, File hierarchiesFile, File slotsFile, File structuresFile) {
 		this.entitiesFile = entitiesFile;
 		this.hierarchiesFile = hierarchiesFile;
 		this.slotsFile = slotsFile;

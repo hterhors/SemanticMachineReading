@@ -5,7 +5,7 @@ import java.util.List;
 import de.hterhors.semanticmr.crf.StatePair;
 import de.hterhors.semanticmr.crf.sampling.impl.beam.DefaultBeamSamplingStrategy;
 
-public abstract class AbstractBeamSampler {
+public abstract class AbstractBeamSampler implements ISampler {
 
 	final protected IBeamSamplingStrategy samplingStrategy;
 

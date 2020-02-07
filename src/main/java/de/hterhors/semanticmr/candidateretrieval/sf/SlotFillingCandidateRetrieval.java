@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer.ESamplingMode;
+import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer.EExplorationMode;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
@@ -48,19 +48,19 @@ public class SlotFillingCandidateRetrieval {
 
 	private final Map<SlotType, Set<AbstractAnnotation>> slotTypeCandidates = new HashMap<>();
 
-	public Set<EntityTypeAnnotation> getEntityTypeCandidates(ESamplingMode samplingMode, EntityType entityType) {
-		if (samplingMode == ESamplingMode.ANNOTATION_BASED)
+	public Set<EntityTypeAnnotation> getEntityTypeCandidates(EExplorationMode samplingMode, EntityType entityType) {
+		if (samplingMode == EExplorationMode.ANNOTATION_BASED)
 			return entityTypeAnnotationCandidates.getOrDefault(entityType, Collections.emptySet());
-		if (samplingMode == ESamplingMode.TYPE_BASED)
+		if (samplingMode == EExplorationMode.TYPE_BASED)
 			return entityTypeCandidates.getOrDefault(entityType, Collections.emptySet());
 		else
 			throw new IllegalArgumentException("Unkown sampling mode: " + samplingMode);
 	}
 
-	public Set<AbstractAnnotation> getSlotTypeCandidates(ESamplingMode samplingMode, SlotType slotType) {
-		if (samplingMode == ESamplingMode.ANNOTATION_BASED)
+	public Set<AbstractAnnotation> getSlotTypeCandidates(EExplorationMode samplingMode, SlotType slotType) {
+		if (samplingMode == EExplorationMode.ANNOTATION_BASED)
 			return slotTypeAnnotationCandidates.getOrDefault(slotType, Collections.emptySet());
-		if (samplingMode == ESamplingMode.TYPE_BASED)
+		if (samplingMode == EExplorationMode.TYPE_BASED)
 			return slotTypeCandidates.getOrDefault(slotType, Collections.emptySet());
 		else
 			throw new IllegalArgumentException("Unkown sampling mode: " + samplingMode);
