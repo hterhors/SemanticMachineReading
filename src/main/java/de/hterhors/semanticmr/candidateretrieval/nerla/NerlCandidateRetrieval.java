@@ -112,7 +112,7 @@ public class NerlCandidateRetrieval {
 			return reverseDictionary.getOrDefault(text, Collections.emptySet());
 		else {
 			final Set<EntityType> types = new HashSet<>();
-			types.addAll(types);
+			types.addAll(this.types);
 			types.addAll(reverseDictionary.getOrDefault(text, Collections.emptySet()));
 			return types;
 		}
