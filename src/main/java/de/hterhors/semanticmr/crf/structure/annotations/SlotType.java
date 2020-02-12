@@ -43,6 +43,12 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 		}
 	}
 
+	public static void restoreExcludance(Map<SlotType, Boolean> restore) {
+		for (SlotType st : getAllSlotTypes()) {
+			st.exclude = restore.get(st);
+		}
+	}
+
 	public static void excludeAll() {
 		for (SlotType st : getAllSlotTypes()) {
 			st.exclude();

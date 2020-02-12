@@ -38,7 +38,7 @@ public class DoubleVector {
 	}
 
 	private void setForceZero(String index, Double value) {
-		index = index.intern();
+//		index = index.intern();
 		if (value.doubleValue() != 0.0) {
 			features.put(index, value);
 		} else {
@@ -48,7 +48,7 @@ public class DoubleVector {
 	}
 
 	public void set(String feature, Double value) {
-		if (value == 0.0D)
+		if (value.doubleValue() == 0.0D)
 			return;
 		setForceZero(feature, value);
 	}
@@ -144,14 +144,14 @@ public class DoubleVector {
 		this.isDirty = true;
 	}
 
-	public void normalize() {
-		double length = length();
-		if (length > 0) {
-			for (Entry<String, Double> feature : features.entrySet()) {
-				setForceZero(feature.getKey(), feature.getValue() / length);
-			}
-		}
-	}
+//	public void normalize() {
+//		double length = length();
+//		if (length > 0) {
+//			for (Entry<String, Double> feature : features.entrySet()) {
+//				setForceZero(feature.getKey(), feature.getValue() / length);
+//			}
+//		}
+//	}
 
 	public double length() {
 

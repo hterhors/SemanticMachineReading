@@ -13,7 +13,7 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.init.specifications.SystemScope;
 
-public class SpecificationWriter {
+public class DataStructureWriter {
 
 	public static void writeEntityDataStructureFile(File file, EntityType rootEntity) throws IOException {
 

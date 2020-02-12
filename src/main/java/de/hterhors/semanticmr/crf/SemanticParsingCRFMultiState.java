@@ -194,7 +194,7 @@ public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 							/*
 							 * Update model weights
 							 */
-							model.updateWeights(learner, candidateState.currentState, candidateState.candidateState);
+							model.updateWeights(learner,  candidateState.candidateState,candidateState.currentState);
 
 							if (isAccepted) {
 								/*
