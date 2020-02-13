@@ -358,13 +358,13 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 	public Map<Instance, State> predictHighRecall(List<Instance> instancesToPredict, final int n,
 			ISamplingStoppingCriterion... stoppingCriterion) {
 		return predictP(this.model, instancesToPredict, n, stoppingCriterion).entrySet().stream()
-				.collect(Collectors.toMap(m -> m.getKey(), m -> merge(m, n)));
+				.collect(Collectors.toMap(m -> m.getKey(), m -> merge(m)));
 	}
 
 	public Map<Instance, State> predictHighRecall(Model model, List<Instance> instancesToPredict, final int n,
 			ISamplingStoppingCriterion... stoppingCriterion) {
 		return predictP(model, instancesToPredict, n, stoppingCriterion).entrySet().stream()
-				.collect(Collectors.toMap(m -> m.getKey(), m -> merge(m, n)));
+				.collect(Collectors.toMap(m -> m.getKey(), m -> merge(m)));
 	}
 
 	public Map<Instance, State> predict(Model model, List<Instance> instancesToPredict,
@@ -431,13 +431,12 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 						currentStates = new ArrayList<>();
 
-					final 	State prevCurrentState = producedStateChain.get(producedStateChain.size() - 2);
+						final State prevCurrentState = producedStateChain.get(producedStateChain.size() - 2);
 
-						
 						for (int i = 0; i < Math.min(proposalStates.size(), n); i++) {
 
 							accepted = AcceptStrategies.strictModelAccept().isAccepted(proposalStates.get(i),
-									prevCurrentState ); // prev current state
+									prevCurrentState); // prev current state
 
 							if (accepted) {
 								objectiveFunction.score(proposalStates.get(i));
@@ -479,15 +478,12 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 	 * @param m
 	 * @return
 	 */
-	private State merge(Entry<Instance, List<State>> m, final int n) {
+	private State merge(Entry<Instance, List<State>> m) {
 		List<AbstractAnnotation> mergedAnnotations = new ArrayList<>();
 
-		outer: for (int i = 0; i < m.getValue().size(); i++) {
+		for (int i = 0; i < m.getValue().size(); i++) {
 
 			for (AbstractAnnotation abstractAnnotation : m.getValue().get(i).getCurrentPredictions().getAnnotations()) {
-
-				if (mergedAnnotations.size() == n)
-					break outer;
 				mergedAnnotations.add(abstractAnnotation);
 			}
 

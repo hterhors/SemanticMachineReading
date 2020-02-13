@@ -198,7 +198,7 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 			@Override
 			public IDistributorStrategy distributeTestInstances(List<Instance> testDocuments) {
 				testDocuments.addAll(instancesToRedistribute.subList(numberForTraining + numberForDevelopment,
-						instancesToRedistribute.size()));
+						numberForTraining + numberForDevelopment + numberForTest));
 				testDocuments.stream().forEach(i -> i.setRedistributedContext(EInstanceContext.TEST));
 				return this;
 			}
