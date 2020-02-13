@@ -431,10 +431,13 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 						currentStates = new ArrayList<>();
 
+					final 	State prevCurrentState = producedStateChain.get(producedStateChain.size() - 2);
+
+						
 						for (int i = 0; i < Math.min(proposalStates.size(), n); i++) {
 
 							accepted = AcceptStrategies.strictModelAccept().isAccepted(proposalStates.get(i),
-									currentState);
+									prevCurrentState ); // prev current state
 
 							if (accepted) {
 								objectiveFunction.score(proposalStates.get(i));
@@ -447,10 +450,8 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 								break;
 							}
 						}
-
 						finalStates.put(instance, currentStates);
 					}
-
 				}
 				if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain)) {
 					break;
