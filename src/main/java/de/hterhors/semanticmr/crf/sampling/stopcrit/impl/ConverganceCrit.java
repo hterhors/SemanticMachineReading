@@ -14,7 +14,7 @@ public class ConverganceCrit implements ISamplingStoppingCriterion {
 	final private Function<State, Double> f;
 
 	public ConverganceCrit(final int maxTimesNoChange, Function<State, Double> f) {
-		this(maxTimesNoChange, f, 0.001);
+		this(maxTimesNoChange, f, 0.0001);
 	}
 
 	public ConverganceCrit(final int maxTimesNoChange, Function<State, Double> f, final double threshold) {

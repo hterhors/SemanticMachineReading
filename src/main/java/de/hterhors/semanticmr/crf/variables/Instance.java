@@ -55,11 +55,11 @@ public class Instance implements Comparable<Instance> {
 	private final NerlCandidateRetrieval nerlaCandidateRetrieval = new NerlCandidateRetrieval();
 
 	public Set<EntityTypeAnnotation> getEntityTypeCandidates(EExplorationMode samplingMode, EntityType entityType) {
-		return slotFillingCandidateRetrieval.getEntityTypeCandidates(samplingMode,entityType);
+		return slotFillingCandidateRetrieval.getEntityTypeCandidates(samplingMode, entityType);
 	}
 
 	public Set<AbstractAnnotation> getSlotTypeCandidates(EExplorationMode samplingMode, SlotType slotType) {
-		return slotFillingCandidateRetrieval.getSlotTypeCandidates(samplingMode,slotType);
+		return slotFillingCandidateRetrieval.getSlotTypeCandidates(samplingMode, slotType);
 	}
 
 	public void addCandidates(final File dictionaryFile) {
@@ -72,6 +72,10 @@ public class Instance implements Comparable<Instance> {
 
 	public void addCandidate(EntityType entityType, Set<String> words) {
 		nerlaCandidateRetrieval.addCandidate(entityType, words);
+	}
+
+	public void addCandidate(EntityType entityType, String word) {
+		nerlaCandidateRetrieval.addCandidate(entityType, word);
 	}
 
 	public void addCandidate(EntityType entityType) {

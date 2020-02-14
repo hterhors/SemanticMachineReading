@@ -22,9 +22,9 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 
 	final private HardConstraintsProvider hardConstraintsProvider;
 
-	public EntityRecLinkExplorer(HardConstraintsProvider hardConstraintsProvder) {
-		this.hardConstraintsProvider = hardConstraintsProvder;
-	}
+//	public EntityRecLinkExplorer(HardConstraintsProvider hardConstraintsProvder) {
+//		this.hardConstraintsProvider = hardConstraintsProvder;
+//	}
 
 	public EntityRecLinkExplorer() {
 		this.hardConstraintsProvider = null;
@@ -34,7 +34,7 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 	 * Average number of new explored proposal states. This variable is used as
 	 * initial size of the next new proposal state list.
 	 */
-	int averageNumberOfNewProposalStates = 16;
+	private int averageNumberOfNewProposalStates = 16;
 
 	public int MAX_WINDOW_SIZE = 10;
 	public int MIN_WINDOW_SIZE = 1;
@@ -105,7 +105,7 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 
 					try {
 						AbstractAnnotation newCurrentPrediction = AnnotationBuilder.toAnnotation(
-								currentState.getInstance().getDocument(), entityType.name, text,
+								currentState.getInstance().getDocument(), entityType, text,
 								fromToken.getDocCharOffset());
 						proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));
 					} catch (RuntimeException e) {

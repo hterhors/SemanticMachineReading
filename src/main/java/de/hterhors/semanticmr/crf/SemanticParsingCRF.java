@@ -145,7 +145,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 				finalStates.put(instance, currentState);
 				producedStateChain.add(currentState);
 				int samplingStep;
-				for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
+				sampling: for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
 
 					for (IExplorationStrategy explorer : explorerList) {
 
@@ -172,21 +172,19 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 						if (isAccepted) {
 							currentState = candidateState;
-//							LogUtils.logState(log,
-//									INTERMEDIATE_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "["
-//											+ ++instanceIndex + "/" + trainingInstances.size() + "]" + "["
-//											+ (samplingStep + 1) + "]",
-//									instance, currentState);
 						}
 
 						producedStateChain.add(currentState);
 
 						finalStates.put(instance, currentState);
 
+						if (currentState.getObjectiveScore() == 1.0D)
+							break sampling;
+
 					}
 
 					if (meetsSamplingStoppingCriterion(samplingStoppingCrits, producedStateChain))
-						break;
+						break sampling;
 
 				}
 				this.trainingStatistics.endTrainingTime = System.currentTimeMillis();

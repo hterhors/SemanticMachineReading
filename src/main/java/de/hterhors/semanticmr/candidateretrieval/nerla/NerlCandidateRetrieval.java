@@ -93,6 +93,16 @@ public class NerlCandidateRetrieval {
 
 	}
 
+	public void addCandidate(EntityType entityType, String word) {
+
+		this.dictionary.putIfAbsent(entityType, new HashSet<>());
+		this.dictionary.get(entityType).add(word);
+
+		this.reverseDictionary.putIfAbsent(word, new HashSet<>());
+		this.reverseDictionary.get(word).add(entityType);
+
+	}
+
 	public void addCandidate(EntityType entityType) {
 		this.types.add(entityType);
 	}

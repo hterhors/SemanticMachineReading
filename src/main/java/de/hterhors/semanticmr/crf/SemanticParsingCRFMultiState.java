@@ -185,9 +185,13 @@ public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 
 							final StatePair candidateState = sampler.sampleCandidate(proposalStatePairs, 1).get(0);
 
-							scoreSelectedStates(sampleBasedOnObjectiveFunction, candidateState.currentState,
-									candidateState.candidateState);
-
+							if (sampleBasedOnObjectiveFunction) {
+								model.score(candidateState.candidateState);
+							} else {
+								objectiveFunction.score(candidateState.candidateState);
+								objectiveFunction.score(candidateState.currentState);
+							}
+							
 							boolean isAccepted = sampler.getAcceptanceStrategy(epoch)
 									.isAccepted(candidateState.candidateState, candidateState.currentState);
 

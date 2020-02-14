@@ -27,7 +27,6 @@ public class AnnotationBuilder {
 	public static DocumentLinkedAnnotation toAnnotation(final Document document, final EntityType entityType,
 			final String textualContent, final int offset) {
 		try {
-
 			Objects.requireNonNull(document);
 			Objects.requireNonNull(entityType);
 			Objects.requireNonNull(textualContent);
