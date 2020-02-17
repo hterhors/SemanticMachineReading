@@ -26,13 +26,17 @@ public class TextualContent {
 		return "TextualContent [toPrettyString()=" + toPrettyString() + "]";
 	}
 
-	transient final public String cleanedSurfaceForm;
+	transient private String cleanedSurfaceForm;
+
+	public String getCleanedSurfaceForm() {
+		return cleanedSurfaceForm == null ? cleanedSurfaceForm = cleanSurfaceForm(this.surfaceForm)
+				: cleanedSurfaceForm;
+	}
 
 	transient private Boolean isNormalized = null;
 
 	public TextualContent(String surfaceForm) {
 		this.surfaceForm = surfaceForm;
-		this.cleanedSurfaceForm = cleanSurfaceForm(this.surfaceForm);
 	}
 
 	/**

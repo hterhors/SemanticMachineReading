@@ -118,9 +118,6 @@ public class Annotations {
 //				return Score.TP;
 //		}
 
-		if (this.annotations.size() == 0 || otherAnnotations.annotations.size() == 0 || otherVal == null)
-			return Score.ZERO;
-
 		if (this.annotations.size() == 1 && otherAnnotations.annotations.size() == 1)
 			return evaluator.scoreSingle(this.annotations.get(0), otherAnnotations.annotations.get(0));
 
