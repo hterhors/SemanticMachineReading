@@ -1,7 +1,0 @@
-#Entity	Slot	SlotSuperEntityType
-SoccerPlayer	position	Position
-SoccerPlayer	cityOfBirth	City
-SoccerPlayer	countryOfBirth	Country
-SoccerPlayer	birthYear	Year
-SoccerPlayer	deathYear	Year
-SoccerPlayer	team	SoccerClub

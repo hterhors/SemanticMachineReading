@@ -25,7 +25,7 @@ import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 public class Annotations {
 
-	public static boolean removeDuplicates = false;
+	public static boolean REMOVE_DUPLICATES = false;
 
 	private List<AbstractAnnotation> annotations;
 
@@ -74,7 +74,7 @@ public class Annotations {
 
 		l_1: for (AbstractAnnotation abstractAnnotation : modifiedAnnotations) {
 
-			if (removeDuplicates)
+			if (REMOVE_DUPLICATES)
 				for (AbstractAnnotation abstractAnnotation2 : distinctAnnotations) {
 
 					if (abstractAnnotation2.evaluate(evaluator, abstractAnnotation).getF1() == 1.0D) {
@@ -111,12 +111,6 @@ public class Annotations {
 			return Score.ZERO;
 
 		final Annotations otherAnnotations = (Annotations) otherVal;
-
-//		if (this.predictions.isEmpty() && otherAnnotations.predictions.size() == 1) {
-//			AbstractAnnotation e = otherAnnotations.predictions.iterator().next();
-//			if (e.getEntityType() == EntityType.get("VertebralArea") && e.asInstanceOfEntityTemplate().isEmpty())
-//				return Score.TP;
-//		}
 
 		if (this.annotations.size() == 1 && otherAnnotations.annotations.size() == 1)
 			return evaluator.scoreSingle(this.annotations.get(0), otherAnnotations.annotations.get(0));

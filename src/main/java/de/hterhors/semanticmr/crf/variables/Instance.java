@@ -145,7 +145,7 @@ public class Instance implements Comparable<Instance> {
 				+ (redistributedContext != EInstanceContext.UNSPECIFIED
 						? ", redistributedContext=" + redistributedContext
 						: "")
-				+ ", document=" + document + ", goldAnnotations=" + groundTruth + "]";
+				+ ", document=" + document ;//+ ", goldAnnotations=" + groundTruth + "]";
 	}
 
 	@Override

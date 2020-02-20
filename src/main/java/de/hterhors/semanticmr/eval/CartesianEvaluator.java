@@ -32,7 +32,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 
 	public CartesianEvaluator(EEvaluationDetail evaluationMode) {
 		super(evaluationMode);
-		this.stdEvalForDocLinked = new NerlaEvaluator(evaluationMode);
+		this.stdEvalForDocLinked = new NerlaEvaluator(EEvaluationDetail.LITERAL);
 	}
 
 	public static int MAXIMUM_PERMUTATION_SIZE = 8;

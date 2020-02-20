@@ -33,11 +33,6 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 	 */
 	public final int testProportion;
 
-//	/**
-//	 * The random to shuffle the documents.
-//	 */
-//	public final Random rnd;
-
 	/**
 	 * The seed that was used to initialize the random.
 	 */
@@ -51,7 +46,6 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 		this.developmentProportion = developmentProportion;
 		this.testProportion = testProportion;
 		this.seed = seed;
-//		this.rnd = new Random(seed);
 	}
 
 	private int proportionSum() {
@@ -168,7 +162,6 @@ public class ShuffleCorpusDistributor extends AbstractCorpusDistributor {
 	 */
 	@Override
 	public IDistributorStrategy distributeInstances(List<Instance> instancesToRedistribute) {
-
 		Collections.sort(instancesToRedistribute);
 		Collections.shuffle(instancesToRedistribute, new Random(seed));
 
