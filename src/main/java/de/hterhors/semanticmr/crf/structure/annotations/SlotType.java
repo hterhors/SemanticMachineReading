@@ -3,6 +3,7 @@ package de.hterhors.semanticmr.crf.structure.annotations;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -77,8 +78,40 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 		this.exclude = true;
 	}
 
+	public void excludeRec() {
+		exclRec(new HashSet<>(), this);
+	}
+
+	private void exclRec(Set<SlotType> exclSet, SlotType slotType) {
+		if (exclSet.contains(slotType))
+			return;
+		slotType.exclude();
+		exclSet.add(slotType);
+		for (EntityType et : slotType.getSlotFillerEntityTypes()) {
+			for (SlotType st : et.getSlots()) {
+				exclRec(exclSet, st);
+			}
+		}
+	}
+
 	public void include() {
 		this.exclude = false;
+	}
+
+	public void includeRec() {
+		inclRec(new HashSet<>(), this);
+	}
+
+	private void inclRec(Set<SlotType> inclSet, SlotType slotType) {
+		if (inclSet.contains(slotType))
+			return;
+		slotType.include();
+		inclSet.add(slotType);
+		for (EntityType et : slotType.getSlotFillerEntityTypes()) {
+			for (SlotType st : et.getSlots()) {
+				inclRec(inclSet, st);
+			}
+		}
 	}
 
 	public boolean isExcluded() {
@@ -214,7 +247,8 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
 	@Override
 	public String toString() {
-		return "SlotType [slotTypeName=" + name + "]";
+		return "SlotType [frozen=" + frozen + ", exclude=" + exclude + ", name=" + name + ", slotMaxCapacity="
+				+ slotMaxCapacity + "]";
 	}
 
 	@Override

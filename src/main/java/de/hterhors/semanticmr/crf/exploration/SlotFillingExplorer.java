@@ -8,6 +8,8 @@ import org.apache.commons.collections.set.SynchronizedSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
+
 import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.of.IObjectiveFunction;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
@@ -121,7 +123,8 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 		}
 
 		if (proposalStates.isEmpty()) {
-			log.warn("No states were generated for instance: " + currentState.getInstance().getName());
+			log.warn("No states were generated in explorer " + getClass().getSimpleName() + " for instance: "
+					+ currentState.getInstance().getName());
 		}
 
 		updateAverage(proposalStates);

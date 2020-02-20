@@ -19,6 +19,7 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 	private static Logger log = LogManager.getFormatterLogger(RootTemplateCardinalityExplorer.class);
 
 	public static int MAX_NUMBER_OF_ANNOTATIONS;
+	public static int MIN_NUMBER_OF_ANNOTATIONS;
 
 	final private EntityTypeAnnotation initAnnotation;
 	final private EExplorationMode samplingMode;
@@ -55,17 +56,19 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 
 			}
 		}
+		if (currentState.getCurrentPredictions().getAnnotations().size() > MIN_NUMBER_OF_ANNOTATIONS) {
+			for (int annotationIndex = 0; annotationIndex < currentState.getCurrentPredictions().getAnnotations()
+					.size(); annotationIndex++) {
 
-		for (int annotationIndex = 0; annotationIndex < currentState.getCurrentPredictions().getAnnotations()
-				.size(); annotationIndex++) {
+				proposalStates.add(currentState.deepRemoveCopy(annotationIndex));
 
-			proposalStates.add(currentState.deepRemoveCopy(annotationIndex));
-
+			}
 		}
-
 		if (proposalStates.isEmpty()) {
-			log.warn("No states were generated for instance: " + currentState.getInstance().getName());
+			log.warn("No states were generated in explorer " + getClass().getSimpleName() + " for instance: "
+					+ currentState.getInstance().getName());
 		}
+
 		updateAverage(proposalStates);
 		return proposalStates;
 
