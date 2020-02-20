@@ -315,7 +315,10 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 			final List<State> producedStateChain) {
 		for (ISamplingStoppingCriterion sc : stoppingCriterion) {
 			if (sc.meetsCondition(producedStateChain))
+			{
+				log.info(sc.getClass().getSimpleName()+" meets criterion! Stop Sampling");
 				return true;
+			}
 		}
 		return false;
 	}

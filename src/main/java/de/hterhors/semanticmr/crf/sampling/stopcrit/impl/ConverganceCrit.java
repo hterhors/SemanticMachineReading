@@ -14,13 +14,13 @@ public class ConverganceCrit implements ISamplingStoppingCriterion {
 	final private Function<State, Double> f;
 
 	public ConverganceCrit(final int maxTimesNoChange, Function<State, Double> f) {
-		this(maxTimesNoChange, f, 0.0001);
+		this(maxTimesNoChange, f, 0.00001);
 	}
 
 	public ConverganceCrit(final int maxTimesNoChange, Function<State, Double> f, final double threshold) {
 		if (maxTimesNoChange < 1)
 			throw new IllegalArgumentException(
-					"The parameter maxTimesNoChange must be larger than 1, iven value: " + maxTimesNoChange);
+					"The parameter maxTimesNoChange must be larger than 1, given value: " + maxTimesNoChange);
 		this.maxTimesNoChange = maxTimesNoChange;
 		this.threshold = threshold;
 		this.f = f;
@@ -36,10 +36,12 @@ public class ConverganceCrit implements ISamplingStoppingCriterion {
 
 		int countNoChange = 0;
 
+		
+		
 		for (int i = producedStateChain.size() - 2; i >= 0; i--) {
 			final double v = f.apply(producedStateChain.get(i)).doubleValue();
 
-			if (latestValue - v <= threshold) {
+			if (Math.abs(latestValue - v) <= threshold) {
 				countNoChange++;
 
 				if (countNoChange == maxTimesNoChange)

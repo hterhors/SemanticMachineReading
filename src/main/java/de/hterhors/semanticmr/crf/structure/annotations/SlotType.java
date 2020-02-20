@@ -139,7 +139,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 	/**
 	 * Maximum size as specified in the specifications.
 	 */
-	final public int slotMaxCapacity;
+	public int slotMaxCapacity;
 
 	final private Set<String> slotFillerEntityTypeNames;
 

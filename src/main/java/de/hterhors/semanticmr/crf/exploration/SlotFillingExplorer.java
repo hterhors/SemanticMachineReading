@@ -219,7 +219,8 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 		if (entityTemplate.getMultiFillerSlot(slotType).containsMaximumFiller())
 			return;
 
-		if (entityTemplate.getMultiFillerSlot(slotType).size() == MAX_NUMBER_OF_ANNOTATIONS)
+		if (entityTemplate.getMultiFillerSlot(slotType).size() == Math.max(MAX_NUMBER_OF_ANNOTATIONS,
+				Math.min(slotType.slotMaxCapacity, 100)))
 			return;
 
 		/*
