@@ -442,9 +442,9 @@ public class Model {
 		}
 	}
 
-	private static AbstractFeatureTemplate toAbstractFeatureTemplate(final GenericTemplate t) {
+	private static AbstractFeatureTemplate<?> toAbstractFeatureTemplate(final GenericTemplate t) {
 		try {
-			final AbstractFeatureTemplate template = (AbstractFeatureTemplate) Class
+			final AbstractFeatureTemplate<?> template = (AbstractFeatureTemplate<?>) Class
 					.forName(t.packageName + "." + t.templateName).newInstance();
 
 			final DoubleVector v = new DoubleVector();
