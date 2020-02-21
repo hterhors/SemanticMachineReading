@@ -44,7 +44,7 @@ public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 	 * The maximum number of sampling steps per instance. This prevents infinite
 	 * loops if no stopping criterion ever matches.
 	 */
-	final static public int MAX_SAMPLING = 100;
+	final static public int MAX_SAMPLING = 200;
 
 	public final List<IExplorationStrategy> explorerList;
 

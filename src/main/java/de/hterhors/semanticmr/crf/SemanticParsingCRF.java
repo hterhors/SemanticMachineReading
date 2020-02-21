@@ -46,7 +46,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 	 * The maximum number of sampling steps per instance. This prevents infinite
 	 * loops if no stopping criterion ever matches.
 	 */
-	final static public int MAX_SAMPLING = 100;
+	final static public int MAX_SAMPLING = 200;
 
 	private static final String COVERAGE_CONTEXT = "===========COVERAGE============\n";
 	private static final String TRAIN_CONTEXT = "===========TRAIN============\n";
@@ -76,7 +76,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 	private CRFStatistics testStatistics;
 
 	private IObjectiveFunction coverageObjectiveFunction = new SlotFillingObjectiveFunction(
-			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
+			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE, EEvaluationDetail.DOCUMENT_LINKED));
 
 	public SemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
 			IObjectiveFunction objectiveFunction) {
@@ -172,6 +172,12 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 						if (isAccepted) {
 							currentState = candidateState;
+
+//							LogUtils.logState(log,
+//									INTERMEDIATE_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + ++instanceIndex + "/"
+//											+ trainingInstances.size() + "]" + "[" + (samplingStep + 1) + "]",
+//									instance, currentState);
+						
 						}
 
 						producedStateChain.add(currentState);
@@ -314,9 +320,8 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 	private boolean meetsSamplingStoppingCriterion(ISamplingStoppingCriterion[] stoppingCriterion,
 			final List<State> producedStateChain) {
 		for (ISamplingStoppingCriterion sc : stoppingCriterion) {
-			if (sc.meetsCondition(producedStateChain))
-			{
-				log.info(sc.getClass().getSimpleName()+" meets criterion! Stop Sampling");
+			if (sc.meetsCondition(producedStateChain)) {
+				log.info(sc.getClass().getSimpleName() + " meets criterion! Stop Sampling");
 				return true;
 			}
 		}

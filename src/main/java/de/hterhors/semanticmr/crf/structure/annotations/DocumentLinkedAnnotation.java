@@ -176,4 +176,8 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluationDetail);
 	}
 
+	@Override
+	public boolean evaluateEquals(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
+		return evaluate(evaluationDetail, otherVal).getF1() == 1.0D;
+	}
 }

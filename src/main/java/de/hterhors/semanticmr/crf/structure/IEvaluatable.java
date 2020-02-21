@@ -3,6 +3,7 @@ package de.hterhors.semanticmr.crf.structure;
 import java.text.DecimalFormat;
 
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
@@ -59,10 +60,10 @@ public interface IEvaluatable {
 
 		@Override
 		public String toString() {
-			return "Score [" + (tn != 0 ? ("getAccuracy()=" + SCORE_FORMAT.format(getAccuracy())+", ") : "") + " getF1()="
-					+ SCORE_FORMAT.format(getF1()) + ", getPrecision()=" + SCORE_FORMAT.format(getPrecision())
-					+ ", getRecall()=" + SCORE_FORMAT.format(getRecall()) + ", tp=" + tp + ", fp=" + fp + ", fn=" + fn
-					+ ", tn=" + tn + "]";
+			return "Score [" + (tn != 0 ? ("getAccuracy()=" + SCORE_FORMAT.format(getAccuracy()) + ", ") : "")
+					+ " getF1()=" + SCORE_FORMAT.format(getF1()) + ", getPrecision()="
+					+ SCORE_FORMAT.format(getPrecision()) + ", getRecall()=" + SCORE_FORMAT.format(getRecall())
+					+ ", tp=" + tp + ", fp=" + fp + ", fn=" + fn + ", tn=" + tn + "]";
 		}
 
 		public void add(Score evaluate) {
@@ -244,5 +245,9 @@ public interface IEvaluatable {
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable otherVal);
 
 	public Score evaluate(EEvaluationDetail evaluationDetail, IEvaluatable otherVal);
+
+	public boolean evaluateEquals(AbstractEvaluator evaluator, IEvaluatable otherVal);
+
+	public boolean evaluateEquals(EEvaluationDetail evaluationDetail, IEvaluatable otherVal);
 
 }

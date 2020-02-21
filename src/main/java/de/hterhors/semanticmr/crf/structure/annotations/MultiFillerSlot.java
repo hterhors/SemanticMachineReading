@@ -46,7 +46,7 @@ public class MultiFillerSlot extends AbstractSlot {
 		if (objectiveFunction != null) {
 
 			for (AbstractAnnotation slotFillerValue : slotFiller) {
-				if (slotFillerValue.evaluate(objectiveFunction.getEvaluator(), slotFillerCandidate).getF1() == 1.0F) {
+				if (slotFillerValue.evaluateEquals(objectiveFunction.getEvaluator(), slotFillerCandidate)) {
 					return true;
 				}
 			}

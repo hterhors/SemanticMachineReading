@@ -7,9 +7,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer.EExplorationMode;
+import de.hterhors.semanticmr.crf.exploration.constraints.HardConstraintsProvider;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.variables.State;
+import de.hterhors.semanticmr.eval.AbstractEvaluator;
 
 /**
  * @author hterhors
@@ -23,10 +25,23 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 
 	final private EntityTypeAnnotation initAnnotation;
 	final private EExplorationMode samplingMode;
+	final private AbstractEvaluator abstractEvaluator;
+	final private HardConstraintsProvider hardConstraintsProvider;
 
-	public RootTemplateCardinalityExplorer(EExplorationMode samplingMode, EntityTypeAnnotation initAnnotation) {
+	public RootTemplateCardinalityExplorer(AbstractEvaluator abstractEvaluator, EExplorationMode samplingMode,
+			EntityTypeAnnotation initAnnotation) {
+		this.hardConstraintsProvider = null;
 		this.initAnnotation = initAnnotation;
 		this.samplingMode = samplingMode;
+		this.abstractEvaluator = abstractEvaluator;
+	}
+
+	public RootTemplateCardinalityExplorer(HardConstraintsProvider hardConstraintsProvider,
+			AbstractEvaluator abstractEvaluator, EExplorationMode samplingMode, EntityTypeAnnotation initAnnotation) {
+		this.hardConstraintsProvider = hardConstraintsProvider;
+		this.initAnnotation = initAnnotation;
+		this.samplingMode = samplingMode;
+		this.abstractEvaluator = abstractEvaluator;
 	}
 
 	/**
@@ -44,15 +59,23 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 
 		if (currentState.getCurrentPredictions().getAnnotations().size() < MAX_NUMBER_OF_ANNOTATIONS) {
 
-			proposalStates.add(currentState.deepAddCopy(new EntityTemplate((init))));
+			EntityTemplate deepInitCopy = new EntityTemplate((init));
+
+			if (!violatesConstraints(currentState, deepInitCopy))
+				proposalStates.add(currentState.deepAddCopy(deepInitCopy));
 
 			for (EntityTypeAnnotation templateTypeCandidate : currentState.getInstance()
 					.getEntityTypeCandidates(samplingMode, init.getEntityType())) {
 
-				if (templateTypeCandidate.equals(init))
+				if (templateTypeCandidate.evaluateEquals(abstractEvaluator, init))
 					continue;
 
-				proposalStates.add(currentState.deepAddCopy(new EntityTemplate((templateTypeCandidate))));
+				EntityTemplate deepCopy = new EntityTemplate((templateTypeCandidate));
+
+				if (violatesConstraints(currentState, deepCopy))
+					continue;
+
+				proposalStates.add(currentState.deepAddCopy(deepCopy));
 
 			}
 		}
@@ -71,6 +94,24 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 
 		updateAverage(proposalStates);
 		return proposalStates;
+
+	}
+
+	/**
+	 * TODO: inefficient way of checking constraints! First deep copy and then
+	 * discard is a bad way. Rather check first before deep copy!
+	 * 
+	 * Checks if the newly generated templateEntity violates any constraints.
+	 * 
+	 * @param deepCopy
+	 * 
+	 * @return false if the template does NOT violates any constraints, else true.
+	 */
+	private boolean violatesConstraints(State state, EntityTemplate deepCopy) {
+		if (hardConstraintsProvider == null)
+			return false;
+		else
+			return hardConstraintsProvider.violatesConstraints(state, deepCopy);
 
 	}
 

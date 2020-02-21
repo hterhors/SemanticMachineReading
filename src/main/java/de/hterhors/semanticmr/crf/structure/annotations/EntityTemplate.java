@@ -337,6 +337,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 		return true;
 	}
 
+	@Override
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable other) {
 
 		if (other != null && !(other instanceof EntityTemplate)) {
@@ -344,9 +345,9 @@ final public class EntityTemplate extends AbstractAnnotation {
 			final Score score = new Score();
 			score.add(this.rootAnnotation.evaluate(evaluator, other));
 
-			addScoresForSingleFillerSlots(evaluator, null, score);
+			score.add(scoreSingleFillerSlots(evaluator, null, false));
 
-			addScoresForMultiFillerSlots(evaluator, null, score);
+			score.add(scoreMultiFillerSlots(evaluator, null, false));
 
 			return score;
 		} else {
@@ -360,16 +361,65 @@ final public class EntityTemplate extends AbstractAnnotation {
 				score.add(this.rootAnnotation.evaluate(evaluator, oet.rootAnnotation));
 			}
 
-			addScoresForSingleFillerSlots(evaluator, oet, score);
+			score.add(scoreSingleFillerSlots(evaluator, oet, false));
 
-			addScoresForMultiFillerSlots(evaluator, oet, score);
+			score.add(scoreMultiFillerSlots(evaluator, oet, false));
 
 			return score;
 		}
 
 	}
 
-	private void addScoresForSingleFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, final Score score) {
+	@Override
+	public boolean evaluateEquals(AbstractEvaluator evaluator, IEvaluatable other) {
+
+		if (this == other)
+			return true;
+
+		if (other != null && !(other instanceof EntityTemplate)) {
+
+			final Score score = new Score();
+			score.add(this.rootAnnotation.evaluate(evaluator, other));
+
+			if (isNotEqual(score))
+				return false;
+
+			score.add(scoreSingleFillerSlots(evaluator, null, true));
+
+			if (isNotEqual(score))
+				return false;
+
+			score.add(scoreMultiFillerSlots(evaluator, null, true));
+
+			return !isNotEqual(score);
+
+		} else {
+
+			final Score score = new Score();
+
+			EntityTemplate oet = (EntityTemplate) other;
+			if (other == null) {
+				score.increaseFalseNegative();
+			} else {
+				score.add(this.rootAnnotation.evaluate(evaluator, oet.rootAnnotation));
+			}
+
+			if (isNotEqual(score))
+				return false;
+			
+			score.add(scoreSingleFillerSlots(evaluator, oet, true));
+
+			if (isNotEqual(score))
+				return false;
+			
+			score.add(scoreMultiFillerSlots(evaluator, oet, true));
+
+			return !isNotEqual(score);
+		}
+	}
+
+	private Score scoreSingleFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, boolean earlyBreak) {
+		final Score score = new Score();
 		for (SlotType singleSlotType : getSingleFillerSlotTypes()) {
 
 			if (singleSlotType.isExcluded() || singleSlotType.isFrozen())
@@ -393,10 +443,15 @@ final public class EntityTemplate extends AbstractAnnotation {
 				score.increaseFalsePositive();
 			}
 
+			if (earlyBreak)
+				if (isNotEqual(score))
+					break;
 		}
+		return score;
 	}
 
-	private void addScoresForMultiFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, final Score score) {
+	private Score scoreMultiFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, boolean earlyBreak) {
+		final Score score = new Score();
 
 		for (SlotType multiSlotType : getMultiFillerSlotTypes()) {
 
@@ -425,7 +480,15 @@ final public class EntityTemplate extends AbstractAnnotation {
 			final Score bestScore = evaluator.scoreMultiValues(slotFiller, otherSlotFiller);
 
 			score.add(bestScore);
+			if (earlyBreak)
+				if (isNotEqual(score))
+					break;
 		}
+		return score;
+	}
+
+	public boolean isNotEqual(final Score score) {
+		return score.getFn() != 0 || score.getFp() != 0;
 	}
 
 	@Override
@@ -462,6 +525,11 @@ final public class EntityTemplate extends AbstractAnnotation {
 	@Override
 	public Score evaluate(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
 		throw new IllegalStateException("Can not evaluate entity templates without evaluator.");
+	}
+
+	@Override
+	public boolean evaluateEquals(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
+		throw new IllegalStateException("Can not evaluateEquals entity templates without evaluator.");
 	}
 
 	/**

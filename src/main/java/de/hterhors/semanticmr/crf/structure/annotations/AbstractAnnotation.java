@@ -140,4 +140,18 @@ public abstract class AbstractAnnotation implements IEvaluatable, IDeepCopyable 
 
 		return redAnn;
 	}
+
+	/**
+	 * Checks if the evaluation of this entity to the given entity is equals to
+	 * 1.0D. This method is equal to calling evaluate().getF1() == 1.0D but runs
+	 * faster as it breaks if a fp or fn appears.
+	 * 
+	 * @param evaluator
+	 * @param entityTemplate
+	 * @return
+	 */
+	@Override
+	public boolean evaluateEquals(AbstractEvaluator evaluator, IEvaluatable otherVal) {
+		return evaluateEquals(evaluator.evaluationDetail, otherVal);
+	}
 }

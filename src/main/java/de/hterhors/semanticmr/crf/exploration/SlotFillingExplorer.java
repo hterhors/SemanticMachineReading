@@ -284,7 +284,8 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 			/*
 			 * Do not add the same value again.
 			 */
-			if (slotFillerCandidate.equals(entityTemplate.getSingleFillerSlot(slotType).getSlotFiller()))
+			if (slotFillerCandidate.evaluateEquals(objectiveFunction.getEvaluator(),
+					entityTemplate.getSingleFillerSlot(slotType).getSlotFiller()))
 				return;
 
 			final EntityTemplate deepCopy = entityTemplate.deepCopy();

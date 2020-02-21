@@ -5,6 +5,7 @@ import java.util.Map;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
+import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 /**
@@ -120,8 +121,7 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return entityType;
+	public EntityType getEntityType() {		return entityType;
 	}
 
 	@Override
@@ -129,4 +129,8 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 		return "EntityTypeAnnotation [entityType=" + entityType + "]";
 	}
 
+	@Override
+	public boolean evaluateEquals(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
+		return evaluate(evaluationDetail, otherVal).getF1() == 1.0D;
+	}
 }

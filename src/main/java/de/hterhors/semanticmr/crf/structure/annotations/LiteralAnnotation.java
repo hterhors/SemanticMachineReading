@@ -133,4 +133,9 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 	final public int getSurfaceFormAsInt() {
 		return Integer.parseInt(textualContent.surfaceForm);
 	}
+
+	@Override
+	public boolean evaluateEquals(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
+		return evaluate(evaluationDetail, otherVal).getF1() == 1.0D;
+	}
 }
