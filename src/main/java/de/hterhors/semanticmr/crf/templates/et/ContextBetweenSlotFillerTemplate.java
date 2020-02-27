@@ -19,7 +19,6 @@ import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 
 /**
  * This template creates feature in form of an in between context. Each feature

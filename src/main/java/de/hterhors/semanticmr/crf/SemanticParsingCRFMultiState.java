@@ -27,6 +27,7 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ITrainingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.IStateInitializer;
@@ -69,7 +70,7 @@ public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 	private CRFStatistics testStatistics;
 
 	private IObjectiveFunction coverageObjectiveFunction = new SlotFillingObjectiveFunction(
-			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
+			EScoreType.MICRO, new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
 
 	public SemanticParsingCRFMultiState(Model model, IExplorationStrategy explorer, AbstractBeamSampler sampler,
 			IObjectiveFunction objectiveFunction) {
@@ -106,6 +107,7 @@ public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 //		return train(learner, trainingInstances, numberOfEpochs, trainingStoppingCrits,
 //				new ISamplingStoppingCriterion[] {});
 //	}
+	public boolean parallelModelUpdate = false;
 
 	public Map<Instance, State> train(final AdvancedLearner learner, List<Instance> trainingInstances,
 			final int numberOfEpochs, final ITrainingStoppingCriterion[] trainingStoppingCrits,
@@ -191,14 +193,14 @@ public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 								objectiveFunction.score(candidateState.candidateState);
 								objectiveFunction.score(candidateState.currentState);
 							}
-							
+
 							boolean isAccepted = sampler.getAcceptanceStrategy(epoch)
 									.isAccepted(candidateState.candidateState, candidateState.currentState);
 
 							/*
 							 * Update model weights
 							 */
-							model.updateWeights(learner,  candidateState.candidateState,candidateState.currentState);
+							model.updateWeights(learner, candidateState.candidateState, candidateState.currentState);
 
 							if (isAccepted) {
 								/*
@@ -230,12 +232,14 @@ public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 						/*
 						 * Update learner based on pairwise multi states
 						 */
-						List<Integer> is = new ArrayList<>(currentStatePairs.keySet());
+						if (parallelModelUpdate) {
+							List<Integer> is = new ArrayList<>(currentStatePairs.keySet());
 
-						for (int i = 0; i < is.size(); i++) {
-							for (int j = i + 1; j < is.size(); j++) {
-								model.updateWeights(learner, currentStatePairs.get(is.get(i)).currentState,
-										currentStatePairs.get(is.get(j)).currentState);
+							for (int i = 0; i < is.size(); i++) {
+								for (int j = i + 1; j < is.size(); j++) {
+									model.updateWeights(learner, currentStatePairs.get(is.get(i)).currentState,
+											currentStatePairs.get(is.get(j)).currentState);
+								}
 							}
 						}
 
@@ -597,7 +601,7 @@ public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 				log.info(
 						finalState.getKey().getName().substring(0, Math.min(finalState.getKey().getName().length(), 10))
 								+ "... \t" + SCORE_FORMAT.format(finalState.getValue().getObjectiveScore()));
-			meanTrainOFScore.add(finalState.getValue().getScore());
+			meanTrainOFScore.add(finalState.getValue().getMicroScore());
 		}
 
 		return meanTrainOFScore;

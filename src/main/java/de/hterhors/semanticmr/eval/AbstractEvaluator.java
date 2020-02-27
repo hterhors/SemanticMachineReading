@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
@@ -60,11 +61,16 @@ public abstract class AbstractEvaluator {
 	}
 
 	protected abstract Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
-			Collection<? extends AbstractAnnotation> otherAnnotations);
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType);
 
 	public Score scoreMultiValues(Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations) {
-		return scoreMax(annotations, otherAnnotations);
+		return scoreMax(annotations, otherAnnotations, EScoreType.MICRO);
+	}
+
+	public Score scoreMultiValues(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
+		return scoreMax(annotations, otherAnnotations, scoreType);
 	}
 
 }

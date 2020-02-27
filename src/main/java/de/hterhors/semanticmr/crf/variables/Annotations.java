@@ -5,19 +5,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.http.annotation.Experimental;
-
-import com.fasterxml.jackson.annotation.JsonCreator.Mode;
-
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
-import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
@@ -105,18 +100,26 @@ public class Annotations {
 		return annotations;
 	}
 
-	public Score evaluate(AbstractEvaluator evaluator, Annotations otherVal) {
+	public Score evaluate(AbstractEvaluator evaluator, Annotations otherVal, EScoreType scoreType) {
 
-		if (!(otherVal instanceof Annotations))
-			return Score.ZERO;
+		Score score;
 
-		final Annotations otherAnnotations = (Annotations) otherVal;
+		if (!(otherVal instanceof Annotations)) {
+			score = Score.ZERO;
+		} else {
+			final Annotations otherAnnotations = (Annotations) otherVal;
 
-		if (this.annotations.size() == 1 && otherAnnotations.annotations.size() == 1)
-			return evaluator.scoreSingle(this.annotations.get(0), otherAnnotations.annotations.get(0));
+			if (this.annotations.size() == 1 && otherAnnotations.annotations.size() == 1)
+				score = evaluator.scoreSingle(this.annotations.get(0), otherAnnotations.annotations.get(0));
+			else
+				score = evaluator.scoreMultiValues(this.annotations, otherAnnotations.annotations, scoreType);
+		}
+		
+		
+		if (scoreType == EScoreType.MACRO)
+			score.toMacro();
 
-		return evaluator.scoreMultiValues(this.annotations, otherAnnotations.annotations);
-
+		return score;
 	}
 
 	public Annotations deepUpdateCopy(int annotationIndex, AbstractAnnotation newCurrentPrediction) {

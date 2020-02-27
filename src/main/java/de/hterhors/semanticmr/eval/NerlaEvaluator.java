@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 
@@ -58,7 +59,7 @@ public class NerlaEvaluator extends AbstractEvaluator {
 
 	@Override
 	protected Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
-			Collection<? extends AbstractAnnotation> otherAnnotations) {
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoretype) {
 		return prf1(annotations, otherAnnotations);
 	}
 

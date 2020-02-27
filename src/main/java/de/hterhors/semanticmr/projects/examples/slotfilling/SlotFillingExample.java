@@ -28,6 +28,7 @@ import de.hterhors.semanticmr.crf.sampling.impl.EpochSwitchSampler;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.MaxChainLengthCrit;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
@@ -192,7 +193,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 *
 		 */
 		IObjectiveFunction objectiveFunction = new SlotFillingObjectiveFunction(
-				new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
+				EScoreType.MICRO, new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
 
 		/**
 		 * The provision of existing entities is an important part in slot filling for

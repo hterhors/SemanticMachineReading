@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.ser.impl.StringCollectionSerializer;
-
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
@@ -340,19 +338,16 @@ final public class EntityTemplate extends AbstractAnnotation {
 	@Override
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable other) {
 
+		final Score score = new Score();
 		if (other != null && !(other instanceof EntityTemplate)) {
 
-			final Score score = new Score();
 			score.add(this.rootAnnotation.evaluate(evaluator, other));
 
 			score.add(scoreSingleFillerSlots(evaluator, null, false));
 
 			score.add(scoreMultiFillerSlots(evaluator, null, false));
 
-			return score;
 		} else {
-
-			final Score score = new Score();
 
 			EntityTemplate oet = (EntityTemplate) other;
 			if (other == null) {
@@ -365,8 +360,8 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 			score.add(scoreMultiFillerSlots(evaluator, oet, false));
 
-			return score;
 		}
+		return score;
 
 	}
 
@@ -406,19 +401,19 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 			if (isNotEqual(score))
 				return false;
-			
+
 			score.add(scoreSingleFillerSlots(evaluator, oet, true));
 
 			if (isNotEqual(score))
 				return false;
-			
+
 			score.add(scoreMultiFillerSlots(evaluator, oet, true));
 
 			return !isNotEqual(score);
 		}
 	}
 
-	private Score scoreSingleFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, boolean earlyBreak) {
+	private Score scoreSingleFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, boolean checkEquals) {
 		final Score score = new Score();
 		for (SlotType singleSlotType : getSingleFillerSlotTypes()) {
 
@@ -443,14 +438,14 @@ final public class EntityTemplate extends AbstractAnnotation {
 				score.increaseFalsePositive();
 			}
 
-			if (earlyBreak)
+			if (checkEquals)
 				if (isNotEqual(score))
 					break;
 		}
 		return score;
 	}
 
-	private Score scoreMultiFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, boolean earlyBreak) {
+	private Score scoreMultiFillerSlots(AbstractEvaluator evaluator, EntityTemplate other, boolean checkEquals) {
 		final Score score = new Score();
 
 		for (SlotType multiSlotType : getMultiFillerSlotTypes()) {
@@ -480,7 +475,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 			final Score bestScore = evaluator.scoreMultiValues(slotFiller, otherSlotFiller);
 
 			score.add(bestScore);
-			if (earlyBreak)
+			if (checkEquals)
 				if (isNotEqual(score))
 					break;
 		}

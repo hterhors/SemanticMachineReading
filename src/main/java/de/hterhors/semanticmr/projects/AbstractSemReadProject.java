@@ -28,9 +28,8 @@ public class AbstractSemReadProject {
 			if (predictionOF != null)
 				predictionOF.score(res.getValue());
 
-		
-			mean.add(res.getValue().getScore());
-			
+			mean.add(res.getValue().getMicroScore());
+
 			LogUtils.logState(log, "======Final Evaluation======", res.getKey(), res.getValue());
 		}
 		return mean;

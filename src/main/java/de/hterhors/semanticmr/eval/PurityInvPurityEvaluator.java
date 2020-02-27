@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.jena.ext.com.google.common.collect.Streams;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 
 public class PurityInvPurityEvaluator extends AbstractEvaluator {
@@ -157,7 +158,7 @@ public class PurityInvPurityEvaluator extends AbstractEvaluator {
 
 	@Override
 	protected Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
-			Collection<? extends AbstractAnnotation> otherAnnotations) {
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoretype) {
 //		return fPurityInvPurity(annotations, otherAnnotations);
 		return null;
 	}

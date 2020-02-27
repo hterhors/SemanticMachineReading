@@ -6,6 +6,7 @@ import java.util.Map;
 
 import de.hterhors.semanticmr.crf.model.FactorGraph;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
@@ -30,7 +31,8 @@ public class State {
 
 	private double objectiveScore;
 
-	private Score score;
+	private Score microScore;
+	private Score macroScore;
 
 	public State(Instance instance, Annotations currentPredictions) {
 		this.instance = instance;
@@ -118,13 +120,18 @@ public class State {
 		return instance.getGoldAnnotations();
 	}
 
-	public Score score(AbstractEvaluator evaluator) {
-		this.score = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions);
-		return score;
+	public State score(AbstractEvaluator evaluator) {
+		this.microScore = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions, EScoreType.MICRO);
+		this.macroScore = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions, EScoreType.MACRO);
+		return this;
 	}
 
-	public Score getScore() {
-		return score;
+	public Score getMicroScore() {
+		return microScore;
+	}
+
+	public Score getMacroScore() {
+		return macroScore;
 	}
 
 	public Instance getInstance() {
@@ -133,6 +140,10 @@ public class State {
 
 	public boolean containsAnnotationOnTokens(DocumentToken... tokens) {
 		return currentPredictions.containsAnnotationOnTokens(tokens);
+	}
+
+	public Score getScore(EScoreType scoreType) {
+		return scoreType == EScoreType.MICRO ? getMicroScore() : getMacroScore();
 	}
 
 }

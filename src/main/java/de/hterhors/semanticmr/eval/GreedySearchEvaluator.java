@@ -1,14 +1,11 @@
 package de.hterhors.semanticmr.eval;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 
 public class GreedySearchEvaluator extends AbstractEvaluator {
@@ -37,7 +34,7 @@ public class GreedySearchEvaluator extends AbstractEvaluator {
 
 	@Override
 	public Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
-			Collection<? extends AbstractAnnotation> otherAnnotations) {
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoretype) {
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
 		/*

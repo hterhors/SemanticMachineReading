@@ -1,9 +1,7 @@
 package de.hterhors.semanticmr.corpus.distributor;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.crf.variables.Instance;

@@ -1,17 +1,17 @@
 package de.hterhors.semanticmr.eval;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.apache.jena.ext.com.google.common.collect.Collections2;
 
-import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 
 public class CartesianEvaluator extends AbstractEvaluator {
@@ -34,7 +34,8 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		super(evaluationMode);
 		this.stdEvalForDocLinked = new NerlaEvaluator(EEvaluationDetail.DOCUMENT_LINKED);
 	}
-	public CartesianEvaluator(EEvaluationDetail slotFillingEvaluationMode,EEvaluationDetail nerlaEvaluationMode) {
+
+	public CartesianEvaluator(EEvaluationDetail slotFillingEvaluationMode, EEvaluationDetail nerlaEvaluationMode) {
 		super(slotFillingEvaluationMode);
 		this.stdEvalForDocLinked = new NerlaEvaluator(nerlaEvaluationMode);
 	}
@@ -51,15 +52,6 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		}
 	}
 
-	private static Stream<List<Integer>> getPermutationStream(final int size) {
-
-		if (permutationCache.length <= size)
-			throw new IllegalArgumentException(
-					"Requested permutation size " + size + " exceeds maximum size of: " + MAXIMUM_PERMUTATION_SIZE);
-
-		return permutationCache[size].stream();
-	}
-
 	private static List<List<Integer>> getPermutations(final int size) {
 
 		if (permutationCache.length <= size)
@@ -71,7 +63,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 
 	@Override
 	protected Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
-			Collection<? extends AbstractAnnotation> otherAnnotations) {
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
 
 		final Score bestScore;
 		boolean docLinked = true;
@@ -91,14 +83,17 @@ public class CartesianEvaluator extends AbstractEvaluator {
 
 		if (docLinked)
 			bestScore = stdEvalForDocLinked.prf1(annotations, otherAnnotations);
-		else
-			bestScore = cartesian(annotations, otherAnnotations);
+		else {
+			bestScore = cartesian(annotations, otherAnnotations, scoreType);
+		}
 
 		return bestScore;
 	}
 
-	public Score cartesian(Collection<? extends AbstractAnnotation> annotations,
-			Collection<? extends AbstractAnnotation> otherAnnotations) {
+	static boolean x = false;
+
+	private Score cartesian(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
 //		System.out.println("Annotations:");
@@ -107,7 +102,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 //		otherAnnotations.forEach(a -> System.out.println(a.toPrettyString()));
 
 		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
-		final Score bestScore = new Score();
+		final Score bestScore = new Score(scoreType);
 		final List<List<Integer>> permutations;
 		try {
 
@@ -124,11 +119,17 @@ public class CartesianEvaluator extends AbstractEvaluator {
 
 		for (List<Integer> indexPermutation : permutations) {
 
-			final Score sum = new Score();
+			final Score sum = new Score(scoreType);
 
 			for (int index = 0; index < indexPermutation.size(); index++) {
 				final int permIndex = indexPermutation.get(index).intValue();
-				sum.add(scores[index][permIndex]);
+
+				Score score = scores[index][permIndex];
+
+				if (scoreType == EScoreType.MACRO)
+					score.toMacro();
+
+				sum.add(score);
 			}
 
 			final double f1 = sum.getF1();
@@ -146,23 +147,29 @@ public class CartesianEvaluator extends AbstractEvaluator {
 	}
 
 	public List<Integer> getBestAssignment(Collection<? extends AbstractAnnotation> annotations,
-			Collection<? extends AbstractAnnotation> otherAnnotations) {
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
 		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
 
-		final Score bestScore = new Score();
+		final Score bestScore = new Score(scoreType);
 		final List<List<Integer>> permutations = getPermutations(maxSize);
 		int permutationRunIndex = 0;
 		int bestIndexPermutation = 0;
 
 		for (List<Integer> indexPermutation : permutations) {
 
-			final Score sum = new Score();
+			final Score sum = new Score(scoreType);
 
 			for (int index = 0; index < indexPermutation.size(); index++) {
 				final int permIndex = indexPermutation.get(index).intValue();
-				sum.add(scores[index][permIndex]);
+
+				Score score = scores[index][permIndex];
+
+				if (scoreType == EScoreType.MACRO)
+					score.toMacro();
+
+				sum.add(score);
 			}
 
 			final double f1 = sum.getF1();
@@ -225,21 +232,21 @@ public class CartesianEvaluator extends AbstractEvaluator {
 
 		final Score[][] scores;
 
-		final double multiThreadProb = multiThreadProbs.length > maxSize ? multiThreadProbs[maxSize]
-				: multiThreadProbs[multiThreadProbs.length - 1];
-
-		final boolean multiThread = Math.random() < multiThreadProb;
-
-		long t = System.nanoTime();
-		if (multiThread) {
-			scores = multiThreaded(slotFiller, otherSlotFiller, maxSize);
-		} else {
-			scores = singleThreaded(slotFiller, otherSlotFiller, maxSize);
-		}
-		double newTime = System.nanoTime() - t;
-		updateProbs(maxSize, multiThread, meanComputationTime > newTime);
-		meanComputationTime += newTime;
-		meanComputationTime /= 2;
+//		final double multiThreadProb = multiThreadProbs.length > maxSize ? multiThreadProbs[maxSize]
+//				: multiThreadProbs[multiThreadProbs.length - 1];
+//
+//		final boolean multiThread = Math.random() < multiThreadProb;
+//
+//		long t = System.nanoTime();
+//		if (multiThread) {
+//		scores = multiThreaded(slotFiller, otherSlotFiller, maxSize);
+//	}else {
+		scores = singleThreaded(slotFiller, otherSlotFiller, maxSize);
+//		}
+//		double newTime = System.nanoTime() - t;
+//		updateProbs(maxSize, multiThread, meanComputationTime > newTime);
+//		meanComputationTime += newTime;
+//		meanComputationTime /= 2;
 
 		return scores;
 	}

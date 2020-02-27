@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 
 public class BeamSearchEvaluator extends AbstractEvaluator {
@@ -40,7 +41,7 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 
 	@Override
 	public Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
-			Collection<? extends AbstractAnnotation> otherAnnotations) {
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoretype) {
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
 		/*

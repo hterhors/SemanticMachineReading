@@ -26,6 +26,7 @@ import de.hterhors.semanticmr.crf.sampling.stopcrit.ISamplingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.ITrainingStoppingCriterion;
 import de.hterhors.semanticmr.crf.sampling.stopcrit.impl.ConverganceCrit;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
@@ -75,7 +76,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 	private CRFStatistics testStatistics;
 
-	private IObjectiveFunction coverageObjectiveFunction = new SlotFillingObjectiveFunction(
+	private IObjectiveFunction coverageObjectiveFunction = new SlotFillingObjectiveFunction(EScoreType.MICRO,
 			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE, EEvaluationDetail.DOCUMENT_LINKED));
 
 	public SemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
@@ -177,7 +178,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 //									INTERMEDIATE_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + ++instanceIndex + "/"
 //											+ trainingInstances.size() + "]" + "[" + (samplingStep + 1) + "]",
 //									instance, currentState);
-						
+
 						}
 
 						producedStateChain.add(currentState);
@@ -648,7 +649,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 				log.info(
 						finalState.getKey().getName().substring(0, Math.min(finalState.getKey().getName().length(), 10))
 								+ "... \t" + SCORE_FORMAT.format(finalState.getValue().getObjectiveScore()));
-			meanTrainOFScore.add(finalState.getValue().getScore());
+			meanTrainOFScore.add(finalState.getValue().getMicroScore());
 		}
 
 		return meanTrainOFScore;

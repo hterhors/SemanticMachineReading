@@ -2,7 +2,6 @@ package de.hterhors.semanticmr.crf.sampling.stopcrit;
 
 import java.util.List;
 
-import de.hterhors.semanticmr.crf.StatePair;
 import de.hterhors.semanticmr.crf.variables.State;
 
 /**

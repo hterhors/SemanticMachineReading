@@ -9,9 +9,9 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.hterhors.semanticmr.corpus.JsonCorpus;
 import de.hterhors.semanticmr.corpus.EInstanceContext;
 import de.hterhors.semanticmr.corpus.InstanceProvider;
+import de.hterhors.semanticmr.corpus.JsonCorpus;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.ShuffleCorpusDistributor;

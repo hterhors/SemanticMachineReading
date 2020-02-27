@@ -1,8 +1,8 @@
 package de.hterhors.semanticmr.crf.structure.annotations;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IDeepCopyable;

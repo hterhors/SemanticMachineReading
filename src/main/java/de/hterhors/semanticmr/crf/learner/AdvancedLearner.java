@@ -6,7 +6,6 @@ import java.util.Map;
 
 import de.hterhors.semanticmr.crf.learner.optimizer.Optimizer;
 import de.hterhors.semanticmr.crf.learner.regularizer.Regularizer;
-import de.hterhors.semanticmr.crf.model.AbstractFactorScope;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.State;

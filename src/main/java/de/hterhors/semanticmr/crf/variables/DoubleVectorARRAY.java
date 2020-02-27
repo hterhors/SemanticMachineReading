@@ -1,8 +1,6 @@
 package de.hterhors.semanticmr.crf.variables;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import de.hterhors.semanticmr.crf.model.Model;
 
