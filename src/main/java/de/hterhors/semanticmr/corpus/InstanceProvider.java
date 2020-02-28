@@ -20,6 +20,7 @@ import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
+import de.hterhors.semanticmr.crf.variables.Instance.DuplicationRule;
 import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.exce.DuplicateDocumentException;
@@ -100,7 +101,21 @@ public class InstanceProvider {
 	 * @param jsonInstancesDirectory the data set directory.
 	 */
 	public InstanceProvider(final File jsonInstancesDirectory, Collection<GoldModificationRule> modifyGoldRules) {
-		this(jsonInstancesDirectory, null, Integer.MAX_VALUE, modifyGoldRules);
+		this(jsonInstancesDirectory, null, Integer.MAX_VALUE, modifyGoldRules, (a, b) -> false);
+	}
+
+	/**
+	 * Reads all .json files from the given directory.
+	 * 
+	 * Applies the distributor to the original data set.
+	 * 
+	 * 
+	 * @param jsonInstancesDirectory the data set directory.
+	 * @param distributor            the distributor.
+	 */
+	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
+			Collection<GoldModificationRule> modifyGoldRules, DuplicationRule duplicationRule) {
+		this(jsonInstancesDirectory, distributor, Integer.MAX_VALUE, modifyGoldRules, duplicationRule);
 	}
 
 	/**
@@ -114,7 +129,7 @@ public class InstanceProvider {
 	 */
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
 			Collection<GoldModificationRule> modifyGoldRules) {
-		this(jsonInstancesDirectory, distributor, Integer.MAX_VALUE, modifyGoldRules);
+		this(jsonInstancesDirectory, distributor, Integer.MAX_VALUE, modifyGoldRules, (a, b) -> false);
 	}
 
 	/**
@@ -126,7 +141,7 @@ public class InstanceProvider {
 	public InstanceProvider(final File jsonInstancesDirectory, final int numToRead,
 			Collection<GoldModificationRule> modifyGoldRules) {
 		this(jsonInstancesDirectory, new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build(),
-				numToRead, modifyGoldRules);
+				numToRead, modifyGoldRules, (a, b) -> false);
 	}
 
 	/**
@@ -135,7 +150,7 @@ public class InstanceProvider {
 	 * @param jsonInstancesDirectory the data set directory.
 	 */
 	public InstanceProvider(final File jsonInstancesDirectory) {
-		this(jsonInstancesDirectory, null, Integer.MAX_VALUE, Collections.emptySet());
+		this(jsonInstancesDirectory, null, Integer.MAX_VALUE, Collections.emptySet(), (a, b) -> false);
 	}
 
 	/**
@@ -148,7 +163,7 @@ public class InstanceProvider {
 	 * @param distributor            the distributor.
 	 */
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor) {
-		this(jsonInstancesDirectory, distributor, Integer.MAX_VALUE, Collections.emptySet());
+		this(jsonInstancesDirectory, distributor, Integer.MAX_VALUE, Collections.emptySet(), (a, b) -> false);
 	}
 
 	/**
@@ -159,7 +174,7 @@ public class InstanceProvider {
 	 */
 	public InstanceProvider(final File jsonInstancesDirectory, final int numToRead) {
 		this(jsonInstancesDirectory, new OriginalCorpusDistributor.Builder().setCorpusSizeFraction(1F).build(),
-				numToRead, Collections.emptySet());
+				numToRead, Collections.emptySet(), (a, b) -> false);
 	}
 
 	private <T> Set<T> findDuplicates(Collection<T> collection) {
@@ -168,7 +183,7 @@ public class InstanceProvider {
 	}
 
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
-			final int numToRead, Collection<GoldModificationRule> modifyGoldRules) {
+			final int numToRead, Collection<GoldModificationRule> modifyGoldRules, DuplicationRule duplicationRule) {
 		try {
 			this.jsonInstancesDirectory = jsonInstancesDirectory;
 
@@ -176,8 +191,8 @@ public class InstanceProvider {
 
 			this.validateFiles();
 
-			List<Instance> instancesToRedistribute = new JsonInstanceReader(jsonInstancesDirectory, modifyGoldRules)
-					.readInstances(numToRead);
+			List<Instance> instancesToRedistribute = new JsonInstanceReader(jsonInstancesDirectory, modifyGoldRules,
+					duplicationRule).readInstances(numToRead);
 
 			checkInstancesForDuplicats(instancesToRedistribute);
 

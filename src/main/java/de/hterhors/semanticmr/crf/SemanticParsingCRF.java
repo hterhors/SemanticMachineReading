@@ -162,7 +162,6 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 						}
 						final State candidateState = sampler.sampleCandidate(proposalStates);
 
-//						proposalStates.clear();
 
 						scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
 

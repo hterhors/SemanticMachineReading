@@ -35,7 +35,8 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 	private static final String EOF = "EOF";
 	private static final String PREFIX = "NGTCT\t";
 
-	class NGramTokenContextScope extends AbstractFactorScope {
+
+	static class NGramTokenContextScope extends AbstractFactorScope {
 
 		public final Instance instance;
 
@@ -58,7 +59,6 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 		public int hashCode() {
 			final int prime = 31;
 			int result = super.hashCode();
-			result = prime * result + getOuterType().hashCode();
 			result = prime * result + endOffset;
 			result = prime * result + ((entityType == null) ? 0 : entityType.hashCode());
 			result = prime * result + ((instance == null) ? 0 : instance.hashCode());
@@ -75,8 +75,6 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 			if (getClass() != obj.getClass())
 				return false;
 			NGramTokenContextScope other = (NGramTokenContextScope) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
 			if (endOffset != other.endOffset)
 				return false;
 			if (entityType == null) {
@@ -102,10 +100,6 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 		@Override
 		public boolean implementEquals(Object obj) {
 			return equals(obj);
-		}
-
-		private NGramTokenContextTemplate getOuterType() {
-			return NGramTokenContextTemplate.this;
 		}
 
 	}

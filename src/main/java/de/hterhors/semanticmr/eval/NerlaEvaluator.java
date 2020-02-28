@@ -30,7 +30,7 @@ public class NerlaEvaluator extends AbstractEvaluator {
 		int fn = 0;
 		outer: for (AbstractAnnotation a : annotations) {
 			for (AbstractAnnotation oa : otherAnnotations) {
-				if (oa.evaluate(this, a).getF1() == 1.0) {
+				if (oa.evaluateEquals(this, a)) {
 					tp++;
 					continue outer;
 				}
@@ -41,7 +41,7 @@ public class NerlaEvaluator extends AbstractEvaluator {
 
 		outer: for (AbstractAnnotation a : otherAnnotations) {
 			for (AbstractAnnotation oa : annotations) {
-				if (oa.evaluate(this, a).getF1() == 1.0) {
+				if (oa.evaluateEquals(this, a)) {
 					continue outer;
 				}
 			}
@@ -60,7 +60,11 @@ public class NerlaEvaluator extends AbstractEvaluator {
 	@Override
 	protected Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoretype) {
-		return prf1(annotations, otherAnnotations);
+		Score score = prf1(annotations, otherAnnotations);
+
+		if (scoretype == EScoreType.MACRO)
+			score.toMacro();
+		return score;
 	}
 
 }

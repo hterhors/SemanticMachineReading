@@ -224,7 +224,8 @@ public class Model {
 		factors.parallelStream().forEach(factor -> {
 			factor.getFactorScope().template.generateFeatureVector(factor);
 		});
-
+		
+		
 		for (Factor<?> factor : factors) {
 			if (!factor.getFactorScope().template.enableFactorCaching)
 				continue;

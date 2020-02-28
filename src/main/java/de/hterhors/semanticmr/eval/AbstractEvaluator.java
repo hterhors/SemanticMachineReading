@@ -26,8 +26,14 @@ public abstract class AbstractEvaluator {
 		this.evaluationDetail = evaluationDetail;
 	}
 
+	/**
+	 * Is always computed for MICRO !
+	 * 
+	 * @param val
+	 * @param otherVal
+	 * @return
+	 */
 	public Score scoreSingle(final AbstractAnnotation val, final AbstractAnnotation otherVal) {
-
 		Score score;
 //		Map<AbstractAnnotation, Score> map;
 //		if ((map = cache.get(val)) != null) {
@@ -64,12 +70,9 @@ public abstract class AbstractEvaluator {
 			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType);
 
 	public Score scoreMultiValues(Collection<? extends AbstractAnnotation> annotations,
-			Collection<? extends AbstractAnnotation> otherAnnotations) {
-		return scoreMax(annotations, otherAnnotations, EScoreType.MICRO);
-	}
-
-	public Score scoreMultiValues(Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
+		if (annotations.isEmpty() && otherAnnotations.isEmpty())
+			return Score.getZero(scoreType);
 		return scoreMax(annotations, otherAnnotations, scoreType);
 	}
 

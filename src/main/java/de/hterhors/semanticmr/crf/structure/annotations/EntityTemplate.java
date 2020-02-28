@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
@@ -417,7 +418,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 		final Score score = new Score();
 		for (SlotType singleSlotType : getSingleFillerSlotTypes()) {
 
-			if (singleSlotType.isExcluded() || singleSlotType.isFrozen())
+			if (singleSlotType.isExcluded())
 				continue;
 
 			final SingleFillerSlot otherSingleSlotFiller;
@@ -450,7 +451,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 		for (SlotType multiSlotType : getMultiFillerSlotTypes()) {
 
-			if (multiSlotType.isExcluded() || multiSlotType.isFrozen())
+			if (multiSlotType.isExcluded())
 				continue;
 
 			final Set<AbstractAnnotation> otherSlotFiller;
@@ -472,7 +473,7 @@ final public class EntityTemplate extends AbstractAnnotation {
 
 			}
 
-			final Score bestScore = evaluator.scoreMultiValues(slotFiller, otherSlotFiller);
+			final Score bestScore = evaluator.scoreMultiValues(slotFiller, otherSlotFiller, EScoreType.MICRO);
 
 			score.add(bestScore);
 			if (checkEquals)

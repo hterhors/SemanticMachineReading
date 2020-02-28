@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.variables.Instance;
+import de.hterhors.semanticmr.crf.variables.Instance.DuplicationRule;
 import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.json.converter.JsonInstanceWrapperToInstance;
 import de.hterhors.semanticmr.json.wrapper.JsonInstanceWrapper;
@@ -21,11 +22,14 @@ public class JsonInstanceReader {
 	private static Logger log = LogManager.getFormatterLogger(JsonInstanceReader.class);
 
 	private final File corpusDirectory;
-	
-final private 	Collection<GoldModificationRule> modifyGoldRules;
-	public JsonInstanceReader(final File corpusDirectory, Collection<GoldModificationRule> modifyGoldRules) {
+
+	final private Collection<GoldModificationRule> modifyGoldRules;
+final private DuplicationRule duplicationRule;
+	public JsonInstanceReader(final File corpusDirectory, Collection<GoldModificationRule> modifyGoldRules,
+			DuplicationRule duplicationRule) {
 		this.corpusDirectory = corpusDirectory;
 		this.modifyGoldRules = modifyGoldRules;
+		this.duplicationRule = duplicationRule;
 	}
 
 	public List<Instance> readInstances(final int numToRead) throws IOException {
@@ -53,7 +57,8 @@ final private 	Collection<GoldModificationRule> modifyGoldRules;
 				log.debug(" - " + count + " - ");
 			}
 			List<JsonInstanceWrapper> jsonInstances = new JsonInstanceIO(true).readInstances(jsonFile);
-			trainingInstances.addAll(new JsonInstanceWrapperToInstance(jsonInstances).convertToInstances(modifyGoldRules));
+			trainingInstances.addAll(new JsonInstanceWrapperToInstance(jsonInstances)
+					.convertToInstances(modifyGoldRules, duplicationRule));
 		}
 		log.info("Read instances... done");
 		return trainingInstances;

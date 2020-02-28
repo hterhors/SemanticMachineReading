@@ -13,14 +13,13 @@ import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
+import de.hterhors.semanticmr.crf.variables.Instance.DuplicationRule;
 import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 public class Annotations {
-
-	public static boolean REMOVE_DUPLICATES = false;
 
 	private List<AbstractAnnotation> annotations;
 
@@ -48,12 +47,13 @@ public class Annotations {
 		}
 	}
 
-	public Annotations(Annotations goldAnnotations, Collection<GoldModificationRule> modifyRules) {
-		this(applyModifications(goldAnnotations, modifyRules));
+	public Annotations(Annotations goldAnnotations, Collection<GoldModificationRule> modifyRules,
+			DuplicationRule duplicationRule) {
+		this(applyModifications(goldAnnotations, modifyRules, duplicationRule));
 	}
 
 	private static List<AbstractAnnotation> applyModifications(Annotations goldAnnotations,
-			Collection<GoldModificationRule> modifyRules) {
+			Collection<GoldModificationRule> modifyRules, DuplicationRule duplicationRule) {
 
 		final List<AbstractAnnotation> modifiedAnnotations = new ArrayList<>();
 		for (AbstractAnnotation goldAnnotation : goldAnnotations.getAbstractAnnotations()) {
@@ -69,22 +69,19 @@ public class Annotations {
 
 		l_1: for (AbstractAnnotation abstractAnnotation : modifiedAnnotations) {
 
-			if (REMOVE_DUPLICATES)
-				for (AbstractAnnotation abstractAnnotation2 : distinctAnnotations) {
+			for (AbstractAnnotation abstractAnnotation2 : distinctAnnotations) {
 
-					if (abstractAnnotation2.evaluate(evaluator, abstractAnnotation).getF1() == 1.0D) {
-						continue l_1;
-					}
-
+				if (duplicationRule.isDuplicate(abstractAnnotation, abstractAnnotation2)) {
+					continue l_1;
 				}
+
+			}
 
 			distinctAnnotations.add(abstractAnnotation);
 		}
 
 		return distinctAnnotations;
 	}
-
-	public final static CartesianEvaluator evaluator = new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE);
 
 	public Annotations unmodifiable() {
 		annotations = Collections.unmodifiableList(annotations);
@@ -105,7 +102,7 @@ public class Annotations {
 		Score score;
 
 		if (!(otherVal instanceof Annotations)) {
-			score = Score.ZERO;
+			score = Score.ZERO_MICRO;
 		} else {
 			final Annotations otherAnnotations = (Annotations) otherVal;
 
@@ -114,8 +111,7 @@ public class Annotations {
 			else
 				score = evaluator.scoreMultiValues(this.annotations, otherAnnotations.annotations, scoreType);
 		}
-		
-		
+
 		if (scoreType == EScoreType.MACRO)
 			score.toMacro();
 

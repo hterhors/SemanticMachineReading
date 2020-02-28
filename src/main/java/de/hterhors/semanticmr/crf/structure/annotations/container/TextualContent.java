@@ -76,7 +76,7 @@ public class TextualContent {
 
 	private boolean normalizedIsDifferent() {
 		if (isNormalized == null)
-			isNormalized = new Boolean(normalizedSurfaceForm != this.surfaceForm);
+			isNormalized = new Boolean(!normalizedSurfaceForm.equals(this.surfaceForm));
 		return isNormalized.booleanValue();
 	}
 

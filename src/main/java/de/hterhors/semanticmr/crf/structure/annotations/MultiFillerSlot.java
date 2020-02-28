@@ -34,6 +34,10 @@ public class MultiFillerSlot extends AbstractSlot {
 		return Collections.unmodifiableSet(slotFiller);
 	}
 
+	public <E> Set<E> getAutoCastSlotFiller() {
+		return (Set<E>) Collections.unmodifiableSet(slotFiller);
+	}
+
 	public int getMaxExplorationCapacity() {
 		return slotType.slotMaxCapacity;
 	}

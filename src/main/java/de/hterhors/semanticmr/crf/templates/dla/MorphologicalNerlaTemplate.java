@@ -18,6 +18,10 @@ import de.hterhors.semanticmr.crf.variables.State;
  */
 public class MorphologicalNerlaTemplate extends AbstractFeatureTemplate<MorphologicalNerlaScope> {
 
+	public MorphologicalNerlaTemplate() {
+		super(false);
+	}
+
 	static class MorphologicalNerlaScope extends AbstractFactorScope {
 
 		final public EntityType type;
@@ -98,8 +102,7 @@ public class MorphologicalNerlaTemplate extends AbstractFeatureTemplate<Morpholo
 			return;
 
 		factor.getFeatureVector().set("STARTS_WITH_CAPITAL", Character.isUpperCase(sf.charAt(0)));
-		factor.getFeatureVector().set("STARTS_WITH_CAPITAL_FOR_TYPE_" + type.name,
-				Character.isUpperCase(sf.charAt(0)));
+		factor.getFeatureVector().set("STARTS_WITH_CAPITAL_FOR_TYPE_" + type.name, Character.isUpperCase(sf.charAt(0)));
 
 	}
 

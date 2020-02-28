@@ -11,7 +11,7 @@ public interface IEvaluatable {
 
 		public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.000");
 
-		final public static Score ZERO = new Score().unmod();
+		final public static Score ZERO_MICRO = new Score().unmod();
 
 		final public static Score TP = new Score(1, 0, 0, 0).unmod();
 
@@ -21,14 +21,23 @@ public interface IEvaluatable {
 
 		final public static Score FP = new Score(0, 1, 0, 0).unmod();
 
+		final public static Score ZERO_MACRO = new Score(EScoreType.MACRO).unmod();
+
 		private int tp = 0;
 		private int fp = 0;
 		private int fn = 0;
 		private int tn = 0;
 
-		private int macroAddCounter = 0;
+		private int macroAddCounter;
 
 		private EScoreType type;
+
+		public static Score getZero(EScoreType scoreType) {
+			if (scoreType == EScoreType.MICRO)
+				return ZERO_MICRO;
+			else
+				return ZERO_MACRO;
+		}
 
 		public Score() {
 			this.type = EScoreType.MICRO;
@@ -59,6 +68,9 @@ public interface IEvaluatable {
 		public Score toMacro() {
 			if (isMacro())
 				return this;
+
+			if (this == ZERO_MICRO)
+				return ZERO_MACRO;
 
 			this.macroF1 = getF1();
 			this.macroPrecision = getPrecision();
@@ -96,12 +108,22 @@ public interface IEvaluatable {
 		 * @param recall
 		 * @param f1
 		 */
-		public Score(double precision, double recall, double f1) {
+		public Score(double f1, double precision, double recall) {
 			this(EScoreType.MACRO);
+
+			this.macroAddCounter = 1;
 			this.macroPrecision = precision;
 			this.macroRecall = recall;
+			boolean match = f1 == getMacroF1();
 			this.macroF1 = f1;
-			this.macroAddCounter++;
+
+			if (!match)
+				throw new IllegalArgumentException("Precision and Recall does not match F1: " + toString());
+
+			if (f1 > 1 || precision > 1 || recall > 1)
+				throw new IllegalArgumentException(
+						"F1, Precision and Recall can not be larger than 1.0D, values: " + toString());
+
 		}
 
 		public Score(Score score) {
@@ -144,13 +166,17 @@ public interface IEvaluatable {
 			if (unmod)
 				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
 			if (this.isMacro() && adder.isMacro()) {
+				if (adder == ZERO_MACRO)
+					return;
 				this.macroPrecision += adder.macroPrecision;
 				this.macroRecall += adder.macroRecall;
-				this.macroF1 += adder.macroF1;
+				this.macroF1 += getF1();
 
 				this.macroAddCounter += adder.macroAddCounter;
 
 			} else if (this.isMicro() && adder.isMicro()) {
+				if (adder == ZERO_MICRO)
+					return;
 				this.tp += adder.tp;
 				this.fp += adder.fp;
 				this.fn += adder.fn;
@@ -246,7 +272,10 @@ public interface IEvaluatable {
 		}
 
 		private double getMacroF1() {
-			return macroAddCounter == 0 ? 0D : (macroF1 / macroAddCounter);
+			final double p = getMacroPrecision();
+			final double r = getMacroRecall();
+			final double d = (p + r);
+			return d == 0 ? 0 : (2 * p * r) / d;
 		}
 
 		private double getMicroF1() {
@@ -296,7 +325,7 @@ public interface IEvaluatable {
 				/*
 				 * Invert is the same.
 				 */
-				if (this == FN_FP || this == ZERO)
+				if (this == FN_FP || this == ZERO_MICRO)
 					return this;
 
 				if (this == FN)

@@ -100,8 +100,7 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 					continue;
 
 				final String text = currentState.getInstance().getDocument().getContent(fromToken, toToken);
-if(text.equals("not differ significantly"))
-	System.out.println("IN");
+
 				for (EntityType entityType : currentState.getInstance().getEntityTypeCandidates(text)) {
 
 					try {

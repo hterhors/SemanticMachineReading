@@ -73,7 +73,7 @@ public class PurityInvPurityEvaluator extends AbstractEvaluator {
 	private static Score precision(Set<String> c1, Set<String> c2) {
 
 		if (c1.isEmpty() || c2.isEmpty())
-			return Score.ZERO;
+			return Score.ZERO_MICRO;
 
 		int count = 0;
 		for (String c1Term : c1) {
@@ -144,10 +144,10 @@ public class PurityInvPurityEvaluator extends AbstractEvaluator {
 
 		Score r = recall(c1, c2);
 		if (r.getPurity() == 0)
-			return Score.ZERO;
+			return Score.ZERO_MICRO;
 		Score p = precision(c1, c2);
 		if (p.getPurity() == 0)
-			return Score.ZERO;
+			return Score.ZERO_MICRO;
 
 		Score f = new Score();
 		f.add(r);

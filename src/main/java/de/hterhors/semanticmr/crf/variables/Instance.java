@@ -98,17 +98,21 @@ public class Instance implements Comparable<Instance> {
 	private EInstanceContext redistributedContext = EInstanceContext.UNSPECIFIED;
 
 	public static interface GoldModificationRule {
-		public AbstractAnnotation modify(AbstractAnnotation goldAnnotation);
+		public AbstractAnnotation modify(AbstractAnnotation currentAnnotation);
+	}
+
+	public static interface DuplicationRule {
+		public boolean isDuplicate(AbstractAnnotation annotation1, AbstractAnnotation annotation2);
 	}
 
 	public Instance(EInstanceContext context, Document document, Annotations goldAnnotations,
-			Collection<GoldModificationRule> modifyRules) {
+			Collection<GoldModificationRule> modifyRules, DuplicationRule duplicationRule) {
 
 		this.originalContext = context == null ? EInstanceContext.UNSPECIFIED : context;
 
 		this.document = document;
 
-		this.groundTruth = new Annotations(goldAnnotations, modifyRules).unmodifiable();
+		this.groundTruth = new Annotations(goldAnnotations, modifyRules, duplicationRule).unmodifiable();
 
 		for (AbstractAnnotation a : this.groundTruth.getAnnotations()) {
 			if (a instanceof DocumentLinkedAnnotation) {
@@ -120,7 +124,7 @@ public class Instance implements Comparable<Instance> {
 	}
 
 	public Instance(EInstanceContext context, Document document, Annotations goldAnnotations) {
-		this(context, document, goldAnnotations, Collections.emptySet());
+		this(context, document, goldAnnotations, Collections.emptySet(), (a1, a2) -> false);
 	}
 
 	public String getName() {
@@ -145,7 +149,7 @@ public class Instance implements Comparable<Instance> {
 				+ (redistributedContext != EInstanceContext.UNSPECIFIED
 						? ", redistributedContext=" + redistributedContext
 						: "")
-				+ ", document=" + document ;//+ ", goldAnnotations=" + groundTruth + "]";
+				+ ", document=" + document;// + ", goldAnnotations=" + groundTruth + "]";
 	}
 
 	@Override
