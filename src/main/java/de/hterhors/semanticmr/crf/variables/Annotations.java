@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.omg.CORBA.CurrentHolder;
+
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
@@ -16,14 +18,18 @@ import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation
 import de.hterhors.semanticmr.crf.variables.Instance.DuplicationRule;
 import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
-import de.hterhors.semanticmr.eval.CartesianEvaluator;
-import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 public class Annotations {
 
 	private List<AbstractAnnotation> annotations;
 
 	private Set<DocumentToken> tokensWithAnnotations = new HashSet<>();
+
+	/**
+	 * The new annotation that was added from the previous state.
+	 */
+	private AbstractAnnotation newAddAnnotation;
+	private AbstractAnnotation newRemoveAnnotation;
 
 	public Annotations() {
 		this(Collections.emptyList());
@@ -97,23 +103,55 @@ public class Annotations {
 		return annotations;
 	}
 
+	private Score prevScore = new Score();
+
 	public Score evaluate(AbstractEvaluator evaluator, Annotations otherVal, EScoreType scoreType) {
 
-		Score score;
+		/**
+		 * Speed up evaluation for NER. Only compare the change to the previous state
+		 * with gold and comnbine prev score with the change.
+		 */
+		Score score = Score.getZero(scoreType);
 
 		if (!(otherVal instanceof Annotations)) {
-			score = Score.ZERO_MICRO;
+			score = Score.getZero(scoreType);
 		} else {
-			final Annotations otherAnnotations = (Annotations) otherVal;
-
-			if (this.annotations.size() == 1 && otherAnnotations.annotations.size() == 1)
-				score = evaluator.scoreSingle(this.annotations.get(0), otherAnnotations.annotations.get(0));
-			else
-				score = evaluator.scoreMultiValues(this.annotations, otherAnnotations.annotations, scoreType);
+			if (this.annotations.size() == 1 && otherVal.annotations.size() == 1)
+				score = evaluator.scoreSingle(this.annotations.get(0), otherVal.annotations.get(0));
+			else {
+//				if (scoreType == EScoreType.MICRO && (otherVal.newAddAnnotation != null || otherVal.newRemoveAnnotation != null)) {
+//					if (otherVal.newAddAnnotation != null) {
+//						Score partiallyScore = evaluator.scoreMultiValues(this.annotations,
+//								Arrays.asList(otherVal.newAddAnnotation), scoreType);
+//						/**
+//						 * Fn is here always 0. If a correct annotation is added its tp if a false
+//						 * annotation is added its fp.
+//						 */
+//						score = new Score(this.prevScore.getTp() + partiallyScore.getTp(),
+//								this.prevScore.getFp() + partiallyScore.getFp(), this.prevScore.getFn());
+//						otherVal.newAddAnnotation = null;
+//					}
+//					if (otherVal.newRemoveAnnotation != null) {
+//						Score partiallyScore = evaluator.scoreMultiValues(this.annotations,
+//								Arrays.asList(otherVal.newRemoveAnnotation), scoreType);
+//						/**
+//						 * Fp is here always 0. If a correct annotation was removed its fn if a false
+//						 * annotation was removed its -1 tp.
+//						 */
+//						score = new Score(this.prevScore.getTp() - partiallyScore.getTp(), this.prevScore.getFp(),
+//								this.prevScore.getFn() + partiallyScore.getFn());
+//						otherVal.newRemoveAnnotation = null;
+//					}
+//				} else {
+					score = evaluator.scoreMultiValues(this.annotations, otherVal.annotations, scoreType);
+//				}
+			}
 		}
 
 		if (scoreType == EScoreType.MACRO)
 			score.toMacro();
+		else
+			this.prevScore = score;
 
 		return score;
 	}
@@ -130,20 +168,32 @@ public class Annotations {
 			updatedList.add(annotations.get(index).deepCopy());
 		}
 
-		return new Annotations(updatedList);
+		final Annotations newAnnotations = new Annotations(updatedList);
+
+		if (newCurrentPrediction.isInstanceOfEntityTypeAnnotation()) {
+			newAnnotations.newRemoveAnnotation = annotations.get(annotationIndex);
+			newAnnotations.newAddAnnotation = newCurrentPrediction;
+		}
+
+		return newAnnotations;
 	}
 
-	public Annotations deepRemoveCopy(int annotationIndex) {
+	public Annotations deepRemoveCopy(int removeAnnotationIndex) {
 		final List<AbstractAnnotation> updatedList = new ArrayList<>(annotations.size());
 		for (int index = 0; index < annotations.size(); index++) {
 
-			if (index == annotationIndex)
+			if (index == removeAnnotationIndex)
 				continue;
 
 			updatedList.add(annotations.get(index).deepCopy());
 		}
 
-		return new Annotations(updatedList);
+		Annotations newAnnotations = new Annotations(updatedList);
+
+		if (annotations.get(removeAnnotationIndex).isInstanceOfEntityTypeAnnotation())
+			newAnnotations.newRemoveAnnotation = annotations.get(removeAnnotationIndex);
+
+		return newAnnotations;
 	}
 
 	public Annotations deepAddCopy(AbstractAnnotation newCurrentPrediction) {
@@ -154,7 +204,12 @@ public class Annotations {
 		}
 		updatedList.add(newCurrentPrediction);
 
-		return new Annotations(updatedList);
+		Annotations newAnnotations = new Annotations(updatedList);
+
+		if (newCurrentPrediction.isInstanceOfEntityTypeAnnotation())
+			newAnnotations.newAddAnnotation = newCurrentPrediction;
+
+		return newAnnotations;
 	}
 
 	public Annotations deepCopy() {
@@ -164,7 +219,10 @@ public class Annotations {
 			deepCopyList.add(annotations.get(index).deepCopy());
 		}
 
-		return new Annotations(deepCopyList);
+		Annotations annotations = new Annotations(deepCopyList);
+		annotations.newAddAnnotation = this.newAddAnnotation;
+		annotations.newRemoveAnnotation = this.newRemoveAnnotation;
+		return annotations;
 	}
 
 	@Override
@@ -188,6 +246,9 @@ public class Annotations {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((annotations == null) ? 0 : annotations.hashCode());
+		result = prime * result + ((newAddAnnotation == null) ? 0 : newAddAnnotation.hashCode());
+		result = prime * result + ((newRemoveAnnotation == null) ? 0 : newRemoveAnnotation.hashCode());
+		result = prime * result + ((prevScore == null) ? 0 : prevScore.hashCode());
 		result = prime * result + ((tokensWithAnnotations == null) ? 0 : tokensWithAnnotations.hashCode());
 		return result;
 	}
@@ -205,6 +266,21 @@ public class Annotations {
 			if (other.annotations != null)
 				return false;
 		} else if (!annotations.equals(other.annotations))
+			return false;
+		if (newAddAnnotation == null) {
+			if (other.newAddAnnotation != null)
+				return false;
+		} else if (!newAddAnnotation.equals(other.newAddAnnotation))
+			return false;
+		if (newRemoveAnnotation == null) {
+			if (other.newRemoveAnnotation != null)
+				return false;
+		} else if (!newRemoveAnnotation.equals(other.newRemoveAnnotation))
+			return false;
+		if (prevScore == null) {
+			if (other.prevScore != null)
+				return false;
+		} else if (!prevScore.equals(other.prevScore))
 			return false;
 		if (tokensWithAnnotations == null) {
 			if (other.tokensWithAnnotations != null)

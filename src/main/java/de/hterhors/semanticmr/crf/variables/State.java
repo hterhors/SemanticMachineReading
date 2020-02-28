@@ -122,7 +122,7 @@ public class State {
 
 	public State score(AbstractEvaluator evaluator) {
 		this.microScore = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions, EScoreType.MICRO);
-		this.macroScore = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions, EScoreType.MACRO);
+//		this.macroScore = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions, EScoreType.MACRO);
 		return this;
 	}
 
