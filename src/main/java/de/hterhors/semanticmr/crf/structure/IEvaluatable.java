@@ -39,12 +39,12 @@ public interface IEvaluatable {
 				return ZERO_MACRO;
 		}
 
-		public Score() {
-			this.type = EScoreType.MICRO;
-		}
-
 		public Score(EScoreType type) {
 			this.type = type;
+		}
+
+		public Score() {
+			this(EScoreType.MICRO);
 		}
 
 		private boolean unmod = false;
@@ -127,6 +127,7 @@ public interface IEvaluatable {
 		}
 
 		public Score(Score score) {
+			this();
 			if (score.isMacro()) {
 				toMacro();
 			}

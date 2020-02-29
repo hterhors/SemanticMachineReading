@@ -119,39 +119,47 @@ public class Annotations {
 			if (this.annotations.size() == 1 && otherVal.annotations.size() == 1)
 				score = evaluator.scoreSingle(this.annotations.get(0), otherVal.annotations.get(0));
 			else {
-//				if (scoreType == EScoreType.MICRO && (otherVal.newAddAnnotation != null || otherVal.newRemoveAnnotation != null)) {
-//					if (otherVal.newAddAnnotation != null) {
-//						Score partiallyScore = evaluator.scoreMultiValues(this.annotations,
-//								Arrays.asList(otherVal.newAddAnnotation), scoreType);
-//						/**
-//						 * Fn is here always 0. If a correct annotation is added its tp if a false
-//						 * annotation is added its fp.
-//						 */
-//						score = new Score(this.prevScore.getTp() + partiallyScore.getTp(),
-//								this.prevScore.getFp() + partiallyScore.getFp(), this.prevScore.getFn());
-//						otherVal.newAddAnnotation = null;
-//					}
-//					if (otherVal.newRemoveAnnotation != null) {
-//						Score partiallyScore = evaluator.scoreMultiValues(this.annotations,
-//								Arrays.asList(otherVal.newRemoveAnnotation), scoreType);
-//						/**
-//						 * Fp is here always 0. If a correct annotation was removed its fn if a false
-//						 * annotation was removed its -1 tp.
-//						 */
-//						score = new Score(this.prevScore.getTp() - partiallyScore.getTp(), this.prevScore.getFp(),
-//								this.prevScore.getFn() + partiallyScore.getFn());
-//						otherVal.newRemoveAnnotation = null;
-//					}
-//				} else {
+				if (scoreType == EScoreType.MICRO
+						&& (otherVal.newAddAnnotation != null || otherVal.newRemoveAnnotation != null)) {
+					Score tmp = new Score();
+					if (otherVal.newAddAnnotation != null) {
+						Score partiallyScore = evaluator.scoreMultiValues(this.annotations,
+								Arrays.asList(otherVal.newAddAnnotation), scoreType);
+
+						/**
+						 * if it was added correct add +1 tp and -1 fn
+						 * 
+						 * if it was added wrong +1 fp 
+						 * 
+						 */
+						tmp.add(new Score(otherVal.prevScore.getTp() + partiallyScore.getTp(),
+								otherVal.prevScore.getFp() + partiallyScore.getFp(),
+								otherVal.prevScore.getFn() - partiallyScore.getTp()));
+						otherVal.newAddAnnotation = null;
+					}
+					if (otherVal.newRemoveAnnotation != null) {
+						Score partiallyScore = evaluator.scoreMultiValues(this.annotations,
+								Arrays.asList(otherVal.newRemoveAnnotation), scoreType);
+						/**
+						 * if a correct was removed -1 tp and + fn
+						 * 
+						 * if a wrong was removed -1 fp
+						 */
+						tmp.add(new Score(otherVal.prevScore.getTp() - partiallyScore.getTp(),
+								otherVal.prevScore.getFp() - partiallyScore.getFp(), otherVal.prevScore.getFn() + partiallyScore.getTp()));
+						otherVal.newRemoveAnnotation = null;
+					}
+					score = tmp;
+				} else {
 					score = evaluator.scoreMultiValues(this.annotations, otherVal.annotations, scoreType);
-//				}
+				}
 			}
 		}
 
 		if (scoreType == EScoreType.MACRO)
 			score.toMacro();
 		else
-			this.prevScore = score;
+			otherVal.prevScore = score;
 
 		return score;
 	}
@@ -173,6 +181,7 @@ public class Annotations {
 		if (newCurrentPrediction.isInstanceOfEntityTypeAnnotation()) {
 			newAnnotations.newRemoveAnnotation = annotations.get(annotationIndex);
 			newAnnotations.newAddAnnotation = newCurrentPrediction;
+			newAnnotations.prevScore = new Score(this.prevScore);
 		}
 
 		return newAnnotations;
@@ -190,9 +199,10 @@ public class Annotations {
 
 		Annotations newAnnotations = new Annotations(updatedList);
 
-		if (annotations.get(removeAnnotationIndex).isInstanceOfEntityTypeAnnotation())
+		if (annotations.get(removeAnnotationIndex).isInstanceOfEntityTypeAnnotation()) {
+			newAnnotations.prevScore = new Score(this.prevScore);
 			newAnnotations.newRemoveAnnotation = annotations.get(removeAnnotationIndex);
-
+		}
 		return newAnnotations;
 	}
 
@@ -206,9 +216,10 @@ public class Annotations {
 
 		Annotations newAnnotations = new Annotations(updatedList);
 
-		if (newCurrentPrediction.isInstanceOfEntityTypeAnnotation())
+		if (newCurrentPrediction.isInstanceOfEntityTypeAnnotation()) {
 			newAnnotations.newAddAnnotation = newCurrentPrediction;
-
+			newAnnotations.prevScore = new Score(this.prevScore);
+		}
 		return newAnnotations;
 	}
 
@@ -222,6 +233,7 @@ public class Annotations {
 		Annotations annotations = new Annotations(deepCopyList);
 		annotations.newAddAnnotation = this.newAddAnnotation;
 		annotations.newRemoveAnnotation = this.newRemoveAnnotation;
+		annotations.prevScore = new Score(this.prevScore);
 		return annotations;
 	}
 

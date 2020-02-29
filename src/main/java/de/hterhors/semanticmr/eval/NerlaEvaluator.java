@@ -25,9 +25,11 @@ public class NerlaEvaluator extends AbstractEvaluator {
 //		System.out.println(annotations);
 //		System.out.println("otherAnnotations.size(): " + otherAnnotations.size());
 //		System.out.println(otherAnnotations);
+
 		int tp = 0;
 		int fp = 0;
 		int fn = 0;
+
 		outer: for (AbstractAnnotation a : annotations) {
 			for (AbstractAnnotation oa : otherAnnotations) {
 				if (oa.evaluateEquals(this, a)) {
@@ -38,15 +40,17 @@ public class NerlaEvaluator extends AbstractEvaluator {
 
 			fn++;
 		}
+		
+		fp += otherAnnotations.size() - tp;
 
-		outer: for (AbstractAnnotation a : otherAnnotations) {
-			for (AbstractAnnotation oa : annotations) {
-				if (oa.evaluateEquals(this, a)) {
-					continue outer;
-				}
-			}
-			fp++;
-		}
+		// outer: for (AbstractAnnotation a : otherAnnotations) {
+//				for (AbstractAnnotation oa : annotations) {
+//					if (oa.evaluateEquals(this, a)) {
+//						continue outer;
+//					}
+//				}
+//				fp++;
+//			}
 //		System.out.println(new Score(tp, fp, fn));
 //		System.out.println();
 		return new Score(tp, fp, fn);

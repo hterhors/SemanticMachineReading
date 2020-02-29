@@ -152,6 +152,10 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 						final List<State> proposalStates = explorer.explore(currentState);
 
+//						for (State state : proposalStates) {
+//							System.out.println(state);
+//						}
+
 						if (proposalStates.isEmpty())
 							proposalStates.add(currentState);
 
@@ -160,8 +164,10 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 						} else {
 							model.score(proposalStates);
 						}
+//						for (State state : proposalStates) {
+//							System.out.println(state);
+//						}
 						final State candidateState = sampler.sampleCandidate(proposalStates);
-
 
 						scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
 
