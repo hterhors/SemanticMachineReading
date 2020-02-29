@@ -28,7 +28,9 @@ public class SlotFillingObjectiveFunction implements IObjectiveFunction {
 
 	@Override
 	public void score(State state) {
-		state.setObjectiveScore(state.score(evaluator).getScore(scoreType).getF1());
+		state.setObjectiveScore(state.score(evaluator, scoreType).getF1());
+		state.score(evaluator, EScoreType.MACRO);
+		state.score(evaluator, EScoreType.MICRO);
 	}
 
 	@Override

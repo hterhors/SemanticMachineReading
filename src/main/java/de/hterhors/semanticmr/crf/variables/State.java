@@ -120,17 +120,42 @@ public class State {
 		return instance.getGoldAnnotations();
 	}
 
-	public State score(AbstractEvaluator evaluator) {
-		this.microScore = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions, EScoreType.MICRO);
-//		this.macroScore = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions, EScoreType.MACRO);
-		return this;
+	private boolean isMicroScored = false;
+	private boolean isMacroScored = false;
+
+	public boolean isMacroScored() {
+		return isMacroScored;
+	}
+	
+	public boolean isMicroScored() {
+		return isMicroScored;
+	
+	}
+	public Score getMicroScore() {
+		if (!isMicroScored)
+			throw new IllegalStateException("State is not scored for micro score.");
+		return microScore;
 	}
 
-	public Score getMicroScore() {
+	public Score getMicroScore(AbstractEvaluator evaluator) {
+		if (!isMicroScored) {
+			this.microScore = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions, EScoreType.MICRO);
+			isMicroScored = true;
+		}
 		return microScore;
 	}
 
 	public Score getMacroScore() {
+		if (!isMacroScored)
+			throw new IllegalStateException("State is not scored for macro score.");
+		return macroScore;
+	}
+
+	public Score getMacroScore(AbstractEvaluator evaluator) {
+		if (!isMacroScored) {
+			this.macroScore = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions, EScoreType.MACRO);
+			isMacroScored = true;
+		}
 		return macroScore;
 	}
 
@@ -142,8 +167,8 @@ public class State {
 		return currentPredictions.containsAnnotationOnTokens(tokens);
 	}
 
-	public Score getScore(EScoreType scoreType) {
-		return scoreType == EScoreType.MICRO ? getMicroScore() : getMacroScore();
+	public Score score(AbstractEvaluator evaluator, EScoreType scoreType) {
+		return scoreType == EScoreType.MICRO ? getMicroScore(evaluator) : getMacroScore(evaluator);
 	}
 
 }

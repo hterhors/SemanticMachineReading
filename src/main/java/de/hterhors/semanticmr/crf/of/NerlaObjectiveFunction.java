@@ -21,7 +21,7 @@ public class NerlaObjectiveFunction implements IObjectiveFunction {
 
 	@Override
 	public void score(State state) {
-		state.setObjectiveScore(state.score(evaluator).getMicroScore().getF1());
+		state.setObjectiveScore(state.getMicroScore(evaluator).getF1());
 	}
 
 	@Override

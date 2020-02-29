@@ -29,8 +29,10 @@ public class LogUtils {
 			logger.info(ga.toPrettyString());
 		}
 		logger.info("}");
-		logger.info(currentState.getMicroScore());
-		logger.info(currentState.getMacroScore());
+		if (currentState.isMicroScored())
+			logger.info(currentState.getMicroScore());
+		if (currentState.isMacroScored())
+			logger.info(currentState.getMacroScore());
 		logger.info("***********************************************************");
 		logger.info("\n");
 	}
@@ -56,8 +58,10 @@ public class LogUtils {
 				logger.info(ga.toPrettyString());
 			}
 			logger.info("}");
-			logger.info(statePair.currentState.getMicroScore());
-			logger.info(statePair.currentState.getMacroScore());
+			if (statePair.currentState.isMicroScored())
+				logger.info(statePair.currentState.getMicroScore());
+			if (statePair.currentState.isMacroScored())
+				logger.info(statePair.currentState.getMacroScore());
 			logger.info("++++++++++++++++++++++++++++++++");
 		}
 		logger.info("***********************************************************");
