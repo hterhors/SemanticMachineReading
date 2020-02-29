@@ -49,6 +49,8 @@ public class State {
 		this.factorGraphs = value.factorGraphs;
 		this.modelScore = value.modelScore;
 		this.objectiveScore = value.objectiveScore;
+		this.microScore= value.microScore; 
+		this.macroScore= value.macroScore; 
 	}
 
 	public State deepAddCopy(AbstractAnnotation newCurrentPrediction) {
@@ -74,16 +76,6 @@ public class State {
 	public void addIfAbsentFactorGraph(final AbstractFeatureTemplate<?> template, final FactorGraph factorGraph) {
 		factorGraphs.put(template, factorGraph);
 	}
-
-//	public FactorGraph getFactorGraph(FactorPool factorPool, final AbstractFeatureTemplate<?> template) {
-//		FactorGraph fg;
-//		if ((fg = factorGraphs.get(template)) == null) {
-//			fg = new FactorGraph(factorPool, template);
-//			factorGraphs.put(template, fg);
-//		}
-//
-//		return fg;
-//	}
 
 	public FactorGraph getFactorGraph(final AbstractFeatureTemplate<?> template) {
 		return factorGraphs.get(template);
