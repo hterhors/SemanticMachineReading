@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.omg.CORBA.CurrentHolder;
-
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
@@ -109,7 +107,7 @@ public class Annotations {
 
 		/**
 		 * Speed up evaluation for NER. Only compare the change to the previous state
-		 * with gold and comnbine prev score with the change.
+		 * with gold and combine prev score with the change.
 		 */
 		Score score = Score.getZero(scoreType);
 
@@ -129,7 +127,7 @@ public class Annotations {
 						/**
 						 * if it was added correct add +1 tp and -1 fn
 						 * 
-						 * if it was added wrong +1 fp 
+						 * if it was added wrong +1 fp
 						 * 
 						 */
 						tmp.add(new Score(otherVal.prevScore.getTp() + partiallyScore.getTp(),
@@ -146,7 +144,8 @@ public class Annotations {
 						 * if a wrong was removed -1 fp
 						 */
 						tmp.add(new Score(otherVal.prevScore.getTp() - partiallyScore.getTp(),
-								otherVal.prevScore.getFp() - partiallyScore.getFp(), otherVal.prevScore.getFn() + partiallyScore.getTp()));
+								otherVal.prevScore.getFp() - partiallyScore.getFp(),
+								otherVal.prevScore.getFn() + partiallyScore.getTp()));
 						otherVal.newRemoveAnnotation = null;
 					}
 					score = tmp;

@@ -12,6 +12,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
+import de.hterhors.semanticmr.crf.templates.et.SlotIsFilledTemplate;
 import de.hterhors.semanticmr.crf.variables.State;
 
 /**
@@ -215,9 +216,16 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 		if (entityTemplate.getMultiFillerSlot(slotType).containsMaximumFiller())
 			return;
 
-		if (entityTemplate.getMultiFillerSlot(slotType).size() == Math.max(MAX_NUMBER_OF_ANNOTATIONS,
-				Math.min(slotType.slotMaxCapacity, 100)))
-			return;
+		/**
+		 * TODO: FIX the issue of cardinalities for different explorer.
+		 */
+		if (slotType.slotMaxCapacity < 100) {
+			if (entityTemplate.getMultiFillerSlot(slotType).size() == slotType.slotMaxCapacity)
+				return;
+		} else {
+			if (entityTemplate.getMultiFillerSlot(slotType).size() == MAX_NUMBER_OF_ANNOTATIONS)
+				return;
+		}
 
 		/*
 		 * Do no add itself

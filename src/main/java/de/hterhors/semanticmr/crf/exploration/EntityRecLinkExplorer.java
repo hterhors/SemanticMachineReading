@@ -1,7 +1,11 @@
 package de.hterhors.semanticmr.crf.exploration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +15,7 @@ import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
+import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.State;
 
 /**
@@ -25,6 +30,7 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 //	public EntityRecLinkExplorer(HardConstraintsProvider hardConstraintsProvder) {
 //		this.hardConstraintsProvider = hardConstraintsProvder;
 //	}
+	private final Map<CacheKey, Set<AbstractAnnotation>> cache = new HashMap<>();
 
 	public EntityRecLinkExplorer() {
 		this.hardConstraintsProvider = null;
@@ -99,22 +105,78 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 				else if (currentState.containsAnnotationOnTokens(fromToken, toToken))
 					continue;
 
-				final String text = currentState.getInstance().getDocument().getContent(fromToken, toToken);
+				final CacheKey key = new CacheKey(currentState.getInstance(), fromToken.getDocTokenIndex(),
+						toToken.getDocTokenIndex());
+				Set<AbstractAnnotation> annotations;
+				if ((annotations = cache.get(key)) == null) {
+					annotations = new HashSet<>();
+					final String text = currentState.getInstance().getDocument().getContent(fromToken, toToken);
 
-				for (EntityType entityType : currentState.getInstance().getEntityTypeCandidates(text)) {
+					for (EntityType entityType : currentState.getInstance().getEntityTypeCandidates(text)) {
 
-					try {
-						AbstractAnnotation newCurrentPrediction = AnnotationBuilder.toAnnotation(
-								currentState.getInstance().getDocument(), entityType, text,
-								fromToken.getDocCharOffset());
-						proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));
-					} catch (RuntimeException e) {
-						e.printStackTrace();
+						try {
+							AbstractAnnotation newCurrentPrediction = AnnotationBuilder.toAnnotation(
+									currentState.getInstance().getDocument(), entityType, text,
+									fromToken.getDocCharOffset());
+							annotations.add(newCurrentPrediction);
+							proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));
+						} catch (RuntimeException e) {
+							e.printStackTrace();
+						}
+
 					}
-
+					cache.put(key, annotations);
+				} else {
+					for (AbstractAnnotation newCurrentPrediction : annotations) {
+						proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));
+					}
 				}
 			}
 		}
+	}
+
+	static class CacheKey {
+		final Instance instance;
+		final int fromTokenOffset;
+		final int toTokenOffset;
+
+		public CacheKey(Instance instance, int fromTokenOffset, int toTokenOffset) {
+			this.instance = instance;
+			this.fromTokenOffset = fromTokenOffset;
+			this.toTokenOffset = toTokenOffset;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + fromTokenOffset;
+			result = prime * result + ((instance == null) ? 0 : instance.hashCode());
+			result = prime * result + toTokenOffset;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			CacheKey other = (CacheKey) obj;
+			if (fromTokenOffset != other.fromTokenOffset)
+				return false;
+			if (instance == null) {
+				if (other.instance != null)
+					return false;
+			} else if (!instance.equals(other.instance))
+				return false;
+			if (toTokenOffset != other.toTokenOffset)
+				return false;
+			return true;
+		}
+
 	}
 
 	private void updateAverage(final List<State> proposalStates) {

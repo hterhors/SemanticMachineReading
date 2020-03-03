@@ -8,7 +8,6 @@ import de.hterhors.semanticmr.eval.EEvaluationDetail;
 public interface IEvaluatable {
 
 	public static class Score {
-
 		public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.000");
 
 		final public static Score ZERO_MICRO = new Score().unmod();
@@ -114,11 +113,11 @@ public interface IEvaluatable {
 			this.macroAddCounter = 1;
 			this.macroPrecision = precision;
 			this.macroRecall = recall;
-			boolean match = f1 == getMacroF1();
+//			boolean match = SCORE_COMPARATOR.format(f1).equals(SCORE_COMPARATOR.format(getMacroF1()));
 			this.macroF1 = f1;
 
-			if (!match)
-				throw new IllegalArgumentException("Precision and Recall does not match F1: " + toString());
+//			if (!match)
+//				throw new IllegalArgumentException("Precision and Recall does not match F1: " + toString());
 
 			if (f1 > 1 || precision > 1 || recall > 1)
 				throw new IllegalArgumentException(
@@ -262,6 +261,10 @@ public interface IEvaluatable {
 			if ((tp + fn) == 0)
 				return 0;
 			return ((double) tp) / (tp + fn);
+		}
+
+		public String getF1(DecimalFormat formatter) {
+			return formatter.format(getF1());
 		}
 
 		public double getF1() {
