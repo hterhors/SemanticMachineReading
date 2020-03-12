@@ -41,7 +41,7 @@ public class NerlaEvaluator extends AbstractEvaluator {
 			fn++;
 		}
 		
-		fp += otherAnnotations.size() - tp;
+		fp += Math.max(otherAnnotations.size() - tp,0);
 
 		// outer: for (AbstractAnnotation a : otherAnnotations) {
 //				for (AbstractAnnotation oa : annotations) {
