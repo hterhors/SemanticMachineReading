@@ -41,6 +41,13 @@
 			<artifactId>log4j-core</artifactId>
 			<version>2.11.1</version>
 		</dependency>
+		
+		
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>23.5-jre</version> <!-- or 23.5-android for the Android flavor -->
+		</dependency>
 	</dependencies>
 
 	<build>

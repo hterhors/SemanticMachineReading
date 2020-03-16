@@ -125,29 +125,31 @@ public class State {
 	}
 	public Score getMicroScore() {
 		if (!isMicroScored)
-			throw new IllegalStateException("State is not scored for micro score.");
+			getMicroScore();
+//			throw new IllegalStateException("State is not scored for micro score.");
 		return microScore;
 	}
 
 	public Score getMicroScore(AbstractEvaluator evaluator) {
-		if (!isMicroScored) {
+//		if (!isMicroScored) {
 			this.microScore = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions, EScoreType.MICRO);
 			isMicroScored = true;
-		}
+//		}
 		return microScore;
 	}
 
 	public Score getMacroScore() {
 		if (!isMacroScored)
-			throw new IllegalStateException("State is not scored for macro score.");
+			getMacroScore();
+//			throw new IllegalStateException("State is not scored for macro score.");
 		return macroScore;
 	}
 
 	public Score getMacroScore(AbstractEvaluator evaluator) {
-		if (!isMacroScored) {
+//		if (!isMacroScored) {
 			this.macroScore = instance.getGoldAnnotations().evaluate(evaluator, currentPredictions, EScoreType.MACRO);
 			isMacroScored = true;
-		}
+//		}
 		return macroScore;
 	}
 

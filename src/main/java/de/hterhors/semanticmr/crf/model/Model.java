@@ -33,7 +33,7 @@ public class Model {
 
 	public static boolean alwaysTrainModel = false;
 
-	final private FactorPool factorPool = new FactorPool();
+	final private FactorPoolCache factorCache = new FactorPoolCache(this);
 
 	/**
 	 * Converts a feature name to its index.
@@ -216,7 +216,7 @@ public class Model {
 
 		for (AbstractFactorScope scope : stream.distinct()
 				.filter(fs -> !fs.template.enableFactorCaching
-						|| (fs.template.enableFactorCaching && !factorPool.containsFactorScope(fs)))
+						|| (fs.template.enableFactorCaching && !factorCache.containsFactorScope(fs)))
 				.collect(Collectors.toList())) {
 			factors.add(new Factor(scope));
 		}
@@ -224,12 +224,11 @@ public class Model {
 		factors.parallelStream().forEach(factor -> {
 			factor.getFactorScope().template.generateFeatureVector(factor);
 		});
-		
-		
+
 		for (Factor<?> factor : factors) {
 			if (!factor.getFactorScope().template.enableFactorCaching)
 				continue;
-			factorPool.addFactor(factor);
+			factorCache.addFactor(factor);
 		}
 	}
 
@@ -238,7 +237,7 @@ public class Model {
 		FactorGraph factorGraph = state.getFactorGraph(template);
 
 		if (factorGraph == null) {
-			factorGraph = new FactorGraph(factorPool, template);
+			factorGraph = new FactorGraph(factorCache, template);
 		}
 		state.addIfAbsentFactorGraph(template, factorGraph);
 
