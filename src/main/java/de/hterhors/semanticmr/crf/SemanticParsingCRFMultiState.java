@@ -69,8 +69,8 @@ public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 
 	private CRFStatistics testStatistics;
 
-	private IObjectiveFunction coverageObjectiveFunction = new SlotFillingObjectiveFunction(
-			EScoreType.MICRO, new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
+	private IObjectiveFunction coverageObjectiveFunction = new SlotFillingObjectiveFunction(EScoreType.MICRO,
+			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
 
 	public SemanticParsingCRFMultiState(Model model, IExplorationStrategy explorer, AbstractBeamSampler sampler,
 			IObjectiveFunction objectiveFunction) {
@@ -124,6 +124,7 @@ public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 		Map<Instance, State> selectedbestStates = new HashMap<>();
 
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
+
 			log.info("############");
 			log.info("# Epoch: " + (epoch + 1) + " #");
 			log.info("############");

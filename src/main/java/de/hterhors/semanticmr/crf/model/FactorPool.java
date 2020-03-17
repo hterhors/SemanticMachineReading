@@ -14,12 +14,12 @@ import java.util.Map;
  * @author hterhors
  *
  */
-final class FactorPool {
+public final class FactorPool {
 
 	/**
 	 * The factor cache
 	 */
-	final private Map<AbstractFactorScope, Factor> factorCache;
+	final public Map<AbstractFactorScope, Factor> factorCache;
 
 	/**
 	 * The instance of this caching pool.

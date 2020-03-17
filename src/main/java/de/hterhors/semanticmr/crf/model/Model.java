@@ -21,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
+import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
 import de.hterhors.semanticmr.crf.variables.DoubleVectorARRAY;
@@ -33,8 +34,8 @@ public class Model {
 
 	public static boolean alwaysTrainModel = false;
 
-	final private FactorPoolCache factorCache = new FactorPoolCache(this, 200_000, 100_000);
-//	final private FactorPool factorCache = new FactorPool();
+	final public FactorPoolCache factorCache = new FactorPoolCache(this, 800_000, 400_000);
+//	final public FactorPool factorCache = new FactorPool();
 
 	/**
 	 * Converts a feature name to its index.
@@ -53,73 +54,6 @@ public class Model {
 
 	private final File modelBaseDir;
 	private final String modelName;
-
-//	Without hardconstraints
-//	Time: 1257741
-//	***********************************************************
-//	|1/3||===========TRAIN============
-//	 [6/10][50/76][21]______
-	
-//WITH Hardconstraint provide
-	//	Time: 3957011
-//	***********************************************************
-//	|1/3||===========TRAIN============
-//	 [4/10][65/76][20]____
-	
-	
-//	Time: 4202201
-//5Gb 20_000 ende 4
-	
-	
-//	Time: 1713946
-//8GB
-//	End Epoch 5
-	private static void COMPARE_VECTORS() {
-		DoubleVector av1[] = new DoubleVector[300];
-		DoubleVector av2[] = new DoubleVector[av1.length];
-		DoubleVectorARRAY bv1[] = new DoubleVectorARRAY[av1.length];
-		DoubleVectorARRAY bv2[] = new DoubleVectorARRAY[av1.length];
-
-		for (int j = 0; j < av1.length; j++) {
-			DoubleVector avec = new DoubleVector();
-			DoubleVector avec2 = new DoubleVector();
-			DoubleVectorARRAY bvec = new DoubleVectorARRAY();
-			DoubleVectorARRAY bvec2 = new DoubleVectorARRAY();
-			for (int i = 0; i < 200000; i++) {
-				String r = i + "feature";
-				float a = (float) Math.random();
-				float b = (float) Math.random();
-				float c = (float) Math.random();
-				float d = (float) Math.random();
-				avec.set(r, a < 0.5 ? b : 0D);
-				avec2.set(r, c < 0.5 ? d : 0D);
-				bvec.set(r, a < 0.5 ? b : 0F);
-				bvec2.set(r, c < 0.5 ? d : 0F);
-			}
-			av1[j] = avec;
-			av2[j] = avec2;
-			bv1[j] = bvec;
-			bv2[j] = bvec2;
-			System.out.println(j);
-		}
-		long t = System.nanoTime();
-		System.out.println("done");
-		double x = 0;
-		for (int i = 0; i < av1.length; i++) {
-			x += av1[i].dotProduct(av2[i]);
-		}
-		System.out.println(x);
-		System.out.println(System.nanoTime() - t);
-
-		t = System.nanoTime();
-		System.out.println("done");
-		x = 0;
-		for (int i = 0; i < bv1.length; i++) {
-			x += bv1[i].dotProduct(bv2[i]);
-		}
-		System.out.println(x);
-		System.out.println(System.nanoTime() - t);
-	}
 
 	/**
 	 * Synchronized method

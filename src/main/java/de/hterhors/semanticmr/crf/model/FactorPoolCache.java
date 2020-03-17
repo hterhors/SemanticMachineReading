@@ -16,12 +16,12 @@ import com.google.common.cache.LoadingCache;
  * @author hterhors
  *
  */
-final class FactorPoolCache {
+final public class FactorPoolCache {
 
 	/**
 	 * The factor cache
 	 */
-	private LoadingCache<AbstractFactorScope, Factor> factorCache;
+	public LoadingCache<AbstractFactorScope, Factor> factorCache;
 
 	/**
 	 * The instance of this caching pool.

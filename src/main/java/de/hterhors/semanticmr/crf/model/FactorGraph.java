@@ -35,8 +35,12 @@ public class FactorGraph {
 	private boolean isDirty = true;
 	private final AbstractFeatureTemplate<?> template;
 //	final private FactorPool factorPool;
-	final private FactorPoolCache factorPool;
+//	public FactorGraph(FactorPool factorPool, AbstractFeatureTemplate<?> template) {
+//		this.template = template;
+//		this.factorPool = factorPool;
+//	}
 
+	 final private FactorPoolCache factorPool;
 	public FactorGraph(FactorPoolCache factorPool, AbstractFeatureTemplate<?> template) {
 		this.template = template;
 		this.factorPool = factorPool;
