@@ -33,7 +33,8 @@ public class Model {
 
 	public static boolean alwaysTrainModel = false;
 
-	final private FactorPoolCache factorCache = new FactorPoolCache(this);
+	final private FactorPoolCache factorCache = new FactorPoolCache(this, 200_000, 100_000);
+//	final private FactorPool factorCache = new FactorPool();
 
 	/**
 	 * Converts a feature name to its index.
@@ -53,6 +54,26 @@ public class Model {
 	private final File modelBaseDir;
 	private final String modelName;
 
+//	Without hardconstraints
+//	Time: 1257741
+//	***********************************************************
+//	|1/3||===========TRAIN============
+//	 [6/10][50/76][21]______
+	
+//WITH Hardconstraint provide
+	//	Time: 3957011
+//	***********************************************************
+//	|1/3||===========TRAIN============
+//	 [4/10][65/76][20]____
+	
+	
+//	Time: 4202201
+//5Gb 20_000 ende 4
+	
+	
+//	Time: 1713946
+//8GB
+//	End Epoch 5
 	private static void COMPARE_VECTORS() {
 		DoubleVector av1[] = new DoubleVector[300];
 		DoubleVector av2[] = new DoubleVector[av1.length];
@@ -207,7 +228,6 @@ public class Model {
 		 * Compute and set model score
 		 */
 		states.parallelStream().forEach(state -> state.setModelScore(computeScore(state)));
-
 	}
 
 	private void computeRemainingFactors(Stream<AbstractFactorScope> stream) {

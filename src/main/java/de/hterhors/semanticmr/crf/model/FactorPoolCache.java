@@ -28,8 +28,8 @@ final class FactorPoolCache {
 	 */
 //	private static FactorPool sharedInstance = null;
 
-	FactorPoolCache(Model model) {
-		factorCache = CacheBuilder.newBuilder().maximumSize(20000).initialCapacity(500)
+	FactorPoolCache(Model model,int maxSize, int initSize) {
+		factorCache = CacheBuilder.newBuilder().maximumSize(maxSize).initialCapacity(initSize)
 				.build(new FactorCacheLoader(model));
 	}
 
@@ -44,6 +44,13 @@ final class FactorPoolCache {
 //		}
 //		return sharedInstance;
 //	}
+	
+//	CRFStatistics [context=Train, getTotalDuration()=31683]
+//	CRFStatistics [context=Test, getTotalDuration()=1348]
+	
+//	CRFStatistics [context=Train, getTotalDuration()=23368]
+//	CRFStatistics [context=Test, getTotalDuration()=1044]
+
 
 	/**
 	 * 
@@ -53,12 +60,7 @@ final class FactorPoolCache {
 	 * @return true if the pool contains the given factor scope.
 	 */
 	protected boolean containsFactorScope(AbstractFactorScope factorScope) {
-		try {
-			return factorCache.get(factorScope) != null;
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-		return false;
+		return factorCache.getIfPresent(factorScope) != null;
 	}
 
 	/**
@@ -83,9 +85,12 @@ final class FactorPoolCache {
 
 			final Factor factor;
 
-			if ((factor = factorCache.getIfPresent(factorVariables)) == null)
+			try {
+				factor = factorCache.get(factorVariables);
+			} catch (ExecutionException e) {
 				throw new IllegalStateException(
 						String.format("Could not retrieve factor for requested factor variables: %s", factorVariables));
+			}
 
 			factors.add((Factor) factor);
 
@@ -104,6 +109,10 @@ final class FactorPoolCache {
 	 */
 	protected void addFactor(Factor factor) {
 		factorCache.put(factor.getFactorScope(), factor);
+	}
+
+	public String stats() {
+		return factorCache.stats().toString();
 	}
 
 }
