@@ -120,7 +120,8 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 	}
 
 	@Override
-	public EntityType getEntityType() {		return entityType;
+	public EntityType getEntityType() {
+		return entityType;
 	}
 
 	@Override
@@ -130,6 +131,28 @@ public class EntityTypeAnnotation extends AbstractAnnotation {
 
 	@Override
 	public boolean evaluateEquals(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
-		return evaluate(evaluationDetail, otherVal).getF1() == 1.0D;
+
+		if (otherVal == null)
+			return false;
+
+		if (evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED || evaluationDetail == EEvaluationDetail.LITERAL
+				|| evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
+
+			if (getClass() == otherVal.getClass()) {
+				if (getClass() != EntityTypeAnnotation.class)
+					return equalsEvalETA(otherVal) ? true : false;
+				else
+					return equals(otherVal) ? true : false;
+			} else {
+				if (this.getClass().isAssignableFrom(otherVal.getClass())) {
+					return this.equalsEvalETA(otherVal) ? true : false;
+				} else if (otherVal.getClass().isAssignableFrom(this.getClass())) {
+					return ((EntityTypeAnnotation) otherVal).equalsEvalETA(this) ? true : false;
+				}
+			}
+			return false;
+		}
+
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluationDetail);
 	}
 }

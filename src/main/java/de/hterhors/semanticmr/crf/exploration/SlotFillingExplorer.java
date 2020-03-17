@@ -12,7 +12,6 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
-import de.hterhors.semanticmr.crf.templates.et.SlotIsFilledTemplate;
 import de.hterhors.semanticmr.crf.variables.State;
 
 /**
@@ -90,14 +89,19 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 			/*
 			 * Change props
 			 */
+
+			List<EntityTemplate> candidates = new ArrayList<>();
+
 			for (SlotType slotType : entityTemplateAnnotation.getSingleFillerSlotTypes()) {
 
 				if (slotType.isFrozen() || slotType.isExcluded())
 					continue;
 
-				changeSingleFiller(proposalStates, currentState, slotType, entityTemplateAnnotation, annotationIndex);
+				collectChangeSingleFiller(candidates, proposalStates, currentState, slotType, entityTemplateAnnotation,
+						annotationIndex);
 
-				deleteSingleFiller(proposalStates, currentState, slotType, entityTemplateAnnotation, annotationIndex);
+				collectDeleteSingleFiller(candidates, proposalStates, currentState, slotType, entityTemplateAnnotation,
+						annotationIndex);
 			}
 
 			for (SlotType slotType : entityTemplateAnnotation.getMultiFillerSlotTypes()) {
@@ -108,14 +112,19 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 				for (AbstractAnnotation slotFillerCandidate : currentState.getInstance()
 						.getSlotTypeCandidates(samplingMode, slotType)) {
 
-					addMultiFiller(proposalStates, currentState, slotType, slotFillerCandidate,
+					collectAddMultiFiller(candidates, proposalStates, currentState, slotType, slotFillerCandidate,
 							entityTemplateAnnotation, annotationIndex);
 
-					changeMultiFiller(proposalStates, currentState, slotType, slotFillerCandidate,
+					collectChangeMultiFiller(candidates, proposalStates, currentState, slotType, slotFillerCandidate,
 							entityTemplateAnnotation, annotationIndex);
 				}
 
-				deleteMultiFiller(proposalStates, currentState, slotType, entityTemplateAnnotation, annotationIndex);
+				collectDeleteMultiFiller(candidates, proposalStates, currentState, slotType, entityTemplateAnnotation,
+						annotationIndex);
+			}
+
+			for (EntityTemplate candidate : filterByViolatesConstraints(currentState, candidates)) {
+				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, candidate));
 			}
 		}
 
@@ -147,6 +156,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 	private void changeTemplateType(final List<State> proposalStates, State currentState, EntityTemplate entityTemplate,
 			int annotationIndex) {
+		List<EntityTemplate> candidates = new ArrayList<>();
 
 		for (EntityTypeAnnotation templateTypeCandidate : currentState.getInstance()
 				.getEntityTypeCandidates(samplingMode, entityTemplate.getEntityType())) {
@@ -156,31 +166,37 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 			final EntityTemplate deepCopy = entityTemplate.deepMergeCopy(templateTypeCandidate);
 
-			if (violatesConstraints(currentState, deepCopy))
-				return;
+//			if (violatesConstraints(currentState, deepCopy))
+//				return;
+			candidates.add(deepCopy);
 
-			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
+		}
+
+		for (EntityTemplate candidate : filterByViolatesConstraints(currentState, candidates)) {
+			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, candidate));
 		}
 	}
 
-	private void deleteMultiFiller(final List<State> proposalStates, State currentState, SlotType slotType,
-			EntityTemplate entityTemplate, int annotationIndex) {
+	private void collectDeleteMultiFiller(final List<EntityTemplate> candidates, final List<State> proposalStates,
+			State currentState, SlotType slotType, EntityTemplate entityTemplate, int annotationIndex) {
 
 		for (AbstractAnnotation slotFiller : entityTemplate.getMultiFillerSlot(slotType).getSlotFiller()) {
 
 			final EntityTemplate deepCopy = entityTemplate.deepCopy();
 			deepCopy.removeMultiFillerSlotFiller(slotType, slotFiller);
 
-			if (violatesConstraints(currentState, deepCopy))
-				continue;
-
-			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
+//			if (violatesConstraints(currentState, deepCopy))
+//				continue;
+			candidates.add(deepCopy);
 		}
-
+//		for (EntityTemplate candidate : filterByViolatesConstraints(currentState, candidates)) {
+//			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, candidate));
+//		}
 	}
 
-	private void changeMultiFiller(final List<State> proposalStates, State currentState, SlotType slotType,
-			AbstractAnnotation slotFillerCandidate, EntityTemplate entityTemplate, int annotationIndex) {
+	private void collectChangeMultiFiller(final List<EntityTemplate> candidates, final List<State> proposalStates,
+			State currentState, SlotType slotType, AbstractAnnotation slotFillerCandidate,
+			EntityTemplate entityTemplate, int annotationIndex) {
 
 		/*
 		 * Do no add itself
@@ -200,15 +216,19 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 			deepCopy.updateMultiFillerSlot(slotType, slotFiller, slotFillerCandidate);
 
-			if (violatesConstraints(currentState, deepCopy))
-				return;
+//			if (violatesConstraints(currentState, deepCopy))
+//				return;
 
-			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
+			candidates.add(deepCopy);
 		}
+//		for (EntityTemplate candidate : filterByViolatesConstraints(currentState, candidates)) {
+//			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, candidate));
+//		}
 	}
 
-	private void addMultiFiller(final List<State> proposalStates, State currentState, SlotType slotType,
-			AbstractAnnotation slotFillerCandidate, EntityTemplate entityTemplate, int annotationIndex) {
+	private void collectAddMultiFiller(final List<EntityTemplate> candidates, final List<State> proposalStates,
+			State currentState, SlotType slotType, AbstractAnnotation slotFillerCandidate,
+			EntityTemplate entityTemplate, int annotationIndex) {
 
 		/*
 		 * Do not add if maximum number of fillers is reached.
@@ -242,15 +262,15 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 		final EntityTemplate deepCopy = entityTemplate.deepCopy();
 		deepCopy.addMultiSlotFiller(slotType, slotFillerCandidate);
-
-		if (violatesConstraints(currentState, deepCopy))
-			return;
-
-		proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
+		candidates.add(deepCopy);
+//		if (violatesConstraints(currentState, deepCopy))
+//			return;
+//
+//		proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
 	}
 
-	private void deleteSingleFiller(final List<State> entityTemplates, State currentState, SlotType slotType,
-			EntityTemplate entityTemplate, int annotationIndex) {
+	private void collectDeleteSingleFiller(final List<EntityTemplate> candidates, final List<State> entityTemplates,
+			State currentState, SlotType slotType, EntityTemplate entityTemplate, int annotationIndex) {
 
 		final EntityTemplate deepCopy = entityTemplate.deepCopy();
 
@@ -259,14 +279,14 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 		deepCopy.clearSlot(slotType);
 
-		if (violatesConstraints(currentState, deepCopy))
-			return;
-
-		entityTemplates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
+//		if (violatesConstraints(currentState, deepCopy))
+//			return;
+		candidates.add(deepCopy);
+//		entityTemplates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
 	}
 
-	private void changeSingleFiller(final List<State> proposalStates, State currentState, SlotType slotType,
-			EntityTemplate entityTemplate, int annotationIndex) {
+	private void collectChangeSingleFiller(final List<EntityTemplate> candidates, final List<State> proposalStates,
+			State currentState, SlotType slotType, EntityTemplate entityTemplate, int annotationIndex) {
 
 		for (AbstractAnnotation slotFillerCandidate : currentState.getInstance().getSlotTypeCandidates(samplingMode,
 				slotType)) {
@@ -296,10 +316,10 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 			deepCopy.setSingleSlotFiller(slotType, slotFillerCandidate);
 
-			if (violatesConstraints(currentState, deepCopy))
-				return;
+//			if (violatesConstraints(currentState, deepCopy))
+//				return;
 
-			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, deepCopy));
+			candidates.add(deepCopy);
 		}
 
 	}
@@ -319,6 +339,14 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 			return false;
 		else
 			return hardConstraintsProvider.violatesConstraints(state, deepCopy);
+
+	}
+
+	private List<EntityTemplate> filterByViolatesConstraints(State state, List<EntityTemplate> deepCopies) {
+		if (hardConstraintsProvider == null)
+			return deepCopies;
+		else
+			return hardConstraintsProvider.filterByViolatesConstraints(state, deepCopies);
 
 	}
 

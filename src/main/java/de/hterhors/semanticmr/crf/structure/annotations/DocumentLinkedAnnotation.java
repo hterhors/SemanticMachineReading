@@ -174,6 +174,16 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 	@Override
 	public boolean evaluateEquals(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
-		return evaluate(evaluationDetail, otherVal).getF1() == 1.0D;
+		if (otherVal == null)
+			return false;
+
+		if (evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED) {
+			return equals(otherVal);
+		} else if (entityType.isLiteral || evaluationDetail == EEvaluationDetail.LITERAL
+				|| evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
+			return super.evaluateEquals(evaluationDetail, otherVal);
+		}
+
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluationDetail);
 	}
 }

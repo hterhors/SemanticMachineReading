@@ -66,6 +66,27 @@ public class CartesianEvaluator extends AbstractEvaluator {
 			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
 
 		final Score bestScore;
+		boolean docLinked = isDocLinked(annotations, otherAnnotations);
+
+		if (docLinked)
+			bestScore = stdEvalForDocLinked.prf1(annotations, otherAnnotations);
+		else {
+			bestScore = cartesian(annotations, otherAnnotations, scoreType);
+		}
+
+		return bestScore;
+	}
+
+	@Override
+	protected boolean evalEqualsMax(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
+
+		return stdEvalForDocLinked.evalEqualsMultiValues(annotations, otherAnnotations);
+
+	}
+
+	private boolean isDocLinked(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
 		boolean docLinked = true;
 		for (AbstractAnnotation abstractAnnotation : annotations) {
 			if (!abstractAnnotation.isInstanceOfDocumentLinkedAnnotation()) {
@@ -80,17 +101,8 @@ public class CartesianEvaluator extends AbstractEvaluator {
 					break;
 				}
 			}
-
-		if (docLinked)
-			bestScore = stdEvalForDocLinked.prf1(annotations, otherAnnotations);
-		else {
-			bestScore = cartesian(annotations, otherAnnotations, scoreType);
-		}
-
-		return bestScore;
+		return docLinked;
 	}
-
-	static boolean x = false;
 
 	private Score cartesian(Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {

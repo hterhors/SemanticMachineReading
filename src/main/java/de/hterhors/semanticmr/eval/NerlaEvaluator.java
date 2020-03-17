@@ -21,10 +21,6 @@ public class NerlaEvaluator extends AbstractEvaluator {
 
 	public Score prf1(EEvaluationDetail evaluationDetail, Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations) {
-//		System.out.println("annotations.size(): " + annotations.size());
-//		System.out.println(annotations);
-//		System.out.println("otherAnnotations.size(): " + otherAnnotations.size());
-//		System.out.println(otherAnnotations);
 
 		int tp = 0;
 		int fp = 0;
@@ -40,19 +36,9 @@ public class NerlaEvaluator extends AbstractEvaluator {
 
 			fn++;
 		}
-		
-		fp += Math.max(otherAnnotations.size() - tp,0);
 
-		// outer: for (AbstractAnnotation a : otherAnnotations) {
-//				for (AbstractAnnotation oa : annotations) {
-//					if (oa.evaluateEquals(this, a)) {
-//						continue outer;
-//					}
-//				}
-//				fp++;
-//			}
-//		System.out.println(new Score(tp, fp, fn));
-//		System.out.println();
+		fp = Math.max(otherAnnotations.size() - tp, 0);
+
 		return new Score(tp, fp, fn);
 
 	}
@@ -69,6 +55,27 @@ public class NerlaEvaluator extends AbstractEvaluator {
 		if (scoretype == EScoreType.MACRO)
 			score.toMacro();
 		return score;
+	}
+
+	@Override
+	protected boolean evalEqualsMax(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
+
+		int tp = 0;
+
+		outer: for (AbstractAnnotation a : annotations) {
+			for (AbstractAnnotation oa : otherAnnotations) {
+				if (oa.evaluateEquals(this, a)) {
+					tp++;
+					continue outer;
+				}
+			}
+
+			return false;
+		}
+
+		return Math.max(otherAnnotations.size() - tp, 0) == 0;
+
 	}
 
 }

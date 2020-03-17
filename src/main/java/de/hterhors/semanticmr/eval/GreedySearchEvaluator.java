@@ -28,8 +28,22 @@ public class GreedySearchEvaluator extends AbstractEvaluator {
 		System.out.println(f.greedySearchDecoder(scores));
 	}
 
+	private final NerlaEvaluator stdEvalForDocLinked;
+
 	public GreedySearchEvaluator(EEvaluationDetail evaluationMode) {
 		super(evaluationMode);
+		this.stdEvalForDocLinked = new NerlaEvaluator(EEvaluationDetail.DOCUMENT_LINKED);
+	}
+
+	public GreedySearchEvaluator(EEvaluationDetail slotFillingEvaluationMode, EEvaluationDetail nerlaEvaluationMode) {
+		super(slotFillingEvaluationMode);
+		this.stdEvalForDocLinked = new NerlaEvaluator(nerlaEvaluationMode);
+	}
+
+	@Override
+	protected boolean evalEqualsMax(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
+		return stdEvalForDocLinked.evalEqualsMultiValues(annotations, otherAnnotations);
 	}
 
 	@Override

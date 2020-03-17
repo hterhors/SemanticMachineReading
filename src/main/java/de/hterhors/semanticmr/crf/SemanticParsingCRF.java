@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -129,7 +130,15 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 		trainingInstances = new ArrayList<>(trainingInstances);
 
 //		Collections.sort(trainingInstances);
+		Random random = new Random(100L);
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
+			Map<SlotType, Boolean> leaveOnePropertyOut = SlotType.storeExcludance();
+
+			List<SlotType> types = leaveOnePropertyOut.entrySet().stream().filter(a -> a.getValue())
+					.map(a -> a.getKey()).collect(Collectors.toList());
+
+			types.get(random.nextInt(types.size())).exclude();
+
 			log.info("############");
 			log.info("# Epoch: " + (epoch + 1) + " #");
 			log.info("############");
@@ -206,6 +215,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 						instance, currentState);
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
 			}
+			SlotType.restoreExcludance(leaveOnePropertyOut);
 
 //			Map<Integer, Double> currentModelWeights = model.getFactorTemplates().stream()
 //					.flatMap(t -> t.getWeights().getFeatures().entrySet().stream())

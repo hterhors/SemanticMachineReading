@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.jena.ext.com.google.common.collect.Streams;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
@@ -159,8 +160,15 @@ public class PurityInvPurityEvaluator extends AbstractEvaluator {
 	@Override
 	protected Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoretype) {
+		throw new NotImplementedException("Not impl.");
 //		return fPurityInvPurity(annotations, otherAnnotations);
-		return null;
+	}
+
+	@Override
+	protected boolean evalEqualsMax(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
+		// TODO Auto-generated method stub
+		throw new NotImplementedException("Not impl.");
 	}
 
 }

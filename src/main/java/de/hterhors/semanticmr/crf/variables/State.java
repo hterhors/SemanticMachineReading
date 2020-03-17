@@ -43,7 +43,6 @@ public class State {
 	}
 
 	public State(State value) {
-
 		this.instance = value.instance;
 		this.currentPredictions = value.currentPredictions.deepCopy();
 		this.factorGraphs = value.factorGraphs;

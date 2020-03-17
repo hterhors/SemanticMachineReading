@@ -34,9 +34,19 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 		System.out.println(f.beamSearchDecoder(maxSize, scores));
 	}
 
+	private final NerlaEvaluator stdEvalForDocLinked;
+
+	public BeamSearchEvaluator(EEvaluationDetail slotFillingEvaluationMode, final int beamSize,
+			EEvaluationDetail nerlaEvaluationMode) {
+		super(slotFillingEvaluationMode);
+		this.beamSize = beamSize;
+		this.stdEvalForDocLinked = new NerlaEvaluator(nerlaEvaluationMode);
+	}
+
 	public BeamSearchEvaluator(EEvaluationDetail evaluationMode, final int beamSize) {
 		super(evaluationMode);
 		this.beamSize = beamSize;
+		this.stdEvalForDocLinked = new NerlaEvaluator(EEvaluationDetail.DOCUMENT_LINKED);
 	}
 
 	@Override
@@ -70,6 +80,12 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 				assignments.subList(0, Math.min(assignments.size(), beamSize)));
 
 		return bestAssignment.score;
+	}
+
+	@Override
+	protected boolean evalEqualsMax(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
+		return stdEvalForDocLinked.evalEqualsMultiValues(annotations, otherAnnotations);
 	}
 
 	private Assignment beamSearchAssignment(Score[][] scores, List<Assignment> assignments) {

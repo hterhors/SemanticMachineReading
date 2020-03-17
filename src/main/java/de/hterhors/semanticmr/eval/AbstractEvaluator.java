@@ -27,7 +27,7 @@ public abstract class AbstractEvaluator {
 	}
 
 	/**
-	 * Is always computed for MICRO !
+	 * Always computes MIRCO score!
 	 * 
 	 * @param val
 	 * @param otherVal
@@ -66,6 +66,29 @@ public abstract class AbstractEvaluator {
 		return score;
 	}
 
+	public boolean evalEqualsSingle(final AbstractAnnotation val, final AbstractAnnotation otherVal) {
+		if (val instanceof DocumentLinkedAnnotation
+				&& (otherVal instanceof DocumentLinkedAnnotation || otherVal == null)) {
+			return ((DocumentLinkedAnnotation) val).evaluateEquals(this, (DocumentLinkedAnnotation) otherVal);
+		} else if (val instanceof LiteralAnnotation && (otherVal instanceof LiteralAnnotation || otherVal == null)) {
+			return ((LiteralAnnotation) val).evaluateEquals(this, (LiteralAnnotation) otherVal);
+		} else if (val instanceof EntityTypeAnnotation
+				&& (otherVal instanceof EntityTypeAnnotation || otherVal == null)) {
+			return ((EntityTypeAnnotation) val).evaluateEquals(this, (EntityTypeAnnotation) otherVal);
+		} else if (val instanceof EntityTemplate && (otherVal instanceof EntityTemplate || otherVal == null)) {
+			return ((EntityTemplate) val).evaluateEquals(this, (EntityTemplate) otherVal);
+		} else if (val instanceof EntityTemplate && !(otherVal instanceof EntityTemplate)) {
+			return ((EntityTemplate) val).evaluateEquals(this, otherVal);
+		} else if (otherVal instanceof EntityTemplate && !(val instanceof EntityTemplate)) {
+			return ((EntityTemplate) otherVal).evaluateEquals(this, val);
+		} else {
+			/*
+			 * Should never happen!
+			 */
+			throw new IllegalStateException("Illegal state detected during evaluation!");
+		}
+	}
+
 	protected abstract Score scoreMax(Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType);
 
@@ -74,6 +97,16 @@ public abstract class AbstractEvaluator {
 		if (annotations.isEmpty() && otherAnnotations.isEmpty())
 			return Score.getZero(scoreType);
 		return scoreMax(annotations, otherAnnotations, scoreType);
+	}
+
+	protected abstract boolean evalEqualsMax(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations);
+
+	public boolean evalEqualsMultiValues(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations) {
+		if (annotations.isEmpty() && otherAnnotations.isEmpty())
+			return true;
+		return evalEqualsMax(annotations, otherAnnotations);
 	}
 
 }

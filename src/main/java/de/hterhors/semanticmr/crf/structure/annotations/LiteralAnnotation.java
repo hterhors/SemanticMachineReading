@@ -135,6 +135,33 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 
 	@Override
 	public boolean evaluateEquals(EEvaluationDetail evaluationDetail, IEvaluatable otherVal) {
-		return evaluate(evaluationDetail, otherVal).getF1() == 1.0D;
+		if (otherVal == null)
+			return false;
+		if (entityType.isLiteral || evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED
+				|| evaluationDetail == EEvaluationDetail.LITERAL) {
+			if (getClass() == otherVal.getClass()) {
+				if (getClass() != LiteralAnnotation.class)
+					return equalsEvalLA(otherVal) ? true : false;
+				else
+					return equals(otherVal) ? true : false;
+			} else {
+				if ((this.getClass() == DocumentLinkedAnnotation.class))
+					if (otherVal.getClass() == LiteralAnnotation.class)
+						return ((LiteralAnnotation) otherVal).equalsEvalLA(this) ? true : false;
+					else
+						return false;
+
+				else if ((otherVal.getClass() == DocumentLinkedAnnotation.class))
+					if (getClass() == LiteralAnnotation.class)
+						return ((LiteralAnnotation) this).equalsEvalLA(otherVal) ? true : false;
+					else
+						return false;
+			}
+			return false;
+		} else if (evaluationDetail == EEvaluationDetail.ENTITY_TYPE) {
+			return super.evaluateEquals(evaluationDetail, otherVal);
+		}
+
+		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluationDetail);
 	}
 }

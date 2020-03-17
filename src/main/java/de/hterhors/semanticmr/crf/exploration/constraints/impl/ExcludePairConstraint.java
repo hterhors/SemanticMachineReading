@@ -1,5 +1,9 @@
 package de.hterhors.semanticmr.crf.exploration.constraints.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import de.hterhors.semanticmr.crf.exploration.constraints.AbstractHardConstraint;
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractSlot;
@@ -103,6 +107,17 @@ public class ExcludePairConstraint extends AbstractHardConstraint {
 			return false;
 
 		return excludeSlotFiller.containsSlotFillerOfEntityType(exclude.entityType);
+	}
+
+	@Override
+	public List<EntityTemplate> violatesConstraint(State currentState, List<EntityTemplate> candidateListToFilter) {
+
+		List<EntityTemplate> filteredList = new ArrayList<>(candidateListToFilter.size());
+
+		filteredList = candidateListToFilter.parallelStream()
+				.filter(candidate -> !violatesConstraint(currentState, candidate)).collect(Collectors.toList());
+
+		return filteredList;
 	}
 
 }
