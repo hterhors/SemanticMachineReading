@@ -26,9 +26,9 @@ final public class FactorPoolCache {
 	/**
 	 * The instance of this caching pool.
 	 */
-//	private static FactorPool sharedInstance = null;
+	// private static FactorPool sharedInstance = null;
 
-	FactorPoolCache(Model model,int maxSize, int initSize) {
+	public	FactorPoolCache(Model model, int maxSize, int initSize) {
 		factorCache = CacheBuilder.newBuilder().maximumSize(maxSize).initialCapacity(initSize)
 				.build(new FactorCacheLoader(model));
 	}
@@ -44,13 +44,12 @@ final public class FactorPoolCache {
 //		}
 //		return sharedInstance;
 //	}
-	
+
 //	CRFStatistics [context=Train, getTotalDuration()=31683]
 //	CRFStatistics [context=Test, getTotalDuration()=1348]
-	
+
 //	CRFStatistics [context=Train, getTotalDuration()=23368]
 //	CRFStatistics [context=Test, getTotalDuration()=1044]
-
 
 	/**
 	 * 

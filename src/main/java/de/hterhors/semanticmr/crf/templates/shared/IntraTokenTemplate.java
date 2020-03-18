@@ -30,6 +30,10 @@ public class IntraTokenTemplate extends AbstractFeatureTemplate<IntraTokenScope>
 	 * 
 	 */
 
+	public IntraTokenTemplate() {
+//		super(false);
+	}
+
 	private static final String TOKEN_SPLITTER_SPACE = " ";
 
 	private static final String END_SIGN = "$";

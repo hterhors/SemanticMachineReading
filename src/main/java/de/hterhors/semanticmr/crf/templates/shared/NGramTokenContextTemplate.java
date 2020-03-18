@@ -23,6 +23,10 @@ import de.hterhors.semanticmr.crf.variables.State;
 
 public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramTokenContextScope> {
 
+	public NGramTokenContextTemplate() {
+//super(false);
+	}
+
 	private static final int DEFAULT_MAX_TOKEN_CONTEXT_LEFT = 3;
 	private static final int DEFAULT_MAX_TOKEN_CONTEXT_RIGHT = 3;
 	private static final int MAX_TOKEN_CONTEXT_LEFT = DEFAULT_MAX_TOKEN_CONTEXT_LEFT;
@@ -34,7 +38,6 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 	private static final String BOF = "BOF";
 	private static final String EOF = "EOF";
 	private static final String PREFIX = "NGTCT\t";
-
 
 	static class NGramTokenContextScope extends AbstractFactorScope {
 

@@ -129,16 +129,21 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 		trainingInstances = new ArrayList<>(trainingInstances);
 
+		/**
+		 * TODO: PARAMETERIZE
+		 */
+		boolean includeLeaveOnePropertyOut = false;
+
 //		Collections.sort(trainingInstances);
 		Random random = new Random(100L);
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
-			Map<SlotType, Boolean> leaveOnePropertyOut = SlotType.storeExcludance();
-
-			List<SlotType> types = leaveOnePropertyOut.entrySet().stream().filter(a -> a.getValue())
-					.map(a -> a.getKey()).collect(Collectors.toList());
-
-			types.get(random.nextInt(types.size())).exclude();
-
+			Map<SlotType, Boolean> leaveOnePropertyOut = null;
+			if (includeLeaveOnePropertyOut) {
+				leaveOnePropertyOut = SlotType.storeExcludance();
+				List<SlotType> types = leaveOnePropertyOut.entrySet().stream().filter(a -> !a.getValue())
+						.map(a -> a.getKey()).collect(Collectors.toList());
+				types.get(random.nextInt(types.size())).exclude();
+			}
 			log.info("############");
 			log.info("# Epoch: " + (epoch + 1) + " #");
 			log.info("############");
@@ -161,10 +166,6 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 						final List<State> proposalStates = explorer.explore(currentState);
 
-//						for (State state : proposalStates) {
-//							System.out.println(state);
-//						}
-
 						if (proposalStates.isEmpty())
 							proposalStates.add(currentState);
 
@@ -173,9 +174,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 						} else {
 							model.score(proposalStates);
 						}
-//						for (State state : proposalStates) {
-//							System.out.println(state);
-//						}
+
 						final State candidateState = sampler.sampleCandidate(proposalStates);
 
 						scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
@@ -215,7 +214,8 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 						instance, currentState);
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
 			}
-			SlotType.restoreExcludance(leaveOnePropertyOut);
+			if (includeLeaveOnePropertyOut)
+				SlotType.restoreExcludance(leaveOnePropertyOut);
 
 //			Map<Integer, Double> currentModelWeights = model.getFactorTemplates().stream()
 //					.flatMap(t -> t.getWeights().getFeatures().entrySet().stream())
@@ -337,7 +337,6 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 			final List<State> producedStateChain) {
 		for (ISamplingStoppingCriterion sc : stoppingCriterion) {
 			if (sc.meetsCondition(producedStateChain)) {
-				log.info(sc.getClass().getSimpleName() + " meets criterion! Stop Sampling");
 				return true;
 			}
 		}

@@ -34,7 +34,7 @@ public class Model {
 
 	public static boolean alwaysTrainModel = false;
 
-	final public FactorPoolCache factorCache = new FactorPoolCache(this, 800_000, 400_000);
+	private FactorPoolCache factorCache = new FactorPoolCache(this, 800_000, 400_000);
 //	final public FactorPool factorCache = new FactorPool();
 
 	/**
@@ -54,6 +54,10 @@ public class Model {
 
 	private final File modelBaseDir;
 	private final String modelName;
+
+	public void setCache(FactorPoolCache factorCache) {
+		this.factorCache = factorCache;
+	}
 
 	/**
 	 * Synchronized method
@@ -387,7 +391,7 @@ public class Model {
 		return model;
 	}
 
-	public void setParameter(Map<Class<? extends AbstractFeatureTemplate<?>>, Object[]> parameter) {
+	public void setfeatureTemplateParameter(Map<Class<? extends AbstractFeatureTemplate<?>>, Object[]> parameter) {
 
 		for (AbstractFeatureTemplate<?> featureTemplate : this.factorTemplates) {
 			if (parameter.containsKey(featureTemplate.getClass())) {

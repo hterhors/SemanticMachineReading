@@ -71,7 +71,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		if (docLinked)
 			bestScore = stdEvalForDocLinked.prf1(annotations, otherAnnotations);
 		else {
-			bestScore = cartesian(annotations, otherAnnotations, scoreType);
+			bestScore = cartesianSearch(annotations, otherAnnotations, scoreType);
 		}
 
 		return bestScore;
@@ -104,7 +104,7 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		return docLinked;
 	}
 
-	private Score cartesian(Collection<? extends AbstractAnnotation> annotations,
+	private Score cartesianSearch(Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 

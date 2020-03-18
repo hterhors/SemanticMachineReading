@@ -71,6 +71,10 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 	private void addNewAnnotation(final List<State> proposalStates, State currentState) {
 		final List<DocumentToken> tokens = currentState.getInstance().getDocument().tokenList;
 
+		
+		
+		
+		
 		for (int windowSize = MIN_WINDOW_SIZE; windowSize <= MAX_WINDOW_SIZE; windowSize++) {
 
 			for (int runIndex = 0; runIndex < tokens.size() - windowSize; runIndex++) {
@@ -78,6 +82,9 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 				final DocumentToken fromToken = tokens.get(runIndex); // including
 				final DocumentToken toToken = tokens.get(runIndex + windowSize - 1); // including
 
+				
+				
+				
 				/*
 				 * Check some basic constraints.
 				 */
