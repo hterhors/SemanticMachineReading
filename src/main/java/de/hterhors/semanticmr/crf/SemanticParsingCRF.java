@@ -443,6 +443,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 						currentState = candidateState;
 						objectiveFunction.score(currentState);
 					}
+					
 
 					producedStateChain.add(currentState);
 

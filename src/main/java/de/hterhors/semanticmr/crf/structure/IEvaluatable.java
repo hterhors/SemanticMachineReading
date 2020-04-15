@@ -267,6 +267,14 @@ public interface IEvaluatable {
 			return formatter.format(getF1());
 		}
 
+		public String getPrecision(DecimalFormat formatter) {
+			return formatter.format(getPrecision());
+		}
+
+		public String getRecall(DecimalFormat formatter) {
+			return formatter.format(getRecall());
+		}
+
 		public double getF1() {
 			if (isMicro()) {
 				return getMicroF1();
