@@ -85,24 +85,44 @@ public class SpecifiedDistributor extends AbstractCorpusDistributor {
 
 			@Override
 			public IDistributorStrategy distributeTrainingInstances(List<Instance> trainingDocuments) {
-				trainingDocuments.addAll(instancesToRedistribute.stream()
-						.filter(i -> trainingInstanceNames.contains(i.getName())).collect(Collectors.toList()));
+
+				for (String name : trainingInstanceNames) {
+					for (Instance instance : instancesToRedistribute) {
+						if (instance.getName().equals(name))
+							trainingDocuments.add(instance);
+					}
+
+				}
+
 				return this;
 			}
 
 			@Override
 			public IDistributorStrategy distributeDevelopmentInstances(List<Instance> developmentDocuments) {
-				developmentDocuments.addAll(instancesToRedistribute.stream()
-						.filter(i -> developInstanceNames.contains(i.getName())).collect(Collectors.toList()));
+
+				for (String name : developInstanceNames) {
+					for (Instance instance : instancesToRedistribute) {
+						if (instance.getName().equals(name))
+							developmentDocuments.add(instance);
+					}
+
+				}
+
 				return this;
 			}
 
 			@Override
 			public IDistributorStrategy distributeTestInstances(List<Instance> testDocuments) {
-				testDocuments.addAll(instancesToRedistribute.stream()
-						.filter(i -> testInstanceNames.contains(i.getName())).collect(Collectors.toList()));
+				for (String name : testInstanceNames) {
+					for (Instance instance : instancesToRedistribute) {
+						if (instance.getName().equals(name))
+							testDocuments.add(instance);
+					}
+
+				}
 				return this;
 			}
+
 		};
 	}
 

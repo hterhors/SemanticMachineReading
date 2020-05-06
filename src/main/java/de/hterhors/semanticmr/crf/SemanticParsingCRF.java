@@ -133,10 +133,35 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 		 * TODO: PARAMETERIZE
 		 */
 		boolean includeLeaveOnePropertyOut = false;
-
+//		Score: SPECIES_GENDER_WEIGHT_AGE_CATEGORY_AGE	0.94	0.95	0.94
+		
+		
+//		Score: SPECIES_GENDER_WEIGHT_AGE_CATEGORY_AGE	0.93	0.94	0.91
+		
+//		standard: Score [getF1()=0.425, getPrecision()=0.598, getRecall()=0.330, tp=61, fp=41, fn=124, tn=0]
+//				only root: Score [getF1()=0.548, getPrecision()=0.575, getRecall()=0.523, tp=23, fp=17, fn=21, tn=0]
+//				CRFStatistics [context=Train, getTotalDuration()=85465]
+//				CRFStatistics [context=Test, getTotalDuration()=299]
+//				Compute coverage...
+//				Coverage Training: Score [getF1()=0.931, getPrecision()=1.000, getRecall()=0.871, tp=651, fp=0, fn=96, tn=0]
+//				Compute coverage...
+//				Coverage Development: Score [getF1()=0.876, getPrecision()=0.967, getRecall()=0.800, tp=148, fp=5, fn=37, tn=0]
+//				modelName: Injury9847
+//		standard: Score [getF1()=0.432, getPrecision()=0.608, getRecall()=0.335, tp=62, fp=40, fn=123, tn=0]
+//				only root: Score [getF1()=0.571, getPrecision()=0.600, getRecall()=0.545, tp=24, fp=16, fn=20, tn=0]
+//				CRFStatistics [context=Train, getTotalDuration()=65265]
+//				CRFStatistics [context=Test, getTotalDuration()=189]
+//				Compute coverage...
+//				Coverage Training: Score [getF1()=0.931, getPrecision()=1.000, getRecall()=0.871, tp=651, fp=0, fn=96, tn=0]
+//				Compute coverage...
+//				Coverage Development: Score [getF1()=0.876, getPrecision()=0.967, getRecall()=0.800, tp=148, fp=5, fn=37, tn=0]
+//				modelName: Injury1364
+		
 //		Collections.sort(trainingInstances);
-		Random random = new Random(100L);
+		Random random = new Random(1000L);
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
+			Collections.shuffle(trainingInstances, new Random(random.nextLong()));
+
 			Map<SlotType, Boolean> leaveOnePropertyOut = null;
 			if (includeLeaveOnePropertyOut) {
 				leaveOnePropertyOut = SlotType.storeExcludance();

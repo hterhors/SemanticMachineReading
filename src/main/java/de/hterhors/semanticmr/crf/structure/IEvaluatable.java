@@ -58,7 +58,7 @@ public interface IEvaluatable {
 		}
 
 		/**
-		 * Converts this score object into a macro score object. Removes tp,fp,fn,tn and
+		 * Converts this score object into a macro score. Removes tp,fp,fn,tn and
 		 * keeps f1, precision and recall. Modification functions such as add do not
 		 * work.
 		 * 

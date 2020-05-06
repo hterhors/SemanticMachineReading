@@ -186,4 +186,14 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
 		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluationDetail);
 	}
+
+	/**
+	 * Returns a new LiteralAnnotation object with all properties of this
+	 * DocumentLinkedAnnotation but the document link character offset.
+	 * 
+	 * @return a literalAnnotation version of this documentLinkedAnnotation.
+	 */
+	public LiteralAnnotation reduceToLiteralAnnotation() {
+		return new LiteralAnnotation(getEntityType(), textualContent.deepCopy());
+	}
 }

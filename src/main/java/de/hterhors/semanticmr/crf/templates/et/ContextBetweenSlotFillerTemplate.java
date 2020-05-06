@@ -47,6 +47,10 @@ public class ContextBetweenSlotFillerTemplate extends AbstractFeatureTemplate<Co
 
 	private static final String PREFIX = "CBSFT\t";
 
+	public ContextBetweenSlotFillerTemplate() {
+//super(false);
+	}
+	
 	static class PositionPairContainer {
 
 		final String fromClassNameType;

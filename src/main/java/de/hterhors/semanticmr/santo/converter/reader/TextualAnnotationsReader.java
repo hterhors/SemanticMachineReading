@@ -18,13 +18,13 @@ import de.hterhors.semanticmr.santo.helper.PatternCollection;
 
 public class TextualAnnotationsReader {
 
-	private static final int ANNOTATION_ID_INDEX = 0;
-	private static final int CLASS_TYPE_INDEX = 1;
-	private static final int ONSET_INDEX = 2;
-	private static final int OFFSET_INDEX = 3;
-	private static final int TEXT_MENTION_INDEX = 4;
-	private static final int META_INDEX = 5;
-	private static final int RDF_LINK_INDEX = 6;
+	public static final int ANNOTATION_ID_INDEX = 0;
+	public static final int CLASS_TYPE_INDEX = 1;
+	public static final int ONSET_INDEX = 2;
+	public static final int OFFSET_INDEX = 3;
+	public static final int TEXT_MENTION_INDEX = 4;
+	public static final int META_INDEX = 5;
+	public static final int RDF_LINK_INDEX = 6;
 
 	final private File textualAnnotationsFile;
 	final private Document document;

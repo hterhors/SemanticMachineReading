@@ -30,7 +30,7 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 	private static final String PREFIX = "STCT\t";
 
 	public SingleTokenContextTemplate() {
-		super(false);
+//		super(false);
 	}
 
 	static class SingleTokenContextScope extends AbstractFactorScope {

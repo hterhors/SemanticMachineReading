@@ -136,12 +136,12 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 
 		final String slotName = factor.getFactorScope().slot.name;
 
-		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains >2 element",
-				factor.getFactorScope().numberOfSlotFiller >= 2);
-		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains >3 element",
-				factor.getFactorScope().numberOfSlotFiller >= 3);
-		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains >4 element",
-				factor.getFactorScope().numberOfSlotFiller >= 4);
+//		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains >2 element",
+//				factor.getFactorScope().numberOfSlotFiller >= 2);
+//		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains >3 element",
+//				factor.getFactorScope().numberOfSlotFiller >= 3);
+//		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains >4 element",
+//				factor.getFactorScope().numberOfSlotFiller >= 4);
 
 //		featureVector.set("[" + parentClassName + "]" + propertyNameChain + " contains >2 distinct element",
 //				factor.getFactorScope().numberOfDistinctSlotFiller >= 2
@@ -160,7 +160,9 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 //		}
 
 		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " contains elements", slotIsFilled);
-		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " is empty", !slotIsFilled);
+//		featureVector.set(PREFIX + "[" + parentClassName + "]" + slotName + " is empty", !slotIsFilled);
 	}
 
 }
+
+

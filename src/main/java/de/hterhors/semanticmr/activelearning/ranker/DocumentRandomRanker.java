@@ -19,7 +19,6 @@ public class DocumentRandomRanker implements IActiveLearningDocumentRanker {
 
 	public DocumentRandomRanker() {
 		random = new Random(123456L);
-//		random = ((ActiveLearningDistributor) runner.getParameter().corpusDistributor).random;
 	}
 
 	@Override

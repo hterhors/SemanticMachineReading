@@ -20,6 +20,10 @@ import de.hterhors.semanticmr.crf.variables.State;
  */
 public class ClusterTemplate extends AbstractFeatureTemplate<ClusterScope> {
 
+	public ClusterTemplate() {
+//super(false);
+	}
+	
 	static class ClusterScope extends AbstractFactorScope {
 
 		public final int sentenceSpread;
