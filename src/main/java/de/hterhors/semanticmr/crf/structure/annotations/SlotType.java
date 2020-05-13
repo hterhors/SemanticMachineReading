@@ -35,6 +35,12 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 		for (SlotType st : getAllSlotTypes()) {
 			storeExclude.put(st, st.exclude);
 		}
+
+		Map<SlotType, Boolean> storeExclude = new HashMap<>();
+		for (SlotType key : SlotType.storeExclude.keySet()) {
+			storeExclude.put(key, SlotType.storeExclude.get(key));
+		}
+
 		return Collections.unmodifiableMap(storeExclude);
 	}
 
@@ -58,7 +64,7 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 
 	public static void includeAll() {
 		for (SlotType st : getAllSlotTypes()) {
-			st.exclude();
+			st.include();
 		}
 	}
 

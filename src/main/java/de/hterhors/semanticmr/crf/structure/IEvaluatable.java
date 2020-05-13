@@ -58,9 +58,8 @@ public interface IEvaluatable {
 		}
 
 		/**
-		 * Converts this score object into a macro score. Removes tp,fp,fn,tn and
-		 * keeps f1, precision and recall. Modification functions such as add do not
-		 * work.
+		 * Converts this score object into a macro score. Removes tp,fp,fn,tn and keeps
+		 * f1, precision and recall. Modification functions such as add do not work.
 		 * 
 		 * @return
 		 */
@@ -378,6 +377,14 @@ public interface IEvaluatable {
 			if (unmod)
 				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
 			this.fn++;
+		}
+
+		public void increaseTruePositive() {
+			if (isMacro())
+				throw new IllegalStateException("Can not increase false negatives for macro score objects.");
+			if (unmod)
+				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
+			this.tp++;
 		}
 
 		public int getTp() {

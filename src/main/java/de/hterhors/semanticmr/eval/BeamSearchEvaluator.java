@@ -18,9 +18,9 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 
 	public static void main(String[] args) {
 
-		int maxSize = 100;
+		int maxSize = 3;
 		Score[][] scores = new Score[maxSize][maxSize];
-		Random rand = new Random(2);
+		Random rand = new Random(10);
 
 		for (int i = 0; i < scores.length; i++) {
 			for (int j = 0; j < scores[i].length; j++) {
@@ -29,7 +29,7 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 			}
 		}
 
-		BeamSearchEvaluator f = new BeamSearchEvaluator(EEvaluationDetail.ENTITY_TYPE, 1);
+		BeamSearchEvaluator f = new BeamSearchEvaluator(EEvaluationDetail.ENTITY_TYPE, 5);
 
 		System.out.println(f.beamSearchDecoder(maxSize, scores));
 	}
@@ -58,7 +58,6 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 		 * Init scores
 		 */
 		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
-
 		return beamSearchDecoder(maxSize, scores);
 	}
 
@@ -126,6 +125,8 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 		public final boolean[] to;
 		private final int maxSize;
 
+		private List<Integer> assignmentsPairs;
+
 		/*
 		 * Clone
 		 */
@@ -134,6 +135,7 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 			this.score = new Score(assignments.score);
 			this.from = Arrays.copyOf(assignments.from, assignments.maxSize);
 			this.to = Arrays.copyOf(assignments.to, assignments.maxSize);
+			this.assignmentsPairs = new ArrayList<>(assignments.assignmentsPairs);
 		}
 
 		/*
@@ -146,12 +148,18 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 			this.to = new boolean[maxSize];
 			this.from[from] = true;
 			this.to[to] = true;
+			this.assignmentsPairs = new ArrayList<>();
+			for (int i = 0; i < maxSize; i++) {
+				this.assignmentsPairs.add(i);
+			}
+			this.assignmentsPairs.set(from, to);
 		}
 
 		public void addAssignment(int from, int to, Score score) {
 			this.score.add(score);
 			this.from[from] = true;
 			this.to[to] = true;
+			this.assignmentsPairs.set(from, to);
 		}
 
 		@Override
@@ -165,7 +173,12 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 		@Override
 		public String toString() {
 			return "Assignment [score=" + score + ", from=" + Arrays.toString(from) + ", to=" + Arrays.toString(to)
-					+ ", maxSize=" + maxSize + "]";
+					+ ", maxSize=" + maxSize + " ]";
+		}
+
+		public List<Integer> getAssignments() {
+//			return Collections.emptyList();
+			return Collections.unmodifiableList(this.assignmentsPairs);
 		}
 
 	}
@@ -215,6 +228,35 @@ public class BeamSearchEvaluator extends AbstractEvaluator {
 		}
 
 		return scores;
+	}
+
+	public List<Integer> getBestAssignment(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
+
+		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
+
+		/*
+		 * Init scores
+		 */
+		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
+
+		/*
+		 * Init beam
+		 */
+		List<Assignment> assignments = new ArrayList<>();
+
+		for (int from = 0; from < scores.length; from++) {
+			for (int to = 0; to < scores[from].length; to++) {
+				assignments.add(new Assignment(maxSize, from, to, scores[from][to]));
+			}
+		}
+
+		Collections.sort(assignments);
+
+		Assignment bestAssignment = beamSearchAssignment(scores,
+				assignments.subList(0, Math.min(assignments.size(), beamSize)));
+
+		return bestAssignment.getAssignments();
 	}
 
 }
