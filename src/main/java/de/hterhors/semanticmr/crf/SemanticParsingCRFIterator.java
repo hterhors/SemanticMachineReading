@@ -7,12 +7,18 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.google.common.util.concurrent.AtomicDouble;
 
 import de.hterhors.semanticmr.crf.exploration.IExplorationStrategy;
 import de.hterhors.semanticmr.crf.helper.log.LogUtils;
@@ -39,10 +45,10 @@ import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.NerlaEvaluator;
 
-public class SemanticParsingCRF implements ISemanticParsingCRF {
+public class SemanticParsingCRFIterator implements ISemanticParsingCRF {
 	public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.00000");
 
-	private static Logger log = LogManager.getFormatterLogger(SemanticParsingCRF.class);
+	private static Logger log = LogManager.getFormatterLogger("SlotFilling");
 
 	/**
 	 * The maximum number of sampling steps per instance. This prevents infinite
@@ -80,12 +86,12 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 	private IObjectiveFunction coverageObjectiveFunction = new SlotFillingObjectiveFunction(EScoreType.MICRO,
 			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE, EEvaluationDetail.DOCUMENT_LINKED));
 
-	public SemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
+	public SemanticParsingCRFIterator(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
 			IObjectiveFunction objectiveFunction) {
 		this(model, Arrays.asList(explorer), sampler, objectiveFunction);
 	}
 
-	public SemanticParsingCRF(Model model, List<IExplorationStrategy> explorer, AbstractSampler sampler,
+	public SemanticParsingCRFIterator(Model model, List<IExplorationStrategy> explorer, AbstractSampler sampler,
 			IObjectiveFunction objectiveFunction) {
 		this.model = model;
 		this.explorerList = explorer;
@@ -93,7 +99,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 		this.sampler = sampler;
 	}
 
-	public SemanticParsingCRF(Model model, List<IExplorationStrategy> explorerList, AbstractSampler sampler,
+	public SemanticParsingCRFIterator(Model model, List<IExplorationStrategy> explorerList, AbstractSampler sampler,
 			IStateInitializer stateInitializer, IObjectiveFunction trainingObjectiveFunction) {
 		this.model = model;
 		this.explorerList = explorerList;
@@ -187,23 +193,31 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 				sampling: for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
 
 					for (IExplorationStrategy explorer : explorerList) {
+						explorer.set(currentState);
 
-						final List<State> proposalStates = explorer.explore(currentState);
+						State candidateState = currentState;
+						double maxValue = 0;
+						while (explorer.hasNext()) {
+							State proposalState = explorer.next();
 
-						if (epoch == 1) {
-							System.out.println("");
+							final double newVal;
+							if (sampleBasedOnObjectiveFunction) {
+								objectiveFunction.score(proposalState);
+								newVal = proposalState.getObjectiveScore();
+							} else {
+								model.score(proposalState);
+								newVal = proposalState.getModelScore();
+							}
+
+							if (newVal >= maxValue) {
+								maxValue = newVal;
+								candidateState = proposalState;
+
+								if (currentState.getObjectiveScore() == 1.0)
+									break;
+
+							}
 						}
-
-						if (proposalStates.isEmpty())
-							proposalStates.add(currentState);
-
-						if (sampleBasedOnObjectiveFunction) {
-							objectiveFunction.score(proposalStates);
-						} else {
-							model.score(proposalStates);
-						}
-
-						final State candidateState = sampler.sampleCandidate(proposalStates);
 
 						scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
 
@@ -287,9 +301,10 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 //			lastModelWeights = currentModelWeights;
 //			Collections.shuffle(trainingInstances);
 
-		}this.trainingStatistics.endTrainingTime=System.currentTimeMillis();
+		}
+		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 
-	return finalStates;
+		return finalStates;
 
 	}
 
@@ -629,6 +644,10 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 	 * @param instances        the instances to compute the coverage on.
 	 * @return a score that contains information of the coverage.
 	 */
+
+	private State candidateState = null;
+	private Object lock = "";
+
 	public Score computeCoverage(final boolean printDetailedLog, IObjectiveFunction predictionOF,
 			final List<Instance> instances) {
 
@@ -646,22 +665,66 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 			State currentState = initializer.getInitState(instance);
 			predictionOF.score(currentState);
-
 			finalStates.put(instance, currentState);
 			producedStateChain.add(currentState);
 			int samplingStep;
 			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
+
 				for (IExplorationStrategy explorer : explorerList) {
 
-					final List<State> proposalStates = explorer.explore(currentState);
+					explorer.set(currentState);
+					AtomicInteger c = new AtomicInteger(0);
 
-					if (proposalStates.isEmpty())
-						proposalStates.add(currentState);
+					AtomicDouble maxValue = new AtomicDouble(0);
+					candidateState = currentState;
 
-					predictionOF.score(proposalStates);
+					StreamSupport.stream(Spliterators.spliteratorUnknownSize(explorer, Spliterator.IMMUTABLE), true)
+							.forEach(proposalState -> {
 
-					final State candidateState = SamplerCollection.greedyObjectiveStrategy()
-							.sampleCandidate(proposalStates);
+								final double newVal;
+								objectiveFunction.score(proposalState);
+								newVal = proposalState.getObjectiveScore();
+								c.incrementAndGet();
+								synchronized (lock) {
+									if (newVal >= maxValue.get()) {
+										maxValue.set(newVal);
+										candidateState = proposalState;
+									}
+
+								}
+							});
+
+					System.out.println(c);
+//					State candidateState = currentState;
+//					double maxValue = 0;
+//					while (explorer.hasNext()) {
+//						c++;
+//						State proposalState = explorer.next();
+//
+//						final double newVal;
+//						objectiveFunction.score(proposalState);
+//						newVal = proposalState.getObjectiveScore();
+//
+//						if (newVal >= maxValue) {
+//							maxValue = newVal;
+//							candidateState = proposalState;
+//
+//							if (currentState.getObjectiveScore() == 1.0)
+//								break;
+//
+//						}
+//					}
+//					System.out.println(c);
+
+//					final List<State> proposalStates = explorer.explore(currentState);
+//
+//					if (proposalStates.isEmpty())
+//						proposalStates.add(currentState);
+//
+//					predictionOF.score(proposalStates);
+
+//					final State candidateState = SamplerCollection.greedyObjectiveStrategy()
+//							.sampleCandidate(proposalStates);
 
 					boolean isAccepted = SamplerCollection.greedyObjectiveStrategy().getAcceptanceStrategy(0)
 							.isAccepted(candidateState, currentState);
@@ -673,6 +736,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 					producedStateChain.add(currentState);
 
 					finalStates.put(instance, currentState);
+
 				}
 				if (meetsSamplingStoppingCriterion(noObjectiveChangeCrit, producedStateChain))
 					break;

@@ -350,4 +350,22 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 	}
 
+	@Override
+	public boolean hasNext() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public State next() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void set(State state) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

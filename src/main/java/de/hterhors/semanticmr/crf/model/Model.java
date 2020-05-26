@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -15,16 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.hterhors.semanticmr.crf.learner.AdvancedLearner;
-import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.templates.AbstractFeatureTemplate;
 import de.hterhors.semanticmr.crf.variables.DoubleVector;
-import de.hterhors.semanticmr.crf.variables.DoubleVectorARRAY;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.exce.ModelLoadException;
 import de.hterhors.semanticmr.exce.ModelSaveException;
@@ -118,93 +116,44 @@ public class Model {
 	}
 
 	public void score(State state) {
-
-		/**
-		 * TODO: measure efficiency of streams
-		 */
-		for (AbstractFeatureTemplate template : this.factorTemplates) {
-
-			/*
-			 * Collect all factor scopes of all states to that this template can be applied
-			 */
-
-			collectFactorScopesForState(template, state);
-//
-//			System.out.println(template.getClass().getSimpleName());
-//			state.getFactorGraph(template).getFactorScopes().forEach(System.out::println);
-//
-//			System.out.println("------------------------------------------------------");
-		}
-		/*
-		 * Compute all selected factors in parallel.
-		 */
-		computeRemainingFactors(state.getFactorGraphs().stream().flatMap(l -> l.getFactorScopes().stream()));
-
-		/*
-		 * Compute and set model score
-		 */
-		state.setModelScore(computeScore(state));
+		score(Arrays.asList(state));
 	}
 
 	public void score(List<State> states) {
 
-		for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
+		/*
+		 * Collect all factor scopes of all states to that this template can be applied
+		 */
+		states.parallelStream().forEach(state -> {
+			for (AbstractFeatureTemplate<?> template : this.factorTemplates) {
 
-			/*
-			 * Collect all factor scopes of all states to that this template can be applied
-			 */
+				FactorGraph factorGraph = state.getFactorGraph(template);
 
-			states.parallelStream().forEach(state -> collectFactorScopesForState(template, state));
+				if (factorGraph == null) {
+					factorGraph = new FactorGraph(factorCache, template);
+				}
+				state.setFactorGraph(template, factorGraph);
 
-		}
+				factorGraph.addFactorScopes((List<AbstractFactorScope>) template.generateFactorScopes(state));
+			}
+
+		});
+
 		/*
 		 * Compute all selected factors in parallel.
 		 */
-		computeRemainingFactors(states.stream().flatMap(state -> state.getFactorGraphs().stream())
-				.flatMap(fg -> fg.getFactorScopes().stream()));
+		computeRemainingFactors(states);
 		/*
 		 * Compute and set model score
 		 */
 		states.parallelStream().forEach(state -> state.setModelScore(computeScore(state)));
 	}
 
-	private void computeRemainingFactors(Stream<AbstractFactorScope> stream) {
-
-		List<Factor> factors = new ArrayList<>();
-
-		for (AbstractFactorScope scope : stream.distinct()
-				.filter(fs -> !fs.template.enableFactorCaching
-						|| (fs.template.enableFactorCaching && !factorCache.containsFactorScope(fs)))
-				.collect(Collectors.toList())) {
-			factors.add(new Factor(scope));
-		}
-
-		factors.parallelStream().forEach(factor -> {
-			factor.getFactorScope().template.generateFeatureVector(factor);
-		});
-
-		for (Factor<?> factor : factors) {
-			if (!factor.getFactorScope().template.enableFactorCaching)
-				continue;
-			factorCache.addFactor(factor);
-		}
-	}
-
-	private void collectFactorScopesForState(AbstractFeatureTemplate template, State state) {
-
-		FactorGraph factorGraph = state.getFactorGraph(template);
-
-		if (factorGraph == null) {
-			factorGraph = new FactorGraph(factorCache, template);
-		}
-		state.addIfAbsentFactorGraph(template, factorGraph);
-
-		factorGraph.addFactorScopes(template.generateFactorScopes(state));
-	}
-
 	/**
 	 * Computes the score of this state according to the trained model. The computed
 	 * score is returned but also updated in the state objects <i>score</i> field.
+	 * 
+	 * @param preComputedFactors
 	 * 
 	 * @param list
 	 * @return
@@ -213,9 +162,10 @@ public class Model {
 
 		double score = 1;
 		boolean factorsAvailable = false;
+
 		for (FactorGraph factorGraph : state.getFactorGraphs()) {
 
-			final List<Factor> factors = factorGraph.getFactors();
+			final List<Factor> factors = factorGraph.getCachedFactors();
 
 			factorsAvailable |= factors.size() != 0;
 
@@ -228,6 +178,48 @@ public class Model {
 			return score;
 
 		return 0;
+
+	}
+
+	private void computeRemainingFactors(List<State> states) {
+
+		List<List<Factor>> factorsToCache = Collections.synchronizedList(new ArrayList<>());
+
+		states.parallelStream().forEach(state -> {
+
+			List<Factor> factors = new ArrayList<>();
+			for (FactorGraph factorGraph : state.getFactorGraphs()) {
+
+				List<Factor> computedFactors = new ArrayList<>();
+				for (AbstractFactorScope scope : factorGraph.getFactorScopes()) {
+
+					Factor factor;
+
+					if ((factor = factorCache.getIfPresent(scope)) == null) {
+						factor = new Factor(scope);
+						factor.getFactorScope().template.generateFeatureVector(factor);
+					}
+
+					computedFactors.add(factor);
+					factors.add(factor);
+
+				}
+				factorsToCache.add(computedFactors);
+
+				factorGraph.cacheFactors(computedFactors);
+
+			}
+		});
+
+		/*
+		 * This might removes cache values form the cache due to fix cache size. But
+		 * factors for factor graphs are already stored in the factor graph.
+		 */
+		for (List<Factor> list : factorsToCache) {
+			for (Factor<?> factor : list) {
+				factorCache.addFactor(factor);
+			}
+		}
 
 	}
 
@@ -251,37 +243,6 @@ public class Model {
 
 	}
 
-//	public void printReadable(File modelDir, String modelName) {
-//		log.info("Print model in readable format...");
-//		try {
-//			for (AbstractFeatureTemplate template : this.factorTemplates) {
-//				File parentDir = new File(modelDir, modelName + DEFAULT_READABLE_DIR);
-//				parentDir.mkdirs();
-//
-//				final File f = new File(parentDir, template.getClass().getSimpleName());
-//
-//				PrintStream ps = new PrintStream(f);
-//				log.info("Print template to " + f.getAbsolutePath());
-//
-//				List<Pair> sortedWeights = new ArrayList<>();
-//				for (int i = 0; i < template.getWeights().getFeatures().length; i++) {
-//					sortedWeights.add(new Pair(i, template.getWeights().getFeatures()[i]));
-//				}
-//
-//				if (sortedWeights.size() == 0)
-//
-//					log.warn("No features found for template: " + template.getClass().getSimpleName());
-//				Collections.sort(sortedWeights, (o1, o2) -> -Double.compare(o1.value, o2.value));
-//				for (Pair feature : sortedWeights) {
-//					ps.println(indexFeatureName.get(feature.index) + "\t" + feature.value);
-//				}
-//				ps.close();
-//
-//			}
-//		} catch (IOException ex) {
-//			throw new RuntimeException("The model could not be printed. Failed with error: " + ex.getMessage());
-//		}
-//	}
 	public void printReadable(File modelDir, String modelName) {
 		log.info("Print model in readable format...");
 		try {

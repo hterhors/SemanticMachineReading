@@ -192,6 +192,9 @@ public class SemanticParsingBeamCRF {
 							boolean isAccepted = sampler.getAcceptanceStrategy(epoch)
 									.isAccepted(beamStatePair.candidateState, beamStatePair.currentState);
 
+							
+							System.out.println();
+							
 							/*
 							 * Update model weights
 							 */

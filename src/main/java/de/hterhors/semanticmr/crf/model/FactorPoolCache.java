@@ -28,7 +28,7 @@ final public class FactorPoolCache {
 	 */
 	// private static FactorPool sharedInstance = null;
 
-	public	FactorPoolCache(Model model, int maxSize, int initSize) {
+	public FactorPoolCache(Model model, int maxSize, int initSize) {
 		factorCache = CacheBuilder.newBuilder().maximumSize(maxSize).initialCapacity(initSize)
 				.build(new FactorCacheLoader(model));
 	}
@@ -59,7 +59,30 @@ final public class FactorPoolCache {
 	 * @return true if the pool contains the given factor scope.
 	 */
 	protected boolean containsFactorScope(AbstractFactorScope factorScope) {
+		/*
+		 * If is not cacheable return false,
+		 */
+		if (!factorScope.template.enableFactorCaching)
+			return false;
+
 		return factorCache.getIfPresent(factorScope) != null;
+	}
+
+	/**
+	 * 
+	 * Checks if the factor pool already contains a factor scope as key.
+	 * 
+	 * @param factorScope
+	 * @return true if the pool contains the given factor scope.
+	 */
+	protected Factor getIfPresent(AbstractFactorScope factorScope) {
+		/*
+		 * If is not cacheable return false,
+		 */
+		if (!factorScope.template.enableFactorCaching)
+			return null;
+
+		return factorCache.getIfPresent(factorScope);
 	}
 
 	/**
@@ -78,11 +101,11 @@ final public class FactorPoolCache {
 		if (factorScopes.isEmpty())
 			return Collections.emptyList();
 
-		final List<Factor> factors = new ArrayList<>();
+		final List<Factor<?>> factors = new ArrayList<>();
 
 		for (Scope factorVariables : factorScopes) {
 
-			final Factor factor;
+			final Factor<?> factor;
 
 			try {
 				factor = factorCache.get(factorVariables);
@@ -91,7 +114,7 @@ final public class FactorPoolCache {
 						String.format("Could not retrieve factor for requested factor variables: %s", factorVariables));
 			}
 
-			factors.add((Factor) factor);
+			factors.add(factor);
 
 		}
 		return Collections.unmodifiableList(factors);
@@ -101,12 +124,11 @@ final public class FactorPoolCache {
 	 * Adds a pre-computed factor to this factor pool. The factor is stored under
 	 * its corresponding factor scope.
 	 * 
-	 * @throws IllegalStateException if a factor was already stored for that
-	 *                               specific scope.
-	 * 
 	 * @param factor
 	 */
 	protected void addFactor(Factor factor) {
+		if (!factor.getFactorScope().template.enableFactorCaching)
+			return;
 		factorCache.put(factor.getFactorScope(), factor);
 	}
 

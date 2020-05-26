@@ -40,7 +40,8 @@ public class FactorGraph {
 //		this.factorPool = factorPool;
 //	}
 
-	 final private FactorPoolCache factorPool;
+	final private FactorPoolCache factorPool;
+
 	public FactorGraph(FactorPoolCache factorPool, AbstractFeatureTemplate<?> template) {
 		this.template = template;
 		this.factorPool = factorPool;
@@ -71,36 +72,41 @@ public class FactorGraph {
 	 * 
 	 * @return
 	 */
-	public List<Factor> getFactors() {
-		if (this.template.enableFactorCaching)
-			return getCachedFactors();
-		else
-			return getUnCachedFactors();
-	}
-
 	public List<Factor> getCachedFactors() {
-		if (this.isDirty || this.cache == null)
-			this.cache = factorPool.getFactors(factorScopes);
+		return this.cache;
 
-		/*
-		 * Set dirty flag to false.
-		 */
-		this.isDirty = false;
-		return cache;
+//		if (this.template.enableFactorCaching) {
+//			return getCachedFactors();
+//		} else
+//			return getUnCachedFactors();
 	}
 
-	public List<Factor> getUnCachedFactors() {
+//	public List<Factor> getCachedFactors() {
+//
+//		if (this.isDirty || this.cache == null) {
+//
+//			this.cache = factorPool.getFactors(factorScopes);
+//		}
+//
+//		/*
+//		 * Set dirty flag to false.
+//		 */
+//		this.isDirty = false;
+//		return this.cache;
+//	}
 
-		List<Factor> factors = new ArrayList<>();
-
-		for (AbstractFactorScope fs : factorScopes) {
-			factors.add(new Factor(fs));
-		}
-
-		factors.parallelStream().forEach(f -> this.template.generateFeatureVector(f));
-		return factors;
-
-	}
+//	public List<Factor> getUnCachedFactors() {
+//
+//		List<Factor> factors = new ArrayList<>();
+//
+//		for (AbstractFactorScope fs : factorScopes) {
+//			factors.add(new Factor(fs));
+//		}
+//
+//		factors.parallelStream().forEach(f -> this.template.generateFeatureVector(f));
+//		return factors;
+//
+//	}
 
 	/**
 	 * Return the factor scopes of this factor graph.
@@ -109,6 +115,11 @@ public class FactorGraph {
 	 */
 	public List<? extends AbstractFactorScope> getFactorScopes() {
 		return factorScopes;
+	}
+
+	public void cacheFactors(List<Factor> computedFactors) {
+		this.cache = computedFactors;
+		this.isDirty = false;
 	}
 
 }

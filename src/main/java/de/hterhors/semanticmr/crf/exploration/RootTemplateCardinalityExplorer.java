@@ -120,4 +120,22 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 		averageNumberOfNewProposalStates /= 2;
 	}
 
+	@Override
+	public boolean hasNext() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public State next() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void set(State state) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

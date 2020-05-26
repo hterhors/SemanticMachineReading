@@ -3,6 +3,7 @@ package de.hterhors.semanticmr.crf.exploration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +23,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  * @author hterhors
  *
  */
-public class EntityRecLinkExplorer implements IExplorationStrategy {
+public class EntityRecLinkExplorer implements IExplorationStrategy{
 	private static Logger log = LogManager.getFormatterLogger(EntityRecLinkExplorer.class);
 
 	final private HardConstraintsProvider hardConstraintsProvider;
@@ -71,8 +72,6 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 	private void addNewAnnotation(final List<State> proposalStates, State currentState) {
 		final List<DocumentToken> tokens = currentState.getInstance().getDocument().tokenList;
 
-		
-		
 		
 		
 		for (int windowSize = MIN_WINDOW_SIZE; windowSize <= MAX_WINDOW_SIZE; windowSize++) {
@@ -190,5 +189,24 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 		averageNumberOfNewProposalStates += proposalStates.size();
 		averageNumberOfNewProposalStates /= 2;
 	}
+
+	@Override
+	public boolean hasNext() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public State next() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void set(State state) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

@@ -16,6 +16,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation
 import de.hterhors.semanticmr.crf.variables.Instance.DuplicationRule;
 import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
+import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
 public class Annotations {
 
@@ -117,7 +118,7 @@ public class Annotations {
 			if (this.annotations.size() == 1 && otherVal.annotations.size() == 1)
 				score = evaluator.scoreSingle(this.annotations.get(0), otherVal.annotations.get(0));
 			else {
-				if (scoreType == EScoreType.MICRO
+				if (evaluator.evaluationDetail == EEvaluationDetail.DOCUMENT_LINKED && scoreType == EScoreType.MICRO
 						&& (otherVal.newAddAnnotation != null || otherVal.newRemoveAnnotation != null)) {
 					Score tmp = new Score();
 					if (otherVal.newAddAnnotation != null) {

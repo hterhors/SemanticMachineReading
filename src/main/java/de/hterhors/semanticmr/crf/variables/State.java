@@ -72,7 +72,7 @@ public class State {
 		return new State(this.instance, currentPredictions.deepRemoveCopy(annotationIndex));
 	}
 
-	public void addIfAbsentFactorGraph(final AbstractFeatureTemplate<?> template, final FactorGraph factorGraph) {
+	public void setFactorGraph(final AbstractFeatureTemplate<?> template, final FactorGraph factorGraph) {
 		factorGraphs.put(template, factorGraph);
 	}
 
