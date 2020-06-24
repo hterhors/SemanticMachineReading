@@ -46,7 +46,7 @@ public class DoubleVector {
 	}
 
 	public void set(String feature, Double value) {
-		if (value.doubleValue() == 0.0D)
+		if (value.doubleValue() == 0.0F)
 			return;
 		setForceZero(feature, value);
 	}

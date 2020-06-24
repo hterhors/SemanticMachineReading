@@ -171,4 +171,11 @@ public class PurityInvPurityEvaluator extends AbstractEvaluator {
 		throw new NotImplementedException("Not impl.");
 	}
 
+	@Override
+	public List<Integer> getBestAssignment(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
+		// TODO Auto-generated method stub
+		throw new NotImplementedException("Not impl.");
+	}
+
 }

@@ -368,6 +368,8 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	 * This is basically all super and sub entities and for each recursively
 	 * reachable slot all entity filler types.
 	 * 
+	 * ONLY Slots that are included
+	 * 
 	 * @return
 	 */
 	public Set<EntityType> getRelatedEntityTypes() {
@@ -377,9 +379,10 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 			for (EntityType relatedET : getHierarchicalEntityTypes()) {
 				this.allRealtedEntityTypes.add(relatedET);
 				for (SlotType slotType : relatedET.getSlots()) {
-					for (EntityType entityType : slotType.getSlotFillerEntityTypes()) {
-						allRealtedEntityTypes.addAll(entityType.getRelatedEntityTypes());
-					}
+					if (slotType.isIncluded())
+						for (EntityType entityType : slotType.getSlotFillerEntityTypes()) {
+							allRealtedEntityTypes.addAll(entityType.getRelatedEntityTypes());
+						}
 				}
 			}
 		}

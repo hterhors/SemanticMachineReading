@@ -4,11 +4,13 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,11 +40,14 @@ import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.NerlaEvaluator;
+import de.hterhors.semanticmr.tools.AutomatedSectionifcation;
+import de.hterhors.semanticmr.tools.AutomatedSectionifcation.ESection;
+import de.hterhors.semanticmr.tools.KeyTermExtractor;
 
 public class SemanticParsingCRF implements ISemanticParsingCRF {
 	public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.00000");
 
-	private static Logger log = LogManager.getFormatterLogger(SemanticParsingCRF.class);
+	private static Logger log = LogManager.getFormatterLogger("SlotFilling");
 
 	/**
 	 * The maximum number of sampling steps per instance. This prevents infinite
@@ -177,26 +182,26 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 			int instanceIndex = 0;
 
 			for (Instance instance : trainingInstances) {
-				final List<State> producedStateChain = new ArrayList<>();
+				++instanceIndex;
 
 				State currentState = initializer.getInitState(instance);
 				objectiveFunction.score(currentState);
 				finalStates.put(instance, currentState);
+				int samplingStep = 0;
+				int intermediateCounter = 0;
+				int proposalStateCounter = 0;
+
+				final List<State> producedStateChain = new ArrayList<>();
 				producedStateChain.add(currentState);
-				int samplingStep;
-				sampling: for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
+
+				sampling: for (samplingStep = 0; samplingStep < 10; samplingStep++) {
 
 					for (IExplorationStrategy explorer : explorerList) {
 
-						final List<State> proposalStates = explorer.explore(currentState);
-
-						if (epoch == 1) {
-							System.out.println("");
-						}
-
+						List<State> proposalStates = explorer.explore(currentState);
 						if (proposalStates.isEmpty())
 							proposalStates.add(currentState);
-
+						proposalStateCounter += proposalStates.size();
 						if (sampleBasedOnObjectiveFunction) {
 							objectiveFunction.score(proposalStates);
 						} else {
@@ -212,16 +217,17 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 						model.updateWeights(learner, currentState, candidateState);
 
+						intermediateCounter++;
 						if (isAccepted) {
 							currentState = candidateState;
 
-//							LogUtils.logState(log,
-//									INTERMEDIATE_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + ++instanceIndex + "/"
-//											+ trainingInstances.size() + "]" + "[" + (samplingStep + 1) + "]",
-//									instance, currentState);
-
+//								LogUtils.logState(log,
+//										INTERMEDIATE_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "["
+//												+ instanceIndex + "/" + trainingInstances.size() + "]" + "["
+//												+ (samplingStep + 1) + "]" + "[" + (intermediateCounter + 1) + "]" + "["
+//												+ proposalStateCounter + "]",
+//										instance, currentState);
 						}
-
 						producedStateChain.add(currentState);
 
 						finalStates.put(instance, currentState);
@@ -233,11 +239,10 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 					if (meetsSamplingStoppingCriterion(samplingStoppingCrits, producedStateChain))
 						break sampling;
-
 				}
 				this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 				LogUtils.logState(log,
-						TRAIN_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + ++instanceIndex + "/"
+						TRAIN_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + instanceIndex + "/"
 								+ trainingInstances.size() + "]" + "[" + (samplingStep + 1) + "]",
 						instance, currentState);
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
@@ -287,9 +292,10 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 //			lastModelWeights = currentModelWeights;
 //			Collections.shuffle(trainingInstances);
 
-		}this.trainingStatistics.endTrainingTime=System.currentTimeMillis();
+		}
+		this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 
-	return finalStates;
+		return finalStates;
 
 	}
 
@@ -437,8 +443,6 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 		int instanceIndex = 0;
 		for (Instance instance : instancesToPredict) {
 
-			final List<State> producedStateChain = new ArrayList<>();
-
 			List<State> currentStates = new ArrayList<>();
 
 			State currentState = initializer.getInitState(instance);
@@ -446,10 +450,12 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 			finalStates.put(instance, Arrays.asList(currentState));
 			objectiveFunction.score(currentState);
 
+			int samplingStep = 0;
+
+			final List<State> producedStateChain = new ArrayList<>();
 			producedStateChain.add(currentState);
 
-			int samplingStep;
-			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
+			for (samplingStep = 0; samplingStep < 10; samplingStep++) {
 
 				for (IExplorationStrategy explorer : explorerList) {
 
@@ -498,20 +504,19 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 								break;
 							}
 						}
-						finalStates.put(instance, currentStates);
+						if (!finalStates.containsKey(instance) || !currentStates.isEmpty())
+							finalStates.put(instance, currentStates);
 					}
 				}
 				if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain)) {
 					break;
 				}
 			}
-
 			this.testStatistics.endTrainingTime = System.currentTimeMillis();
 
 			LogUtils.logState(log,
 					TEST_CONTEXT + "[" + ++instanceIndex + "/" + instancesToPredict.size() + "] [" + samplingStep + "]",
 					instance, currentState);
-//			computeCoverage(true, coverageObjectiveFunction, Arrays.asList(instance));
 			log.info("***********************************************************");
 			log.info("\n");
 			log.info("Time: " + this.testStatistics.getTotalDuration());
@@ -519,6 +524,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 		}
 		this.testStatistics.endTrainingTime = System.currentTimeMillis();
 		return finalStates;
+
 	}
 
 	/**
@@ -649,8 +655,11 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 
 			finalStates.put(instance, currentState);
 			producedStateChain.add(currentState);
-			int samplingStep;
+
+			int samplingStep = 0;
+
 			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
+
 				for (IExplorationStrategy explorer : explorerList) {
 
 					final List<State> proposalStates = explorer.explore(currentState);
@@ -678,6 +687,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 					break;
 
 			}
+
 			if (printDetailedLog)
 				LogUtils.logState(log, COVERAGE_CONTEXT + " [1/1]" + "[" + ++instanceIndex + "/" + instances.size()
 						+ "]" + "[" + (samplingStep + 1) + "]", instance, currentState);

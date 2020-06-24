@@ -1,4 +1,4 @@
-package de.hterhors.semanticmr.tools.specifications;
+package de.hterhors.semanticmr.tools;
 
 import java.io.File;
 import java.util.ArrayList;

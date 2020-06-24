@@ -2,11 +2,15 @@ package de.hterhors.semanticmr.eval;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
+
+import org.apache.commons.lang3.NotImplementedException;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
+import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 
 public class GreedySearchEvaluator extends AbstractEvaluator {
 
@@ -129,6 +133,13 @@ public class GreedySearchEvaluator extends AbstractEvaluator {
 		}
 
 		return scores;
+	}
+
+	@Override
+	public List<Integer> getBestAssignment(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
+		throw new NotImplementedException("Not impl.");
+
 	}
 
 }

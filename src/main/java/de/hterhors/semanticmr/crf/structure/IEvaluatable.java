@@ -378,6 +378,13 @@ public interface IEvaluatable {
 				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
 			this.fn++;
 		}
+		public void increaseTrueNegative() {
+			if (isMacro())
+				throw new IllegalStateException("Can not increase true negatives for macro score objects.");
+			if (unmod)
+				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
+			this.tn++;
+		}
 
 		public void increaseTruePositive() {
 			if (isMacro())

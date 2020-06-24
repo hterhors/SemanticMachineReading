@@ -363,9 +363,8 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	}
 
 	@Override
-	public void set(State state) {
+	public void set(int sentenceIndex) {
 		// TODO Auto-generated method stub
-
 	}
 
 }

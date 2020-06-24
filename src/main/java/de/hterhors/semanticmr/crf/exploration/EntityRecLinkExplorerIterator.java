@@ -12,8 +12,8 @@ import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.AnnotationBuilder;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.State;
-import de.hterhors.semanticmr.tools.specifications.AutomatedSectionifcation;
-import de.hterhors.semanticmr.tools.specifications.AutomatedSectionifcation.ESection;
+import de.hterhors.semanticmr.tools.AutomatedSectionifcation;
+import de.hterhors.semanticmr.tools.AutomatedSectionifcation.ESection;
 
 /**
  * @author hterhors
@@ -47,21 +47,25 @@ public class EntityRecLinkExplorerIterator implements IExplorationStrategy {
 
 	private Iterator<EntityType> entityTypeIterator;
 	private Iterator<AbstractAnnotation> removeIterator;
-	private 	State currentState;
-	private 	int windowSize;
+	private State currentState;
+	private int windowSize;
 	private int runIndex;
 	private List<DocumentToken> tokens;
 	private String text = "";
-	private 	int removeIndex;
+	private int removeIndex;
 	private boolean newRunUpate;
 	private DocumentToken fromToken;
 	private DocumentToken toToken;
 	private boolean surpassConditions = false;
 	AutomatedSectionifcation sectionifcation;
 
+	public void set(int sentenceIndex) {
+
+	}
+
 	public void set(State state) {
 		this.currentState = state;
-		sectionifcation = AutomatedSectionifcation.getInstance(currentState.getInstance());
+		this.sectionifcation = AutomatedSectionifcation.getInstance(currentState.getInstance());
 		this.removeIterator = currentState.getCurrentPredictions().getAnnotations().iterator();
 		this.windowSize = MIN_WINDOW_SIZE;
 		this.runIndex = 0;
@@ -77,7 +81,6 @@ public class EntityRecLinkExplorerIterator implements IExplorationStrategy {
 		return removeIterator.hasNext() || windowSize <= MAX_WINDOW_SIZE;
 	}
 
-
 	@Override
 	public State next() {
 
@@ -91,7 +94,7 @@ public class EntityRecLinkExplorerIterator implements IExplorationStrategy {
 			 * Check some basic constraints.
 			 */
 			if (!surpassConditions) {
-				
+
 				if (sectionifcation.getSection(fromToken.getSentenceIndex()) != ESection.RESULTS) {
 					update();
 					continue;

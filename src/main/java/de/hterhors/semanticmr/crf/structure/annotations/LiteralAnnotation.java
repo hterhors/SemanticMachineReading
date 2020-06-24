@@ -12,7 +12,7 @@ import de.hterhors.semanticmr.eval.EEvaluationDetail;
  * @author hterhors
  *
  */
-public class LiteralAnnotation extends EntityTypeAnnotation {
+public class LiteralAnnotation extends EntityTypeAnnotation implements Comparable<LiteralAnnotation> {
 
 	/**
 	 * Contains the textual content of this annotation.
@@ -32,7 +32,8 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 
 	@Override
 	public LiteralAnnotation deepCopy() {
-		return new LiteralAnnotation(entityType, textualContent.deepCopy());
+		return this;
+//		return new LiteralAnnotation(entityType, textualContent.deepCopy());
 	}
 
 	@Override
@@ -163,5 +164,10 @@ public class LiteralAnnotation extends EntityTypeAnnotation {
 		}
 
 		throw new IllegalStateException("Unkown or unhandled evaluation mode: " + evaluationDetail);
+	}
+
+	@Override
+	public int compareTo(LiteralAnnotation o) {
+		return getSurfaceForm().compareTo(o.getSurfaceForm());
 	}
 }

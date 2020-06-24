@@ -4,21 +4,17 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.common.util.concurrent.AtomicDouble;
 
 import de.hterhors.semanticmr.crf.exploration.IExplorationStrategy;
 import de.hterhors.semanticmr.crf.helper.log.LogUtils;
@@ -44,8 +40,11 @@ import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.NerlaEvaluator;
+import de.hterhors.semanticmr.tools.AutomatedSectionifcation;
+import de.hterhors.semanticmr.tools.AutomatedSectionifcation.ESection;
+import de.hterhors.semanticmr.tools.KeyTermExtractor;
 
-public class SemanticParsingCRFIterator implements ISemanticParsingCRF {
+public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 	public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.00000");
 
 	private static Logger log = LogManager.getFormatterLogger("SlotFilling");
@@ -86,12 +85,12 @@ public class SemanticParsingCRFIterator implements ISemanticParsingCRF {
 	private IObjectiveFunction coverageObjectiveFunction = new SlotFillingObjectiveFunction(EScoreType.MICRO,
 			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE, EEvaluationDetail.DOCUMENT_LINKED));
 
-	public SemanticParsingCRFIterator(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
+	public NERSemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
 			IObjectiveFunction objectiveFunction) {
 		this(model, Arrays.asList(explorer), sampler, objectiveFunction);
 	}
 
-	public SemanticParsingCRFIterator(Model model, List<IExplorationStrategy> explorer, AbstractSampler sampler,
+	public NERSemanticParsingCRF(Model model, List<IExplorationStrategy> explorer, AbstractSampler sampler,
 			IObjectiveFunction objectiveFunction) {
 		this.model = model;
 		this.explorerList = explorer;
@@ -99,7 +98,7 @@ public class SemanticParsingCRFIterator implements ISemanticParsingCRF {
 		this.sampler = sampler;
 	}
 
-	public SemanticParsingCRFIterator(Model model, List<IExplorationStrategy> explorerList, AbstractSampler sampler,
+	public NERSemanticParsingCRF(Model model, List<IExplorationStrategy> explorerList, AbstractSampler sampler,
 			IStateInitializer stateInitializer, IObjectiveFunction trainingObjectiveFunction) {
 		this.model = model;
 		this.explorerList = explorerList;
@@ -181,76 +180,96 @@ public class SemanticParsingCRFIterator implements ISemanticParsingCRF {
 			final boolean sampleBasedOnObjectiveFunction = sampler.sampleBasedOnObjectiveScore(epoch);
 
 			int instanceIndex = 0;
+
+			Set<String> keyTerms = KeyTermExtractor.getKeyTerms(trainingInstances);
+
 			for (Instance instance : trainingInstances) {
-				final List<State> producedStateChain = new ArrayList<>();
+				++instanceIndex;
 
 				State currentState = initializer.getInitState(instance);
 				objectiveFunction.score(currentState);
 				finalStates.put(instance, currentState);
-				producedStateChain.add(currentState);
-				int samplingStep;
-				sampling: for (samplingStep = 0; samplingStep < 1000 + MAX_SAMPLING; samplingStep++) {
+				int samplingStep = 0;
+				int intermediateCounter = 0;
+				int proposalStateCounter = 0;
+//				AutomatedSectionifcation sectionifcation = AutomatedSectionifcation
+//						.getInstance(currentState.getInstance());
 
-					for (IExplorationStrategy explorer : explorerList) {
-//						explorer.set(currentState);
+				for (int sentenceIndex = 0; sentenceIndex < instance.getDocument()
+						.getNumberOfSentences(); sentenceIndex++) {
 
-						State candidateState = currentState;
-						double maxValue = 0;
-						while (explorer.hasNext()) {
-							State proposalState = explorer.next();
+//					if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS)
+//						continue;
 
-							final double newVal;
-							if (sampleBasedOnObjectiveFunction) {
-								objectiveFunction.score(proposalState);
-								newVal = proposalState.getObjectiveScore();
-							} else {
-								model.score(proposalState);
-								newVal = proposalState.getModelScore();
-							}
+					boolean containsKeyterm = false;
+					String sentence = instance.getDocument().getContentOfSentence(sentenceIndex);
 
-							if (newVal >= maxValue) {
-								maxValue = newVal;
-								candidateState = proposalState;
+					for (String keyTerm : keyTerms) {
 
-								if (currentState.getObjectiveScore() == 1.0)
-									break;
-
-							}
+						if (sentence.contains(keyTerm)) {
+							containsKeyterm = true;
+							break;
 						}
-
-						scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
-
-						boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState,
-								currentState);
-
-						model.updateWeights(learner, currentState, candidateState);
-
-						if (isAccepted) {
-							currentState = candidateState;
-
-//							LogUtils.logState(log,
-//									INTERMEDIATE_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + ++instanceIndex + "/"
-//											+ trainingInstances.size() + "]" + "[" + (samplingStep + 1) + "]",
-//									instance, currentState);
-
-						}
-
-						producedStateChain.add(currentState);
-
-						finalStates.put(instance, currentState);
-
-						if (currentState.getObjectiveScore() == 1.0D)
-							break sampling;
-
 					}
 
-					if (meetsSamplingStoppingCriterion(samplingStoppingCrits, producedStateChain))
-						break sampling;
+					if (!containsKeyterm)
+						continue;
 
+					final List<State> producedStateChain = new ArrayList<>();
+					producedStateChain.add(currentState);
+
+					sampling: for (samplingStep = 0; samplingStep < 10; samplingStep++) {
+
+						for (IExplorationStrategy explorer : explorerList) {
+
+							explorer.set(sentenceIndex);
+
+							List<State> proposalStates = explorer.explore(currentState);
+							if (proposalStates.isEmpty())
+								proposalStates.add(currentState);
+							proposalStateCounter += proposalStates.size();
+							if (sampleBasedOnObjectiveFunction) {
+								objectiveFunction.score(proposalStates);
+							} else {
+								model.score(proposalStates);
+							}
+
+							final State candidateState = sampler.sampleCandidate(proposalStates);
+
+							scoreSelectedStates(sampleBasedOnObjectiveFunction, currentState, candidateState);
+
+							boolean isAccepted = sampler.getAcceptanceStrategy(epoch).isAccepted(candidateState,
+									currentState);
+
+							model.updateWeights(learner, currentState, candidateState);
+
+							intermediateCounter++;
+							if (isAccepted) {
+								currentState = candidateState;
+
+//								LogUtils.logState(log,
+//										INTERMEDIATE_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "["
+//												+ instanceIndex + "/" + trainingInstances.size() + "]" + "["
+//												+ (samplingStep + 1) + "]" + "[" + (intermediateCounter + 1) + "]" + "["
+//												+ proposalStateCounter + "]",
+//										instance, currentState);
+							}
+							producedStateChain.add(currentState);
+
+							finalStates.put(instance, currentState);
+
+							if (currentState.getObjectiveScore() == 1.0D)
+								break sampling;
+
+						}
+
+						if (meetsSamplingStoppingCriterion(samplingStoppingCrits, producedStateChain))
+							break sampling;
+					}
 				}
 				this.trainingStatistics.endTrainingTime = System.currentTimeMillis();
 				LogUtils.logState(log,
-						TRAIN_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + ++instanceIndex + "/"
+						TRAIN_CONTEXT + " [" + (epoch + 1) + "/" + numberOfEpochs + "]" + "[" + instanceIndex + "/"
 								+ trainingInstances.size() + "]" + "[" + (samplingStep + 1) + "]",
 						instance, currentState);
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
@@ -451,8 +470,6 @@ public class SemanticParsingCRFIterator implements ISemanticParsingCRF {
 		int instanceIndex = 0;
 		for (Instance instance : instancesToPredict) {
 
-			final List<State> producedStateChain = new ArrayList<>();
-
 			List<State> currentStates = new ArrayList<>();
 
 			State currentState = initializer.getInitState(instance);
@@ -460,63 +477,94 @@ public class SemanticParsingCRFIterator implements ISemanticParsingCRF {
 			finalStates.put(instance, Arrays.asList(currentState));
 			objectiveFunction.score(currentState);
 
-			producedStateChain.add(currentState);
+			Set<String> keyTerms = KeyTermExtractor.getKeyTerms(instancesToPredict);
 
-			int samplingStep;
-			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
+			int samplingStep = 0;
 
-				for (IExplorationStrategy explorer : explorerList) {
+			AutomatedSectionifcation sectionifcation = AutomatedSectionifcation.getInstance(instance);
 
-					final List<State> proposalStates = explorer.explore(currentState);
+			for (int sentenceIndex = 0; sentenceIndex < instance.getDocument()
+					.getNumberOfSentences(); sentenceIndex++) {
+//
+//
+				if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS)
+					continue;
+//
+				boolean containsKeyterm = false;
+				String sentence = instance.getDocument().getContentOfSentence(sentenceIndex);
 
-					if (proposalStates.isEmpty())
-						proposalStates.add(currentState);
+				for (String keyTerm : keyTerms) {
 
-					model.score(proposalStates);
-
-					Collections.sort(proposalStates,
-							(s1, s2) -> -Double.compare(s1.getModelScore(), s2.getModelScore()));
-
-					final State candidateState = proposalStates.get(0);
-
-					boolean accepted = AcceptStrategies.strictModelAccept().isAccepted(candidateState, currentState);
-
-					if (accepted) {
-						currentState = candidateState;
-						objectiveFunction.score(currentState);
-					}
-
-					producedStateChain.add(currentState);
-
-					if (n == 1) {
-						finalStates.put(instance, Arrays.asList(currentState));
-					} else {
-
-						currentStates = new ArrayList<>();
-
-						final State prevCurrentState = producedStateChain.get(producedStateChain.size() - 2);
-
-						for (int i = 0; i < Math.min(proposalStates.size(), n); i++) {
-
-							accepted = AcceptStrategies.strictModelAccept().isAccepted(proposalStates.get(i),
-									prevCurrentState); // prev current state
-
-							if (accepted) {
-								objectiveFunction.score(proposalStates.get(i));
-								currentStates.add(proposalStates.get(i));
-							} else {
-								/*
-								 * Quick break cause monotone decreasing model score distribution and strict
-								 * evaluation.
-								 */
-								break;
-							}
-						}
-						finalStates.put(instance, currentStates);
+					if (sentence.contains(keyTerm)) {
+						containsKeyterm = true;
+						break;
 					}
 				}
-				if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain)) {
-					break;
+
+				if (!containsKeyterm)
+					continue;
+
+				final List<State> producedStateChain = new ArrayList<>();
+				producedStateChain.add(currentState);
+
+				for (samplingStep = 0; samplingStep < 10; samplingStep++) {
+
+					for (IExplorationStrategy explorer : explorerList) {
+						
+						explorer.set(sentenceIndex);
+						
+						final List<State> proposalStates = explorer.explore(currentState);
+
+						if (proposalStates.isEmpty())
+							proposalStates.add(currentState);
+
+						model.score(proposalStates);
+
+						Collections.sort(proposalStates,
+								(s1, s2) -> -Double.compare(s1.getModelScore(), s2.getModelScore()));
+
+						final State candidateState = proposalStates.get(0);
+
+						boolean accepted = AcceptStrategies.strictModelAccept().isAccepted(candidateState,
+								currentState);
+
+						if (accepted) {
+							currentState = candidateState;
+							objectiveFunction.score(currentState);
+						}
+
+						producedStateChain.add(currentState);
+
+						if (n == 1) {
+							finalStates.put(instance, Arrays.asList(currentState));
+						} else {
+
+							currentStates = new ArrayList<>();
+
+							final State prevCurrentState = producedStateChain.get(producedStateChain.size() - 2);
+
+							for (int i = 0; i < Math.min(proposalStates.size(), n); i++) {
+
+								accepted = AcceptStrategies.strictModelAccept().isAccepted(proposalStates.get(i),
+										prevCurrentState); // prev current state
+
+								if (accepted) {
+									objectiveFunction.score(proposalStates.get(i));
+									currentStates.add(proposalStates.get(i));
+								} else {
+									/*
+									 * Quick break cause monotone decreasing model score distribution and strict
+									 * evaluation.
+									 */
+									break;
+								}
+							}
+							finalStates.put(instance, currentStates);
+						}
+					}
+					if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain)) {
+						break;
+					}
 				}
 			}
 
@@ -525,7 +573,6 @@ public class SemanticParsingCRFIterator implements ISemanticParsingCRF {
 			LogUtils.logState(log,
 					TEST_CONTEXT + "[" + ++instanceIndex + "/" + instancesToPredict.size() + "] [" + samplingStep + "]",
 					instance, currentState);
-//			computeCoverage(true, coverageObjectiveFunction, Arrays.asList(instance));
 			log.info("***********************************************************");
 			log.info("\n");
 			log.info("Time: " + this.testStatistics.getTotalDuration());
@@ -643,10 +690,6 @@ public class SemanticParsingCRFIterator implements ISemanticParsingCRF {
 	 * @param instances        the instances to compute the coverage on.
 	 * @return a score that contains information of the coverage.
 	 */
-
-	private State candidateState = null;
-	private Object lock = "";
-
 	public Score computeCoverage(final boolean printDetailedLog, IObjectiveFunction predictionOF,
 			final List<Instance> instances) {
 
@@ -664,85 +707,66 @@ public class SemanticParsingCRFIterator implements ISemanticParsingCRF {
 
 			State currentState = initializer.getInitState(instance);
 			predictionOF.score(currentState);
+
 			finalStates.put(instance, currentState);
 			producedStateChain.add(currentState);
-			int samplingStep;
-			for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
+			Set<String> keyTerms = KeyTermExtractor.getKeyTerms(instances);
 
-				for (IExplorationStrategy explorer : explorerList) {
+			int samplingStep = 0;
+//			AutomatedSectionifcation sectionifcation = AutomatedSectionifcation.getInstance(currentState.getInstance());
 
-//					explorer.set(currentState);
-				
-					AtomicInteger c = new AtomicInteger(0);
+			for (int sentenceIndex = 0; sentenceIndex < instance.getDocument()
+					.getNumberOfSentences(); sentenceIndex++) {
 
-					AtomicDouble maxValue = new AtomicDouble(0);
-					candidateState = currentState;
-					System.out.println(samplingStep);
-					
-					StreamSupport.stream(Spliterators.spliteratorUnknownSize(explorer, Spliterator.IMMUTABLE), true)
-							.forEach(proposalState -> {
-
-								final double newVal;
-								objectiveFunction.score(proposalState);
-								newVal = proposalState.getObjectiveScore();
-								c.incrementAndGet();
-								synchronized (lock) {
-									if (newVal >= maxValue.get()) {
-										maxValue.set(newVal);
-										candidateState = proposalState;
-									}
-
-								}
-							});
-
-					System.out.println(c);
-//					State candidateState = currentState;
-//					double maxValue = 0;
-//					while (explorer.hasNext()) {
-//						c++;
-//						State proposalState = explorer.next();
+//				if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS)
+//					continue;
 //
-//						final double newVal;
-//						objectiveFunction.score(proposalState);
-//						newVal = proposalState.getObjectiveScore();
-//
-//						if (newVal >= maxValue) {
-//							maxValue = newVal;
-//							candidateState = proposalState;
-//
-//							if (currentState.getObjectiveScore() == 1.0)
-//								break;
-//
-//						}
-//					}
-//					System.out.println(c);
+				boolean containsKeyterm = false;
+				String sentence = instance.getDocument().getContentOfSentence(sentenceIndex);
 
-//					final List<State> proposalStates = explorer.explore(currentState);
-//
-//					if (proposalStates.isEmpty())
-//						proposalStates.add(currentState);
-//
-//					predictionOF.score(proposalStates);
+				for (String keyTerm : keyTerms) {
 
-//					final State candidateState = SamplerCollection.greedyObjectiveStrategy()
-//							.sampleCandidate(proposalStates);
-
-					boolean isAccepted = SamplerCollection.greedyObjectiveStrategy().getAcceptanceStrategy(0)
-							.isAccepted(candidateState, currentState);
-
-					if (isAccepted) {
-						currentState = candidateState;
+					if (sentence.contains(keyTerm)) {
+						containsKeyterm = true;
+						break;
 					}
+				}
 
-					producedStateChain.add(currentState);
+				if (!containsKeyterm)
+					continue;
 
-					finalStates.put(instance, currentState);
+				for (samplingStep = 0; samplingStep < MAX_SAMPLING; samplingStep++) {
+
+					for (IExplorationStrategy explorer : explorerList) {
+						explorer.set(sentenceIndex);
+
+						final List<State> proposalStates = explorer.explore(currentState);
+
+						if (proposalStates.isEmpty())
+							proposalStates.add(currentState);
+
+						predictionOF.score(proposalStates);
+
+						final State candidateState = SamplerCollection.greedyObjectiveStrategy()
+								.sampleCandidate(proposalStates);
+
+						boolean isAccepted = SamplerCollection.greedyObjectiveStrategy().getAcceptanceStrategy(0)
+								.isAccepted(candidateState, currentState);
+
+						if (isAccepted) {
+							currentState = candidateState;
+						}
+
+						producedStateChain.add(currentState);
+
+						finalStates.put(instance, currentState);
+					}
+					if (meetsSamplingStoppingCriterion(noObjectiveChangeCrit, producedStateChain))
+						break;
 
 				}
-				if (meetsSamplingStoppingCriterion(noObjectiveChangeCrit, producedStateChain))
-					break;
-
 			}
+
 			if (printDetailedLog)
 				LogUtils.logState(log, COVERAGE_CONTEXT + " [1/1]" + "[" + ++instanceIndex + "/" + instances.size()
 						+ "]" + "[" + (samplingStep + 1) + "]", instance, currentState);

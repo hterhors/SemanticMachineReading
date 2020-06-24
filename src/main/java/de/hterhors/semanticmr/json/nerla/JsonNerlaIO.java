@@ -6,12 +6,15 @@ import java.io.PrintStream;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.jena.ext.com.google.common.reflect.TypeToken;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.json.nerla.wrapper.JsonEntityAnnotationWrapper;
 
 public class JsonNerlaIO {
@@ -54,6 +57,11 @@ public class JsonNerlaIO {
 		PrintStream ps = new PrintStream(outputFile);
 		ps.println(gson.toJson(Arrays.asList(instance), type));
 		ps.close();
+	}
+
+	public void writeNerlas(File outputFile, Set<DocumentLinkedAnnotation> trendAnns) throws IOException {
+		writeNerlas(outputFile,
+				trendAnns.stream().map(a -> new JsonEntityAnnotationWrapper(a)).collect(Collectors.toList()));
 	}
 
 }

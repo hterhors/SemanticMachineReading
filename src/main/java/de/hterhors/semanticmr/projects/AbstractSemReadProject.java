@@ -26,6 +26,9 @@ public class AbstractSemReadProject {
 
 		for (Entry<Instance, State> res : testResults.entrySet()) {
 
+			log.info("Number to compare: " + res.getValue().getCurrentPredictions().getAnnotations().size() + " with "
+					+ res.getKey().getGoldAnnotations().getAbstractAnnotations().size());
+
 			if (predictionOF != null)
 				predictionOF.score(res.getValue());
 

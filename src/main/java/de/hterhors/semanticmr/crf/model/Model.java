@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -32,8 +33,13 @@ public class Model {
 
 	public static boolean alwaysTrainModel = false;
 
-	private FactorPoolCache factorCache = new FactorPoolCache(this, 800_000, 400_000);
+//	private FactorPoolCache factorCache = new FactorPoolCache(this, 800_000, 400_000);
+	private FactorPoolCache factorCache = new FactorPoolCache(this, 6400, 3200);
 //	final public FactorPool factorCache = new FactorPool();
+
+	public FactorPoolCache getFactorCache() {
+		return factorCache;
+	}
 
 	/**
 	 * Converts a feature name to its index.
@@ -75,7 +81,7 @@ public class Model {
 		return index;
 	}
 
-	public static synchronized String getFeatureForIndex(Integer feature) {
+	public static String getFeatureForIndex(Integer feature) {
 		return indexFeatureName.get(feature);
 	}
 
@@ -162,7 +168,6 @@ public class Model {
 
 		double score = 1;
 		boolean factorsAvailable = false;
-
 		for (FactorGraph factorGraph : state.getFactorGraphs()) {
 
 			final List<Factor> factors = factorGraph.getCachedFactors();
@@ -181,6 +186,8 @@ public class Model {
 
 	}
 
+	Map<Class<?>, Map<Boolean, Integer>> cacheCount = new ConcurrentHashMap<>();
+
 	private void computeRemainingFactors(List<State> states) {
 
 		List<List<Factor>> factorsToCache = Collections.synchronizedList(new ArrayList<>());
@@ -195,15 +202,21 @@ public class Model {
 
 					Factor factor;
 
+					cacheCount.putIfAbsent(scope.getClass(), new HashMap<>());
 					if ((factor = factorCache.getIfPresent(scope)) == null) {
 						factor = new Factor(scope);
 						factor.getFactorScope().template.generateFeatureVector(factor);
+						cacheCount.get(scope.getClass()).put(false,
+								cacheCount.get(scope.getClass()).getOrDefault(false, 0) + 1);
+					} else {
+						cacheCount.get(scope.getClass()).put(true,
+								cacheCount.get(scope.getClass()).getOrDefault(true, 0) + 1);
 					}
 
 					computedFactors.add(factor);
 					factors.add(factor);
-
 				}
+
 				factorsToCache.add(computedFactors);
 
 				factorGraph.cacheFactors(computedFactors);

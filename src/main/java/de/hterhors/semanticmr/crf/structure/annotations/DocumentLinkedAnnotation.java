@@ -104,12 +104,13 @@ final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 	@SuppressWarnings("unchecked")
 	@Override
 	public DocumentLinkedAnnotation deepCopy() {
-		try {
-			return new DocumentLinkedAnnotation(document, entityType, textualContent.deepCopy(),
-					documentPosition.deepCopy());
-		} catch (DocumentLinkedAnnotationMismatchException e) {
-			throw new IllegalStateException("This can not happen!");
-		}
+//		try {
+			return this;
+//			return new DocumentLinkedAnnotation(document, entityType, textualContent.deepCopy(),
+//					documentPosition.deepCopy());
+//		} catch (DocumentLinkedAnnotationMismatchException e) {
+//			throw new IllegalStateException("This can not happen!");
+//		}
 	}
 
 	@Override

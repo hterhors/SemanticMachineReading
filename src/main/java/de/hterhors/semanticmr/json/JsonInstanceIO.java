@@ -47,12 +47,14 @@ public class JsonInstanceIO {
 	public void writeInstances(final File outputFile, List<JsonInstanceWrapper> instances) throws IOException {
 		PrintStream ps = new PrintStream(outputFile);
 		ps.println(gson.toJson(instances, type));
+		ps.flush();
 		ps.close();
 	}
 
 	public void writeInstance(final File outputFile, JsonInstanceWrapper instance) throws IOException {
 		PrintStream ps = new PrintStream(outputFile);
 		ps.println(gson.toJson(Arrays.asList(instance), type));
+		ps.flush();
 		ps.close();
 	}
 }

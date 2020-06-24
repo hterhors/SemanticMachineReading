@@ -23,7 +23,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  * @author hterhors
  *
  */
-public class EntityRecLinkExplorer implements IExplorationStrategy{
+public class EntityRecLinkExplorer implements IExplorationStrategy {
 	private static Logger log = LogManager.getFormatterLogger(EntityRecLinkExplorer.class);
 
 	final private HardConstraintsProvider hardConstraintsProvider;
@@ -45,6 +45,8 @@ public class EntityRecLinkExplorer implements IExplorationStrategy{
 
 	public int MAX_WINDOW_SIZE = 10;
 	public int MIN_WINDOW_SIZE = 1;
+
+	private int sentenceIndex = 0;
 
 	@Override
 	public List<State> explore(State currentState) {
@@ -70,10 +72,8 @@ public class EntityRecLinkExplorer implements IExplorationStrategy{
 	}
 
 	private void addNewAnnotation(final List<State> proposalStates, State currentState) {
-		final List<DocumentToken> tokens = currentState.getInstance().getDocument().tokenList;
+		final List<DocumentToken> tokens = currentState.getInstance().getDocument().getSentenceByIndex(sentenceIndex);
 
-		
-		
 		for (int windowSize = MIN_WINDOW_SIZE; windowSize <= MAX_WINDOW_SIZE; windowSize++) {
 
 			for (int runIndex = 0; runIndex < tokens.size() - windowSize; runIndex++) {
@@ -81,9 +81,6 @@ public class EntityRecLinkExplorer implements IExplorationStrategy{
 				final DocumentToken fromToken = tokens.get(runIndex); // including
 				final DocumentToken toToken = tokens.get(runIndex + windowSize - 1); // including
 
-				
-				
-				
 				/*
 				 * Check some basic constraints.
 				 */
@@ -203,10 +200,8 @@ public class EntityRecLinkExplorer implements IExplorationStrategy{
 	}
 
 	@Override
-	public void set(State state) {
-		// TODO Auto-generated method stub
-		
+	public void set(int sentenceIndex) {
+		this.sentenceIndex = sentenceIndex;
 	}
-
 
 }

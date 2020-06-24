@@ -24,7 +24,7 @@ import de.hterhors.semanticmr.crf.variables.State;
 public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramTokenContextScope> {
 
 	public NGramTokenContextTemplate() {
-//super(false);
+//		super(false);
 	}
 
 	private static final int DEFAULT_MAX_TOKEN_CONTEXT_LEFT = 3;
@@ -131,6 +131,8 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 							rootAnn.getStartDocCharOffset(), rootAnn.getEndDocCharOffset()));
 				}
 
+				if (annotation.asInstanceOfEntityTemplate().isEmpty())
+					continue;
 				final EntityTemplateAnnotationFilter filter = ((EntityTemplate) annotation).filter().singleSlots()
 						.multiSlots().merge().nonEmpty().docLinkedAnnoation().build();
 
@@ -218,7 +220,6 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 
 	private void getContextFeatures(DoubleVector featureVector, final Set<EntityType> entityTypes,
 			final String[] leftContext, final String[] rightContext) {
-
 		final StringBuffer lCs = new StringBuffer();
 		final StringBuffer rCs = new StringBuffer();
 		String context;

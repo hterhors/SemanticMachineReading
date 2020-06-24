@@ -9,6 +9,5 @@ public interface IExplorationStrategy extends Iterator<State> {
 
 	public List<State> explore(State currentState);
 
-	public void set(State state);
-
+	public void set(int sentenceIndex);
 }

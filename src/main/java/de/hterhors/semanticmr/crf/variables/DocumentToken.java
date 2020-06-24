@@ -9,6 +9,7 @@ public class DocumentToken {
 	final private int docCharOffset;
 	final private String text;
 
+	final private boolean isNumber;
 	private boolean isStopWord = false;
 	private boolean isPunctuation = false;
 
@@ -48,6 +49,7 @@ public class DocumentToken {
 		this.senCharOffset = senCharOnset;
 		this.docCharOffset = docCharOnset;
 		this.text = text;
+		this.isNumber = text.matches("\\d+");
 	}
 
 	@Override
@@ -59,6 +61,10 @@ public class DocumentToken {
 
 	public boolean isStopWord() {
 		return isStopWord;
+	}
+
+	public boolean isNumber() {
+		return isNumber;
 	}
 
 	public void setStopWord(boolean isStopWord) {

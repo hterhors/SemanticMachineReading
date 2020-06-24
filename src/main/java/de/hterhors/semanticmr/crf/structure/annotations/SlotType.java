@@ -44,11 +44,11 @@ public class SlotType implements Comparable<SlotType>, IRequiresInitialization {
 		return Collections.unmodifiableMap(storeExclude);
 	}
 
-	public static void restoreExcludance() {
-		for (SlotType st : getAllSlotTypes()) {
-			st.exclude = storeExclude.get(st);
-		}
-	}
+//	public static void restoreExcludance() {
+//		for (SlotType st : getAllSlotTypes()) {
+//			st.exclude = storeExclude.get(st);
+//		}
+//	}
 
 	public static void restoreExcludance(Map<SlotType, Boolean> restore) {
 		for (SlotType st : getAllSlotTypes()) {

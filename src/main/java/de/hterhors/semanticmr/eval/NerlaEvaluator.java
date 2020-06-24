@@ -2,6 +2,9 @@ package de.hterhors.semanticmr.eval;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.lang3.NotImplementedException;
 
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
@@ -75,6 +78,13 @@ public class NerlaEvaluator extends AbstractEvaluator {
 		}
 
 		return Math.max(otherAnnotations.size() - tp, 0) == 0;
+
+	}
+
+	@Override
+	public List<Integer> getBestAssignment(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
+		throw new NotImplementedException("Not impl.");
 
 	}
 

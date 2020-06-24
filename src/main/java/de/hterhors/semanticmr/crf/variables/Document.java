@@ -28,14 +28,14 @@ public class Document {
 	final static private Map<String, Document> documents = new HashMap<>();
 
 	static private Set<String> punctuationWords = Collections.unmodifiableSet(
-			new HashSet<>(Arrays.asList("±",",", ".", "-", "_", ";", ":", "#", "'", "+", "*", "~", "!", "\"", "§", "$", "%",
-					"&", "/", "(", ")", "{", "}", "[", "]", "=", "?", "\\", "´", "`", "^", "°", "<", ">", "|")));
+			new HashSet<>(Arrays.asList("±", ",", ".", "-", "_", ";", ":", "#", "'", "+", "*", "~", "!", "\"", "§", "$",
+					"%", "&", "/", "(", ")", "{", "}", "[", "]", "=", "?", "\\", "´", "`", "^", "°", "<", ">", "|")));
 
-	static private Set<String> stopWords = Collections.unmodifiableSet(
-			new HashSet<>(Arrays.asList("a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in",
-					"into", "is", "it", "no", "not", "of", "on", "or", "such", "that", "the", "their", "then", "there",
-					"these", "they", "this", "to", "was", "will", "with", "his", "her", "from", "who", "whom")));
-
+	static private Set<String> stopWords = Collections.unmodifiableSet(new HashSet<>(
+			Arrays.asList("a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it",
+					 "of", "on", "or", "such", "that", "the", "their", "then", "there", "these", "they",
+					"this", "to", "was", "will", "with", "his", "her", "from", "who", "whom", "were")));
+//	"no", "not"
 	final public String documentContent;
 
 	final public String documentID;

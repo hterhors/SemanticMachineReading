@@ -2,6 +2,7 @@ package de.hterhors.semanticmr.eval;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -42,6 +43,9 @@ public abstract class AbstractEvaluator {
 //		} else {
 //			cache.put(val, map = new HashMap<>());
 //		}
+		if (val == null && otherVal == null)
+			return Score.ZERO_MICRO;
+		
 		if (val instanceof DocumentLinkedAnnotation
 				&& (otherVal instanceof DocumentLinkedAnnotation || otherVal == null)) {
 			score = ((DocumentLinkedAnnotation) val).evaluate(this, (DocumentLinkedAnnotation) otherVal);
@@ -60,7 +64,7 @@ public abstract class AbstractEvaluator {
 			/*
 			 * Should never happen!
 			 */
-			throw new IllegalStateException("Illegal state detected during evaluation!");
+			throw new IllegalStateException("Illegal state detected during evaluation: " + val + "\t" + otherVal);
 		}
 //		map.put(otherVal, score);
 		return score;
@@ -108,5 +112,8 @@ public abstract class AbstractEvaluator {
 			return true;
 		return evalEqualsMax(annotations, otherAnnotations);
 	}
+
+	public abstract List<Integer> getBestAssignment(Collection<? extends AbstractAnnotation> annotations,
+			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType);
 
 }
