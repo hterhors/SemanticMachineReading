@@ -135,7 +135,7 @@ public class SantoRDFConverter {
 			final String slotName = SantoHelper.getResource(props.getKey());
 			if (slotName.endsWith("Deprecated"))
 				continue;
-			
+
 			final SlotType slot = SlotType.get(slotName);
 
 			if (!filterSlotTypes.isEmpty() && !filterSlotTypes.contains(slot))
@@ -197,7 +197,7 @@ public class SantoRDFConverter {
 					if (onlyLeafEntities && !isLeafEntity(entityTypeAnnotation.entityType))
 						continue;
 					predicateValues.add(entityTypeAnnotation);
-				} catch (DocumentLinkedAnnotationMismatchException e) {
+				} catch (Exception e) {
 					System.out.println("WARN! " + e.getMessage());
 //					e.printStackTrace();
 				}
