@@ -10,7 +10,7 @@ public class WeightNormalization extends AbstractNormalizationFunction {
 	}
 
 	@Override
-	public String interprete(String annotation) {
+	public String normalize(String annotation) {
 		final String[] parts = annotation.toLowerCase().split("\\W");
 		StringBuilder normalizedString = new StringBuilder();
 		for (String part : parts) {

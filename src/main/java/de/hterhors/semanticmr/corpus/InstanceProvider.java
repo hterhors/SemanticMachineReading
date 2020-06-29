@@ -20,7 +20,7 @@ import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.crf.variables.Instance.DuplicationRule;
+import de.hterhors.semanticmr.crf.variables.Instance.DeduplicationRule;
 import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.exce.DuplicateDocumentException;
@@ -114,7 +114,7 @@ public class InstanceProvider {
 	 * @param distributor            the distributor.
 	 */
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
-			Collection<GoldModificationRule> modifyGoldRules, DuplicationRule duplicationRule) {
+			Collection<GoldModificationRule> modifyGoldRules, DeduplicationRule duplicationRule) {
 		this(jsonInstancesDirectory, distributor, Integer.MAX_VALUE, modifyGoldRules, duplicationRule);
 	}
 
@@ -183,7 +183,7 @@ public class InstanceProvider {
 	}
 
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
-			final int numToRead, Collection<GoldModificationRule> modifyGoldRules, DuplicationRule duplicationRule) {
+			final int numToRead, Collection<GoldModificationRule> modifyGoldRules, DeduplicationRule duplicationRule) {
 		try {
 			this.jsonInstancesDirectory = jsonInstancesDirectory;
 

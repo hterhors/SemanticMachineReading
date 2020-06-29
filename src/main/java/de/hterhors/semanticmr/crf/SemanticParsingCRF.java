@@ -650,6 +650,9 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 		for (Instance instance : instances) {
 			final List<State> producedStateChain = new ArrayList<>();
 
+			if(instance.getName().startsWith("N190"))
+				System.out.println("");
+			
 			State currentState = initializer.getInitState(instance);
 			predictionOF.score(currentState);
 

@@ -85,7 +85,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 		 * entities-file is important) defined specification files. The scope mainly
 		 * affects the exploration.
 		 */
-		super(SystemScope.Builder.getScopeHandler()
+		SystemScope.Builder.getScopeHandler()
 				/**
 				 * We add a scope reader that reads and interprets the 4 specification files.
 				 */
@@ -107,7 +107,7 @@ public class NamedEntityRecognitionAndLinkingExample extends AbstractSemReadProj
 				/**
 				 * Finally, we build the systems scope.
 				 */
-				.build());
+				.build();
 
 		/**
 		 * 2. STEP read and distribute the corpus.

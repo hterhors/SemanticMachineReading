@@ -365,7 +365,7 @@ public class Model {
 		return model;
 	}
 
-	public void setfeatureTemplateParameter(Map<Class<? extends AbstractFeatureTemplate<?>>, Object[]> parameter) {
+	public void setFeatureTemplateParameter(Map<Class<? extends AbstractFeatureTemplate<?>>, Object[]> parameter) {
 
 		for (AbstractFeatureTemplate<?> featureTemplate : this.factorTemplates) {
 			if (parameter.containsKey(featureTemplate.getClass())) {

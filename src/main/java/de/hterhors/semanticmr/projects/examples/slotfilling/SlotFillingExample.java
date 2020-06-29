@@ -99,7 +99,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * The scope represents the specifications of the 4 defined specification files.
 		 * The scope mainly affects the exploration.
 		 */
-		super(SystemScope.Builder.getScopeHandler()
+		SystemScope.Builder.getScopeHandler()
 				/**
 				 * We add a scope reader that reads and interprets the 4 specification files.
 				 */
@@ -122,7 +122,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 				/**
 				 * Finally, we build the systems scope.
 				 */
-				.build());
+				.build();
 
 		/**
 		 * Read and distribute the corpus.
@@ -192,8 +192,8 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * Here only the entity type is required.
 		 *
 		 */
-		IObjectiveFunction objectiveFunction = new SlotFillingObjectiveFunction(
-				EScoreType.MICRO, new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
+		IObjectiveFunction objectiveFunction = new SlotFillingObjectiveFunction(EScoreType.MICRO,
+				new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE));
 
 		/**
 		 * The provision of existing entities is an important part in slot filling for

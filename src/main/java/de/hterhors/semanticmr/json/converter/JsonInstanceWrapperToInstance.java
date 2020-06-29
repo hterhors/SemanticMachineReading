@@ -22,7 +22,7 @@ import de.hterhors.semanticmr.crf.variables.Annotations;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.Instance;
-import de.hterhors.semanticmr.crf.variables.Instance.DuplicationRule;
+import de.hterhors.semanticmr.crf.variables.Instance.DeduplicationRule;
 import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
 import de.hterhors.semanticmr.json.wrapper.JsonAnnotationsWrapper;
@@ -50,14 +50,14 @@ public class JsonInstanceWrapperToInstance {
 	}
 
 	public List<Instance> convertToInstances(Collection<GoldModificationRule> modifyGoldRules,
-			DuplicationRule duplicationRule) {
+			DeduplicationRule duplicationRule) {
 		return jsonInstances.stream()
 				.map(instanceWrapper -> toInstance(instanceWrapper, modifyGoldRules, duplicationRule))
 				.collect(Collectors.toList());
 	}
 
 	private Instance toInstance(JsonInstanceWrapper instanceWrapper, Collection<GoldModificationRule> modifyGoldRules,
-			DuplicationRule duplicationRule) {
+			DeduplicationRule duplicationRule) {
 		Document document = toDocument(instanceWrapper.getDocument());
 		return new Instance(instanceWrapper.getContext(), document,
 				toAnnotations(document, instanceWrapper.getGoldAnnotations()), modifyGoldRules, duplicationRule);

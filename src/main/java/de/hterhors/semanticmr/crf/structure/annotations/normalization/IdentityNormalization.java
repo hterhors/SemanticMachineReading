@@ -18,7 +18,7 @@ public class IdentityNormalization implements INormalizationFunction {
 	}
 
 	@Override
-	public String interprete(String annotation) {
+	public String normalize(String annotation) {
 		return annotation;
 	}
 

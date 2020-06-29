@@ -133,7 +133,7 @@ public class TextualContent {
 	}
 
 	public void normalize(INormalizationFunction normalizationFunction) {
-		this.normalizedSurfaceForm = normalizationFunction.interprete(this.surfaceForm);
+		this.normalizedSurfaceForm = normalizationFunction.normalize(this.surfaceForm);
 	}
 
 }

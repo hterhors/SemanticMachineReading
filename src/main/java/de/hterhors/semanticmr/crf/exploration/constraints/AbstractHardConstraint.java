@@ -1,6 +1,8 @@
 package de.hterhors.semanticmr.crf.exploration.constraints;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.crf.structure.annotations.EntityTemplate;
 import de.hterhors.semanticmr.crf.variables.State;
@@ -28,11 +30,18 @@ public abstract class AbstractHardConstraint {
 
 	/**
 	 * 
-	 * @param currentState         the current state
+	 * @param currentState          the current state
 	 * @param candidateListToFilter
 	 * 
 	 * @return the filtered List
 	 */
-	public abstract List<EntityTemplate> violatesConstraint(State currentState, List<EntityTemplate> candidateListToFilter);
+	public List<EntityTemplate> violatesConstraint(State currentState, List<EntityTemplate> candidateListToFilter) {
 
+		List<EntityTemplate> filteredList = new ArrayList<>(candidateListToFilter.size());
+
+		filteredList = candidateListToFilter.parallelStream()
+				.filter(candidate -> !violatesConstraint(currentState, candidate)).collect(Collectors.toList());
+
+		return filteredList;
+	}
 }

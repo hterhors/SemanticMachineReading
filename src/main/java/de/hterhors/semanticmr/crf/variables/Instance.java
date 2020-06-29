@@ -101,12 +101,12 @@ public class Instance implements Comparable<Instance> {
 		public AbstractAnnotation modify(AbstractAnnotation currentAnnotation);
 	}
 
-	public static interface DuplicationRule {
+	public static interface DeduplicationRule {
 		public boolean isDuplicate(AbstractAnnotation annotation1, AbstractAnnotation annotation2);
 	}
 
 	public Instance(EInstanceContext context, Document document, Annotations goldAnnotations,
-			Collection<GoldModificationRule> modifyRules, DuplicationRule duplicationRule) {
+			Collection<GoldModificationRule> modifyRules, DeduplicationRule duplicationRule) {
 
 		this.originalContext = context == null ? EInstanceContext.UNSPECIFIED : context;
 

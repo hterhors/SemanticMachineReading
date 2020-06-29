@@ -13,7 +13,7 @@ import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
-import de.hterhors.semanticmr.crf.variables.Instance.DuplicationRule;
+import de.hterhors.semanticmr.crf.variables.Instance.DeduplicationRule;
 import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
@@ -35,11 +35,19 @@ public class Annotations {
 	}
 
 	public Annotations(AbstractAnnotation... annotation) {
-		this(Arrays.asList(annotation));
+		this(asList(annotation));
 	}
 
 	public Annotations(AbstractAnnotation annotation) {
-		this(Arrays.asList(annotation));
+		this(asList(annotation));
+	}
+
+	private static List<AbstractAnnotation> asList(AbstractAnnotation... annotation) {
+		List<AbstractAnnotation> list = new ArrayList<>();
+		for (AbstractAnnotation a : annotation) {
+			list.add(a);
+		}
+		return list;
 	}
 
 	public Annotations(List<AbstractAnnotation> annotations) {
@@ -53,12 +61,12 @@ public class Annotations {
 	}
 
 	public Annotations(Annotations goldAnnotations, Collection<GoldModificationRule> modifyRules,
-			DuplicationRule duplicationRule) {
+			DeduplicationRule duplicationRule) {
 		this(applyModifications(goldAnnotations, modifyRules, duplicationRule));
 	}
 
 	private static List<AbstractAnnotation> applyModifications(Annotations goldAnnotations,
-			Collection<GoldModificationRule> modifyRules, DuplicationRule duplicationRule) {
+			Collection<GoldModificationRule> modifyRules, DeduplicationRule duplicationRule) {
 
 		final List<AbstractAnnotation> modifiedAnnotations = new ArrayList<>();
 		for (AbstractAnnotation goldAnnotation : goldAnnotations.getAbstractAnnotations()) {
