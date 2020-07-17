@@ -15,10 +15,6 @@ import de.hterhors.semanticmr.crf.variables.State;
 
 public class AbstractSemReadProject {
 
-//	public AbstractSemReadProject(SystemScope scope) {
-//		this.scope = scope;
-//	}
-
 	public static Score evaluate(Logger log, Map<Instance, State> testResults, IObjectiveFunction predictionOF) {
 
 		Score mean = new Score();
@@ -40,7 +36,15 @@ public class AbstractSemReadProject {
 			if (predictionOF != null)
 				predictionOF.score(res.getValue());
 
-			mean.add(res.getValue().getMicroScore());
+//			int x = (int) res.getValue().getCurrentPredictions().getAnnotations().stream()
+//					.filter(a -> a.getEntityType().name.equals("CompoundTreatment")).count();
+//
+//			if (x != 0) {
+//				mean.add(new Score(Math.max(0, res.getValue().getMicroScore().getTp() - x),
+//						res.getValue().getMicroScore().getFp(), res.getValue().getMicroScore().getFn()));
+//			} else {
+				mean.add(res.getValue().getMicroScore());
+//			}
 
 			LogUtils.logState(log, "======Final Evaluation======", res.getKey(), res.getValue());
 		}

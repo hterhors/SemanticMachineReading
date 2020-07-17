@@ -46,4 +46,6 @@ public interface ISemanticParsingCRF {
 
 	public CRFStatistics getTrainingStatistics();
 
+	public Map<Instance, State> predictHighRecall(List<Instance> collect, int n, ISamplingStoppingCriterion ... samplingCrits);
+
 }

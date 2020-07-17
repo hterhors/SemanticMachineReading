@@ -107,11 +107,6 @@ public class CartesianEvaluator extends AbstractEvaluator {
 			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
 		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
-//		System.out.println("Annotations:");
-//		annotations.forEach(a -> System.out.println(a.toPrettyString()));
-//		System.out.println("Other annotations:");
-//		otherAnnotations.forEach(a -> System.out.println(a.toPrettyString()));
-
 		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
 		final Score bestScore = new Score(scoreType);
 		final List<List<Integer>> permutations;
@@ -120,11 +115,15 @@ public class CartesianEvaluator extends AbstractEvaluator {
 			permutations = getPermutations(maxSize);
 
 		} catch (IllegalArgumentException e) {
+			log.error("Annotations: " + annotations.size());
+			for (AbstractAnnotation abstractAnnotation : annotations) {
+				log.error(abstractAnnotation.toPrettyString());
+			}
+			log.error("Other annotations: " + otherAnnotations.size());
+			for (AbstractAnnotation abstractAnnotation : otherAnnotations) {
+				log.error(abstractAnnotation.toPrettyString());
+			}
 			e.printStackTrace();
-			log.info(annotations.size());
-			log.info(otherAnnotations.size());
-			log.info(annotations);
-			log.info(otherAnnotations);
 			return bestScore;
 		}
 
@@ -153,51 +152,65 @@ public class CartesianEvaluator extends AbstractEvaluator {
 				break;
 
 		}
-//		System.out.println("Score: " + bestScore);
 		return bestScore;
 	}
 
 	public List<Integer> getBestAssignment(Collection<? extends AbstractAnnotation> annotations,
 			Collection<? extends AbstractAnnotation> otherAnnotations, EScoreType scoreType) {
-		final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
+		try {
+			final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
-		final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
+			final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
 
-		final Score bestScore = new Score(scoreType);
-		final List<List<Integer>> permutations = getPermutations(maxSize);
-		int permutationRunIndex = 0;
-		int bestIndexPermutation = 0;
+			final Score bestScore = new Score(scoreType);
 
-		for (List<Integer> indexPermutation : permutations) {
+			final List<List<Integer>> permutations = getPermutations(maxSize);
+			int permutationRunIndex = 0;
+			int bestIndexPermutation = 0;
 
-			final Score sum = new Score(scoreType);
+			for (List<Integer> indexPermutation : permutations) {
 
-			for (int index = 0; index < indexPermutation.size(); index++) {
-				final int permIndex = indexPermutation.get(index).intValue();
+				final Score sum = new Score(scoreType);
 
-				Score score = scores[index][permIndex];
+				for (int index = 0; index < indexPermutation.size(); index++) {
+					final int permIndex = indexPermutation.get(index).intValue();
 
-				if (scoreType == EScoreType.MACRO)
-					score.toMacro();
+					Score score = scores[index][permIndex];
 
-				sum.add(score);
+					if (scoreType == EScoreType.MACRO)
+						score.toMacro();
+
+					sum.add(score);
+				}
+
+				final double f1 = sum.getF1();
+
+				if (bestScore.getF1() <= f1) {
+					bestScore.set(sum);
+					bestIndexPermutation = permutationRunIndex;
+				}
+
+				if (f1 == 1.0D)
+					break;
+
+				permutationRunIndex++;
+
 			}
 
-			final double f1 = sum.getF1();
+			return permutations.get(bestIndexPermutation);
+		} catch (IllegalArgumentException e) {
 
-			if (bestScore.getF1() <= f1) {
-				bestScore.set(sum);
-				bestIndexPermutation = permutationRunIndex;
+			log.error("Annotations: " + annotations.size());
+			for (AbstractAnnotation abstractAnnotation : annotations) {
+				log.error(abstractAnnotation.toPrettyString());
 			}
-
-			if (f1 == 1.0D)
-				break;
-
-			permutationRunIndex++;
-
+			log.error("Other annotations: " + otherAnnotations.size());
+			for (AbstractAnnotation abstractAnnotation : otherAnnotations) {
+				log.error(abstractAnnotation.toPrettyString());
+			}
+			e.printStackTrace();
 		}
-
-		return permutations.get(bestIndexPermutation);
+		return null;
 	}
 
 	private static class Compair {

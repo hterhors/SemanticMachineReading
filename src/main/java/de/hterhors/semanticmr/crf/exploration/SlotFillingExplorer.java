@@ -123,7 +123,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 						annotationIndex);
 			}
 
-			for (EntityTemplate candidate : filterByViolatesConstraints(currentState, candidates)) {
+			for (EntityTemplate candidate : filterByViolatesConstraints(currentState, annotationIndex, candidates)) {
 				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, candidate));
 			}
 		}
@@ -172,7 +172,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 		}
 
-		for (EntityTemplate candidate : filterByViolatesConstraints(currentState, candidates)) {
+		for (EntityTemplate candidate : filterByViolatesConstraints(currentState, annotationIndex, candidates)) {
 			proposalStates.add(currentState.deepUpdateCopy(annotationIndex, candidate));
 		}
 	}
@@ -334,19 +334,20 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	 * 
 	 * @return false if the template does NOT violates any constraints, else true.
 	 */
-	private boolean violatesConstraints(State state, EntityTemplate deepCopy) {
-		if (hardConstraintsProvider == null)
-			return false;
-		else
-			return hardConstraintsProvider.violatesConstraints(state, deepCopy);
+//	private boolean violatesConstraints(State state, EntityTemplate deepCopy) {
+//		if (hardConstraintsProvider == null)
+//			return false;
+//		else
+//			return hardConstraintsProvider.violatesConstraints(state, deepCopy);
+//
+//	}
 
-	}
-
-	private List<EntityTemplate> filterByViolatesConstraints(State state, List<EntityTemplate> deepCopies) {
+	private List<EntityTemplate> filterByViolatesConstraints(State state, int annotationIndex,
+			List<EntityTemplate> deepCopies) {
 		if (hardConstraintsProvider == null)
 			return deepCopies;
 		else
-			return hardConstraintsProvider.filterByViolatesConstraints(state, deepCopies);
+			return hardConstraintsProvider.filterByViolatesConstraints(state, deepCopies, annotationIndex);
 
 	}
 

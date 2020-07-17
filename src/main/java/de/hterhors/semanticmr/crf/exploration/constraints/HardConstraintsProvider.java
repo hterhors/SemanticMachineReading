@@ -19,19 +19,20 @@ public class HardConstraintsProvider {
 
 	final List<AbstractHardConstraint> hardConstraints = new ArrayList<>();
 
-	public boolean violatesConstraints(State state, EntityTemplate candidate) {
+	public boolean violatesConstraints(State state, EntityTemplate candidate, int annotationIndex) {
 		for (AbstractHardConstraint hardConstraint : hardConstraints) {
-			if (hardConstraint.violatesConstraint(state, candidate))
+			if (hardConstraint.violatesConstraint(state, candidate, annotationIndex))
 				return true;
 		}
 		return false;
 	}
 
-	public List<EntityTemplate> filterByViolatesConstraints(State state, List<EntityTemplate> candidateListToFilter) {
+	public List<EntityTemplate> filterByViolatesConstraints(State state, List<EntityTemplate> candidateListToFilter,
+			int annotationIndex) {
 
 		List<EntityTemplate> filteredList = candidateListToFilter;
 		for (AbstractHardConstraint hardConstraint : hardConstraints) {
-			filteredList = hardConstraint.violatesConstraint(state, candidateListToFilter);
+			filteredList = hardConstraint.violatesConstraint(state, filteredList, annotationIndex);
 		}
 
 		return filteredList;

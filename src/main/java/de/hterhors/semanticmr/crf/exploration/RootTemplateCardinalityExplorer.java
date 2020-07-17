@@ -61,7 +61,8 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 
 			EntityTemplate deepInitCopy = new EntityTemplate((init));
 
-			if (!violatesConstraints(currentState, deepInitCopy))
+			if (!violatesConstraints(currentState, deepInitCopy,
+					currentState.getCurrentPredictions().getAnnotations().size() + 1))
 				proposalStates.add(currentState.deepAddCopy(deepInitCopy));
 
 			for (EntityTypeAnnotation templateTypeCandidate : currentState.getInstance()
@@ -72,7 +73,8 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 
 				EntityTemplate deepCopy = new EntityTemplate((templateTypeCandidate));
 
-				if (violatesConstraints(currentState, deepCopy))
+				if (violatesConstraints(currentState, deepCopy,
+						currentState.getCurrentPredictions().getAnnotations().size() + 1))
 					continue;
 
 				proposalStates.add(currentState.deepAddCopy(deepCopy));
@@ -107,11 +109,11 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 	 * 
 	 * @return false if the template does NOT violates any constraints, else true.
 	 */
-	private boolean violatesConstraints(State state, EntityTemplate deepCopy) {
+	private boolean violatesConstraints(State state, EntityTemplate deepCopy, int annotationIndex) {
 		if (hardConstraintsProvider == null)
 			return false;
 		else
-			return hardConstraintsProvider.violatesConstraints(state, deepCopy);
+			return hardConstraintsProvider.violatesConstraints(state, deepCopy, annotationIndex);
 
 	}
 
@@ -135,7 +137,7 @@ public class RootTemplateCardinalityExplorer implements IExplorationStrategy {
 	@Override
 	public void set(int sentenceIndex) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

@@ -84,7 +84,7 @@ public class ExcludePairConstraint extends AbstractHardConstraint {
 	}
 
 	@Override
-	public boolean violatesConstraint(State state, EntityTemplate entityTemplate) {
+	public boolean violatesConstraint(State state, EntityTemplate entityTemplate, int annotationindex) {
 
 		if (onTemplateType != null && onTemplateType != entityTemplate.getEntityType())
 			return false;
@@ -110,12 +110,14 @@ public class ExcludePairConstraint extends AbstractHardConstraint {
 	}
 
 	@Override
-	public List<EntityTemplate> violatesConstraint(State currentState, List<EntityTemplate> candidateListToFilter) {
+	public List<EntityTemplate> violatesConstraint(State currentState, List<EntityTemplate> candidateListToFilter,
+			int annotationindex) {
 
 		List<EntityTemplate> filteredList = new ArrayList<>(candidateListToFilter.size());
 
 		filteredList = candidateListToFilter.parallelStream()
-				.filter(candidate -> !violatesConstraint(currentState, candidate)).collect(Collectors.toList());
+				.filter(candidate -> !violatesConstraint(currentState, candidate, annotationindex))
+				.collect(Collectors.toList());
 
 		return filteredList;
 	}

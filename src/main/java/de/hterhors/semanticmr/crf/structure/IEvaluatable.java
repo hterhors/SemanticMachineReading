@@ -73,7 +73,8 @@ public interface IEvaluatable {
 			this.macroF1 = getF1();
 			this.macroPrecision = getPrecision();
 			this.macroRecall = getRecall();
-			this.macroAddCounter = 1;
+			if (!(tp == 0 && fp == 0 && fn == 0 && tn == 0))
+				this.macroAddCounter = 1;
 			this.type = EScoreType.MACRO;
 
 			return this;
@@ -151,7 +152,8 @@ public interface IEvaluatable {
 
 		public String macroToString() {
 			return "Score [macroF1=" + SCORE_FORMAT.format(getF1()) + ", macroPrecision="
-					+ SCORE_FORMAT.format(getPrecision()) + ", macroRecall=" + SCORE_FORMAT.format(getRecall()) + "]";
+					+ SCORE_FORMAT.format(getPrecision()) + ", macroRecall=" + SCORE_FORMAT.format(getRecall())
+					+ ", macroAddCounter=" + macroAddCounter + "]";
 		}
 
 		public String microToString() {
@@ -165,23 +167,52 @@ public interface IEvaluatable {
 			if (unmod)
 				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
 			if (this.isMacro() && adder.isMacro()) {
+
 				if (adder == ZERO_MACRO)
 					return;
+
+				if (adder.macroAddCounter == 0)
+					return;
+
 				this.macroPrecision += adder.macroPrecision;
 				this.macroRecall += adder.macroRecall;
-				this.macroF1 += getF1();
-
 				this.macroAddCounter += adder.macroAddCounter;
+				this.macroF1 = getF1();
 
 			} else if (this.isMicro() && adder.isMicro()) {
-				if (adder == ZERO_MICRO)
-					return;
 				this.tp += adder.tp;
 				this.fp += adder.fp;
 				this.fn += adder.fn;
 				this.tn += adder.tn;
 			} else {
 				throw new IllegalStateException("Can not add " + adder.type + " to a " + this.type + " score.");
+			}
+		}
+		
+		public void sub(Score subber) {
+			if (unmod)
+				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
+			if (this.isMacro() && subber.isMacro()) {
+				
+				if (subber == ZERO_MACRO)
+					return;
+				
+				if (subber.macroAddCounter == 0)
+					return;
+				
+				this.macroPrecision -= subber.macroPrecision;
+				this.macroRecall -= subber.macroRecall;
+				this.macroF1 -= getF1();
+				
+				this.macroAddCounter += subber.macroAddCounter;
+				
+			} else if (this.isMicro() && subber.isMicro()) {
+				this.tp -= subber.tp;
+				this.fp -= subber.fp;
+				this.fn -= subber.fn;
+				this.tn -= subber.tn;
+			} else {
+				throw new IllegalStateException("Can not sub " + subber.type + " to a " + this.type + " score.");
 			}
 		}
 
@@ -378,6 +409,7 @@ public interface IEvaluatable {
 				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
 			this.fn++;
 		}
+
 		public void increaseTrueNegative() {
 			if (isMacro())
 				throw new IllegalStateException("Can not increase true negatives for macro score objects.");
@@ -505,6 +537,24 @@ public interface IEvaluatable {
 			if (unmod != other.unmod)
 				return false;
 			return true;
+		}
+
+		public String toTSVString() {
+			if (isMicro())
+				return microToTSVString();
+			else {
+				return macroToTSVString();
+			}
+		}
+
+		public String macroToTSVString() {
+			return SCORE_FORMAT.format(getF1()) + "\t" + SCORE_FORMAT.format(getPrecision()) + "\t"
+					+ SCORE_FORMAT.format(getRecall());
+		}
+
+		public String microToTSVString() {
+			return (tn != 0 ? SCORE_FORMAT.format(getAccuracy() + "\t") : "") + SCORE_FORMAT.format(getF1()) + "\t"
+					+ SCORE_FORMAT.format(getPrecision()) + "\t" + SCORE_FORMAT.format(getRecall());
 		}
 
 	}

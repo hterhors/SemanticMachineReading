@@ -355,7 +355,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 			/**
 			 * Train the CRF.
 			 */
-			crf.train(learner, instanceProvider.getRedistributedTrainingInstances(), numberOfEpochs,
+			crf.train(learner, instanceProvider.getTrainingInstances(), numberOfEpochs,
 					sampleStoppingCrits);
 
 			/**
@@ -376,7 +376,7 @@ public class SlotFillingExample extends AbstractSemReadProject {
 		 * in this case. This method returns for each instances a final state (best
 		 * state based on the trained model) that contains annotations.
 		 */
-		Map<Instance, State> testResults = crf.predict(instanceProvider.getRedistributedTestInstances(), maxStepCrit,
+		Map<Instance, State> testResults = crf.predict(instanceProvider.getTestInstances(), maxStepCrit,
 				noModelChangeCrit);
 
 		/**

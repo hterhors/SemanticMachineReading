@@ -4,13 +4,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,9 +38,6 @@ import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.CartesianEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.NerlaEvaluator;
-import de.hterhors.semanticmr.tools.AutomatedSectionifcation;
-import de.hterhors.semanticmr.tools.AutomatedSectionifcation.ESection;
-import de.hterhors.semanticmr.tools.KeyTermExtractor;
 
 public class SemanticParsingCRF implements ISemanticParsingCRF {
 	public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.00000");
@@ -635,7 +630,7 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 	 * @param instances        the instances to compute the coverage on.
 	 * @return a score that contains information of the coverage.
 	 */
-	public Score computeCoverage(final boolean printDetailedLog, IObjectiveFunction predictionOF,
+	public Map<Instance, State> computeCoverage(final boolean printDetailedLog, IObjectiveFunction predictionOF,
 			final List<Instance> instances) {
 
 		log.info("Compute coverage...");
@@ -650,9 +645,6 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 		for (Instance instance : instances) {
 			final List<State> producedStateChain = new ArrayList<>();
 
-			if(instance.getName().startsWith("N190"))
-				System.out.println("");
-			
 			State currentState = initializer.getInitState(instance);
 			predictionOF.score(currentState);
 
@@ -695,18 +687,8 @@ public class SemanticParsingCRF implements ISemanticParsingCRF {
 				LogUtils.logState(log, COVERAGE_CONTEXT + " [1/1]" + "[" + ++instanceIndex + "/" + instances.size()
 						+ "]" + "[" + (samplingStep + 1) + "]", instance, currentState);
 		}
+		return finalStates;
 
-		Score meanTrainOFScore = new Score();
-		for (Entry<Instance, State> finalState : finalStates.entrySet()) {
-			predictionOF.score(finalState.getValue());
-			if (printDetailedLog)
-				log.info(
-						finalState.getKey().getName().substring(0, Math.min(finalState.getKey().getName().length(), 10))
-								+ "... \t" + SCORE_FORMAT.format(finalState.getValue().getObjectiveScore()));
-			meanTrainOFScore.add(finalState.getValue().getMicroScore());
-		}
-
-		return meanTrainOFScore;
 	}
 
 	public String getModelName() {

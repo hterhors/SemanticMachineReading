@@ -163,7 +163,7 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 
 		Set<EntityType> entityTypes = new HashSet<>();
 		entityTypes.add(factor.getFactorScope().entityType);
-		entityTypes.addAll(factor.getFactorScope().entityType.getTransitiveClosureSuperEntityTypes());
+//		entityTypes.addAll(factor.getFactorScope().entityType.getTransitiveClosureSuperEntityTypes());
 
 		int distance = 0;
 		for (int i = Math.max(0, beginToken.getDocTokenIndex() - DEFAULT_MAX_TOKEN_CONTEXT_LEFT) - 1; i < beginToken
@@ -178,9 +178,17 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 				if (Document.getStopWords().contains(text))
 					continue;
 				for (EntityType entityType : entityTypes) {
-					featureVector.set(PREFIX + text + " " + entityType.name, true);
-					featureVector.set(PREFIX + text + "... " + entityType.name, true);
-					featureVector.set(PREFIX + text + "... -" + distance + "... " + entityType.name, true);
+					if (factor.getFactorScope().instance.getDocument().tokenList.get(i).getSentenceIndex() == beginToken
+							.getSentenceIndex()) {
+						featureVector.set(PREFIX + "sameSentence_" + text + " " + entityType.name, true);
+						featureVector.set(PREFIX + "sameSentence_" + text + "... " + entityType.name, true);
+						featureVector.set(
+								PREFIX + "sameSentence_" + text + "... -" + distance + "... " + entityType.name, true);
+					}
+
+//					featureVector.set(PREFIX + text + " " + entityType.name, true);
+//					featureVector.set(PREFIX + text + "... " + entityType.name, true);
+//					featureVector.set(PREFIX + text + "... -" + distance + "... " + entityType.name, true);
 				}
 			}
 			distance++;
@@ -199,9 +207,16 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 				if (Document.getStopWords().contains(text))
 					continue;
 				for (EntityType entityType : entityTypes) {
-					featureVector.set(PREFIX + text + " " + entityType.name, true);
-					featureVector.set(PREFIX + entityType.name + "... " + text, true);
-					featureVector.set(PREFIX + entityType.name + "... +" + distance + "... " + text, true);
+					if (factor.getFactorScope().instance.getDocument().tokenList.get(i).getSentenceIndex() == beginToken
+							.getSentenceIndex()) {
+						featureVector.set(PREFIX + "sameSentence_" + text + " " + entityType.name, true);
+						featureVector.set(PREFIX + "sameSentence_" + entityType.name + "... " + text, true);
+						featureVector.set(
+								PREFIX + "sameSentence_" + entityType.name + "... +" + distance + "... " + text, true);
+					}
+//					featureVector.set(PREFIX + text + " " + entityType.name, true);
+//					featureVector.set(PREFIX + entityType.name + "... " + text, true);
+//					featureVector.set(PREFIX + entityType.name + "... +" + distance + "... " + text, true);
 				}
 			}
 			distance++;
@@ -209,4 +224,51 @@ public class SingleTokenContextTemplate extends AbstractFeatureTemplate<SingleTo
 
 	}
 
+//	only same sentence
+//	MACRO	Root = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	hasLowerVertebrae = 0.667	0.667	0.667	0.769	0.769	0.769	0.867	0.867	0.867
+//			MACRO	hasUpperVertebrae = 0.733	0.733	0.733	0.786	0.786	0.786	0.933	0.933	0.933
+//			MACRO	Cardinality = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	Overall = 0.800	0.800	0.800	0.829	0.800	0.857	0.966	1.000	0.933
+//			modelName: VertebralArea1072708009
+
+	// include hierarchical only same sentence
+//	MACRO	Root = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	hasLowerVertebrae = 0.600	0.600	0.600	0.692	0.692	0.692	0.867	0.867	0.867
+//			MACRO	hasUpperVertebrae = 0.533	0.533	0.533	0.571	0.571	0.571	0.933	0.933	0.933
+//			MACRO	Cardinality = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	Overall = 0.711	0.711	0.711	0.737	0.711	0.762	0.966	1.000	0.933
+//			modelName: VertebralArea1515874717
+
+	// include hierarchical both
+//	MACRO	Root = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	hasLowerVertebrae = 0.400	0.400	0.400	0.462	0.462	0.462	0.867	0.867	0.867
+//			MACRO	hasUpperVertebrae = 0.733	0.733	0.733	0.786	0.786	0.786	0.933	0.933	0.933
+//			MACRO	Cardinality = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	Overall = 0.711	0.711	0.711	0.737	0.711	0.762	0.966	1.000	0.933
+//			modelName: VertebralArea1348497874
+
+//include hierarchical 	 only wihtout samesentence
+//	MACRO	Root = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	hasLowerVertebrae = 0.733	0.733	0.733	0.846	0.846	0.846	0.867	0.867	0.867
+//			MACRO	hasUpperVertebrae = 0.600	0.600	0.600	0.643	0.643	0.643	0.933	0.933	0.933
+//			MACRO	Cardinality = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	Overall = 0.778	0.778	0.778	0.806	0.778	0.833	0.966	1.000	0.933
+//			modelName: VertebralArea1136835709
+//			
+	// only wihtout samesentence
+//	MACRO	Root = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	hasLowerVertebrae = 0.667	0.667	0.667	0.769	0.769	0.769	0.867	0.867	0.867
+//			MACRO	hasUpperVertebrae = 0.667	0.667	0.667	0.714	0.714	0.714	0.933	0.933	0.933
+//			MACRO	Cardinality = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	Overall = 0.778	0.778	0.778	0.806	0.778	0.833	0.966	1.000	0.933
+//			modelName: VertebralArea1214172265
+
+//	both
+//	MACRO	Root = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	hasLowerVertebrae = 0.467	0.467	0.467	0.538	0.538	0.538	0.867	0.867	0.867
+//			MACRO	hasUpperVertebrae = 0.733	0.733	0.733	0.786	0.786	0.786	0.933	0.933	0.933
+//			MACRO	Cardinality = 1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000	1.000
+//			MACRO	Overall = 0.733	0.733	0.733	0.760	0.733	0.786	0.966	1.000	0.933
+//			modelName: VertebralArea1216050734
 }

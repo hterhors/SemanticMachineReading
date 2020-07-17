@@ -87,13 +87,12 @@ public class CSVDataStructureReader implements ISpecificationsReader {
 
 			for (String[] line : structures) {
 				try {
-					
-				slotsForEntity.putIfAbsent(line[0], new HashSet<>());
-				slotsForEntity.get(line[0]).add(line[1]);
-				slotFillerEntityTypes.putIfAbsent(line[1], new HashSet<>());
-				slotFillerEntityTypes.get(line[1]).add(line[2]);
-				}catch(Exception e)
-				{
+
+					slotsForEntity.putIfAbsent(line[0], new HashSet<>());
+					slotsForEntity.get(line[0]).add(line[1]);
+					slotFillerEntityTypes.putIfAbsent(line[1], new HashSet<>());
+					slotFillerEntityTypes.get(line[1]).add(line[2]);
+				} catch (Exception e) {
 					System.out.println(Arrays.toString(line));
 					e.printStackTrace();
 				}
@@ -112,22 +111,26 @@ public class CSVDataStructureReader implements ISpecificationsReader {
 				if (sa2.contains(string[0]))
 					System.out.println("WARN: " + string[0]);
 				sa2.add(string[0]);
-				
+
 			}
-	
+
 			Map<String, Boolean> isLiteralValueSlotTypes = entities.stream()
 					.collect(Collectors.toMap(s -> s[0], s -> new Boolean(s[1].equals("true"))));
 
-			Map<String, Integer> slotMaxSize = slots.stream().collect(Collectors.toMap(s -> s[0], s -> {
+			Map<String, Integer> slotMaxSize = new HashMap<>();
+			for (String[] s : slots) {
+				int value = 1;
 				if (s[1].isEmpty()) {
-					return Integer.MAX_VALUE;
+					value = Integer.MAX_VALUE;
 				}
-				final Integer max = Integer.valueOf(s[1]);
-				if (max.intValue() <= 0) {
-					return Integer.MAX_VALUE;
+				if (Integer.valueOf(s[1]).intValue() <= 0) {
+					value = Integer.MAX_VALUE;
 				}
-				return max;
-			}));
+
+				if (!slotMaxSize.containsKey(s[0]) || !new Integer(Integer.MAX_VALUE).equals(slotMaxSize.get(s[0])))
+					slotMaxSize.put(s[0], value);
+
+			}
 
 			return new Specifications(entityTypeNames, slotTypeNames, isLiteralValueSlotTypes, slotFillerEntityTypes,
 					superEntityTypes, subEntityTypes, slotsForEntity, slotMaxSize);

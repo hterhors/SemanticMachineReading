@@ -19,8 +19,8 @@ import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
  * @author hterhors
  *
  */
-final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 
+final public class DocumentLinkedAnnotation extends LiteralAnnotation {
 	public static final Comparator<DocumentLinkedAnnotation> COMPARE_BY_SURFACEFORM = new Comparator<DocumentLinkedAnnotation>() {
 
 		@Override

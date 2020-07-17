@@ -184,6 +184,8 @@ public class InstanceProvider {
 
 	public InstanceProvider(final File jsonInstancesDirectory, final AbstractCorpusDistributor distributor,
 			final int numToRead, Collection<GoldModificationRule> modifyGoldRules, DeduplicationRule duplicationRule) {
+		log.info("Read instances from: " + jsonInstancesDirectory);
+		log.info("Distributor: " + distributor);
 		try {
 			this.jsonInstancesDirectory = jsonInstancesDirectory;
 
@@ -301,7 +303,7 @@ public class InstanceProvider {
 	 * 
 	 * @return a list of training instances based on the distributor.
 	 */
-	public List<Instance> getRedistributedTrainingInstances() {
+	public List<Instance> getTrainingInstances() {
 		if (distributor == null)
 			throw new IllegalStateException("No distributor specified!");
 		return Collections.unmodifiableList(redistTrainInstances);
@@ -312,7 +314,7 @@ public class InstanceProvider {
 	 * 
 	 * @return a list of development instances based on the distributor.
 	 */
-	public List<Instance> getRedistributedDevelopmentInstances() {
+	public List<Instance> getDevelopmentInstances() {
 		if (distributor == null)
 			throw new IllegalStateException("No distributor specified!");
 		return Collections.unmodifiableList(redistDevInstances);
@@ -323,7 +325,7 @@ public class InstanceProvider {
 	 * 
 	 * @return a list of test instances based on the distributor.
 	 */
-	public List<Instance> getRedistributedTestInstances() {
+	public List<Instance> getTestInstances() {
 		if (distributor == null)
 			throw new IllegalStateException("No distributor specified!");
 		return Collections.unmodifiableList(redistTestInstances);

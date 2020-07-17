@@ -23,6 +23,8 @@ import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
 import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.exce.DocumentLinkedAnnotationMismatchException;
+import de.hterhors.semanticmr.exce.UnkownEnityTypeException;
+import de.hterhors.semanticmr.exce.UnkownSlotTypeException;
 import de.hterhors.semanticmr.santo.container.RDFRelatedAnnotation;
 import de.hterhors.semanticmr.santo.container.Triple;
 import de.hterhors.semanticmr.santo.helper.PatternCollection;
@@ -72,7 +74,6 @@ public class SantoRDFConverter {
 		final List<AbstractAnnotation> instances = new ArrayList<>();
 
 		for (String rootDataPoint : rootDataPoints) {
-
 			final String object = rdfData.get(rootDataPoint).get(RDF_TYPE_NAMESPACE).iterator().next();
 			/*
 			 * TODO: Assume that there is only one rdf:type!
@@ -96,6 +97,74 @@ public class SantoRDFConverter {
 				instances.add(entityTemplate);
 			} catch (DocumentLinkedAnnotationMismatchException e) {
 				e.printStackTrace();
+			}
+
+		}
+
+		for (String annotationKey : rdfData.keySet()) {
+
+			Map<String, Set<String>> annotationValues = rdfData.get(annotationKey);
+
+			for (String propertyURI : annotationValues.keySet()) {
+
+				final String property = SantoHelper.getResource(propertyURI);
+
+				try {
+					SlotType.get(property);
+				} catch (UnkownSlotTypeException e) {
+					continue;
+				}
+
+				if (!filterSlotTypes.isEmpty() && !filterSlotTypes.contains(SlotType.get(property)))
+					continue;
+
+				for (String resource : annotationValues.get(propertyURI)) {
+
+					final Triple linkedID = new Triple(annotationKey, propertyURI, resource);
+
+					final RDFRelatedAnnotation annotation = annotations.get(linkedID);
+
+					if (annotation == null)
+						continue;
+
+					try {
+						EntityType.get(SantoHelper.getResource(resource));
+					} catch (UnkownEnityTypeException e) {
+						continue;
+					}
+
+					EntityType aet = EntityType.get(SantoHelper.getResource(resource));
+
+					boolean pass = false;
+
+					for (EntityType rootE : rootEntities) {
+
+						if (rootE.isSuperEntityOf(aet)) {
+							pass = true;
+						}
+						if (rootE == aet)
+							pass = true;
+
+						if (pass)
+							break;
+
+					}
+
+					if (!pass)
+						continue;
+
+					try {
+
+						EntityTemplate entityTemplate = new EntityTemplate(toEntityTemplateTypeAnnotation(document,
+								SantoHelper.getResource(resource), annotation));
+						instances.add(entityTemplate);
+
+					} catch (DocumentLinkedAnnotationMismatchException e) {
+						e.printStackTrace();
+					}
+
+				}
+
 			}
 
 		}
@@ -398,7 +467,6 @@ public class SantoRDFConverter {
 
 		final Set<String> subEntities = new HashSet<>();
 		final Set<String> rootEntityNames = rootEntityTypes.stream().map(r -> r.name).collect(Collectors.toSet());
-
 		for (EntityType rootEntityType : rootEntityTypes) {
 			for (EntityType string : rootEntityType.getTransitiveClosureSubEntityTypes()) {
 				subEntities.add(string.name);

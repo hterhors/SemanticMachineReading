@@ -31,24 +31,25 @@ public class JSONNerlaReader {
 
 		jsonNerla = new ArrayList<>();
 
-		if (nerlaFileOrDir.isDirectory()) {
-			jsonNerla = new ArrayList<>();
-			for (File nerlaJsonFile : nerlaFileOrDir.listFiles()) {
+		if (nerlaFileOrDir != null)
+			if (nerlaFileOrDir.isDirectory()) {
+				jsonNerla = new ArrayList<>();
+				for (File nerlaJsonFile : nerlaFileOrDir.listFiles()) {
+					try {
+						jsonNerla.addAll(new JsonNerlaIO(true)
+								.fromJsonString(new String(Files.readAllBytes(nerlaJsonFile.toPath()))));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			} else {
 				try {
-					jsonNerla.addAll(new JsonNerlaIO(true)
-							.fromJsonString(new String(Files.readAllBytes(nerlaJsonFile.toPath()))));
+					jsonNerla = new JsonNerlaIO(true)
+							.fromJsonString(new String(Files.readAllBytes(nerlaFileOrDir.toPath())));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-		} else {
-			try {
-				jsonNerla = new JsonNerlaIO(true)
-						.fromJsonString(new String(Files.readAllBytes(nerlaFileOrDir.toPath())));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	public List<DocumentLinkedAnnotation> getForInstance(Instance instance) {
@@ -60,14 +61,15 @@ public class JSONNerlaReader {
 
 		for (JsonEntityAnnotationWrapper jsonEntityAnnotationWrapper : jsonNerla) {
 
+			if (instance == null)
+				continue;
+
 			if (!jsonEntityAnnotationWrapper.getDocumentID().equals(instance.getName()))
 				continue;
 
 			if (count++ % 5000 == 0)
 				log.debug(" - " + count + " - ");
 
-			if (instance == null)
-				continue;
 
 			try {
 				nerlas.add(new DocumentLinkedAnnotation(instance.getDocument(),

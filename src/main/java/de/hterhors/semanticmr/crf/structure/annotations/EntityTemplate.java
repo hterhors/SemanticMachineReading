@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.ser.impl.StringCollectionSerializer;
+
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
@@ -350,7 +352,17 @@ final public class EntityTemplate extends AbstractAnnotation {
 				score.add(this.rootAnnotation.evaluate(evaluator, other));
 			} else {
 				oet = (EntityTemplate) other;
-				score.add(this.rootAnnotation.evaluate(evaluator, oet.rootAnnotation));
+
+				/**
+				 * TODO: REMOVE QUICK FIX
+				 */
+				if (oet.rootAnnotation.isInstanceOfEntityTypeAnnotation()
+						&& (oet.getEntityType().name.equals("CompoundTreatment")
+								|| oet.getEntityType().getDirectSuperEntityTypes().isEmpty())) {
+
+				} else {
+					score.add(this.rootAnnotation.evaluate(evaluator, oet.rootAnnotation));
+				}
 			}
 		}
 

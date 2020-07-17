@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.annotations.SlotType;
@@ -46,10 +47,13 @@ public class DataStructureWriter {
 	public static void writeSlotsDataStructureFile(File file, EntityType rootEntity) throws IOException {
 
 		Set<EntityType> relatedEntities = rootEntity.getRelatedEntityTypes();
-		Set<SlotType> slotTypes = new HashSet<>();
-		for (EntityType et : relatedEntities) {
-			slotTypes.addAll(et.getSlots());
-		}
+		Set<SlotType> slotTypes = relatedEntities.stream().flatMap(et -> et.getSlots().stream())
+				.filter(s -> s.isIncluded()).collect(Collectors.toSet());
+
+//				new HashSet<>();
+//		for (EntityType et : relatedEntities) {
+//			slotTypes.addAll(et.getSlots());
+//		}
 
 		PrintStream ps = new PrintStream(file);
 		ps.println("#Slot\tMaxCardinality");
@@ -65,10 +69,12 @@ public class DataStructureWriter {
 			throws IOException {
 
 		Set<EntityType> relatedEntities = rootEntity.getRelatedEntityTypes();
-		Set<SlotType> slotTypes = new HashSet<>();
-		for (EntityType et : relatedEntities) {
-			slotTypes.addAll(et.getSlots());
-		}
+//		Set<SlotType> slotTypes = new HashSet<>();
+//		for (EntityType et : relatedEntities) {
+//			slotTypes.addAll(et.getSlots());
+//		}
+		Set<SlotType> slotTypes = relatedEntities.stream().flatMap(et -> et.getSlots().stream())
+				.filter(s -> s.isIncluded()).collect(Collectors.toSet());
 
 		List<String> inputLines = Files.readAllLines(input.toPath());
 		PrintStream ps = new PrintStream(output);
@@ -80,7 +86,7 @@ public class DataStructureWriter {
 				continue;
 			String[] data = inLine.split("\t");
 			if (relatedEntities.contains(EntityType.get(data[0])) && slotTypes.contains(SlotType.get(data[1]))
-					&& relatedEntities.contains(EntityType.get(data[2]))) {
+					&& SlotType.get(data[1]).isIncluded() && relatedEntities.contains(EntityType.get(data[2]))) {
 				ps.println(inLine);
 			}
 

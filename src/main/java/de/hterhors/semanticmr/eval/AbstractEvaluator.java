@@ -17,7 +17,7 @@ import de.hterhors.semanticmr.crf.structure.annotations.EntityTypeAnnotation;
 import de.hterhors.semanticmr.crf.structure.annotations.LiteralAnnotation;
 
 public abstract class AbstractEvaluator {
-	protected static Logger log = LogManager.getFormatterLogger(AbstractEvaluator.class);
+	protected static Logger log = LogManager.getFormatterLogger("SlotFilling");
 
 	final public EEvaluationDetail evaluationDetail;
 

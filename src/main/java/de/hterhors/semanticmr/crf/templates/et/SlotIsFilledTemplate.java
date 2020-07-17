@@ -109,8 +109,9 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 
 			for (Entry<SlotType, Set<AbstractAnnotation>> slotIsFilledScope : filter.getMergedAnnotations()
 					.entrySet()) {
-				factors.add(new SlotIsFilledScope(this, annotation.getEntityType(), slotIsFilledScope.getKey(),
-						slotIsFilledScope.getValue().size()));
+				if (slotIsFilledScope.getValue().size() != 0)
+					factors.add(new SlotIsFilledScope(this, annotation.getEntityType(), slotIsFilledScope.getKey(),
+							slotIsFilledScope.getValue().size()));
 			}
 		}
 		return factors;
@@ -120,13 +121,13 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 	public void generateFeatureVector(Factor<SlotIsFilledScope> factor) {
 
 		DoubleVector featureVector = factor.getFeatureVector();
-		
+
 		EntityType entity = factor.getFactorScope().entityTemplateType;
 		add(factor, featureVector, entity);
 
-		for (EntityType e : entity.getDirectSuperEntityTypes()) {
-			add(factor, featureVector, e);
-		}
+//		for (EntityType e : entity.getDirectSuperEntityTypes()) {
+//			add(factor, featureVector, e);
+//		}
 
 	}
 
@@ -164,5 +165,3 @@ public class SlotIsFilledTemplate extends AbstractFeatureTemplate<SlotIsFilledSc
 	}
 
 }
-
-

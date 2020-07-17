@@ -140,8 +140,8 @@ public class SystemScope {
 			return NormalizationFunctionHandler.getInstance(builder);
 		}
 
-		public SystemScope build() {
-			return apply().build();
+		public void build() {
+			apply().build();
 		}
 
 	}
@@ -190,8 +190,8 @@ public class SystemScope {
 			return this;
 		}
 
-		public SystemScope build() {
-			return builder.build();
+		public void build() {
+			builder.build();
 		}
 	}
 

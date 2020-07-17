@@ -26,7 +26,7 @@ public abstract class AbstractHardConstraint {
 	 * @param entityTemplate
 	 * @return true if the implemented constraint is violated, else false.
 	 */
-	public abstract boolean violatesConstraint(State currentState, EntityTemplate entityTemplate);
+	public abstract boolean violatesConstraint(State currentState, EntityTemplate entityTemplate, int annotationIndex);
 
 	/**
 	 * 
@@ -35,12 +35,14 @@ public abstract class AbstractHardConstraint {
 	 * 
 	 * @return the filtered List
 	 */
-	public List<EntityTemplate> violatesConstraint(State currentState, List<EntityTemplate> candidateListToFilter) {
+	public List<EntityTemplate> violatesConstraint(State currentState, List<EntityTemplate> candidateListToFilter,
+			int annotationIndex) {
 
 		List<EntityTemplate> filteredList = new ArrayList<>(candidateListToFilter.size());
 
 		filteredList = candidateListToFilter.parallelStream()
-				.filter(candidate -> !violatesConstraint(currentState, candidate)).collect(Collectors.toList());
+				.filter(candidate -> !violatesConstraint(currentState, candidate, annotationIndex))
+				.collect(Collectors.toList());
 
 		return filteredList;
 	}

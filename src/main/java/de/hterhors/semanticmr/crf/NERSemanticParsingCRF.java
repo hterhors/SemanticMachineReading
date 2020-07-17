@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,6 @@ import de.hterhors.semanticmr.eval.EEvaluationDetail;
 import de.hterhors.semanticmr.eval.NerlaEvaluator;
 import de.hterhors.semanticmr.tools.AutomatedSectionifcation;
 import de.hterhors.semanticmr.tools.AutomatedSectionifcation.ESection;
-import de.hterhors.semanticmr.tools.KeyTermExtractor;
 
 public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 	public static final DecimalFormat SCORE_FORMAT = new DecimalFormat("0.00000");
@@ -85,18 +84,18 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 	private IObjectiveFunction coverageObjectiveFunction = new SlotFillingObjectiveFunction(EScoreType.MICRO,
 			new CartesianEvaluator(EEvaluationDetail.ENTITY_TYPE, EEvaluationDetail.DOCUMENT_LINKED));
 
-	public NERSemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
-			IObjectiveFunction objectiveFunction) {
-		this(model, Arrays.asList(explorer), sampler, objectiveFunction);
-	}
-
-	public NERSemanticParsingCRF(Model model, List<IExplorationStrategy> explorer, AbstractSampler sampler,
-			IObjectiveFunction objectiveFunction) {
-		this.model = model;
-		this.explorerList = explorer;
-		this.objectiveFunction = objectiveFunction;
-		this.sampler = sampler;
-	}
+//	public NERSemanticParsingCRF(Model model, IExplorationStrategy explorer, AbstractSampler sampler,
+//			IObjectiveFunction objectiveFunction) {
+//		this(model, Arrays.asList(explorer), sampler, objectiveFunction);
+//	}
+//
+//	public NERSemanticParsingCRF(Model model, List<IExplorationStrategy> explorer, AbstractSampler sampler,
+//			IObjectiveFunction objectiveFunction) {
+//		this.model = model;
+//		this.explorerList = explorer;
+//		this.objectiveFunction = objectiveFunction;
+//		this.sampler = sampler;
+//	}
 
 	public NERSemanticParsingCRF(Model model, List<IExplorationStrategy> explorerList, AbstractSampler sampler,
 			IStateInitializer stateInitializer, IObjectiveFunction trainingObjectiveFunction) {
@@ -120,6 +119,13 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 //				new ISamplingStoppingCriterion[] {});
 //	}
 
+	public NERSemanticParsingCRF setKeyTerms(Set<String> keyTerms) {
+//		this.keyTerms = keyTerms;
+		return this;
+	}
+
+	private Set<String> keyTerms = new HashSet<>();
+
 	public Map<Instance, State> train(final AdvancedLearner learner, List<Instance> trainingInstances,
 			final int numberOfEpochs, final ITrainingStoppingCriterion[] trainingStoppingCrits,
 			final ISamplingStoppingCriterion[] samplingStoppingCrits) {
@@ -134,45 +140,12 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 
 		trainingInstances = new ArrayList<>(trainingInstances);
 
-		/**
-		 * TODO: PARAMETERIZE
-		 */
-		boolean includeLeaveOnePropertyOut = false;
-//		Score: SPECIES_GENDER_WEIGHT_AGE_CATEGORY_AGE	0.94	0.95	0.94
-
-//		Score: SPECIES_GENDER_WEIGHT_AGE_CATEGORY_AGE	0.93	0.94	0.91
-
-//		standard: Score [getF1()=0.425, getPrecision()=0.598, getRecall()=0.330, tp=61, fp=41, fn=124, tn=0]
-//				only root: Score [getF1()=0.548, getPrecision()=0.575, getRecall()=0.523, tp=23, fp=17, fn=21, tn=0]
-//				CRFStatistics [context=Train, getTotalDuration()=85465]
-//				CRFStatistics [context=Test, getTotalDuration()=299]
-//				Compute coverage...
-//				Coverage Training: Score [getF1()=0.931, getPrecision()=1.000, getRecall()=0.871, tp=651, fp=0, fn=96, tn=0]
-//				Compute coverage...
-//				Coverage Development: Score [getF1()=0.876, getPrecision()=0.967, getRecall()=0.800, tp=148, fp=5, fn=37, tn=0]
-//				modelName: Injury9847
-//		standard: Score [getF1()=0.432, getPrecision()=0.608, getRecall()=0.335, tp=62, fp=40, fn=123, tn=0]
-//				only root: Score [getF1()=0.571, getPrecision()=0.600, getRecall()=0.545, tp=24, fp=16, fn=20, tn=0]
-//				CRFStatistics [context=Train, getTotalDuration()=65265]
-//				CRFStatistics [context=Test, getTotalDuration()=189]
-//				Compute coverage...
-//				Coverage Training: Score [getF1()=0.931, getPrecision()=1.000, getRecall()=0.871, tp=651, fp=0, fn=96, tn=0]
-//				Compute coverage...
-//				Coverage Development: Score [getF1()=0.876, getPrecision()=0.967, getRecall()=0.800, tp=148, fp=5, fn=37, tn=0]
-//				modelName: Injury1364
-
 //		Collections.sort(trainingInstances);
 		Random random = new Random(1000L);
+
 		for (int epoch = 0; epoch < numberOfEpochs; epoch++) {
 			Collections.shuffle(trainingInstances, new Random(random.nextLong()));
 
-			Map<SlotType, Boolean> leaveOnePropertyOut = null;
-			if (includeLeaveOnePropertyOut) {
-				leaveOnePropertyOut = SlotType.storeExcludance();
-				List<SlotType> types = leaveOnePropertyOut.entrySet().stream().filter(a -> !a.getValue())
-						.map(a -> a.getKey()).collect(Collectors.toList());
-				types.get(random.nextInt(types.size())).exclude();
-			}
 			log.info("############");
 			log.info("# Epoch: " + (epoch + 1) + " #");
 			log.info("############");
@@ -180,8 +153,6 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 			final boolean sampleBasedOnObjectiveFunction = sampler.sampleBasedOnObjectiveScore(epoch);
 
 			int instanceIndex = 0;
-
-			Set<String> keyTerms = KeyTermExtractor.getKeyTerms(trainingInstances);
 
 			for (Instance instance : trainingInstances) {
 				++instanceIndex;
@@ -192,16 +163,18 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 				int samplingStep = 0;
 				int intermediateCounter = 0;
 				int proposalStateCounter = 0;
-//				AutomatedSectionifcation sectionifcation = AutomatedSectionifcation
-//						.getInstance(currentState.getInstance());
+				AutomatedSectionifcation sectionifcation = AutomatedSectionifcation
+						.getInstance(currentState.getInstance());
 
 				for (int sentenceIndex = 0; sentenceIndex < instance.getDocument()
 						.getNumberOfSentences(); sentenceIndex++) {
 
-//					if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS)
-//						continue;
+					if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS
+//							&& sectionifcation.getSection(sentenceIndex) != ESection.ABSTRACT
+							)
+						continue;
 
-					boolean containsKeyterm = false;
+					boolean containsKeyterm = keyTerms.isEmpty();
 					String sentence = instance.getDocument().getContentOfSentence(sentenceIndex);
 
 					for (String keyTerm : keyTerms) {
@@ -274,8 +247,6 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 						instance, currentState);
 				log.info("Time: " + this.trainingStatistics.getTotalDuration());
 			}
-			if (includeLeaveOnePropertyOut)
-				SlotType.restoreExcludance(leaveOnePropertyOut);
 
 //			Map<Integer, Double> currentModelWeights = model.getFactorTemplates().stream()
 //					.flatMap(t -> t.getWeights().getFeatures().entrySet().stream())
@@ -477,8 +448,6 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 			finalStates.put(instance, Arrays.asList(currentState));
 			objectiveFunction.score(currentState);
 
-			Set<String> keyTerms = KeyTermExtractor.getKeyTerms(instancesToPredict);
-
 			int samplingStep = 0;
 
 			AutomatedSectionifcation sectionifcation = AutomatedSectionifcation.getInstance(instance);
@@ -487,10 +456,12 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 					.getNumberOfSentences(); sentenceIndex++) {
 //
 //
-				if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS)
+				if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS
+//						&& sectionifcation.getSection(sentenceIndex) != ESection.ABSTRACT
+						)
 					continue;
-//
-				boolean containsKeyterm = false;
+
+				boolean containsKeyterm = keyTerms.isEmpty();
 				String sentence = instance.getDocument().getContentOfSentence(sentenceIndex);
 
 				for (String keyTerm : keyTerms) {
@@ -510,9 +481,9 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 				for (samplingStep = 0; samplingStep < 10; samplingStep++) {
 
 					for (IExplorationStrategy explorer : explorerList) {
-						
+
 						explorer.set(sentenceIndex);
-						
+
 						final List<State> proposalStates = explorer.explore(currentState);
 
 						if (proposalStates.isEmpty())
@@ -548,18 +519,19 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 								accepted = AcceptStrategies.strictModelAccept().isAccepted(proposalStates.get(i),
 										prevCurrentState); // prev current state
 
-								if (accepted) {
-									objectiveFunction.score(proposalStates.get(i));
-									currentStates.add(proposalStates.get(i));
-								} else {
-									/*
-									 * Quick break cause monotone decreasing model score distribution and strict
-									 * evaluation.
-									 */
-									break;
-								}
+//								if (accepted) {
+								objectiveFunction.score(proposalStates.get(i));
+								currentStates.add(proposalStates.get(i));
+//								} else {
+//									/*
+//									 * Quick break cause monotone decreasing model score distribution and strict
+//									 * evaluation.
+//									 */
+//									break;
+//								}
 							}
-							finalStates.put(instance, currentStates);
+							if (!finalStates.containsKey(instance) || !currentStates.isEmpty())
+								finalStates.put(instance, currentStates);
 						}
 					}
 					if (meetsSamplingStoppingCriterion(stoppingCriterion, producedStateChain)) {
@@ -710,18 +682,19 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 
 			finalStates.put(instance, currentState);
 			producedStateChain.add(currentState);
-			Set<String> keyTerms = KeyTermExtractor.getKeyTerms(instances);
 
 			int samplingStep = 0;
-//			AutomatedSectionifcation sectionifcation = AutomatedSectionifcation.getInstance(currentState.getInstance());
+			AutomatedSectionifcation sectionifcation = AutomatedSectionifcation.getInstance(currentState.getInstance());
 
 			for (int sentenceIndex = 0; sentenceIndex < instance.getDocument()
 					.getNumberOfSentences(); sentenceIndex++) {
 
-//				if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS)
-//					continue;
+				if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS
+//						&& sectionifcation.getSection(sentenceIndex) != ESection.ABSTRACT
+						)
+					continue;
 //
-				boolean containsKeyterm = false;
+				boolean containsKeyterm = keyTerms.isEmpty();
 				String sentence = instance.getDocument().getContentOfSentence(sentenceIndex);
 
 				for (String keyTerm : keyTerms) {

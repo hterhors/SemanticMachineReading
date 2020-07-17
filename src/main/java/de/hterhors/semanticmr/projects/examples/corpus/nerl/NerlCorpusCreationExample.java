@@ -246,9 +246,9 @@ public class NerlCorpusCreationExample {
 		log.info(instanceProvider.getOriginalTestInstances());
 
 		log.info("Redistributed...");
-		log.info(instanceProvider.getRedistributedTrainingInstances());
-		log.info(instanceProvider.getRedistributedDevelopmentInstances());
-		log.info(instanceProvider.getRedistributedTestInstances());
+		log.info(instanceProvider.getTrainingInstances());
+		log.info(instanceProvider.getDevelopmentInstances());
+		log.info(instanceProvider.getTestInstances());
 
 	}
 

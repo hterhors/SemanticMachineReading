@@ -510,12 +510,17 @@ public class SemanticParsingCRFMultiState implements ISemanticParsingCRF {
 	 */
 	private State merge(Entry<Instance, List<State>> m, final int n) {
 		List<AbstractAnnotation> mergedAnnotations = new ArrayList<>();
-
+		int size = n;
 		outer: for (int i = 0; i < m.getValue().size(); i++) {
+
+			if (n == 1) {
+				size = m.getValue().get(0).getCurrentPredictions().getAnnotations().size();
+
+			}
 
 			for (AbstractAnnotation abstractAnnotation : m.getValue().get(i).getCurrentPredictions().getAnnotations()) {
 
-				if (mergedAnnotations.size() == n)
+				if (mergedAnnotations.size() == size)
 					break outer;
 				mergedAnnotations.add(abstractAnnotation);
 			}

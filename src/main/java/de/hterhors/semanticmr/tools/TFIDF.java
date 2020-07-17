@@ -152,11 +152,41 @@ public class TFIDF {
 
 			Map<String, Double> v = new HashMap<>();
 			output.put(e.getKey(), v);
-
+			double max = 1;
+			if (normalizedTFValues) {
+				for (Entry<String, Double> string : tfs.entrySet()) {
+					max = string.getValue() * Math.max(max, idfs.getOrDefault(string.getKey(), 0D));
+				}
+			}
 			for (Entry<String, Double> string : tfs.entrySet()) {
 
-//				v.put(string.getKey(), 1 * idfs.getOrDefault(string.getKey(), 0D));
-				v.put(string.getKey(), string.getValue() * idfs.getOrDefault(string.getKey(), 0D));
+				v.put(string.getKey(), string.getValue() * idfs.getOrDefault(string.getKey(), 0D) / max);
+			}
+
+		}
+
+		return output;
+	}
+
+	public static final Map<String, Map<String, Double>> getIDFs(final Map<String, List<String>> documents,
+			boolean localNormalizing) {
+
+		Map<String, Map<String, Double>> output = new HashMap();
+		Map<String, Double> idfs = getIDFs(documents);
+
+		for (Entry<String, List<String>> e : documents.entrySet()) {
+			Map<String, Double> tfs = getTFs(e.getValue(), localNormalizing);
+
+			Map<String, Double> v = new HashMap<>();
+			output.put(e.getKey(), v);
+			double max = 1;
+			if (localNormalizing) {
+				for (Entry<String, Double> string : tfs.entrySet()) {
+					max = Math.max(max, idfs.getOrDefault(string.getKey(), 0D));
+				}
+			}
+			for (Entry<String, Double> string : tfs.entrySet()) {
+				v.put(string.getKey(), idfs.getOrDefault(string.getKey(), 0D) / max);
 			}
 
 		}

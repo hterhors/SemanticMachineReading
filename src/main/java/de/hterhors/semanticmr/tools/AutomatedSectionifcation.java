@@ -1,6 +1,5 @@
 package de.hterhors.semanticmr.tools;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,16 +13,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
 public class AutomatedSectionifcation {
 
-	private static Map<String, ESection> map = new HashMap<>();
+	private static Map<String, ESection> map = null;
 
 	public static enum ESection {
 		ABSTRACT(new HashSet<>(Arrays.asList("Abstract", "ABSTRACT")), 0),
@@ -50,6 +46,8 @@ public class AutomatedSectionifcation {
 			this.synonyms = synonyms;
 			this.ealiestAppearance = ealiestAppearance;
 			for (String syn : synonyms) {
+				if (map == null)
+					map = new HashMap<>();
 
 				if (map.put(syn, this) != null) {
 					throw new IllegalArgumentException("Synonym was used twice: " + syn);
@@ -109,7 +107,6 @@ public class AutomatedSectionifcation {
 		}
 
 	}
-//	188, 184 193 N243
 
 	private final static Map<Instance, AutomatedSectionifcation> factory = new ConcurrentHashMap<>();
 
