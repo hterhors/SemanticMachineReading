@@ -19,6 +19,7 @@ import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
 import de.hterhors.semanticmr.corpus.distributor.AbstractCorpusDistributor;
 import de.hterhors.semanticmr.corpus.distributor.IInstanceDistributor;
 import de.hterhors.semanticmr.corpus.distributor.OriginalCorpusDistributor;
+import de.hterhors.semanticmr.corpus.distributor.SpecifiedDistributor;
 import de.hterhors.semanticmr.crf.variables.Instance;
 import de.hterhors.semanticmr.crf.variables.Instance.DeduplicationRule;
 import de.hterhors.semanticmr.crf.variables.Instance.GoldModificationRule;
@@ -43,7 +44,7 @@ public class InstanceProvider {
 	private static Logger log = LogManager.getFormatterLogger(InstanceProvider.class);
 
 	public static boolean removeEmptyInstances = true;
-	public static boolean removeInstancesWithToManyAnnotations = true;
+	public static boolean removeInstancesWithToManyAnnotations = false;
 	public static int maxNumberOfAnnotations = CartesianEvaluator.MAXIMUM_PERMUTATION_SIZE;
 
 	final private File jsonInstancesDirectory;
@@ -62,7 +63,7 @@ public class InstanceProvider {
 	final private List<Instance> redistTrainInstances = new ArrayList<>();
 	final private List<Instance> redistDevInstances = new ArrayList<>();
 	final private List<Instance> redistTestInstances = new ArrayList<>();
-	public static boolean verbose = false;
+	public static boolean verbose = true;
 	private IInstanceDistributor distributor;
 
 	/**
@@ -76,14 +77,17 @@ public class InstanceProvider {
 		log.info("Redistribute instances based on: " + this.distributor.getDistributorID() + "...");
 		this.distributor.distributeInstances(instancesToRedistribute).distributeTrainingInstances(redistTrainInstances)
 				.distributeDevelopmentInstances(redistDevInstances).distributeTestInstances(redistTestInstances);
+
 		List<Instance> redistributedInstances = Streams.concat(this.redistTrainInstances.stream(),
 				this.redistDevInstances.stream(), this.redistTestInstances.stream()).collect(Collectors.toList());
 
 		final List<String> notDistributableInstances = new ArrayList<>();
+
 		notDistributableInstances
 				.addAll(instancesToRedistribute.stream().map(i -> i.getName()).collect(Collectors.toList()));
 		notDistributableInstances
 				.removeAll(redistributedInstances.stream().map(i -> i.getName()).collect(Collectors.toList()));
+
 		if (!notDistributableInstances.isEmpty()) {
 			log.warn("Could not redistribute following instances: ");
 			notDistributableInstances.forEach(log::warn);
@@ -193,8 +197,16 @@ public class InstanceProvider {
 
 			this.validateFiles();
 
-			List<Instance> instancesToRedistribute = new JsonInstanceReader(jsonInstancesDirectory, modifyGoldRules,
-					duplicationRule).readInstances(numToRead);
+			JsonInstanceReader reader = new JsonInstanceReader(jsonInstancesDirectory, modifyGoldRules,
+					duplicationRule);
+
+			List<Instance> instancesToRedistribute;
+
+			if (distributor instanceof SpecifiedDistributor && ((SpecifiedDistributor) distributor).filter)
+				instancesToRedistribute = reader.readInstances(numToRead,
+						((SpecifiedDistributor) this.distributor).instanceNames);
+			else
+				instancesToRedistribute = reader.readInstances(numToRead);
 
 			checkInstancesForDuplicats(instancesToRedistribute);
 
@@ -239,7 +251,7 @@ public class InstanceProvider {
 				}
 			}
 
-			if (instance.getGoldAnnotations().getAnnotations().size() >= maxNumberOfAnnotations) {
+			if (instance.getGoldAnnotations().getAnnotations().size() > maxNumberOfAnnotations) {
 				if (verbose)
 					log.debug("WARN: Instance " + instance.getName() + " has to many annotations: "
 							+ instance.getGoldAnnotations().getAnnotations().size() + " max number: "
@@ -250,7 +262,7 @@ public class InstanceProvider {
 						log.debug("Remove instance!");
 				} else {
 					if (verbose)
-						log.debug("Keep instance!");
+						log.debug("Keep instance! Apply Fallback evaluator");
 				}
 			}
 

@@ -72,4 +72,11 @@ public class JsonEntityAnnotationWrapper {
 		return result;
 	}
 
+	@Override
+	public String toString() {
+		return "JsonEntityAnnotationWrapper [documentID=" + documentID + ", entityType=" + entityType + ", offset="
+				+ offset + ", surfaceForm=" + surfaceForm + "]";
+	}
+	
+
 }

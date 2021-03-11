@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import de.hterhors.semanticmr.crf.structure.annotations.DocumentLinkedAnnotation;
+import de.hterhors.semanticmr.crf.variables.Document;
 import de.hterhors.semanticmr.crf.variables.DocumentToken;
 import de.hterhors.semanticmr.crf.variables.Instance;
 
@@ -68,13 +69,13 @@ public class AutomatedSectionifcation {
 
 	private static Set<String> sectionBlackList = new HashSet<>(Arrays.asList("The", "In", "Next", "New"));
 
-	private final Instance instance;
+	private final Document document;
 
 	private final List<Section> sections;
 
-	private AutomatedSectionifcation(Instance instance) {
-		this.instance = instance;
-		sections = sectionify(this.instance);
+	private AutomatedSectionifcation(Document document) {
+		this.document = document;
+		sections = sectionify();
 		Collections.sort(sections, new Comparator<Section>() {
 
 			@Override
@@ -108,13 +109,23 @@ public class AutomatedSectionifcation {
 
 	}
 
-	private final static Map<Instance, AutomatedSectionifcation> factory = new ConcurrentHashMap<>();
+	private final static Map<Document, AutomatedSectionifcation> factory = new ConcurrentHashMap<>();
 
 	public static AutomatedSectionifcation getInstance(Instance instance) {
 		AutomatedSectionifcation sec;
-		if ((sec = factory.get(instance)) == null)
+		if ((sec = factory.get(instance.getDocument())) == null)
 			synchronized (factory) {
-				factory.put(instance, sec = new AutomatedSectionifcation(instance));
+				factory.put(instance.getDocument(), sec = new AutomatedSectionifcation(instance.getDocument()));
+			}
+
+		return sec;
+	}
+
+	public static AutomatedSectionifcation getInstance(Document document) {
+		AutomatedSectionifcation sec;
+		if ((sec = factory.get(document)) == null)
+			synchronized (factory) {
+				factory.put(document, sec = new AutomatedSectionifcation(document));
 			}
 
 		return sec;
@@ -199,9 +210,9 @@ public class AutomatedSectionifcation {
 
 	}
 
-	private static List<Section> sectionify(Instance instance) {
+	private List<Section> sectionify() {
 		List<DocumentToken> sectionTokens = new ArrayList<>();
-		for (List<DocumentToken> sentence : instance.getDocument().getSentences()) {
+		for (List<DocumentToken> sentence : document.getSentences()) {
 
 			final String firstToken = sentence.get(0).getText();
 			final String secondToken = sentence.size() > 1 ? sentence.get(1).getText() : "***";

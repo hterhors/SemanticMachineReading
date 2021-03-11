@@ -23,10 +23,10 @@ public class RegularExpressionNerlAnnotator {
 
 	private static final int MIN_NER_LENGTH = 2;
 
-	final Map<EntityType, Set<Pattern>> pattern = new HashMap<>();
+	final Map<EntityType, Set<Pattern>> pattern;
 
 	public RegularExpressionNerlAnnotator(BasicRegExPattern patternFactory) {
-
+		pattern = new HashMap<>();
 		/**
 		 * Initialize for all existing entity types.
 		 */
@@ -37,6 +37,7 @@ public class RegularExpressionNerlAnnotator {
 		}
 
 		for (Entry<EntityType, Set<Pattern>> etPattern : patternFactory.getHandMadePattern().entrySet()) {
+
 			pattern.get(etPattern.getKey()).addAll(etPattern.getValue());
 		}
 	}
@@ -75,8 +76,13 @@ public class RegularExpressionNerlAnnotator {
 									entityType.name, text, offset);
 							annotations.add(docLinkedAnnotation);
 						} catch (Exception e) {
-							log.warn("WARN:" + entityType.name + "-" + text + "-" + offset + ":"
-									+ e.getMessage().substring(e.getMessage().indexOf(':')));
+							try {
+								log.warn("WARN:" + entityType.name + "-" + text + "-" + offset + ":"
+										+ e.getMessage().substring(e.getMessage().indexOf(':')));
+							} catch (Exception e2) {
+								e2.printStackTrace();
+							}
+
 						}
 
 						if (entityType.isLiteral) {

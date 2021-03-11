@@ -29,17 +29,21 @@ public class CartesianEvaluator extends AbstractEvaluator {
 
 	private final NerlaEvaluator stdEvalForDocLinked;
 
+	private BeamSearchEvaluator fallBackEvaluator;
+
 	public CartesianEvaluator(EEvaluationDetail evaluationMode) {
 		super(evaluationMode);
 		this.stdEvalForDocLinked = new NerlaEvaluator(EEvaluationDetail.DOCUMENT_LINKED);
+		this.fallBackEvaluator = new BeamSearchEvaluator(evaluationMode, 25);
 	}
 
 	public CartesianEvaluator(EEvaluationDetail slotFillingEvaluationMode, EEvaluationDetail nerlaEvaluationMode) {
 		super(slotFillingEvaluationMode);
 		this.stdEvalForDocLinked = new NerlaEvaluator(nerlaEvaluationMode);
+		this.fallBackEvaluator = new BeamSearchEvaluator(slotFillingEvaluationMode, 25);
 	}
 
-	public static int MAXIMUM_PERMUTATION_SIZE = 8;
+	final public static int MAXIMUM_PERMUTATION_SIZE = 8;
 
 	@SuppressWarnings("unchecked")
 	private static final List<List<Integer>>[] permutationCache = new ArrayList[1 + MAXIMUM_PERMUTATION_SIZE];
@@ -70,7 +74,11 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		if (docLinked)
 			bestScore = stdEvalForDocLinked.prf1(annotations, otherAnnotations);
 		else {
-			bestScore = cartesianSearch(annotations, otherAnnotations, scoreType);
+			if (annotations.size() > 8 || otherAnnotations.size() > 8) {
+				bestScore = fallBackEvaluator.scoreMax(annotations, otherAnnotations, scoreType);
+			} else {
+				bestScore = cartesianSearch(annotations, otherAnnotations, scoreType);
+			}
 		}
 
 		return bestScore;
@@ -160,10 +168,14 @@ public class CartesianEvaluator extends AbstractEvaluator {
 		try {
 			final int maxSize = Math.max(annotations.size(), otherAnnotations.size());
 
+
+			if (annotations.size() > 8 || otherAnnotations.size() > 8) {
+				return fallBackEvaluator.getBestAssignment(annotations, otherAnnotations, scoreType);
+			}
+
 			final Score[][] scores = computeScores(annotations, otherAnnotations, maxSize);
 
 			final Score bestScore = new Score(scoreType);
-
 			final List<List<Integer>> permutations = getPermutations(maxSize);
 			int permutationRunIndex = 0;
 			int bestIndexPermutation = 0;

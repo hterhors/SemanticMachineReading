@@ -1,7 +1,9 @@
 package de.hterhors.semanticmr.crf.structure;
 
 import java.text.DecimalFormat;
+import java.util.Map;
 
+import de.hterhors.semanticmr.crf.structure.annotations.AbstractAnnotation;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
 import de.hterhors.semanticmr.eval.EEvaluationDetail;
 
@@ -13,6 +15,8 @@ public interface IEvaluatable {
 		final public static Score ZERO_MICRO = new Score().unmod();
 
 		final public static Score TP = new Score(1, 0, 0, 0).unmod();
+
+		final public static Score TN = new Score(0, 0, 0, 1).unmod();
 
 		final public static Score FN_FP = new Score(0, 1, 1, 0).unmod();
 
@@ -188,24 +192,24 @@ public interface IEvaluatable {
 				throw new IllegalStateException("Can not add " + adder.type + " to a " + this.type + " score.");
 			}
 		}
-		
+
 		public void sub(Score subber) {
 			if (unmod)
 				throw new IllegalStateException("Score can not be changed, already set to unmodifiable.");
 			if (this.isMacro() && subber.isMacro()) {
-				
+
 				if (subber == ZERO_MACRO)
 					return;
-				
+
 				if (subber.macroAddCounter == 0)
 					return;
-				
+
 				this.macroPrecision -= subber.macroPrecision;
 				this.macroRecall -= subber.macroRecall;
 				this.macroF1 -= getF1();
-				
+
 				this.macroAddCounter += subber.macroAddCounter;
-				
+
 			} else if (this.isMicro() && subber.isMicro()) {
 				this.tp -= subber.tp;
 				this.fp -= subber.fp;

@@ -1,8 +1,9 @@
 package de.hterhors.semanticmr.corpus.distributor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import de.hterhors.semanticmr.crf.variables.Instance;
 
@@ -21,12 +22,19 @@ public class SpecifiedDistributor extends AbstractCorpusDistributor {
 	private final List<String> developInstanceNames;
 	private final List<String> testInstanceNames;
 
-	private SpecifiedDistributor(float corpusSizeFraction, List<String> trainingInstanceNames,
+	public final Set<String> instanceNames = new HashSet<>();
+	public final boolean filter;
+
+	private SpecifiedDistributor(boolean filter, float corpusSizeFraction, List<String> trainingInstanceNames,
 			List<String> developInstanceNames, List<String> testInstanceNames) {
 		super(corpusSizeFraction);
 		this.trainingInstanceNames = trainingInstanceNames;
 		this.developInstanceNames = developInstanceNames;
 		this.testInstanceNames = testInstanceNames;
+		this.instanceNames.addAll(trainingInstanceNames);
+		this.instanceNames.addAll(developInstanceNames);
+		this.instanceNames.addAll(testInstanceNames);
+		this.filter = filter;
 	}
 
 	public static class Builder extends AbstractCorpusDistributorConfigBuilder<Builder> {
@@ -34,6 +42,16 @@ public class SpecifiedDistributor extends AbstractCorpusDistributor {
 		private List<String> trainingInstanceNames = new ArrayList<>();
 		private List<String> developInstanceNames = new ArrayList<>();
 		private List<String> testInstanceNames = new ArrayList<>();
+		private boolean filter = false;
+
+		public boolean isFilter() {
+			return filter;
+		}
+
+		public Builder setFilter(boolean filter) {
+			this.filter = filter;
+			return this;
+		}
 
 		public List<String> getTrainingInstanceNames() {
 			return trainingInstanceNames;
@@ -64,7 +82,7 @@ public class SpecifiedDistributor extends AbstractCorpusDistributor {
 
 		@Override
 		public SpecifiedDistributor build() {
-			return new SpecifiedDistributor(1F, trainingInstanceNames, developInstanceNames, testInstanceNames);
+			return new SpecifiedDistributor(filter, 1F, trainingInstanceNames, developInstanceNames, testInstanceNames);
 		}
 
 		@Override

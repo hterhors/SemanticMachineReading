@@ -55,13 +55,27 @@ public class NerlaEvaluator extends AbstractEvaluator {
 
 					if (equals) {
 						tp++;
-						continue outer;
+						/**
+						 * Another speed up: TODO check. break if all predicted are correct.
+						 */
+						if (otherAnnotations.size() == tp) {
+							break outer;
+						} else {
+							continue outer;
+						}
 					}
 
 				} else {
 					if (oa.evaluateEquals(this, a)) {
 						tp++;
-						continue outer;
+						/**
+						 * Another speed up: TODO check. break if all predicted are correct.
+						 */
+						if (otherAnnotations.size() == tp) {
+							break outer;
+						} else {
+							continue outer;
+						}
 					}
 				}
 

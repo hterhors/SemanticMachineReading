@@ -1,12 +1,15 @@
 package de.hterhors.semanticmr.crf.exploration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +27,7 @@ import de.hterhors.semanticmr.crf.variables.State;
  *
  */
 public class EntityRecLinkExplorer implements IExplorationStrategy {
-	private static Logger log = LogManager.getFormatterLogger(EntityRecLinkExplorer.class);
+	private static Logger log = LogManager.getFormatterLogger("SlotFilling");
 
 	final private HardConstraintsProvider hardConstraintsProvider;
 
@@ -33,8 +36,73 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 //	}
 	private final Map<CacheKey, Set<AbstractAnnotation>> cache = new HashMap<>();
 
+	public EntityRecLinkExplorer(List<Instance> trainingInstances) {
+		this.hardConstraintsProvider = null;
+		Map<EntityType, Set<Integer>> countTokens = countTokens(trainingInstances);
+		for (EntityType entityType : countTokens.keySet()) {
+			maxTokens.put(entityType,
+					(int) Math.round(countTokens.get(entityType).stream().mapToDouble(x -> x).average().getAsDouble()));
+			log.info("max Tokens = " + entityType + " = " + maxTokens.get(entityType));
+		}
+
+	}
+
 	public EntityRecLinkExplorer() {
 		this.hardConstraintsProvider = null;
+	}
+
+	private Map<EntityType, Integer> maxTokens = new HashMap<>();
+
+	private Map<EntityType, Set<Integer>> countTokens(List<Instance> trainingInstances) {
+		Map<EntityType, Set<Integer>> map = new HashMap<>();
+
+		for (Instance instance : trainingInstances) {
+			for (AbstractAnnotation aa : instance.getGoldAnnotations().getAnnotations()) {
+				tokenRecursive(map, aa);
+			}
+		}
+
+		return map;
+	}
+
+	private void tokenRecursive(Map<EntityType, Set<Integer>> map, AbstractAnnotation aa) {
+		if (aa.isInstanceOfEntityTemplate()) {
+
+			AbstractAnnotation rootA = aa.asInstanceOfEntityTemplate().getRootAnnotation();
+
+			if (rootA.isInstanceOfDocumentLinkedAnnotation()) {
+
+				map.putIfAbsent(rootA.getEntityType(), new HashSet<>());
+				map.get(rootA.getEntityType()).add(rootA.asInstanceOfDocumentLinkedAnnotation().relatedTokens.size());
+
+			}
+
+			for (AbstractAnnotation slotFillerValue : Stream
+					.concat(aa.asInstanceOfEntityTemplate().streamSingleFillerSlotValues(),
+							aa.asInstanceOfEntityTemplate().flatStreamMultiFillerSlotValues())
+					.collect(Collectors.toSet())) {
+
+				if (slotFillerValue.isInstanceOfEntityTemplate()) {
+
+					AbstractAnnotation rootS = slotFillerValue.asInstanceOfEntityTemplate().getRootAnnotation();
+
+					if (rootS.isInstanceOfDocumentLinkedAnnotation()) {
+
+						map.putIfAbsent(rootS.getEntityType(), new HashSet<>());
+						map.get(rootS.getEntityType())
+								.add(rootS.asInstanceOfDocumentLinkedAnnotation().relatedTokens.size());
+
+					}
+
+				}
+
+				tokenRecursive(map, slotFillerValue);
+
+			}
+		} else if (aa.isInstanceOfDocumentLinkedAnnotation()) {
+			map.putIfAbsent(aa.getEntityType(), new HashSet<>());
+			map.get(aa.getEntityType()).add(aa.asInstanceOfDocumentLinkedAnnotation().relatedTokens.size());
+		}
 	}
 
 	/**
@@ -57,7 +125,6 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 		removeAnnotation(proposalStates, currentState);
 
 		updateAverage(proposalStates);
-
 		return proposalStates;
 
 	}
@@ -85,6 +152,11 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 				 * Check some basic constraints.
 				 */
 
+//				if (windowSize==1&&fromToken.getText().equals("rats"))
+//					continue;
+//				if (windowSize==1&&fromToken.getText().equals("rat"))
+//					continue;
+
 				if (fromToken.isStopWord())
 					continue;
 				if (fromToken.isPunctuation())
@@ -108,32 +180,35 @@ public class EntityRecLinkExplorer implements IExplorationStrategy {
 				else if (currentState.containsAnnotationOnTokens(fromToken, toToken))
 					continue;
 
-				final CacheKey key = new CacheKey(currentState.getInstance(), fromToken.getDocTokenIndex(),
-						toToken.getDocTokenIndex());
+//				final CacheKey key = new CacheKey(currentState.getInstance(), fromToken.getDocTokenIndex(),
+//						toToken.getDocTokenIndex());
 				Set<AbstractAnnotation> annotations;
-				if ((annotations = cache.get(key)) == null) {
-					annotations = new HashSet<>();
-					final String text = currentState.getInstance().getDocument().getContent(fromToken, toToken);
+//				if ((annotations = cache.get(key)) == null) {
+				annotations = new HashSet<>();
+				final String text = currentState.getInstance().getDocument().getContent(fromToken, toToken);
 
-					for (EntityType entityType : currentState.getInstance().getEntityTypeCandidates(text)) {
+				for (EntityType entityType : currentState.getInstance().getEntityTypeCandidates(text)) {
 
-						try {
-							AbstractAnnotation newCurrentPrediction = AnnotationBuilder.toAnnotation(
-									currentState.getInstance().getDocument(), entityType, text,
-									fromToken.getDocCharOffset());
-							annotations.add(newCurrentPrediction);
-							proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));
-						} catch (RuntimeException e) {
-							e.printStackTrace();
-						}
+					if (maxTokens.containsKey(entityType) && maxTokens.get(entityType) < windowSize)
+						continue;
 
-					}
-					cache.put(key, annotations);
-				} else {
-					for (AbstractAnnotation newCurrentPrediction : annotations) {
+					try {
+						AbstractAnnotation newCurrentPrediction = AnnotationBuilder.toAnnotation(
+								currentState.getInstance().getDocument(), entityType, text,
+								fromToken.getDocCharOffset());
+						annotations.add(newCurrentPrediction);
 						proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));
+					} catch (RuntimeException e) {
+						e.printStackTrace();
 					}
+
 				}
+//					cache.put(key, annotations);
+//				} else {
+//					for (AbstractAnnotation newCurrentPrediction : annotations) {
+//						proposalStates.add(currentState.deepAddCopy(newCurrentPrediction));
+//					}
+//				}
 			}
 		}
 	}

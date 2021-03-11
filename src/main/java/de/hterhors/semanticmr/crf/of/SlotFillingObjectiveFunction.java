@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.hterhors.semanticmr.crf.exploration.RootTemplateCardinalityExplorer;
 import de.hterhors.semanticmr.crf.exploration.SlotFillingExplorer;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.variables.State;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
@@ -28,7 +29,11 @@ public class SlotFillingObjectiveFunction implements IObjectiveFunction {
 
 	@Override
 	public void score(State state) {
-		state.setObjectiveScore(state.score(evaluator, scoreType).getF1());
+		Score s = state.score(evaluator, scoreType);
+
+//		state.setObjectiveScore(s.getTp() / s.getTp()+s.getFP);
+		state.setObjectiveScore(s.getF1());
+
 		state.score(evaluator, EScoreType.MACRO);
 		state.score(evaluator, EScoreType.MICRO);
 	}

@@ -380,10 +380,17 @@ public class Model {
 					.forName(t.packageName + "." + t.templateName).newInstance();
 
 			final DoubleVector v = new DoubleVector();
-
+			System.out.println("TOTAL FEATURES: " + t.features.entrySet().size());
 			for (Entry<String, Double> fw : t.features.entrySet()) {
-				v.set(fw.getKey(), fw.getValue());
+				if (Math.abs(fw.getValue()) > 0.00015) // 1.5 times learning rate! TODO: Experimental
+
+//Final Score: Score [getF1()=0.876, getPrecision()=1.000, getRecall()=0.779, tp=233, fp=0, fn=66, tn=0]
+//null
+//CRFStatistics [context=Test, getTotalDuration()=152425]
+//modelName: OM_-426874068
+					v.set(fw.getKey(), fw.getValue());
 			}
+			System.out.println("LOADED FEATURES: " + v.getFeatures().size());
 
 			template.setWeights(v);
 

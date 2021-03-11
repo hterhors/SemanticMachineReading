@@ -372,7 +372,7 @@ final public class EntityType implements Comparable<EntityType>, IRequiresInitia
 	 * 
 	 * @return
 	 */
-	public Set<EntityType> getRelatedEntityTypes() {
+	public synchronized Set<EntityType> getRelatedEntityTypes() {
 
 		if (this.allRealtedEntityTypes == null) {
 			this.allRealtedEntityTypes = new HashSet<>();

@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,8 +26,12 @@ public class JSONNerlaReader {
 	private final File nerlaFileOrDir;
 	private List<JsonEntityAnnotationWrapper> jsonNerla;
 
-	public JSONNerlaReader(final File nerlaFileOrDir) {
+	public JSONNerlaReader(final File nerlaFileOrDir, Set<Instance> instances) {
+
 		this.nerlaFileOrDir = nerlaFileOrDir;
+
+		Set<String> basicInstanceNames = instances.stream().map(i -> i.getName().replaceAll("\\.json", ""))
+				.collect(Collectors.toSet());
 
 		this.validateFiles();
 		log.info("Read named entity recognition and linking annotations...");
@@ -35,6 +42,11 @@ public class JSONNerlaReader {
 			if (nerlaFileOrDir.isDirectory()) {
 				jsonNerla = new ArrayList<>();
 				for (File nerlaJsonFile : nerlaFileOrDir.listFiles()) {
+
+					String n = nerlaJsonFile.getName().replaceAll("\\.nerla", "").replaceAll("\\.json", "");
+
+					if (!basicInstanceNames.isEmpty() && !basicInstanceNames.contains(n))
+						continue;
 					try {
 						jsonNerla.addAll(new JsonNerlaIO(true)
 								.fromJsonString(new String(Files.readAllBytes(nerlaJsonFile.toPath()))));
@@ -50,6 +62,11 @@ public class JSONNerlaReader {
 					e.printStackTrace();
 				}
 			}
+
+	}
+
+	public JSONNerlaReader(final File nerlaFileOrDir) {
+		this(nerlaFileOrDir, Collections.emptySet());
 	}
 
 	public List<DocumentLinkedAnnotation> getForInstance(Instance instance) {
@@ -69,7 +86,6 @@ public class JSONNerlaReader {
 
 			if (count++ % 5000 == 0)
 				log.debug(" - " + count + " - ");
-
 
 			try {
 				nerlas.add(new DocumentLinkedAnnotation(instance.getDocument(),

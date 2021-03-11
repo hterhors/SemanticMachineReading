@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ser.impl.StringCollectionSerializer;
 
 import de.hterhors.semanticmr.crf.structure.EntityType;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable;
+import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score;
 import de.hterhors.semanticmr.crf.structure.IEvaluatable.Score.EScoreType;
 import de.hterhors.semanticmr.crf.structure.annotations.filter.EntityTemplateAnnotationFilter;
 import de.hterhors.semanticmr.eval.AbstractEvaluator;
@@ -338,6 +339,115 @@ final public class EntityTemplate extends AbstractAnnotation {
 		return true;
 	}
 
+//	@Override
+//	public void evaluateDetailed(EEvaluationDetail evaluationDetail, IEvaluatable otherVal,
+//			Map<EntityType, Score> detailedScore) {
+//		// TODO Auto-generated method stub
+//
+//	}
+//
+//	@Override
+//	public void evaluateDetailed(AbstractEvaluator evaluator, IEvaluatable other,
+//			Map<EntityType, Score> detailedScore) {
+//
+//		EntityTemplate oet = null;
+//
+//		if (other == null) {
+//			detailedScore.get(getEntityType()).increaseFalseNegative();
+////			score.increaseFalseNegative();
+//		} else {
+//			if (!(other instanceof EntityTemplate)) {
+//				detailedScore.get(getEntityType()).add(this.rootAnnotation.evaluate(evaluator, other));
+////				score.add(this.rootAnnotation.evaluate(evaluator, other));
+//			} else {
+//				oet = (EntityTemplate) other;
+//
+//				/**
+//				 * TODO: REMOVE QUICK FIX
+//				 */
+//				if (oet.rootAnnotation.isInstanceOfEntityTypeAnnotation()
+//						&& (oet.getEntityType().name.equals("CompoundTreatment")
+//								|| oet.getEntityType().getDirectSuperEntityTypes().isEmpty())) {
+//
+//				} else {
+//					detailedScore.get(getEntityType()).add(this.rootAnnotation.evaluate(evaluator, oet.rootAnnotation));
+//				}
+//			}
+//		}
+//
+//		scoreDetailedSingleFillerSlots(evaluator, oet, detailedScore);
+////
+//		scoreDetailedMultiFillerSlots(evaluator, oet, detailedScore);
+//
+//	}
+//
+//	private void scoreDetailedSingleFillerSlots(AbstractEvaluator evaluator, EntityTemplate other,
+//			Map<EntityType, Score> detailedScore) {
+//		for (SlotType singleSlotType : getSingleFillerSlotTypes()) {
+//
+//			if (singleSlotType.isExcluded())
+//				continue;
+//
+//			final SingleFillerSlot otherSingleSlotFiller;
+//
+//			if (other != null && other.hasSlotOfType(singleSlotType))
+//				otherSingleSlotFiller = other.getSingleFillerSlot(singleSlotType);
+//			else
+//				otherSingleSlotFiller = null;
+//
+//			final SingleFillerSlot singleSlotFiller;
+//			AbstractAnnotation val = null;
+//			if ((singleSlotFiller = this.singleFillerSlots.get(singleSlotType)) != null)
+//				val = singleSlotFiller.getSlotFiller();
+//
+//			final AbstractAnnotation otherVal = otherSingleSlotFiller == null ? null
+//					: otherSingleSlotFiller.getSlotFiller();
+//
+//			if (val == null && otherSingleSlotFiller != null && otherSingleSlotFiller.containsSlotFiller()) {
+////				score.increaseFalsePositive();
+//				detailedScore.get(otherSingleSlotFiller.getSlotFiller().getEntityType()).increaseFalsePositive();
+//			} else {
+//				evaluator.scoreDetailedSingle(val, otherVal, detailedScore);
+//			}
+//
+//		}
+//	}
+//
+//	private void scoreDetailedMultiFillerSlots(AbstractEvaluator evaluator, EntityTemplate other,
+//			Map<EntityType, Score> detailedScore) {
+//
+//		for (SlotType multiSlotType : getMultiFillerSlotTypes()) {
+//
+//			if (multiSlotType.isExcluded())
+//				continue;
+//
+//			final Set<AbstractAnnotation> otherSlotFiller;
+//
+//			if (other != null && other.hasSlotOfType(multiSlotType))
+//				otherSlotFiller = other.getMultiFillerSlot(multiSlotType).getSlotFiller();
+//			else
+//				otherSlotFiller = Collections.emptySet();
+//
+//			final Set<AbstractAnnotation> slotFiller;
+//			MultiFillerSlot mfs;
+//			if ((mfs = this.multiFillerSlots.get(multiSlotType)) != null) {
+//				slotFiller = mfs.getSlotFiller();
+//			} else {
+//				slotFiller = Collections.emptySet();
+//
+//				if (otherSlotFiller == null || otherSlotFiller.isEmpty())
+//					continue;
+//
+//			}
+//
+//			evaluator.scoreDetailedMultiValues(slotFiller, otherSlotFiller, EScoreType.MICRO, detailedScore);
+////			final Score bestScore = evaluator.scoreDetailedMultiValues(slotFiller, otherSlotFiller, EScoreType.MICRO,
+////					detailedScore);
+//
+////			score.add(bestScore);
+//		}
+//	}
+
 	@Override
 	public Score evaluate(AbstractEvaluator evaluator, IEvaluatable other) {
 
@@ -349,7 +459,8 @@ final public class EntityTemplate extends AbstractAnnotation {
 			score.increaseFalseNegative();
 		} else {
 			if (!(other instanceof EntityTemplate)) {
-				score.add(this.rootAnnotation.evaluate(evaluator, other));
+				Score s = this.rootAnnotation.evaluate(evaluator, other);
+				score.add(s);
 			} else {
 				oet = (EntityTemplate) other;
 
@@ -361,7 +472,8 @@ final public class EntityTemplate extends AbstractAnnotation {
 								|| oet.getEntityType().getDirectSuperEntityTypes().isEmpty())) {
 
 				} else {
-					score.add(this.rootAnnotation.evaluate(evaluator, oet.rootAnnotation));
+					Score s = this.rootAnnotation.evaluate(evaluator, oet.rootAnnotation);
+					score.add(s);
 				}
 			}
 		}
@@ -389,15 +501,30 @@ final public class EntityTemplate extends AbstractAnnotation {
 				otherSingleSlotFiller = null;
 
 			final SingleFillerSlot singleSlotFiller;
-			if ((singleSlotFiller = this.singleFillerSlots.get(singleSlotType)) != null) {
-				final AbstractAnnotation val = singleSlotFiller.getSlotFiller();
-				final AbstractAnnotation otherVal = otherSingleSlotFiller == null ? null
-						: otherSingleSlotFiller.getSlotFiller();
+			AbstractAnnotation val = null;
+			if ((singleSlotFiller = this.singleFillerSlots.get(singleSlotType)) != null)
+				val = singleSlotFiller.getSlotFiller();
 
-				score.add(evaluator.scoreSingle(val, otherVal));
-			} else if (otherSingleSlotFiller != null && otherSingleSlotFiller.containsSlotFiller()) {
+			final AbstractAnnotation otherVal = otherSingleSlotFiller == null ? null
+					: otherSingleSlotFiller.getSlotFiller();
+
+			if (val == null && otherSingleSlotFiller != null && otherSingleSlotFiller.containsSlotFiller()) {
 				score.increaseFalsePositive();
+
+			} else {
+				Score s = evaluator.scoreSingle(val, otherVal);
+				score.add(s);
 			}
+
+//			if ((singleSlotFiller = this.singleFillerSlots.get(singleSlotType)) != null) {
+//				final AbstractAnnotation val = singleSlotFiller.getSlotFiller();
+//				final AbstractAnnotation otherVal = otherSingleSlotFiller == null ? null
+//						: otherSingleSlotFiller.getSlotFiller();
+//				
+//				score.add(evaluator.scoreSingle(val, otherVal));
+//			} else if (otherSingleSlotFiller != null && otherSingleSlotFiller.containsSlotFiller()) {
+//				score.increaseFalsePositive();
+//			}
 
 		}
 		return score;

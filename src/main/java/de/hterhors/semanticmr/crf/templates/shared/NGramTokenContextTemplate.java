@@ -27,8 +27,8 @@ public class NGramTokenContextTemplate extends AbstractFeatureTemplate<NGramToke
 //		super(false);
 	}
 
-	private static final int DEFAULT_MAX_TOKEN_CONTEXT_LEFT = 3;
-	private static final int DEFAULT_MAX_TOKEN_CONTEXT_RIGHT = 3;
+	private static final int DEFAULT_MAX_TOKEN_CONTEXT_LEFT = 2;
+	private static final int DEFAULT_MAX_TOKEN_CONTEXT_RIGHT = 2;
 	private static final int MAX_TOKEN_CONTEXT_LEFT = DEFAULT_MAX_TOKEN_CONTEXT_LEFT;
 	private static final int MAX_TOKEN_CONTEXT_RIGHT = DEFAULT_MAX_TOKEN_CONTEXT_RIGHT;
 

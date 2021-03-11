@@ -18,6 +18,15 @@ public abstract class BasicRegExPattern implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	
+	public static void main(String[] args) {
+		System.out.println(CAMEL_CASE_SPLIT_PATTERN);
+		
+		String x[] = "Hallo Welt".split(" ");
+		System.out.println(Arrays.toString(x));
+		
+	}
+	
 	/**
 	 * Standard set of stop words.
 	 */

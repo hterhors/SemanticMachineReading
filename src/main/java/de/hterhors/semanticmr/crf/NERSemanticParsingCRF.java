@@ -169,10 +169,19 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 				for (int sentenceIndex = 0; sentenceIndex < instance.getDocument()
 						.getNumberOfSentences(); sentenceIndex++) {
 
-					if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS
-//							&& sectionifcation.getSection(sentenceIndex) != ESection.ABSTRACT
-							)
+					if (sectionifcation.getSection(sentenceIndex) != ESection.ABSTRACT)
 						continue;
+
+					// if (sectionifcation.getSection(sentenceIndex) != ESection.ABSTRACT)
+//						continue;
+
+//					if (!(sectionifcation.getSection(sentenceIndex) == ESection.RESULTS
+//							|| sectionifcation.getSection(sentenceIndex) == ESection.ABSTRACT))
+//						continue;
+
+//					if (!(sectionifcation.getSection(sentenceIndex) == ESection.METHODS
+//							|| sectionifcation.getSection(sentenceIndex) == ESection.ABSTRACT))
+//						continue;
 
 					boolean containsKeyterm = keyTerms.isEmpty();
 					String sentence = instance.getDocument().getContentOfSentence(sentenceIndex);
@@ -188,10 +197,13 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 					if (!containsKeyterm)
 						continue;
 
+					System.out.println("sentenceIndex = " + sentenceIndex);
+
 					final List<State> producedStateChain = new ArrayList<>();
 					producedStateChain.add(currentState);
 
 					sampling: for (samplingStep = 0; samplingStep < 10; samplingStep++) {
+						System.out.println(samplingStep + ": " + proposalStateCounter);
 
 						for (IExplorationStrategy explorer : explorerList) {
 
@@ -456,10 +468,24 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 					.getNumberOfSentences(); sentenceIndex++) {
 //
 //
-				if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS
-//						&& sectionifcation.getSection(sentenceIndex) != ESection.ABSTRACT
-						)
+				System.out
+						.println(sentenceIndex + " : " + currentState.getCurrentPredictions().getAnnotations().size());
+
+				if (sectionifcation.getSection(sentenceIndex) != ESection.ABSTRACT)
 					continue;
+
+//				if (!(sectionifcation.getSection(sentenceIndex) == ESection.RESULTS
+//						|| sectionifcation.getSection(sentenceIndex) == ESection.ABSTRACT))
+//					continue;
+
+//				if (!(sectionifcation.getSection(sentenceIndex) == ESection.METHODS
+//						|| sectionifcation.getSection(sentenceIndex) == ESection.ABSTRACT))
+//					continue;
+
+//				if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS
+////						&& sectionifcation.getSection(sentenceIndex) != ESection.ABSTRACT
+//				)
+//					continue;
 
 				boolean containsKeyterm = keyTerms.isEmpty();
 				String sentence = instance.getDocument().getContentOfSentence(sentenceIndex);
@@ -479,6 +505,7 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 				producedStateChain.add(currentState);
 
 				for (samplingStep = 0; samplingStep < 10; samplingStep++) {
+					System.out.println(samplingStep);
 
 					for (IExplorationStrategy explorer : explorerList) {
 
@@ -691,7 +718,7 @@ public class NERSemanticParsingCRF implements ISemanticParsingCRF {
 
 				if (sectionifcation.getSection(sentenceIndex) != ESection.RESULTS
 //						&& sectionifcation.getSection(sentenceIndex) != ESection.ABSTRACT
-						)
+				)
 					continue;
 //
 				boolean containsKeyterm = keyTerms.isEmpty();

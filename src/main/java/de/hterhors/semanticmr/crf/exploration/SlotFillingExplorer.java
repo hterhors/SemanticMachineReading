@@ -1,6 +1,7 @@
 package de.hterhors.semanticmr.crf.exploration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -64,14 +65,16 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	static public int averageNumberOfNewProposalStates = 16;
 	static public int statesgenerated = 0;
 
+//	static public int elementIndex = -1;
+
 	@Override
 	public List<State> explore(State currentState) {
 
 		final List<State> proposalStates = new ArrayList<>(averageNumberOfNewProposalStates);
-
 		for (int annotationIndex = 0; annotationIndex < currentState.getCurrentPredictions().getAnnotations()
 				.size(); annotationIndex++) {
-
+//			int dim = 1;
+//			elementIndex++;
 			final AbstractAnnotation annotation;
 
 			if (!((annotation = currentState.getCurrentPredictions().getAnnotations()
@@ -83,7 +86,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 			/*
 			 * Change root
 			 */
-
+//			if (elementIndex == 0)
 			changeTemplateType(proposalStates, currentState, entityTemplateAnnotation, annotationIndex);
 
 			/*
@@ -92,7 +95,17 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 
 			List<EntityTemplate> candidates = new ArrayList<>();
 
+//			List<SlotType> slots = new ArrayList<>(entityTemplateAnnotation.getSingleFillerSlotTypes());
+//			Collections.sort(slots);
+//			dim += slots.size();
+
+//			for (int i = 1; i <= slots.size(); i++) {
+//				if (elementIndex != i)
+//					continue;
+//			}
+
 			for (SlotType slotType : entityTemplateAnnotation.getSingleFillerSlotTypes()) {
+//				SlotType slotType = slots.get(i-1);
 
 				if (slotType.isFrozen() || slotType.isExcluded())
 					continue;
@@ -104,7 +117,16 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 						annotationIndex);
 			}
 
+//			slots = new ArrayList<>(entityTemplateAnnotation.getMultiFillerSlotTypes());
+//			Collections.sort(slots);
+//			dim += slots.size();
+
 			for (SlotType slotType : entityTemplateAnnotation.getMultiFillerSlotTypes()) {
+//			for (int i = dim; i <= slots.size(); i++) {
+//				if (elementIndex != i)
+//					continue;
+////			}
+//				SlotType slotType = slots.get(i - dim);
 
 				if (slotType.isFrozen() || slotType.isExcluded())
 					continue;
@@ -126,6 +148,8 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 			for (EntityTemplate candidate : filterByViolatesConstraints(currentState, annotationIndex, candidates)) {
 				proposalStates.add(currentState.deepUpdateCopy(annotationIndex, candidate));
 			}
+//			elementIndex %= dim;
+
 		}
 
 		if (proposalStates.isEmpty()) {
@@ -367,5 +391,7 @@ public class SlotFillingExplorer implements IExplorationStrategy {
 	public void set(int sentenceIndex) {
 		// TODO Auto-generated method stub
 	}
+
+
 
 }

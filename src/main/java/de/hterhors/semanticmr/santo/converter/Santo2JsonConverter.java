@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,6 +90,40 @@ public class Santo2JsonConverter {
 		List<Instance> instances = new ArrayList<>();
 
 		Annotations goldAnnotations = new Annotations(new ArrayList<>(new HashSet<>(rdfAnnotations)));
+
+		/**
+		 * TODO: QUICK FIX for vertebral locations. Remove location annotations which
+		 * are part of the vertebral area itself.
+		 */
+		boolean rm = false;
+		Set<EntityType> typesToRemove = new HashSet<>();
+		
+		for (AbstractAnnotation instance : goldAnnotations.getAbstractAnnotations()) {
+			rm |= instance.getEntityType().name.equals("VertebralArea");
+			if (instance.getEntityType().name.equals("VertebralArea")) {
+				if (instance.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("hasLowerVertebrae"))
+						.containsSlotFiller())
+					typesToRemove.add(instance.asInstanceOfEntityTemplate()
+							.getSingleFillerSlot(SlotType.get("hasLowerVertebrae")).getSlotFiller().getEntityType());
+				if (instance.asInstanceOfEntityTemplate().getSingleFillerSlot(SlotType.get("hasUpperVertebrae"))
+						.containsSlotFiller())
+					typesToRemove.add(instance.asInstanceOfEntityTemplate()
+							.getSingleFillerSlot(SlotType.get("hasUpperVertebrae")).getSlotFiller().getEntityType());
+			}
+
+		}
+		for (Iterator<AbstractAnnotation> iterator = goldAnnotations.getAbstractAnnotations().iterator(); iterator
+				.hasNext();) {
+			AbstractAnnotation instance = iterator.next();
+			if (rm && !instance.getEntityType().name.equals("VertebralArea")
+					&& typesToRemove.contains(instance.getEntityType()))
+				iterator.remove();
+		}
+		
+		
+		/**
+		 * TODO: QUICK FIX END
+		 */
 
 		instances.add(new Instance(instanceContext, document, goldAnnotations));
 

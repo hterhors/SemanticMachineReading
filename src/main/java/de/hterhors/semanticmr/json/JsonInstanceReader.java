@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +26,8 @@ public class JsonInstanceReader {
 	private final File corpusDirectory;
 
 	final private Collection<GoldModificationRule> modifyGoldRules;
-final private DeduplicationRule duplicationRule;
+	final private DeduplicationRule duplicationRule;
+
 	public JsonInstanceReader(final File corpusDirectory, Collection<GoldModificationRule> modifyGoldRules,
 			DeduplicationRule duplicationRule) {
 		this.corpusDirectory = corpusDirectory;
@@ -32,7 +35,8 @@ final private DeduplicationRule duplicationRule;
 		this.duplicationRule = duplicationRule;
 	}
 
-	public List<Instance> readInstances(final int numToRead) throws IOException {
+	public List<Instance> readInstances(final int numToRead, final Set<String> fileNamesToRead) throws IOException {
+
 		log.info("Read corpus instances from the file system...");
 
 		if (numToRead != Integer.MAX_VALUE) {
@@ -40,8 +44,9 @@ final private DeduplicationRule duplicationRule;
 		}
 
 		List<File> jsonFiles = Arrays.stream(corpusDirectory.listFiles()).filter(f -> f.getName().endsWith(".json"))
+				.filter(f -> beginsWith(fileNamesToRead, f.getName()) || fileNamesToRead.contains(f.getName())
+						|| fileNamesToRead.isEmpty())
 				.collect(Collectors.toList());
-
 		Collections.sort(jsonFiles);
 
 		final List<Instance> trainingInstances = new ArrayList<>();
@@ -60,9 +65,28 @@ final private DeduplicationRule duplicationRule;
 			trainingInstances.addAll(new JsonInstanceWrapperToInstance(jsonInstances)
 					.convertToInstances(modifyGoldRules, duplicationRule));
 		}
+
+		for (Iterator<Instance> iterator = trainingInstances.iterator(); iterator.hasNext();) {
+			Instance instance = (Instance) iterator.next();
+			if (instance.getDocument().documentContent.isEmpty())
+				iterator.remove();
+		}
+
 		log.info("Read instances... done");
 		return trainingInstances;
+	}
 
+	private boolean beginsWith(Set<String> fileNamesToRead, String name) {
+		for (String string : fileNamesToRead) {
+			if (name.startsWith(string))
+				return true;
+		}
+
+		return false;
+	}
+
+	public List<Instance> readInstances(final int numToRead) throws IOException {
+		return readInstances(numToRead, Collections.emptySet());
 	}
 
 }
